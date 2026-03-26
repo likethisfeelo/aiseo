@@ -1,3 +1,5 @@
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, GetCommand } = require('@aws-sdk/lib-dynamodb');
 const { GetObjectCommand, PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
 const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 const AdmZip = require('adm-zip');
@@ -7,6 +9,7 @@ const { ensureSiteOwnership } = require('../shared/site-access');
 
 const s3 = new S3Client({});
 const cloudFront = new CloudFrontClient({});
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 const parseBody = (event) => {
   if (!event.body) return {};
@@ -61,7 +64,51 @@ const detectContentType = (path) => {
   return 'application/octet-stream';
 };
 
-const uploadZipEntries = async ({ uploadBucket, objectKey, targetBucket, siteId }) => {
+const buildHeadInjection = (snippets) => {
+  if (!snippets || typeof snippets !== 'object') return '';
+  const parts = [];
+
+  if (snippets.ga4Id) {
+    const id = String(snippets.ga4Id).replace(/[^A-Za-z0-9-]/g, '');
+    parts.push(`<script async src="https://www.googletagmanager.com/gtag/js?id=${id}"></script>`);
+    parts.push(`<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${id}');</script>`);
+  }
+
+  if (snippets.googleAdsId) {
+    const id = String(snippets.googleAdsId).replace(/[^A-Za-z0-9-/]/g, '');
+    parts.push(`<script async src="https://www.googletagmanager.com/gtag/js?id=${id}"></script>`);
+    parts.push(`<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${id}');</script>`);
+  }
+
+  if (snippets.gscMeta) parts.push(String(snippets.gscMeta).slice(0, 500));
+  if (snippets.naverMeta) parts.push(String(snippets.naverMeta).slice(0, 500));
+  if (snippets.customHead) parts.push(String(snippets.customHead).slice(0, 2000));
+
+  return parts.join('\n');
+};
+
+const injectHeadSnippets = (html, injection) => {
+  if (!injection) return html;
+  if (html.includes('</head>')) {
+    return html.replace('</head>', `${injection}\n</head>`);
+  }
+  if (html.includes('<body')) {
+    return html.replace('<body', `${injection}\n<body`);
+  }
+  return injection + '\n' + html;
+};
+
+const loadHeadSnippets = async (siteId, sitesTable) => {
+  if (!sitesTable) return '';
+  try {
+    const result = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
+    return buildHeadInjection(result.Item?.headSnippets);
+  } catch {
+    return '';
+  }
+};
+
+const uploadZipEntries = async ({ uploadBucket, objectKey, targetBucket, siteId, headInjection }) => {
   const zipObject = await s3.send(
     new GetObjectCommand({
       Bucket: uploadBucket,
@@ -84,12 +131,19 @@ const uploadZipEntries = async ({ uploadBucket, objectKey, targetBucket, siteId 
     if (!relativePath) continue;
 
     const targetKey = `${siteId}/${relativePath}`;
+    let body = entry.getData();
+
+    if (headInjection && relativePath.toLowerCase().endsWith('.html')) {
+      const html = body.toString('utf-8');
+      const injected = injectHeadSnippets(html, headInjection);
+      body = Buffer.from(injected, 'utf-8');
+    }
 
     await s3.send(
       new PutObjectCommand({
         Bucket: targetBucket,
         Key: targetKey,
-        Body: entry.getData(),
+        Body: body,
         ContentType: detectContentType(relativePath),
       }),
     );
@@ -148,11 +202,14 @@ exports.handler = async (event) => {
     if (!target.targetBucket) return serverError('Target sites bucket is not configured');
     if (!target.baseDomain) return serverError('Target domain is not configured');
 
+    const headInjection = await loadHeadSnippets(siteId, sitesTable);
+
     const uploadedKeys = await uploadZipEntries({
       uploadBucket: process.env.UPLOAD_BUCKET,
       objectKey,
       targetBucket: target.targetBucket,
       siteId,
+      headInjection,
     });
 
     if (!uploadedKeys.length) {
