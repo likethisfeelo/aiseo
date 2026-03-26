@@ -1,4 +1,4 @@
-import { COGNITO } from './config.js';
+import { COGNITO, COGNITO_REGION } from './config.js';
 
 const ACCESS_TOKEN_KEY = 'aiseo.accessToken';
 const ID_TOKEN_KEY = 'aiseo.idToken';
@@ -92,6 +92,78 @@ export const buildForgotPasswordUrl = () => {
 
   return `${COGNITO.hostedUiDomain}/forgotPassword?${query}`;
 };
+
+const cognitoEndpoint = COGNITO_REGION
+  ? `https://cognito-idp.${COGNITO_REGION}.amazonaws.com/`
+  : '';
+
+const cognitoRequest = async (target, payload) => {
+  if (!cognitoEndpoint || !COGNITO.clientId) {
+    throw new Error('Cognito 환경변수(VITE_COGNITO_USER_POOL_ID/VITE_COGNITO_CLIENT_ID)를 확인하세요.');
+  }
+
+  const response = await fetch(cognitoEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': `AWSCognitoIdentityProviderService.${target}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.__type) {
+    const message = data.message || data.Message || data.__type || 'Cognito 요청 실패';
+    throw new Error(message);
+  }
+
+  return data;
+};
+
+export const signUpWithEmail = async ({ email, password }) => cognitoRequest('SignUp', {
+  ClientId: COGNITO.clientId,
+  Username: email,
+  Password: password,
+  UserAttributes: [{ Name: 'email', Value: email }],
+});
+
+export const confirmSignUpCode = async ({ email, code }) => cognitoRequest('ConfirmSignUp', {
+  ClientId: COGNITO.clientId,
+  Username: email,
+  ConfirmationCode: code,
+});
+
+export const signInWithEmail = async ({ email, password }) => {
+  const data = await cognitoRequest('InitiateAuth', {
+    AuthFlow: 'USER_PASSWORD_AUTH',
+    ClientId: COGNITO.clientId,
+    AuthParameters: {
+      USERNAME: email,
+      PASSWORD: password,
+    },
+  });
+
+  const auth = data.AuthenticationResult || {};
+  tokenStore.setTokens({
+    accessToken: auth.AccessToken || '',
+    idToken: auth.IdToken || '',
+  });
+
+  return auth;
+};
+
+export const requestPasswordResetCode = async ({ email }) => cognitoRequest('ForgotPassword', {
+  ClientId: COGNITO.clientId,
+  Username: email,
+});
+
+export const confirmPasswordReset = async ({ email, code, newPassword }) => cognitoRequest('ConfirmForgotPassword', {
+  ClientId: COGNITO.clientId,
+  Username: email,
+  ConfirmationCode: code,
+  Password: newPassword,
+});
 
 const parseHashParams = (hashValue) => {
   const hash = String(hashValue || '').replace(/^#/, '');

@@ -25,3 +25,5 @@ export const COGNITO = {
   responseType: readEnv('VITE_COGNITO_RESPONSE_TYPE', 'token'),
   scope: readEnv('VITE_COGNITO_SCOPE', 'openid email profile'),
 };
+
+export const COGNITO_REGION = String(COGNITO.userPoolId || '').split('_')[0] || '';

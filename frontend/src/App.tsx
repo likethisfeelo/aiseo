@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createUploadUrl, deploySite, getMe, selectSite, validateSite } from './mvp-api.js';
 import {
-  buildLoginUrl,
   buildLogoutUrl,
   consumeCognitoCallbackTokens,
   tokenStore,
