@@ -35,7 +35,7 @@ export const tokenStore = {
 };
 
 export const createAuthHeaders = () => {
-  const token = tokenStore.getAccessToken() || tokenStore.getIdToken();
+  const token = tokenStore.getIdToken() || tokenStore.getAccessToken();
   if (!token) return {};
 
   return {
