@@ -1,0 +1,14 @@
+{
+  "Changes": [{
+    "Action": "CREATE",
+    "ResourceRecordSet": {
+      "Name": "dev.aiseo.tips",
+      "Type": "A",
+      "AliasTarget": {
+        "HostedZoneId": "Z2FDTNDATAQYW2",
+        "DNSName": "d3lm5va2mg67de.cloudfront.net",
+        "EvaluateTargetHealth": false
+      }
+    }
+  }]
+}

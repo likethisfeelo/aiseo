@@ -1,0 +1,13 @@
+{
+  "CORSRules": [{
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["PUT", "POST"],
+    "AllowedOrigins": [
+      "https://aiseo.tips",
+      "https://*.aiseo.tips",
+      "http://localhost:5173"
+    ],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3000
+  }]
+}

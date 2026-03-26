@@ -1,0 +1,8 @@
+{
+  "Rules": [{
+    "ID": "delete-temp-uploads",
+    "Status": "Enabled",
+    "Filter": {"Prefix": ""},
+    "Expiration": {"Days": 7}
+  }]
+}
