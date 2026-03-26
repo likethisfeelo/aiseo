@@ -1,7 +1,8 @@
-import { Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
@@ -78,6 +79,14 @@ export class CdkStack extends Stack {
     sitesBucket.grantReadWrite(deploySite);
     sitesBucketDev.grantReadWrite(deploySite);
 
+    deploySite.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['cloudfront:CreateInvalidation'],
+      resources: [
+        `arn:aws:cloudfront::${this.account}:distribution/${process.env.DISTRIBUTION_ID ?? ''}`,
+        `arn:aws:cloudfront::${this.account}:distribution/${process.env.DISTRIBUTION_ID_DEV ?? ''}`,
+      ],
+    }));
+
     const api = new apigateway.RestApi(this, 'AiseoApi', {
       restApiName: 'aiseo-api',
       description: 'AISEO API for upload/validate/deploy flow',
@@ -124,6 +133,14 @@ export class CdkStack extends Stack {
     new apigateway.Stage(this, 'ProdApiStage', {
       deployment,
       stageName: 'prod',
+    });
+
+    new CfnOutput(this, 'DevApiUrl', {
+      value: `https://${api.restApiId}.execute-api.${this.region}.amazonaws.com/dev`,
+    });
+
+    new CfnOutput(this, 'ProdApiUrl', {
+      value: `https://${api.restApiId}.execute-api.${this.region}.amazonaws.com/prod`,
     });
   }
 }
