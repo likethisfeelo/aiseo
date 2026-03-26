@@ -3,6 +3,8 @@ const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 const { GetObjectCommand, S3Client } = require('@aws-sdk/client-s3');
 const AdmZip = require('adm-zip');
 const { ok, badRequest, serverError } = require('../shared/response');
+const { requireUser } = require('../shared/auth');
+const { ensureSiteOwnership } = require('../shared/site-access');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const s3 = new S3Client({});
@@ -71,8 +73,12 @@ const readIndexHtml = (zip, entries) => {
 
 exports.handler = async (event) => {
   try {
+    const { user, errorResponse } = requireUser(event);
+    if (errorResponse) return errorResponse;
+
     const reportsTable = process.env.REPORTS_TABLE;
     const uploadBucket = process.env.UPLOAD_BUCKET;
+    const sitesTable = process.env.SITES_TABLE;
 
     if (!reportsTable) {
       return serverError('REPORTS_TABLE is not configured');
@@ -86,6 +92,16 @@ exports.handler = async (event) => {
 
     if (!siteId) return badRequest('siteId is required');
     if (!objectKey) return badRequest('objectKey is required');
+    if (!objectKey.startsWith(`uploads/${siteId}/`)) {
+      return badRequest('objectKey does not match siteId');
+    }
+
+    const access = await ensureSiteOwnership({
+      siteId,
+      userSub: user.sub,
+      tableName: sitesTable,
+    });
+    if (!access.ok) return access.response;
 
     const zipObject = await s3.send(
       new GetObjectCommand({

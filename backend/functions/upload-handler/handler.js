@@ -1,6 +1,8 @@
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { ok, badRequest, serverError } = require('../shared/response');
+const { requireUser } = require('../shared/auth');
+const { ensureSiteOwnership } = require('../shared/site-access');
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 
@@ -17,7 +19,11 @@ const sanitizeFileName = (fileName) => fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
 
 exports.handler = async (event) => {
   try {
+    const { user, errorResponse } = requireUser(event);
+    if (errorResponse) return errorResponse;
+
     const bucket = process.env.UPLOAD_BUCKET;
+    const sitesTable = process.env.SITES_TABLE;
     if (!bucket) {
       return serverError('UPLOAD_BUCKET is not configured');
     }
@@ -33,6 +39,13 @@ exports.handler = async (event) => {
     if (fileSize && Number(fileSize) > MAX_UPLOAD_BYTES) {
       return badRequest(`File is too large. Max size: ${MAX_UPLOAD_BYTES} bytes`);
     }
+
+    const access = await ensureSiteOwnership({
+      siteId,
+      userSub: user.sub,
+      tableName: sitesTable,
+    });
+    if (!access.ok) return access.response;
 
     const objectKey = `uploads/${siteId}/${Date.now()}-${sanitizeFileName(fileName)}`;
 
