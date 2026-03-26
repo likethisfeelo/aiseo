@@ -11,6 +11,9 @@ dist/
 cdk.out/
 infra/cdk/cdk.out/
 
+# TypeScript build cache
+*.tsbuildinfo
+
 # OS
 .DS_Store
 Thumbs.db
