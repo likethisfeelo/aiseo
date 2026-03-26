@@ -7,6 +7,7 @@ test('API, Lambda and Cognito authorizer resources are created', () => {
     context: {
       uploadBucketName: 'aiseo-upload-bucket',
       reportsTableName: 'aiseo-reports',
+      sitesTableName: 'aiseo-sites',
       sitesBucketName: 'aiseo-sites-bucket',
       sitesBucketDevName: 'aiseo-sites-dev-bucket',
       cognitoUserPoolArn: 'arn:aws:cognito-idp:ap-northeast-2:123456789012:userpool/ap-northeast-2_example',
@@ -24,8 +25,8 @@ test('API, Lambda and Cognito authorizer resources are created', () => {
 
   const template = Template.fromStack(stack);
 
-  template.resourceCountIs('AWS::Lambda::Function', 3);
-  template.resourceCountIs('AWS::ApiGateway::Resource', 3);
+  template.resourceCountIs('AWS::Lambda::Function', 5);
+  template.resourceCountIs('AWS::ApiGateway::Resource', 6);
   template.resourceCountIs('AWS::ApiGateway::Authorizer', 1);
 
   template.hasResourceProperties('AWS::ApiGateway::Stage', {

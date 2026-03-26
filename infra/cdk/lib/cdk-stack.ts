@@ -40,6 +40,7 @@ export class CdkStack extends Stack {
       timeout: Duration.seconds(30),
       environment: {
         UPLOAD_BUCKET: uploadBucketName,
+        SITES_TABLE: this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites',
         MAX_UPLOAD_BYTES: '52428800',
       },
     });
@@ -52,6 +53,7 @@ export class CdkStack extends Stack {
       environment: {
         REPORTS_TABLE: reportsTableName,
         UPLOAD_BUCKET: uploadBucketName,
+        SITES_TABLE: this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites',
       },
     });
 
@@ -62,6 +64,7 @@ export class CdkStack extends Stack {
       timeout: Duration.seconds(60),
       environment: {
         UPLOAD_BUCKET: uploadBucketName,
+        SITES_TABLE: this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites',
         SITES_BUCKET: sitesBucketName,
         SITES_BUCKET_DEV: sitesBucketDevName,
         DISTRIBUTION_ID: process.env.DISTRIBUTION_ID ?? '',
@@ -71,9 +74,28 @@ export class CdkStack extends Stack {
       },
     });
 
+    const selectSite = new lambda.Function(this, 'SelectSiteFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'select-site/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        SITES_TABLE: this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites',
+      },
+    });
+
     uploadBucket.grantPut(uploadHandler);
     reportsTable.grantReadWriteData(validateSite);
     uploadBucket.grantRead(validateSite);
+    const sitesTable = dynamodb.Table.fromTableName(
+      this,
+      'SitesTable',
+      this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites',
+    );
+    sitesTable.grantReadData(uploadHandler);
+    sitesTable.grantReadData(validateSite);
+    sitesTable.grantReadData(deploySite);
+    sitesTable.grantReadWriteData(selectSite);
 
     uploadBucket.grantRead(deploySite);
     sitesBucket.grantReadWrite(deploySite);
@@ -93,7 +115,7 @@ export class CdkStack extends Stack {
       deploy: false,
       defaultCorsPreflightOptions: {
         allowOrigins: [devOrigin, prodOrigin],
-        allowMethods: ['POST', 'OPTIONS'],
+        allowMethods: ['GET', 'POST', 'OPTIONS'],
         allowHeaders: ['Content-Type', 'Authorization'],
       },
     });
@@ -114,6 +136,13 @@ export class CdkStack extends Stack {
       });
     };
 
+    const addGet = (resource: apigateway.Resource, integration: apigateway.LambdaIntegration) => {
+      resource.addMethod('GET', integration, {
+        authorizationType: authorizer ? apigateway.AuthorizationType.COGNITO : apigateway.AuthorizationType.NONE,
+        authorizer,
+      });
+    };
+
     const uploadUrl = api.root.addResource('upload-url');
     addPost(uploadUrl, new apigateway.LambdaIntegration(uploadHandler));
 
@@ -122,6 +151,20 @@ export class CdkStack extends Stack {
 
     const deploy = api.root.addResource('deploy');
     addPost(deploy, new apigateway.LambdaIntegration(deploySite));
+
+    const meHandler = new lambda.Function(this, 'MeFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'me/handler.handler',
+      timeout: Duration.seconds(10),
+    });
+
+    const me = api.root.addResource('me');
+    addGet(me, new apigateway.LambdaIntegration(meHandler));
+
+    const site = api.root.addResource('site');
+    const siteSelect = site.addResource('select');
+    addPost(siteSelect, new apigateway.LambdaIntegration(selectSite));
 
     const deployment = new apigateway.Deployment(this, 'AiseoApiDeployment', { api });
 
