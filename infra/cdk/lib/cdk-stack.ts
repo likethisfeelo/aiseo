@@ -166,6 +166,24 @@ export class CdkStack extends Stack {
     const siteSelect = site.addResource('select');
     addPost(siteSelect, new apigateway.LambdaIntegration(selectSite));
 
+    api.addGatewayResponse('Default4xx', {
+      type: apigateway.ResponseType.DEFAULT_4XX,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+        'Access-Control-Allow-Headers': "'Content-Type,Authorization'",
+        'Access-Control-Allow-Methods': "'GET,POST,OPTIONS'",
+      },
+    });
+
+    api.addGatewayResponse('Default5xx', {
+      type: apigateway.ResponseType.DEFAULT_5XX,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+        'Access-Control-Allow-Headers': "'Content-Type,Authorization'",
+        'Access-Control-Allow-Methods': "'GET,POST,OPTIONS'",
+      },
+    });
+
     const deployment = new apigateway.Deployment(this, 'AiseoApiDeployment', { api });
 
     new apigateway.Stage(this, 'DevApiStage', {
