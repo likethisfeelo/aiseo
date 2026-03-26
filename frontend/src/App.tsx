@@ -39,10 +39,11 @@ interface UserProfile {
 }
 
 export default function App() {
-  const authPage =
+  const [authPage, setAuthPage] = useState<string | null>(
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('auth')
-      : null;
+      : null
+  );
   const [step, setStep] = useState<Step>('upload');
   const [siteIdInput, setSiteIdInput] = useState('');
   const [lockedSiteId, setLockedSiteId] = useState('');
@@ -54,28 +55,39 @@ export default function App() {
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
   const [meLoading, setMeLoading] = useState(true);
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [authError, setAuthError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const loadMe = async () => {
+    const accessToken = tokenStore.getAccessToken();
+    if (!accessToken) {
+      setMeLoading(false);
+      return;
+    }
+
+    setAuthError('');
+    try {
+      const data = await getMe();
+      setUser(data.user);
+    } catch (err: unknown) {
+      console.error('[AISEO] Failed to load user profile:', err);
+      tokenStore.clear();
+      setAuthError('로그인 상태 확인에 실패했습니다. 다시 로그인해 주세요.');
+    } finally {
+      setMeLoading(false);
+    }
+  };
+
+  const handleLoginSuccess = async () => {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    setAuthPage(null);
+    setMeLoading(true);
+    setAuthError('');
+    await loadMe();
+  };
 
   useEffect(() => {
     consumeCognitoCallbackTokens();
-
-    const loadMe = async () => {
-      const accessToken = tokenStore.getAccessToken();
-      if (!accessToken) {
-        setMeLoading(false);
-        return;
-      }
-
-      try {
-        const data = await getMe();
-        setUser(data.user);
-      } catch {
-        tokenStore.clear();
-      } finally {
-        setMeLoading(false);
-      }
-    };
-
     loadMe();
   }, []);
 
@@ -182,7 +194,7 @@ export default function App() {
     if (fileRef.current) fileRef.current.value = '';
   };
 
-  if (authPage === 'login') return <LoginPage />;
+  if (authPage === 'login') return <LoginPage onLoginSuccess={handleLoginSuccess} />;
   if (authPage === 'signup') return <SignupPage />;
   if (authPage === 'forgot-password') return <ForgotPasswordPage />;
 
@@ -194,6 +206,11 @@ export default function App() {
     return (
       <div style={{ maxWidth: 640, margin: '40px auto', fontFamily: 'system-ui, sans-serif', padding: '0 20px' }}>
         <h1 style={{ fontSize: 24, marginBottom: 8 }}>AISEO</h1>
+        {authError && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 12, marginBottom: 16, color: '#dc2626' }}>
+            {authError}
+          </div>
+        )}
         <p style={{ color: '#666', marginBottom: 24 }}>
           원래 서비스 흐름으로 진행하려면 회원가입 후 로그인하세요.
         </p>

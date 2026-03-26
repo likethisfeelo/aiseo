@@ -48,7 +48,11 @@ const secondaryLink: CSSProperties = {
   textDecoration: 'none',
 };
 
-export function LoginPage() {
+interface LoginPageProps {
+  onLoginSuccess?: () => void;
+}
+
+export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -60,7 +64,11 @@ export function LoginPage() {
     setLoading(true);
     try {
       await signInWithEmail({ email, password });
-      window.location.href = '/';
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      } else {
+        window.location.href = '/';
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
