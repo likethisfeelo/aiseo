@@ -1,5 +1,12 @@
-import { useState, useRef } from 'react';
-import { createUploadUrl, validateSite, deploySite } from './mvp-api.js';
+import { useEffect, useRef, useState } from 'react';
+import { createUploadUrl, deploySite, getMe, selectSite, validateSite } from './mvp-api.js';
+import {
+  buildLoginUrl,
+  buildLogoutUrl,
+  buildSignupUrl,
+  consumeCognitoCallbackTokens,
+  tokenStore,
+} from './auth.js';
 
 type Step = 'upload' | 'validate' | 'deploy' | 'done';
 
@@ -9,9 +16,8 @@ interface UploadResult {
 }
 
 interface CheckItem {
-  rule: string;
+  reason: string;
   passed: boolean;
-  detail?: string;
 }
 
 interface ValidateResult {
@@ -25,30 +31,89 @@ interface DeployResult {
   invalidationId?: string;
 }
 
+interface UserProfile {
+  sub: string;
+  email: string;
+  emailVerified: boolean;
+  name: string;
+  username: string;
+}
+
 export default function App() {
   const [step, setStep] = useState<Step>('upload');
-  const [siteId, setSiteId] = useState('');
+  const [siteIdInput, setSiteIdInput] = useState('');
+  const [lockedSiteId, setLockedSiteId] = useState('');
   const [objectKey, setObjectKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [validateResult, setValidateResult] = useState<ValidateResult | null>(null);
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
+  const [meLoading, setMeLoading] = useState(true);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    consumeCognitoCallbackTokens();
+
+    const loadMe = async () => {
+      const accessToken = tokenStore.getAccessToken();
+      if (!accessToken) {
+        setMeLoading(false);
+        return;
+      }
+
+      try {
+        const data = await getMe();
+        setUser(data.user);
+      } catch {
+        tokenStore.clear();
+      } finally {
+        setMeLoading(false);
+      }
+    };
+
+    loadMe();
+  }, []);
+
   const resetError = () => setError('');
+  const siteId = lockedSiteId || siteIdInput.trim();
+
+  const handleLockSiteId = async () => {
+    const normalized = siteIdInput.trim();
+    if (!normalized) {
+      setError('사이트 주소(siteId)를 먼저 입력하세요.');
+      return;
+    }
+
+    if (!/^[a-z0-9-]+$/.test(normalized)) {
+      setError('siteId는 영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await selectSite({ siteId: normalized });
+      setLockedSiteId(data.siteId);
+      setError('');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '사이트 주소 확정에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleUpload = async () => {
     resetError();
     const file = fileRef.current?.files?.[0];
-    if (!siteId.trim()) return setError('Site ID를 입력하세요.');
+    if (!lockedSiteId) return setError('사이트 주소를 먼저 확정하세요. 확정 후에는 수정할 수 없습니다.');
     if (!file) return setError('ZIP 파일을 선택하세요.');
     if (!file.name.endsWith('.zip')) return setError('.zip 파일만 업로드할 수 있습니다.');
 
     setLoading(true);
     try {
       const data = await createUploadUrl({
-        siteId: siteId.trim(),
+        siteId,
         fileName: file.name,
         fileSize: file.size,
       });
@@ -74,7 +139,7 @@ export default function App() {
     setLoading(true);
     try {
       const data = await validateSite({
-        siteId: siteId.trim(),
+        siteId,
         objectKey,
       });
       setValidateResult(data);
@@ -91,7 +156,7 @@ export default function App() {
     setLoading(true);
     try {
       const data = await deploySite({
-        siteId: siteId.trim(),
+        siteId,
         objectKey,
         env: 'dev',
       });
@@ -106,7 +171,6 @@ export default function App() {
 
   const handleReset = () => {
     setStep('upload');
-    setSiteId('');
     setObjectKey('');
     setUploadResult(null);
     setValidateResult(null);
@@ -115,14 +179,71 @@ export default function App() {
     if (fileRef.current) fileRef.current.value = '';
   };
 
+  if (meLoading) {
+    return <div style={{ maxWidth: 640, margin: '40px auto' }}>로그인 상태 확인 중...</div>;
+  }
+
+  if (!user) {
+    const loginUrl = buildLoginUrl();
+    const signupUrl = buildSignupUrl();
+
+    return (
+      <div style={{ maxWidth: 640, margin: '40px auto', fontFamily: 'system-ui, sans-serif', padding: '0 20px' }}>
+        <h1 style={{ fontSize: 24, marginBottom: 8 }}>AISEO</h1>
+        <p style={{ color: '#666', marginBottom: 24 }}>
+          원래 서비스 흐름으로 진행하려면 회원가입 후 로그인하세요.
+        </p>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <a href={signupUrl} style={{ background: '#111827', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
+            회원가입
+          </a>
+          <a href={loginUrl} style={{ background: '#2563eb', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
+            로그인
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: 640, margin: '40px auto', fontFamily: 'system-ui, sans-serif', padding: '0 20px' }}>
-      <h1 style={{ fontSize: 24, marginBottom: 8 }}>AISEO Deploy Dashboard</h1>
-      <p style={{ color: '#666', marginBottom: 32 }}>
-        ZIP 파일을 업로드하고, SEO 검증 후 dev 환경에 배포합니다.
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ fontSize: 24, marginBottom: 8 }}>AISEO Deploy Dashboard</h1>
+        <a href={buildLogoutUrl()} style={{ color: '#2563eb' }}>로그아웃</a>
+      </div>
+
+      <p style={{ color: '#666', marginBottom: 8 }}>
+        로그인 사용자: <strong>{user.email || user.username}</strong>
+      </p>
+      <p style={{ color: '#666', marginBottom: 24 }}>
+        회원가입 → 로그인(Cognito) → ZIP 업로드 → SEO 검증 → 배포
       </p>
 
-      {/* Progress */}
+      {!lockedSiteId && (
+        <div style={{ background: '#fff7ed', border: '1px solid #fdba74', borderRadius: 8, padding: 12, marginBottom: 16 }}>
+          <strong>사이트 주소 확정</strong>
+          <p style={{ margin: '8px 0', color: '#9a3412' }}>siteId를 확정하면 계정 기준으로 수정할 수 없습니다.</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              type="text"
+              value={siteIdInput}
+              onChange={(e) => setSiteIdInput(e.target.value)}
+              placeholder="my-site"
+              style={{ flex: 1, padding: 8, border: '1px solid #d1d5db', borderRadius: 6 }}
+            />
+            <button onClick={handleLockSiteId} disabled={loading} style={{ background: '#ea580c', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 12px' }}>
+              {loading ? '확정 중...' : '주소 확정'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {lockedSiteId && (
+        <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: 12, marginBottom: 16 }}>
+          확정된 사이트 주소: <strong>{lockedSiteId}</strong>
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         {(['upload', 'validate', 'deploy', 'done'] as Step[]).map((s, i) => (
           <div
@@ -146,27 +267,16 @@ export default function App() {
         </div>
       )}
 
-      {/* Step 1: Upload */}
       {step === 'upload' && (
         <div>
           <h2 style={{ fontSize: 18, marginBottom: 16 }}>1. ZIP 파일 업로드</h2>
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>Site ID</label>
-            <input
-              type="text"
-              value={siteId}
-              onChange={(e) => setSiteId(e.target.value)}
-              placeholder="my-site"
-              style={{ width: '100%', padding: 8, border: '1px solid #d1d5db', borderRadius: 6, boxSizing: 'border-box' }}
-            />
-          </div>
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>ZIP 파일</label>
             <input type="file" accept=".zip" ref={fileRef} />
           </div>
           <button
             onClick={handleUpload}
-            disabled={loading}
+            disabled={loading || !lockedSiteId}
             style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 24px', cursor: 'pointer', fontSize: 14 }}
           >
             {loading ? '업로드 중...' : '업로드'}
@@ -174,7 +284,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Step 2: Validate */}
       {step === 'validate' && (
         <div>
           <h2 style={{ fontSize: 18, marginBottom: 16 }}>2. SEO 검증</h2>
@@ -191,7 +300,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Step 3: Deploy */}
       {step === 'deploy' && (
         <div>
           <h2 style={{ fontSize: 18, marginBottom: 16 }}>3. 배포</h2>
@@ -203,8 +311,7 @@ export default function App() {
               <ul style={{ listStyle: 'none', padding: 0 }}>
                 {validateResult.checks.map((c, i) => (
                   <li key={i} style={{ padding: '4px 0' }}>
-                    {c.passed ? '\u2705' : '\u274c'} {c.rule}
-                    {c.detail && <span style={{ color: '#666', marginLeft: 8 }}>({c.detail})</span>}
+                    {c.passed ? '\u2705' : '\u274c'} {c.reason}
                   </li>
                 ))}
               </ul>
@@ -220,7 +327,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Step 4: Done */}
       {step === 'done' && deployResult && (
         <div>
           <h2 style={{ fontSize: 18, marginBottom: 16 }}>배포 완료!</h2>
@@ -239,7 +345,7 @@ export default function App() {
             onClick={handleReset}
             style={{ marginTop: 16, background: '#6b7280', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 24px', cursor: 'pointer', fontSize: 14 }}
           >
-            새로운 사이트 배포
+            다시 시작
           </button>
         </div>
       )}
