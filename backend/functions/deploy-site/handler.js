@@ -2,6 +2,8 @@ const { GetObjectCommand, PutObjectCommand, S3Client } = require('@aws-sdk/clien
 const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 const AdmZip = require('adm-zip');
 const { ok, badRequest, serverError } = require('../shared/response');
+const { requireUser } = require('../shared/auth');
+const { ensureSiteOwnership } = require('../shared/site-access');
 
 const s3 = new S3Client({});
 const cloudFront = new CloudFrontClient({});
@@ -119,12 +121,26 @@ const invalidateSite = async ({ distributionId, siteId }) => {
 
 exports.handler = async (event) => {
   try {
+    const { user, errorResponse } = requireUser(event);
+    if (errorResponse) return errorResponse;
+
     const body = parseBody(event);
     const { siteId, objectKey, env = 'dev' } = body;
+    const sitesTable = process.env.SITES_TABLE;
 
     if (!siteId) return badRequest('siteId is required');
     if (!objectKey) return badRequest('objectKey is required');
+    if (!objectKey.startsWith(`uploads/${siteId}/`)) {
+      return badRequest('objectKey does not match siteId');
+    }
     if (!process.env.UPLOAD_BUCKET) return serverError('UPLOAD_BUCKET is not configured');
+
+    const access = await ensureSiteOwnership({
+      siteId,
+      userSub: user.sub,
+      tableName: sitesTable,
+    });
+    if (!access.ok) return access.response;
 
     const resolvedEnv = resolveEnv(env);
     const target = resolveTarget(resolvedEnv);

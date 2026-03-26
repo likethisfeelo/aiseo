@@ -56,6 +56,19 @@ export const buildLoginUrl = () => {
   return `${COGNITO.hostedUiDomain}/login?${query}`;
 };
 
+export const buildSignupUrl = () => {
+  if (!COGNITO.hostedUiDomain || !COGNITO.clientId) return '';
+
+  const query = toQueryString({
+    client_id: COGNITO.clientId,
+    response_type: COGNITO.responseType,
+    scope: COGNITO.scope,
+    redirect_uri: COGNITO.redirectSignIn,
+  });
+
+  return `${COGNITO.hostedUiDomain}/signup?${query}`;
+};
+
 export const buildLogoutUrl = () => {
   if (!COGNITO.hostedUiDomain || !COGNITO.clientId) return '';
 
