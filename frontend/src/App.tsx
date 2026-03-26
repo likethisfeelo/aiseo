@@ -3,10 +3,10 @@ import { createUploadUrl, deploySite, getMe, selectSite, validateSite } from './
 import {
   buildLoginUrl,
   buildLogoutUrl,
-  buildSignupUrl,
   consumeCognitoCallbackTokens,
   tokenStore,
 } from './auth.js';
+import { ForgotPasswordPage, LoginPage, SignupPage } from './auth-pages';
 
 type Step = 'upload' | 'validate' | 'deploy' | 'done';
 
@@ -40,6 +40,7 @@ interface UserProfile {
 }
 
 export default function App() {
+  const pathName = typeof window !== 'undefined' ? window.location.pathname : '/';
   const [step, setStep] = useState<Step>('upload');
   const [siteIdInput, setSiteIdInput] = useState('');
   const [lockedSiteId, setLockedSiteId] = useState('');
@@ -179,14 +180,15 @@ export default function App() {
     if (fileRef.current) fileRef.current.value = '';
   };
 
+  if (pathName === '/login') return <LoginPage />;
+  if (pathName === '/signup') return <SignupPage />;
+  if (pathName === '/forgot-password') return <ForgotPasswordPage />;
+
   if (meLoading) {
     return <div style={{ maxWidth: 640, margin: '40px auto' }}>로그인 상태 확인 중...</div>;
   }
 
   if (!user) {
-    const loginUrl = buildLoginUrl();
-    const signupUrl = buildSignupUrl();
-
     return (
       <div style={{ maxWidth: 640, margin: '40px auto', fontFamily: 'system-ui, sans-serif', padding: '0 20px' }}>
         <h1 style={{ fontSize: 24, marginBottom: 8 }}>AISEO</h1>
@@ -194,10 +196,10 @@ export default function App() {
           원래 서비스 흐름으로 진행하려면 회원가입 후 로그인하세요.
         </p>
         <div style={{ display: 'flex', gap: 12 }}>
-          <a href={signupUrl} style={{ background: '#111827', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
+          <a href="/signup" style={{ background: '#111827', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
             회원가입
           </a>
-          <a href={loginUrl} style={{ background: '#2563eb', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
+          <a href="/login" style={{ background: '#2563eb', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
             로그인
           </a>
         </div>

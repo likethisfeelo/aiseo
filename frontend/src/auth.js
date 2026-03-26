@@ -80,6 +80,19 @@ export const buildLogoutUrl = () => {
   return `${COGNITO.hostedUiDomain}/logout?${query}`;
 };
 
+export const buildForgotPasswordUrl = () => {
+  if (!COGNITO.hostedUiDomain || !COGNITO.clientId) return '';
+
+  const query = toQueryString({
+    client_id: COGNITO.clientId,
+    response_type: COGNITO.responseType,
+    scope: COGNITO.scope,
+    redirect_uri: COGNITO.redirectSignIn,
+  });
+
+  return `${COGNITO.hostedUiDomain}/forgotPassword?${query}`;
+};
+
 const parseHashParams = (hashValue) => {
   const hash = String(hashValue || '').replace(/^#/, '');
   if (!hash) return {};
