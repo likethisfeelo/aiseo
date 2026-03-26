@@ -40,7 +40,10 @@ interface UserProfile {
 }
 
 export default function App() {
-  const pathName = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const authPage =
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('auth')
+      : null;
   const [step, setStep] = useState<Step>('upload');
   const [siteIdInput, setSiteIdInput] = useState('');
   const [lockedSiteId, setLockedSiteId] = useState('');
@@ -180,9 +183,9 @@ export default function App() {
     if (fileRef.current) fileRef.current.value = '';
   };
 
-  if (pathName === '/login') return <LoginPage />;
-  if (pathName === '/signup') return <SignupPage />;
-  if (pathName === '/forgot-password') return <ForgotPasswordPage />;
+  if (authPage === 'login') return <LoginPage />;
+  if (authPage === 'signup') return <SignupPage />;
+  if (authPage === 'forgot-password') return <ForgotPasswordPage />;
 
   if (meLoading) {
     return <div style={{ maxWidth: 640, margin: '40px auto' }}>로그인 상태 확인 중...</div>;
@@ -196,10 +199,10 @@ export default function App() {
           원래 서비스 흐름으로 진행하려면 회원가입 후 로그인하세요.
         </p>
         <div style={{ display: 'flex', gap: 12 }}>
-          <a href="/signup" style={{ background: '#111827', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
+          <a href="/?auth=signup" style={{ background: '#111827', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
             회원가입
           </a>
-          <a href="/login" style={{ background: '#2563eb', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
+          <a href="/?auth=login" style={{ background: '#2563eb', color: '#fff', textDecoration: 'none', padding: '10px 16px', borderRadius: 8 }}>
             로그인
           </a>
         </div>

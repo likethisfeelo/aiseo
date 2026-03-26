@@ -55,9 +55,9 @@ export function LoginPage() {
         ) : (
           <MissingConfig />
         )}
-        <a href="/signup" style={secondaryButton}>회원가입으로 이동</a>
+        <a href="/?auth=signup" style={secondaryButton}>회원가입으로 이동</a>
         <div style={{ marginTop: 12 }}>
-          <a href="/forgot-password" style={{ color: '#2563eb' }}>비밀번호를 잊으셨나요?</a>
+          <a href="/?auth=forgot-password" style={{ color: '#2563eb' }}>비밀번호를 잊으셨나요?</a>
         </div>
       </div>
     </div>
@@ -77,7 +77,7 @@ export function SignupPage() {
         ) : (
           <MissingConfig />
         )}
-        <a href="/login" style={secondaryButton}>로그인으로 이동</a>
+        <a href="/?auth=login" style={secondaryButton}>로그인으로 이동</a>
       </div>
     </div>
   );
@@ -98,7 +98,7 @@ export function ForgotPasswordPage() {
         ) : (
           <MissingConfig />
         )}
-        <a href="/login" style={secondaryButton}>로그인으로 이동</a>
+        <a href="/?auth=login" style={secondaryButton}>로그인으로 이동</a>
       </div>
     </div>
   );
