@@ -1,0 +1,20 @@
+# 환경변수 (절대 커밋 금지)
+.env
+.env.local
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# CDK
+cdk.out/
+infra/cdk/cdk.out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
