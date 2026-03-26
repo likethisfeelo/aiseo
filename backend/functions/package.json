@@ -1,0 +1,17 @@
+{
+  "name": "aiseo-functions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "check": "node --check upload-handler/handler.js && node --check validate-site/handler.js && node --check deploy-site/handler.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.879.0",
+    "@aws-sdk/client-s3": "^3.879.0",
+    "@aws-sdk/lib-dynamodb": "^3.879.0",
+    "@aws-sdk/s3-request-presigner": "^3.879.0",
+    "@aws-sdk/client-cloudfront": "^3.879.0",
+    "adm-zip": "^0.5.16"
+  }
+}

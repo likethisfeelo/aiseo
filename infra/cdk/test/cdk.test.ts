@@ -1,17 +1,44 @@
-// import * as cdk from 'aws-cdk-lib/core';
-// import { Template } from 'aws-cdk-lib/assertions';
-// import * as Cdk from '../lib/cdk-stack';
+import { App } from 'aws-cdk-lib';
+import { Match, Template } from 'aws-cdk-lib/assertions';
+import { CdkStack } from '../lib/cdk-stack';
 
-// example test. To run these tests, uncomment this file along with the
-// example resource in lib/cdk-stack.ts
-test('SQS Queue Created', () => {
-//   const app = new cdk.App();
-//     // WHEN
-//   const stack = new Cdk.CdkStack(app, 'MyTestStack');
-//     // THEN
-//   const template = Template.fromStack(stack);
+test('API, Lambda and Cognito authorizer resources are created', () => {
+  const app = new App({
+    context: {
+      uploadBucketName: 'aiseo-upload-bucket',
+      reportsTableName: 'aiseo-reports',
+      sitesBucketName: 'aiseo-sites-bucket',
+      sitesBucketDevName: 'aiseo-sites-dev-bucket',
+      cognitoUserPoolArn: 'arn:aws:cognito-idp:ap-northeast-2:123456789012:userpool/ap-northeast-2_example',
+      devOrigin: 'https://dev.aiseo.tips',
+      prodOrigin: 'https://aiseo.tips',
+    },
+  });
 
-//   template.hasResourceProperties('AWS::SQS::Queue', {
-//     VisibilityTimeout: 300
-//   });
+  const stack = new CdkStack(app, 'TestStack', {
+    env: {
+      account: '123456789012',
+      region: 'ap-northeast-2',
+    },
+  });
+
+  const template = Template.fromStack(stack);
+
+  template.resourceCountIs('AWS::Lambda::Function', 3);
+  template.resourceCountIs('AWS::ApiGateway::Resource', 3);
+  template.resourceCountIs('AWS::ApiGateway::Authorizer', 1);
+
+  template.hasResourceProperties('AWS::ApiGateway::Stage', {
+    StageName: 'dev',
+  });
+
+  template.hasResourceProperties('AWS::ApiGateway::Stage', {
+    StageName: 'prod',
+  });
+
+  template.hasResourceProperties('AWS::ApiGateway::Method', {
+    HttpMethod: 'POST',
+    AuthorizationType: 'COGNITO_USER_POOLS',
+    AuthorizerId: Match.anyValue(),
+  });
 });
