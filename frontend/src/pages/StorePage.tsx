@@ -36,7 +36,7 @@ export function StorePage({ siteId }: { siteId: string }) {
     await saveStore({ siteId, store: data });
   }, [siteId]);
 
-  const { saving, lastSaved, error: saveError } = useAutoSave({ data: store, saveFn: doSave, enabled: !loading && !!siteId });
+  const { saving, lastSaved, error: saveError, save: manualSave } = useAutoSave({ data: store, saveFn: doSave, enabled: !loading && !!siteId });
 
   if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>불러오는 중...</div>;
 
@@ -46,7 +46,12 @@ export function StorePage({ siteId }: { siteId: string }) {
       <div style={{ width: 400, borderRight: '1px solid #e2e8f0', overflowY: 'auto', padding: 24, background: '#fff' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>매장 관리</h2>
-          <AutoSaveIndicator saving={saving} lastSaved={lastSaved} error={saveError} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <AutoSaveIndicator saving={saving} lastSaved={lastSaved} error={saveError} />
+            <button onClick={manualSave} disabled={saving} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', fontSize: 12, cursor: 'pointer', color: '#475569' }}>
+              {saving ? '저장 중...' : '저장'}
+            </button>
+          </div>
         </div>
 
         {/* Basic */}

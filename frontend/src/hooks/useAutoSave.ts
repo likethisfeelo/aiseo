@@ -13,7 +13,8 @@ export function useAutoSave<T>({ data, saveFn, delay = 2000, enabled = true }: A
   const [error, setError] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dataRef = useRef(data);
-  const initialRef = useRef(true);
+  const lastJsonRef = useRef('');
+  const mountedRef = useRef(false);
 
   dataRef.current = data;
 
@@ -32,10 +33,19 @@ export function useAutoSave<T>({ data, saveFn, delay = 2000, enabled = true }: A
 
   useEffect(() => {
     if (!enabled) return;
-    if (initialRef.current) {
-      initialRef.current = false;
+
+    const json = JSON.stringify(data);
+
+    // Skip initial mount and initial data load
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      lastJsonRef.current = json;
       return;
     }
+
+    // Skip if data hasn't actually changed
+    if (json === lastJsonRef.current) return;
+    lastJsonRef.current = json;
 
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(save, delay);
@@ -45,5 +55,5 @@ export function useAutoSave<T>({ data, saveFn, delay = 2000, enabled = true }: A
     };
   }, [data, delay, enabled, save]);
 
-  return { saving, lastSaved, error };
+  return { saving, lastSaved, error, save };
 }

@@ -57,8 +57,11 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
       .catch(() => {});
   }, [siteId]);
 
-  const handleColumnClick = (col: FocusedColumn) => {
-    if (focused === col) return; // already focused
+  const handleColumnClick = (col: FocusedColumn, e: React.MouseEvent) => {
+    // Don't switch focus if clicking interactive elements inside the column
+    const target = e.target as HTMLElement;
+    if (target.closest('button, input, textarea, select, a, label')) return;
+    if (focused === col) return;
     setFocused(col);
   };
 
@@ -75,6 +78,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
       await fetch(data.uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'application/zip' }, body: file });
       const vResult = await validateSite({ siteId, objectKey: data.objectKey });
       setValidateResult(vResult);
+      setFocused('center'); // Show SEO results after upload
     } catch (e) {
       setError(e instanceof Error ? e.message : '업로드/검증 실패');
     } finally {
@@ -89,6 +93,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
     try {
       const data = await deploySite({ siteId, objectKey, env });
       setDeployResult(data);
+      setFocused('right'); // Show deployed site after deploy
     } catch (e) {
       setError(e instanceof Error ? e.message : '배포 실패');
     } finally {
@@ -117,7 +122,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
 
       {/* ── Left Column: Files & References ── */}
       <div
-        onClick={() => handleColumnClick('left')}
+        onClick={(e) => handleColumnClick('left', e)}
         style={{
           ...getColumnStyle('left', focused, '270px'),
           borderRight: '1px solid #e2e8f0',
@@ -141,7 +146,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             border: '2px dashed #cbd5e1', borderRadius: 8, padding: 20, textAlign: 'center',
             background: '#f8fafc', marginBottom: 16, cursor: 'pointer',
           }}
-          onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}
+          onClick={() => fileRef.current?.click()}
         >
           <input ref={fileRef} type="file" accept=".zip" style={{ display: 'none' }} />
           <div style={{ fontSize: 24, marginBottom: 4 }}>📁</div>
@@ -150,7 +155,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
         </div>
 
         <button
-          onClick={(e) => { e.stopPropagation(); handleUpload(); }}
+          onClick={handleUpload}
           disabled={loading}
           style={{
             width: '100%', padding: '10px', borderRadius: 6, border: 'none',
@@ -176,7 +181,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
 
       {/* ── Center Column: SEO & Marketing ── */}
       <div
-        onClick={() => handleColumnClick('center')}
+        onClick={(e) => handleColumnClick('center', e)}
         style={{
           ...getColumnStyle('center', focused, 'auto'),
           flex: focused === null ? 1 : undefined,
@@ -254,7 +259,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
 
       {/* ── Right Column: Preview & Insights ── */}
       <div
-        onClick={() => handleColumnClick('right')}
+        onClick={(e) => handleColumnClick('right', e)}
         style={{
           ...getColumnStyle('right', focused, '290px'),
           borderLeft: '1px solid #e2e8f0',
