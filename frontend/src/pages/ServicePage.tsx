@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getServices, saveService, deleteService } from '../api';
+import { ConsultantComments } from '../components/common/ConsultantComments';
 import type { Service } from '../types';
 
 const EMPTY_SERVICE: Partial<Service> = { name: '', type: '', price: 0, description: '', schedule: '' };
@@ -176,19 +177,11 @@ export function ServicePage({ siteId }: { siteId: string }) {
               )}
             </div>
 
-            {/* Consultant Comment */}
-            <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 10, padding: 16, marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <span style={{ fontSize: 14 }}>💬</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#92400e' }}>컨설턴트 코멘트</span>
-              </div>
-              <p style={{ fontSize: 13, color: '#78350f', lineHeight: 1.7 }}>
-                아직 등록된 코멘트가 없습니다. 컨설팅 진행 시 서비스에 대한 전문가 의견이 여기에 표시됩니다.
-              </p>
-            </div>
+            {/* Consultant Comments */}
+            <ConsultantComments siteId={siteId} targetType="service" targetId={selected.id} />
 
             {/* AI Analysis Placeholder */}
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10, padding: 16, opacity: 0.6 }}>
+            <div style={{ marginTop: 16, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10, padding: 16, opacity: 0.6 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <span style={{ fontSize: 14 }}>🤖</span>
                 <span style={{ fontSize: 13, fontWeight: 700, color: '#475569' }}>AI 분석</span>

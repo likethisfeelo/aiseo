@@ -59,3 +59,30 @@ export const saveStore = (input: { siteId: string; store: Partial<Store> }) =>
 // ── Image Upload API ──
 export const createImageUploadUrl = (input: { siteId: string; fileName: string; fileType: string }) =>
   postJson('/image-upload', input);
+
+// ── Comments APIs (User) ──
+export const getComments = (siteId: string, targetType?: string, targetId?: string) => {
+  const params = new URLSearchParams({ siteId });
+  if (targetType) params.set('targetType', targetType);
+  if (targetId) params.set('targetId', targetId);
+  return getJson(`/comments?${params.toString()}`);
+};
+
+export const markCommentsRead = (input: { siteId: string; commentIds: string[] }) =>
+  postJson('/comments/read', input);
+
+// ── Admin APIs ──
+export const adminGetSites = () => getJson('/admin/sites');
+
+export const adminGetSite = (siteId: string) =>
+  getJson(`/admin/site?siteId=${encodeURIComponent(siteId)}`);
+
+export const adminCreateComment = (input: {
+  siteId: string;
+  targetType: string;
+  targetId?: string;
+  targetField?: string;
+  type: 'opinion' | 'suggestion' | 'correction';
+  content: string;
+  suggestedValue?: string;
+}) => postJson('/admin/comment', input);

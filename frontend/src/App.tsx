@@ -14,6 +14,8 @@ import { StorePage } from './pages/StorePage';
 import { SiteManagementPage } from './pages/SiteManagementPage';
 import { RoadmapPage } from './pages/RoadmapPage';
 import { ComingSoonPage } from './pages/ComingSoonPage';
+import { AdminSiteListPage } from './pages/admin/AdminSiteListPage';
+import { AdminSiteDetailPage } from './pages/admin/AdminSiteDetailPage';
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -28,6 +30,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/ads': '광고 관리',
   '/content': '콘텐츠 자동화',
   '/roadmap': '성장 로드맵',
+  '/admin': '관리자',
 };
 
 function PageTitleProvider({ children, setPageTitle }: { children: React.ReactNode; setPageTitle: (t: string) => void }) {
@@ -182,6 +185,8 @@ export default function App() {
             <Route path="/analytics" element={<ComingSoonPage title="마케팅 분석" description="GA4 데이터를 기반으로 방문자 현황, 유입 경로, 전환율 등 핵심 마케팅 지표를 분석합니다." icon="📊" />} />
             <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
             <Route path="/content" element={<ComingSoonPage title="콘텐츠 자동화" description="AI를 활용한 SEO 블로그 글 자동 생성, 리뷰 콘텐츠 발행 등 콘텐츠 마케팅을 자동화합니다." icon="✍️" />} />
+            <Route path="/admin" element={<AdminSiteListPage />} />
+            <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
             <Route path="*" element={<Navigate to="/site/upload" replace />} />
           </Routes>
         </DashboardLayout>
