@@ -173,9 +173,9 @@ export default function App() {
             <Route path="/products" element={<ProductPage siteId={siteId} />} />
             <Route path="/services" element={<ServicePage siteId={siteId} />} />
             <Route path="/store" element={<StorePage siteId={siteId} />} />
-            <Route path="/site/upload" element={<SiteManagementPage siteId={siteId} />} />
-            <Route path="/site/seo" element={<SiteManagementPage siteId={siteId} />} />
-            <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} />} />
+            <Route path="/site/upload" element={<SiteManagementPage siteId={siteId} initialFocus="left" />} />
+            <Route path="/site/seo" element={<SiteManagementPage siteId={siteId} initialFocus="center" />} />
+            <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} initialFocus="right" />} />
             <Route path="/site" element={<Navigate to="/site/upload" replace />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
             <Route path="/seo-status" element={<ComingSoonPage title="SEO 현황" description="사이트의 검색 엔진 최적화 현황을 한눈에 확인할 수 있습니다. 키워드 순위, 검색 노출 추이 등이 제공될 예정입니다." icon="🔍" />} />
