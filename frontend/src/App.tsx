@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import { selectSite } from './api';
 import { tokenStore } from './auth.js';
 import { ForgotPasswordPage, LoginPage, SignupPage } from './auth-pages';
+import { LandingPage } from './pages/LandingPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { EducationDrawer } from './components/education/EducationDrawer';
 import { BrandPage } from './pages/BrandPage';
@@ -30,59 +31,7 @@ function PageTitleProvider({ children, setPageTitle }: { children: React.ReactNo
   return <>{children}</>;
 }
 
-/* ── Landing page for unauthenticated users ── */
-function LandingPage({ authError }: { authError: string }) {
-  return (
-    <div style={{ maxWidth: 640, margin: '40px auto', fontFamily: 'system-ui, sans-serif', padding: '0 20px' }}>
-      <h1 style={{ fontSize: 28, marginBottom: 4 }}>AISEO</h1>
-      <p style={{ fontSize: 15, color: '#2563eb', marginBottom: 24, fontWeight: 500 }}>
-        AI 웹사이트를 SEO 최적화하고, 한 번에 배포하세요. (v2)
-      </p>
-
-      {authError && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 12, marginBottom: 16, color: '#dc2626' }}>
-          {authError}
-        </div>
-      )}
-
-      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 20, marginBottom: 24 }}>
-        <p style={{ fontWeight: 600, marginBottom: 12, fontSize: 15 }}>서비스 이용 흐름</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {[
-            { num: '1', text: '회원가입 및 로그인' },
-            { num: '2', text: '내 사이트 주소 선택 (예: my-shop.aiseo.tips)' },
-            { num: '3', text: 'AI로 만든 웹사이트 ZIP 파일 업로드' },
-            { num: '4', text: 'SEO 자동 검증 (검색엔진 최적화 체크)' },
-            { num: '5', text: '원클릭 배포 — 즉시 접속 가능한 나만의 사이트 완성' },
-          ].map((item) => (
-            <div key={item.num} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 24, height: 24, borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-                {item.num}
-              </span>
-              <span style={{ fontSize: 14, color: '#334155' }}>{item.text}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: 16, marginBottom: 24 }}>
-        <p style={{ fontSize: 13, color: '#1e40af', lineHeight: 1.6 }}>
-          AISEO는 AI로 제작한 웹사이트의 SEO 상태를 자동으로 검증하고,
-          Google/Naver 검색에 최적화된 상태로 배포해 드립니다.
-        </p>
-      </div>
-
-      <div style={{ display: 'flex', gap: 12 }}>
-        <a href="/?auth=signup" style={{ background: '#111827', color: '#fff', textDecoration: 'none', padding: '12px 24px', borderRadius: 8, fontWeight: 500, fontSize: 15 }}>
-          회원가입
-        </a>
-        <a href="/?auth=login" style={{ background: '#2563eb', color: '#fff', textDecoration: 'none', padding: '12px 24px', borderRadius: 8, fontWeight: 500, fontSize: 15 }}>
-          로그인
-        </a>
-      </div>
-    </div>
-  );
-}
+/* LandingPage is now imported from ./pages/LandingPage */
 
 /* ── Site ID Selection (first-time setup) ── */
 function SiteIdSetup({ onSiteSelected }: { onSiteSelected: (id: string) => void }) {
