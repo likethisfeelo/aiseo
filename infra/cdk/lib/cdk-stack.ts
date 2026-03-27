@@ -129,6 +129,63 @@ export class CdkStack extends Stack {
       });
     }
 
+    // ── New Lambda functions for brand/products/services/store/image-upload ──
+    const sitesTableName = this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites';
+    const imagesBucketName = this.node.tryGetContext('imagesBucketName') ?? 'aiseo-images-bucket';
+    const imagesCdnDomain = this.node.tryGetContext('imagesCdnDomain') ?? '';
+
+    const imagesBucket = s3.Bucket.fromBucketName(this, 'ImagesBucket', imagesBucketName);
+
+    const brandHandler = new lambda.Function(this, 'BrandHandlerFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'brand-handler/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { SITES_TABLE: sitesTableName },
+    });
+    sitesTable.grantReadWriteData(brandHandler);
+
+    const productsHandler = new lambda.Function(this, 'ProductsHandlerFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'products-handler/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { SITES_TABLE: sitesTableName },
+    });
+    sitesTable.grantReadWriteData(productsHandler);
+
+    const servicesHandler = new lambda.Function(this, 'ServicesHandlerFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'services-handler/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { SITES_TABLE: sitesTableName },
+    });
+    sitesTable.grantReadWriteData(servicesHandler);
+
+    const storeHandler = new lambda.Function(this, 'StoreHandlerFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'store-handler/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { SITES_TABLE: sitesTableName },
+    });
+    sitesTable.grantReadWriteData(storeHandler);
+
+    const imageUploadHandler = new lambda.Function(this, 'ImageUploadHandlerFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'image-upload-handler/handler.handler',
+      timeout: Duration.seconds(30),
+      environment: {
+        SITES_TABLE: sitesTableName,
+        IMAGES_BUCKET: imagesBucketName,
+        IMAGES_CDN_DOMAIN: imagesCdnDomain,
+      },
+    });
+    sitesTable.grantReadData(imageUploadHandler);
+    imagesBucket.grantPut(imageUploadHandler);
+
     const addPost = (resource: apigateway.Resource, integration: apigateway.LambdaIntegration) => {
       resource.addMethod('POST', integration, {
         authorizationType: authorizer ? apigateway.AuthorizationType.COGNITO : apigateway.AuthorizationType.NONE,
@@ -181,6 +238,34 @@ export class CdkStack extends Stack {
     const siteSettingsIntegration = new apigateway.LambdaIntegration(siteSettingsHandler);
     addGet(siteSettings, siteSettingsIntegration);
     addPost(siteSettings, siteSettingsIntegration);
+
+    // ── Brand/Products/Services/Store/Image-Upload routes ──
+    const brandResource = api.root.addResource('brand');
+    const brandIntegration = new apigateway.LambdaIntegration(brandHandler);
+    addGet(brandResource, brandIntegration);
+    addPost(brandResource, brandIntegration);
+
+    const productsResource = api.root.addResource('products');
+    const productsIntegration = new apigateway.LambdaIntegration(productsHandler);
+    addGet(productsResource, productsIntegration);
+    addPost(productsResource, productsIntegration);
+    const productsDelete = productsResource.addResource('delete');
+    addPost(productsDelete, productsIntegration);
+
+    const servicesResource = api.root.addResource('services');
+    const servicesIntegration = new apigateway.LambdaIntegration(servicesHandler);
+    addGet(servicesResource, servicesIntegration);
+    addPost(servicesResource, servicesIntegration);
+    const servicesDelete = servicesResource.addResource('delete');
+    addPost(servicesDelete, servicesIntegration);
+
+    const storeResource = api.root.addResource('store');
+    const storeIntegration = new apigateway.LambdaIntegration(storeHandler);
+    addGet(storeResource, storeIntegration);
+    addPost(storeResource, storeIntegration);
+
+    const imageUploadResource = api.root.addResource('image-upload');
+    addPost(imageUploadResource, new apigateway.LambdaIntegration(imageUploadHandler));
 
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,
