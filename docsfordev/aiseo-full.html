@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AISEO — 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Noto+Serif+KR:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #111827; --ink-mid: #374151; --ink-light: #9ca3af;
+  --bg: #f3f4f6; --white: #ffffff; --border: #e5e7eb; --border-strong: #d1d5db;
+  --accent: #2563eb; --accent-light: #eff6ff; --accent-dim: #bfdbfe;
+  --success: #059669; --success-light: #d1fae5;
+  --warn: #d97706; --warn-light: #fef3c7;
+  --danger: #dc2626; --danger-light: #fee2e2;
+  --purple: #7c3aed; --purple-light: #ede9fe;
+  --pink: #db2777; --pink-light: #fce7f3;
+  --orange: #ea580c; --orange-light: #ffedd5;
+  --sidebar-w: 220px; --topbar-h: 52px;
+  --edit-w: 400px;
+}
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); font-size: 13px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* ══ TOPBAR ══ */
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--topbar-h); background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px 0 0; }
+.topbar-logo { width: var(--sidebar-w); padding: 0 18px; font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); flex-shrink: 0; display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--border); height: 100%; }
+.topbar-logo span { color: var(--accent); }
+.logo-badge { font-family: 'Noto Sans KR', sans-serif; font-size: 9px; font-weight: 700; background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; }
+.topbar-center { flex: 1; padding: 0 18px; display: flex; align-items: center; gap: 10px; }
+.site-chip { display: flex; align-items: center; gap: 7px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--ink-mid); }
+.site-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+.site-chip .url { color: var(--accent); }
+.page-title-txt { font-size: 13px; font-weight: 700; color: var(--ink); }
+.topbar-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; }
+.topbar-email { font-size: 11px; color: var(--ink-light); }
+.btn-xs { padding: 5px 11px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: white; color: var(--ink-mid); font-family: 'Noto Sans KR', sans-serif; transition: all .15s; white-space: nowrap; }
+.btn-xs:hover { border-color: var(--accent); color: var(--accent); }
+.btn-xs.primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-xs.primary:hover { background: #1d4ed8; }
+
+/* ══ SIDEBAR ══ */
+.sidebar { position: fixed; top: var(--topbar-h); left: 0; bottom: 0; width: var(--sidebar-w); background: white; border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; padding: 10px 0; z-index: 50; }
+.sidebar::-webkit-scrollbar { width: 0; }
+.nav-sec { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-light); padding: 9px 16px 5px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 16px; cursor: pointer; color: var(--ink-mid); font-size: 12px; font-weight: 500; position: relative; border: none; background: none; width: 100%; font-family: 'Noto Sans KR', sans-serif; text-align: left; transition: all .15s; }
+.nav-item:hover { background: var(--bg); color: var(--ink); }
+.nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 700; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); border-radius: 0 3px 3px 0; }
+.nav-item.sub { padding-left: 28px; }
+.nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-divider { height: 1px; background: var(--border); margin: 5px 16px; }
+.nav-badge { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 100px; margin-left: auto; flex-shrink: 0; }
+.nav-badge.new { background: var(--accent); color: white; }
+.nav-badge.locked { background: var(--border); color: var(--ink-light); }
+.nav-badge.soon { background: var(--purple-light); color: var(--purple); }
+.nav-badge.alert { background: var(--danger-light); color: var(--danger); }
+.nav-badge.ok { background: var(--success-light); color: var(--success); }
+
+/* 완성도 mini card in sidebar */
+.sidebar-completeness { padding: 10px 14px 6px; }
+.comp-mini { background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; }
+.comp-mini-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.comp-mini-label { font-size: 11px; font-weight: 700; color: var(--ink); }
+.comp-mini-pct { font-size: 12px; font-weight: 900; color: var(--accent); }
+.comp-mini-bar { height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.comp-mini-fill { height: 100%; background: var(--accent); border-radius: 100px; }
+.comp-mini-sub { font-size: 10px; color: var(--ink-light); margin-top: 4px; }
+
+.sidebar-footer { margin-top: auto; padding: 10px 14px; border-top: 1px solid var(--border); }
+.stage-card { background: linear-gradient(135deg, var(--accent-light), var(--purple-light)); border: 1px solid var(--accent-dim); border-radius: 9px; padding: 11px; }
+.stage-label { font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+.stage-name { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+.stage-bar { height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.stage-fill { height: 100%; background: var(--accent); border-radius: 100px; }
+.stage-sub { font-size: 10px; color: var(--ink-light); margin-top: 4px; }
+
+/* ══ MAIN ══ */
+.main { position: fixed; top: var(--topbar-h); left: var(--sidebar-w); right: 0; bottom: 0; overflow: hidden; }
+
+/* ══ PAGE WRAPPERS ══ */
+.page { display: none; height: 100%; }
+.page.active { display: flex; }
+
+/* ══ BRAND/PRODUCT/SERVICE/STORE: 2-panel ══ */
+.panel-2col { flex-direction: row; overflow: hidden; }
+.edit-panel { width: var(--edit-w); flex-shrink: 0; height: 100%; overflow-y: auto; background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+.edit-panel::-webkit-scrollbar { width: 3px; }
+.edit-panel::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+.preview-panel { flex: 1; height: 100%; overflow-y: auto; background: var(--bg); }
+.preview-panel::-webkit-scrollbar { width: 3px; }
+.preview-panel::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+/* ══ SITE: 3-panel ══ */
+.panel-3col { flex-direction: row; overflow: hidden; }
+.col3 { height: 100%; overflow-y: auto; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+.col3:last-child { border-right: none; }
+.col3-left { flex: 0 0 270px; }
+.col3-right { flex: 0 0 290px; }
+.col3-mid { flex: 1; }
+.col3::-webkit-scrollbar { width: 3px; }
+.col3::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ══ COLUMN HEADERS ══ */
+.col-hd { position: sticky; top: 0; z-index: 10; background: white; border-bottom: 1px solid var(--border); padding: 11px 15px; display: flex; align-items: center; gap: 9px; }
+.col-hd-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.col-hd-icon.b { background: var(--accent-light); }
+.col-hd-icon.g { background: var(--success-light); }
+.col-hd-icon.p { background: var(--purple-light); }
+.col-hd h3 { font-size: 12px; font-weight: 700; color: var(--ink); }
+.col-hd p { font-size: 10px; color: var(--ink-light); }
+.col-bd { padding: 13px; flex: 1; display: flex; flex-direction: column; gap: 9px; }
+
+/* ══ EDIT PANEL HEADER ══ */
+.edit-hd { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: white; z-index: 10; }
+.edit-hd h2 { font-size: 14px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+.edit-hd p { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.edit-body { padding: 16px 18px; display: flex; flex-direction: column; }
+
+/* ══ FORM ══ */
+.form-sec { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px; }
+.form-sec:last-child { border-bottom: none; margin-bottom: 0; }
+.form-sec-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-light); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 9px; }
+.field:last-child { margin-bottom: 0; }
+.field label { font-size: 11px; font-weight: 700; color: var(--ink-mid); display: flex; align-items: center; gap: 5px; }
+.fhint { font-size: 10px; color: var(--ink-light); font-weight: 400; }
+input[type=text], input[type=url], input[type=tel], select, textarea { width: 100%; border: 1px solid var(--border-strong); border-radius: 7px; padding: 7px 9px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: var(--ink); background: white; transition: border-color .15s; outline: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input.set { border-color: #86efac; background: #f0fdf4; }
+textarea { resize: vertical; min-height: 64px; line-height: 1.6; }
+.color-row { display: flex; gap: 5px; align-items: center; }
+.cswatch { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; }
+.cswatch.active { border: 2px solid var(--accent); }
+.img-upload { border: 2px dashed var(--border-strong); border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; transition: all .2s; background: var(--bg); }
+.img-upload:hover { border-color: var(--accent); background: var(--accent-light); }
+.img-upload .ico { font-size: 20px; margin-bottom: 5px; }
+.img-upload .t { font-size: 11px; font-weight: 600; color: var(--ink-mid); margin-bottom: 1px; }
+.img-upload .s { font-size: 10px; color: var(--ink-light); }
+.tag-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag-chip { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 100px; background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-dim); display: flex; align-items: center; gap: 3px; cursor: pointer; }
+.tag-chip .x { font-size: 9px; opacity: 0.6; }
+.tag-add { font-size: 11px; padding: 3px 9px; border-radius: 100px; background: var(--bg); color: var(--ink-light); border: 1px dashed var(--border-strong); cursor: pointer; }
+.tag-add:hover { border-color: var(--accent); color: var(--accent); }
+.save-bar { position: sticky; bottom: 0; background: white; border-top: 1px solid var(--border); padding: 10px 18px; display: flex; gap: 8px; align-items: center; }
+.save-status { font-size: 11px; color: var(--ink-light); flex: 1; }
+.save-status.saved { color: var(--success); }
+.btn-save { padding: 8px 20px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; background: var(--accent); color: white; font-family: 'Noto Sans KR', sans-serif; }
+.btn-save:hover { background: #1d4ed8; }
+
+/* ══ ITEM LIST ══ */
+.item-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 9px; }
+.item-card { border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; background: white; display: flex; align-items: flex-start; gap: 9px; cursor: pointer; transition: all .15s; }
+.item-card:hover, .item-card.selected { border-color: var(--accent); }
+.item-card.selected { background: var(--accent-light); }
+.item-thumb { width: 38px; height: 38px; border-radius: 7px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; border: 1px solid var(--border); }
+.item-info { flex: 1; min-width: 0; }
+.item-name { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 1px; }
+.item-meta { font-size: 10px; color: var(--ink-light); }
+.item-price { font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 1px; }
+.item-acts { display: flex; gap: 3px; flex-shrink: 0; }
+.icon-btn { width: 24px; height: 24px; border: 1px solid var(--border); background: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; color: var(--ink-light); transition: all .15s; }
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.add-item-btn { border: 1.5px dashed var(--border-strong); border-radius: 9px; padding: 10px; text-align: center; font-size: 12px; font-weight: 600; color: var(--ink-light); cursor: pointer; transition: all .2s; }
+.add-item-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+/* ══ PREVIEW PANEL INNER ══ */
+.preview-inner { padding: 20px; max-width: 600px; margin: 0 auto; }
+.preview-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-light); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.preview-lbl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.catalog-cover { border-radius: 14px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+.catalog-cover-img { height: 140px; background: linear-gradient(135deg, #f0fdf4, #dbeafe); display: flex; align-items: center; justify-content: center; font-size: 50px; }
+.catalog-cover-body { background: white; padding: 18px 22px; }
+.catalog-brand-tag { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.catalog-brand-name { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.5px; }
+.catalog-tagline { font-size: 13px; color: var(--ink-mid); line-height: 1.6; margin-bottom: 12px; }
+.catalog-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.ctag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px; background: var(--bg); border: 1px solid var(--border); color: var(--ink-mid); }
+.catalog-sec { background: white; border-radius: 11px; padding: 16px 18px; margin-bottom: 10px; border: 1px solid var(--border); }
+.catalog-sec-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-light); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.brand-story { font-size: 12px; color: var(--ink-mid); line-height: 1.85; }
+.color-palette { display: flex; gap: 7px; align-items: center; margin-top: 10px; }
+.pal-sw { width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(0,0,0,.08); }
+.tone-chips { display: flex; gap: 4px; flex-wrap: wrap; margin-left: 8px; }
+.tone-chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 100px; background: var(--accent-light); color: var(--accent); }
+.target-blk { background: var(--bg); border-radius: 7px; padding: 10px 12px; margin-top: 10px; font-size: 12px; color: var(--ink-mid); line-height: 1.7; }
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.product-card-p { border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+.product-img-p { height: 80px; background: linear-gradient(135deg, var(--bg), var(--border)); display: flex; align-items: center; justify-content: center; font-size: 26px; }
+.product-body-p { padding: 9px 11px; }
+.product-name-p { font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 1px; }
+.product-meta-p { font-size: 10px; color: var(--ink-light); margin-bottom: 4px; }
+.product-price-p { font-size: 12px; font-weight: 900; color: var(--accent); }
+.service-list-p { display: flex; flex-direction: column; gap: 7px; }
+.service-item-p { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: var(--bg); border-radius: 8px; }
+.service-ico-p { font-size: 18px; flex-shrink: 0; }
+.service-name-p { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 1px; }
+.service-desc-p { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.service-price-p { font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 3px; }
+.store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.store-item { background: var(--bg); border-radius: 7px; padding: 10px 12px; }
+.store-lbl { font-size: 9px; font-weight: 700; color: var(--ink-light); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 3px; }
+.store-val { font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.5; }
+.sns-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
+.sns-chip { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 100px; background: var(--bg); border: 1px solid var(--border); color: var(--ink-mid); }
+.ai-ready { background: linear-gradient(135deg, var(--purple-light), var(--accent-light)); border: 1px solid var(--accent-dim); border-radius: 9px; padding: 11px 13px; display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+.ai-ready .ico { font-size: 18px; flex-shrink: 0; }
+.ai-ready .txt strong { font-size: 12px; color: var(--purple); font-weight: 700; display: block; margin-bottom: 1px; }
+.ai-ready .txt span { font-size: 11px; color: var(--ink-mid); }
+.consult-note { background: #fefce8; border: 1px solid #fde68a; border-radius: 9px; padding: 12px 14px; margin-bottom: 12px; }
+.consult-note-lbl { font-size: 9px; font-weight: 700; color: var(--warn); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.consult-note-txt { font-size: 11px; color: #92400e; line-height: 1.7; }
+
+/* ══ SITE PAGE 3-COL COMPONENTS ══ */
+.upload-zone { border: 2px dashed var(--border-strong); border-radius: 9px; padding: 20px 13px; text-align: center; cursor: pointer; transition: all .2s; background: var(--bg); }
+.upload-zone:hover { border-color: var(--accent); background: var(--accent-light); }
+.upload-zone .ico { font-size: 22px; margin-bottom: 7px; }
+.upload-zone .t1 { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.upload-zone .t2 { font-size: 11px; color: var(--ink-light); }
+.upload-zone .t2 a { color: var(--accent); font-weight: 600; }
+.status-ok { background: var(--success-light); border: 1px solid #86efac; border-radius: 8px; padding: 9px 12px; display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: #065f46; }
+.status-ok strong { font-weight: 700; display: block; margin-bottom: 1px; }
+.ref-item { display: flex; align-items: flex-start; gap: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 11px; background: white; }
+.ref-fav { width: 22px; height: 22px; border-radius: 5px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+.ref-info { flex: 1; min-width: 0; }
+.ref-url { font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ref-note { font-size: 10px; color: var(--ink-light); line-height: 1.4; }
+.ref-add { border: 1.5px dashed var(--border-strong); border-radius: 8px; padding: 8px; text-align: center; font-size: 11px; color: var(--ink-light); cursor: pointer; transition: all .2s; }
+.ref-add:hover { border-color: var(--accent); color: var(--accent); }
+.seo-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 7px; border: 1px solid var(--border); }
+.seo-row.pass { background: #f0fdf4; border-color: #bbf7d0; }
+.seo-row.fail { background: #fff7ed; border-color: #fed7aa; }
+.seo-row .ico { font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+.seo-row .lbl { font-size: 12px; font-weight: 700; }
+.seo-row .lbl.p { color: #065f46; }
+.seo-row .lbl.f { color: #9a3412; }
+.seo-row .msg { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.seo-guide { margin-top: 5px; background: white; border: 1px solid #fed7aa; border-radius: 5px; padding: 6px 8px; font-size: 11px; color: var(--ink-mid); line-height: 1.6; }
+.seo-guide code { font-family: monospace; background: var(--bg); padding: 1px 4px; border-radius: 3px; font-size: 10px; }
+.ring-wrap { display: flex; align-items: center; gap: 12px; padding: 11px 13px; }
+.ring { width: 52px; height: 52px; border-radius: 50%; background: conic-gradient(var(--success) 0% 80%, var(--border) 80% 100%); display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+.ring::after { content: ''; position: absolute; inset: 8px; background: white; border-radius: 50%; }
+.ring-n { position: relative; z-index: 1; font-size: 12px; font-weight: 900; color: var(--ink); }
+.ring-info .t1 { font-size: 12px; font-weight: 700; color: var(--ink); }
+.ring-info .t2 { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.pbar { height: 3px; background: var(--border); border-radius: 100px; overflow: hidden; margin-top: 5px; }
+.pfill { height: 100%; border-radius: 100px; background: var(--accent); }
+.cta-block { border-radius: 9px; padding: 11px 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cta-block.edu { background: linear-gradient(135deg, #eff6ff, #e0e7ff); border: 1px solid #c7d2fe; }
+.cta-block.consult2 { background: linear-gradient(135deg, #fdf4ff, #ede9fe); border: 1px solid #ddd6fe; }
+.cta-txt strong { font-size: 12px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 1px; }
+.cta-txt span { font-size: 11px; color: var(--ink-mid); }
+.btn-cta { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; cursor: pointer; border: none; font-family: 'Noto Sans KR', sans-serif; flex-shrink: 0; }
+.btn-cta.b { background: var(--accent); color: white; }
+.btn-cta.p { background: var(--purple); color: white; }
+.thumb-preview { aspect-ratio: 16/9; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.t-bar { background: #e5e7eb; padding: 6px 9px; display: flex; align-items: center; gap: 5px; }
+.t-dot { width: 7px; height: 7px; border-radius: 50%; }
+.t-url { flex: 1; background: white; border-radius: 3px; padding: 2px 7px; font-size: 10px; color: var(--ink-mid); }
+.t-body { padding: 9px; display: flex; flex-direction: column; gap: 5px; }
+.t-blk { height: 8px; background: #d1d5db; border-radius: 3px; }
+.og-card { background: white; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.og-img { height: 65px; background: linear-gradient(135deg, #dbeafe, #c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.og-bd { padding: 9px 11px; }
+.og-domain { font-size: 9px; color: var(--ink-light); margin-bottom: 2px; }
+.og-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.og-desc { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.insight-item { border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; background: white; display: flex; gap: 8px; align-items: flex-start; }
+.insight-item .ico { font-size: 13px; flex-shrink: 0; }
+.insight-item strong { font-size: 12px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 1px; }
+.insight-item span { font-size: 11px; color: var(--ink-mid); line-height: 1.6; }
+.locked-card { background: var(--bg); border: 1.5px dashed var(--border-strong); border-radius: 10px; padding: 16px 13px; text-align: center; }
+.locked-card .ico { font-size: 18px; margin-bottom: 6px; }
+.locked-card .t1 { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.locked-card .t2 { font-size: 11px; color: var(--ink-light); line-height: 1.6; margin-bottom: 9px; }
+.btn-sm-p { padding: 6px 13px; border-radius: 6px; font-size: 11px; font-weight: 700; background: var(--accent); color: white; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+.tag { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; padding: 1px 7px; border-radius: 100px; }
+.tag.g { background: var(--success-light); color: var(--success); }
+.tag.o { background: var(--warn-light); color: var(--warn); }
+.tag.gr { background: var(--border); color: var(--ink-light); }
+.tag.b { background: var(--accent-light); color: var(--accent); }
+.admin-note { background: #fefce8; border: 1px solid #fde68a; border-radius: 7px; padding: 8px 10px; font-size: 11px; color: #92400e; display: flex; gap: 6px; }
+.sec-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-light); }
+.divider { height: 1px; background: var(--border); margin: 0 -13px; }
+.deploy-bar { position: sticky; bottom: 0; background: white; border-top: 1px solid var(--border); padding: 10px 13px; display: flex; gap: 7px; }
+.btn-deploy { flex: 1; padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; font-family: 'Noto Sans KR', sans-serif; transition: all .2s; }
+.btn-deploy.main { background: var(--accent); color: white; }
+.btn-deploy.main:hover { background: #1d4ed8; }
+.btn-deploy.sub { background: var(--bg); color: var(--ink-mid); border: 1px solid var(--border); flex: none; padding: 9px 13px; }
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="topbar-logo">AI<span>SEO</span><span class="logo-badge">BETA</span></div>
+  <div class="topbar-center">
+    <span class="page-title-txt" id="topbar-title">🏷 브랜드 관리</span>
+    <div class="site-chip" id="site-chip" style="display:none;">
+      <span class="dot"></span>
+      <span>내 사이트</span>
+      <span class="url">my-studio.aiseo.tips</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="avatar">P</div>
+    <span class="topbar-email">philo.productiongroup@gmail.com</span>
+    <button class="btn-xs" id="topbar-action1">내보내기 PDF</button>
+    <button class="btn-xs primary" id="topbar-action2">저장</button>
+  </div>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar">
+
+  <div class="sidebar-completeness">
+    <div class="comp-mini">
+      <div class="comp-mini-top">
+        <span class="comp-mini-label">브랜드 완성도</span>
+        <span class="comp-mini-pct">30%</span>
+      </div>
+      <div class="comp-mini-bar"><div class="comp-mini-fill" style="width:30%"></div></div>
+      <div class="comp-mini-sub">채울수록 AI 정확도 ↑</div>
+    </div>
+  </div>
+
+  <div class="nav-sec">내 브랜드</div>
+  <button class="nav-item sub active" onclick="goPage('brand')">
+    <span class="nav-icon">🏷</span><span>브랜드 관리</span>
+    <span class="nav-badge ok">입력중</span>
+  </button>
+  <button class="nav-item sub" onclick="goPage('product')">
+    <span class="nav-icon">📦</span><span>상품 관리</span>
+    <span class="nav-badge alert">2개</span>
+  </button>
+  <button class="nav-item sub" onclick="goPage('service')">
+    <span class="nav-icon">✂️</span><span>서비스 관리</span>
+    <span class="nav-badge alert">2개</span>
+  </button>
+  <button class="nav-item sub" onclick="goPage('store')">
+    <span class="nav-icon">📍</span><span>매장 관리</span>
+    <span class="nav-badge alert">미입력</span>
+  </button>
+
+  <div class="nav-divider"></div>
+  <div class="nav-sec">내 사이트</div>
+  <button class="nav-item" onclick="goPage('site')">
+    <span class="nav-icon">🏠</span><span>사이트 관리</span>
+  </button>
+  <button class="nav-item" onclick="goPage('roadmap')">
+    <span class="nav-icon">🗺</span><span>성장 로드맵</span>
+  </button>
+
+  <div class="nav-divider"></div>
+  <div class="nav-sec">검색 최적화</div>
+  <button class="nav-item">
+    <span class="nav-icon">🔍</span><span>SEO 현황</span>
+    <span class="nav-badge alert">미연동</span>
+  </button>
+  <button class="nav-item">
+    <span class="nav-icon">📊</span><span>마케팅 분석</span>
+    <span class="nav-badge new">GA4</span>
+  </button>
+
+  <div class="nav-divider"></div>
+  <div class="nav-sec">광고 & 콘텐츠</div>
+  <button class="nav-item">
+    <span class="nav-icon">📣</span><span>광고 관리</span>
+    <span class="nav-badge locked">교육 필요</span>
+  </button>
+  <button class="nav-item">
+    <span class="nav-icon">✍️</span><span>콘텐츠 자동화</span>
+    <span class="nav-badge soon">예정</span>
+  </button>
+
+  <div class="nav-divider"></div>
+  <div class="nav-sec">교육 & 지원</div>
+  <button class="nav-item">
+    <span class="nav-icon">🎓</span><span>교육 & 컨설팅</span>
+  </button>
+
+  <div class="sidebar-footer">
+    <div class="stage-card">
+      <div class="stage-label">현재 단계</div>
+      <div class="stage-name">브랜드 기반 구축 중</div>
+      <div class="stage-bar"><div class="stage-fill" style="width:20%"></div></div>
+      <div class="stage-sub">전체 여정의 20% 완료</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- ────── PAGE: 브랜드 관리 ────── -->
+  <div id="page-brand" class="page active panel-2col">
+    <div class="edit-panel">
+      <div class="edit-hd">
+        <h2><span>🏷</span> 브랜드 관리</h2>
+        <p>브랜드 정체성을 정리합니다. 사이트 제작과 SEO 카피의 기반이 됩니다.</p>
+      </div>
+      <div class="edit-body">
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>✦</span> 기본 정보</div>
+          <div class="field"><label>브랜드명</label><input type="text" value="투데이이즈유어벌스데이"></div>
+          <div class="field"><label>영문명 / 약칭</label><input type="text" value="TYBD"></div>
+          <div class="field"><label>슬로건 <span class="fhint">— SEO 타이틀에 활용</span></label><input type="text" value="당신의 하루를 특별하게 만드는 수제 가방"></div>
+          <div class="field"><label>업종</label><select><option selected>공방 · 수공예</option><option>웨딩 · 스튜디오</option><option>카페 · 베이커리</option><option>교육 · 클래스</option></select></div>
+          <div class="field"><label>사업 형태</label><select><option selected>1인 사업자</option><option>소규모 팀</option><option>법인</option></select></div>
+        </div>
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>🎨</span> 아이덴티티</div>
+          <div class="field">
+            <label>브랜드 컬러</label>
+            <div class="color-row">
+              <div class="cswatch active" style="background:#2563eb;"></div>
+              <div class="cswatch" style="background:#059669;"></div>
+              <div class="cswatch" style="background:#db2777;"></div>
+              <div class="cswatch" style="background:#d97706;"></div>
+              <div class="cswatch" style="background:#111827;"></div>
+              <input type="text" class="color-input" value="#2563eb" style="flex:1;">
+            </div>
+          </div>
+          <div class="field"><label>톤 & 무드</label><div class="tag-row"><div class="tag-chip">내추럴 <span class="x">×</span></div><div class="tag-chip">따뜻한 <span class="x">×</span></div><div class="tag-chip">핸드메이드 <span class="x">×</span></div><div class="tag-add">+ 추가</div></div></div>
+          <div class="field"><label>로고 이미지</label><div class="img-upload"><div class="ico">🖼</div><div class="t">로고 업로드</div><div class="s">PNG, SVG 권장</div></div></div>
+        </div>
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>📖</span> 브랜드 스토리</div>
+          <div class="field"><label>시작 계기</label><textarea>10년간 직장 생활을 하다 가죽 공예를 처음 접했습니다. 손으로 무언가를 만드는 기쁨이 너무 커서 2021년 공방을 열었습니다.</textarea></div>
+          <div class="field"><label>핵심 가치</label><textarea>하나를 만들더라도 오래 쓸 수 있는 것. 유행이 아니라 클래식한 디자인.</textarea></div>
+          <div class="field"><label>고객에게 전달할 한 마디</label><input type="text" value="오늘 하루, 내가 만든 가방과 함께하세요"></div>
+        </div>
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>🎯</span> 타겟 & 키워드</div>
+          <div class="field"><label>주요 고객</label><select><option>20대 초중반</option><option selected>20대 후반 ~ 30대</option><option>30대 ~ 40대</option></select></div>
+          <div class="field"><label>고객 특성</label><textarea>직장인 여성, 핸드메이드 제품에 관심 있는 분, 선물을 찾는 분</textarea></div>
+          <div class="field"><label>SEO 핵심 키워드</label><div class="tag-row"><div class="tag-chip">천안 가방 공방 <span class="x">×</span></div><div class="tag-chip">수제 가방 <span class="x">×</span></div><div class="tag-chip">가죽 클래스 <span class="x">×</span></div><div class="tag-add">+</div></div></div>
+          <div class="field"><label>참고 브랜드</label><textarea>이사배, 힘비 가죽공방, 마르젤라 스타일 감도</textarea></div>
+        </div>
+      </div>
+      <div class="save-bar">
+        <span class="save-status saved">✓ 자동 저장됨 · 2분 전</span>
+        <button class="btn-save">저장</button>
+      </div>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-inner">
+        <div class="preview-lbl">카탈로그 미리보기</div>
+        <div class="ai-ready"><span class="ico">🤖</span><div class="txt"><strong>AI 활용 준비도 — 30%</strong><span>채울수록 사이트 카피·SEO·광고 문구를 AI가 정확하게 생성합니다</span></div></div>
+        <div class="consult-note"><div class="consult-note-lbl">💬 컨설턴트 노트</div><div class="consult-note-txt">브랜드 스토리 잘 정리되어 있습니다. <strong>지역 키워드(천안) 포함 필수.</strong> 상품·서비스 채우면 사이트 구조 설계 시작 가능합니다.</div></div>
+        <div class="catalog-cover">
+          <div class="catalog-cover-img">👜</div>
+          <div class="catalog-cover-body">
+            <div class="catalog-brand-tag">공방 · 수공예</div>
+            <div class="catalog-brand-name">투데이이즈유어벌스데이 / TYBD</div>
+            <div class="catalog-tagline">당신의 하루를 특별하게 만드는 수제 가방</div>
+            <div class="catalog-tags"><span class="ctag">천안 가방 공방</span><span class="ctag">수제 가방</span><span class="ctag">가죽 클래스</span></div>
+          </div>
+        </div>
+        <div class="catalog-sec">
+          <div class="catalog-sec-title">브랜드 스토리</div>
+          <div class="brand-story">10년간 직장 생활을 하다 가죽 공예를 처음 접했습니다. 손으로 무언가를 만드는 기쁨이 너무 커서 2021년 공방을 열었습니다.</div>
+          <div class="color-palette"><div class="pal-sw" style="background:#2563eb;"></div><div class="tone-chips"><span class="tone-chip">내추럴</span><span class="tone-chip">따뜻한</span><span class="tone-chip">핸드메이드</span></div></div>
+          <div class="target-blk">20대 후반~30대 직장인 여성 · 핸드메이드 제품 관심 · 선물을 찾는 분</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── PAGE: 상품 관리 ────── -->
+  <div id="page-product" class="page panel-2col">
+    <div class="edit-panel">
+      <div class="edit-hd"><h2><span>📦</span> 상품 관리</h2><p>판매 제품을 등록하세요. 사이트 제품 페이지와 쇼핑 광고에 활용됩니다.</p></div>
+      <div class="edit-body">
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>📋</span> 등록된 상품 (2개)</div>
+          <div class="item-list">
+            <div class="item-card selected"><div class="item-thumb">👜</div><div class="item-info"><div class="item-name">미니 토트백 — 내추럴 베이지</div><div class="item-meta">토트백 · 재고 3개</div><div class="item-price">₩128,000</div></div><div class="item-acts"><div class="icon-btn">✏️</div><div class="icon-btn">🗑</div></div></div>
+            <div class="item-card"><div class="item-thumb">🎒</div><div class="item-info"><div class="item-name">크로스백 — 다크 브라운</div><div class="item-meta">크로스백 · 재고 2개</div><div class="item-price">₩98,000</div></div><div class="item-acts"><div class="icon-btn">✏️</div><div class="icon-btn">🗑</div></div></div>
+          </div>
+          <div class="add-item-btn">+ 상품 추가</div>
+        </div>
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>✏️</span> 상품 편집 — 미니 토트백</div>
+          <div class="field"><label>상품명</label><input type="text" value="미니 토트백 — 내추럴 베이지"></div>
+          <div class="field"><label>카테고리</label><select><option selected>토트백</option><option>크로스백</option><option>백팩</option><option>파우치</option></select></div>
+          <div class="field"><label>가격</label><input type="text" value="128,000"></div>
+          <div class="field"><label>상품 설명</label><textarea>천연 가죽으로 제작한 미니 토트백. 일상에서 가볍게 들기 좋은 사이즈.</textarea></div>
+          <div class="field"><label>소재 / 사이즈</label><input type="text" value="천연 소가죽 · W28×H22×D8cm"></div>
+          <div class="field"><label>제작 기간</label><input type="text" value="주문 후 2~3주 소요"></div>
+          <div class="field"><label>판매 채널</label><div class="tag-row"><div class="tag-chip">자사 사이트 <span class="x">×</span></div><div class="tag-chip">스마트스토어 <span class="x">×</span></div><div class="tag-chip">아이디어스 <span class="x">×</span></div><div class="tag-add">+</div></div></div>
+        </div>
+      </div>
+      <div class="save-bar"><span class="save-status">저장되지 않은 변경사항</span><button class="btn-save">저장</button></div>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-inner">
+        <div class="preview-lbl">상품 목록 미리보기</div>
+        <div class="catalog-sec">
+          <div class="catalog-sec-title">상품 목록 (2개)</div>
+          <div class="product-grid">
+            <div class="product-card-p"><div class="product-img-p">👜</div><div class="product-body-p"><div class="product-name-p">미니 토트백</div><div class="product-meta-p">토트백 · 내추럴 베이지</div><div class="product-price-p">₩128,000</div></div></div>
+            <div class="product-card-p"><div class="product-img-p">🎒</div><div class="product-body-p"><div class="product-name-p">크로스백</div><div class="product-meta-p">크로스백 · 다크 브라운</div><div class="product-price-p">₩98,000</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── PAGE: 서비스 관리 ────── -->
+  <div id="page-service" class="page panel-2col">
+    <div class="edit-panel">
+      <div class="edit-hd"><h2><span>✂️</span> 서비스 관리</h2><p>클래스, 체험, 컨설팅 등 서비스를 등록하세요.</p></div>
+      <div class="edit-body">
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>📋</span> 등록된 서비스 (2개)</div>
+          <div class="item-list">
+            <div class="item-card selected"><div class="item-thumb">🧵</div><div class="item-info"><div class="item-name">가죽 토트백 원데이 클래스</div><div class="item-meta">3시간 · 최대 4명</div><div class="item-price">₩75,000/인</div></div><div class="item-acts"><div class="icon-btn">✏️</div><div class="icon-btn">🗑</div></div></div>
+            <div class="item-card"><div class="item-thumb">📅</div><div class="item-info"><div class="item-name">4주 정기 클래스 — 입문</div><div class="item-meta">주 1회 2시간 · 최대 3명</div><div class="item-price">₩280,000/4주</div></div><div class="item-acts"><div class="icon-btn">✏️</div><div class="icon-btn">🗑</div></div></div>
+          </div>
+          <div class="add-item-btn">+ 서비스 추가</div>
+        </div>
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>✏️</span> 서비스 편집 — 원데이 클래스</div>
+          <div class="field"><label>서비스명</label><input type="text" value="가죽 토트백 원데이 클래스"></div>
+          <div class="field"><label>유형</label><select><option selected>원데이 클래스</option><option>정기 클래스</option><option>1:1 컨설팅</option><option>온라인 강의</option></select></div>
+          <div class="field"><label>가격</label><input type="text" value="75,000원 / 1인"></div>
+          <div class="field"><label>소요 시간 / 인원</label><input type="text" value="약 3시간 · 최대 4명"></div>
+          <div class="field"><label>서비스 설명</label><textarea>가죽 공예 처음이어도 괜찮아요. 재단부터 마감까지 직접 만드는 나만의 토트백.</textarea></div>
+          <div class="field"><label>운영 요일</label><input type="text" value="토·일 10:00, 14:00 (주중 협의 가능)"></div>
+          <div class="field"><label>예약 방법</label><select><option>카카오 오픈채팅</option><option>인스타그램 DM</option><option selected>전화 / 문자</option><option>네이버 예약</option></select></div>
+        </div>
+      </div>
+      <div class="save-bar"><span class="save-status saved">✓ 자동 저장됨</span><button class="btn-save">저장</button></div>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-inner">
+        <div class="preview-lbl">서비스 목록 미리보기</div>
+        <div class="catalog-sec">
+          <div class="catalog-sec-title">서비스 목록 (2개)</div>
+          <div class="service-list-p">
+            <div class="service-item-p"><span class="service-ico-p">🧵</span><div><div class="service-name-p">가죽 토트백 원데이 클래스</div><div class="service-desc-p">처음이어도 괜찮아요. 재단부터 마감까지 직접 만드는 나만의 토트백.</div><div class="service-price-p">₩75,000/인 · 최대 4명 · 약 3시간</div></div></div>
+            <div class="service-item-p"><span class="service-ico-p">📅</span><div><div class="service-name-p">4주 정기 클래스 — 입문</div><div class="service-desc-p">주 1회 2시간, 4주 체계적으로 배우는 가죽 공예 입문.</div><div class="service-price-p">₩280,000/4주 · 최대 3명</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── PAGE: 매장 관리 ────── -->
+  <div id="page-store" class="page panel-2col">
+    <div class="edit-panel">
+      <div class="edit-hd"><h2><span>📍</span> 매장 관리</h2><p>오프라인 공간 정보와 SNS 채널. 구글 비즈니스 등록에 바로 활용됩니다.</p></div>
+      <div class="edit-body">
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>📍</span> 위치 & 연락처</div>
+          <div class="field"><label>매장명</label><input type="text" value="TYBD 가죽 공방"></div>
+          <div class="field"><label>주소</label><input type="text" value="충남 천안시 서북구 성환읍 ○○로 ○○"></div>
+          <div class="field"><label>위치 안내</label><textarea>천안아산역에서 자동차 20분. 주차 3대 가능.</textarea></div>
+          <div class="field"><label>전화</label><input type="tel" value="010-XXXX-XXXX"></div>
+          <div class="field"><label>이메일</label><input type="text" value="tybd@gmail.com"></div>
+        </div>
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>🕐</span> 영업 시간</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:7px;">
+            <div class="field"><label>평일</label><input type="text" value="10:00 ~ 18:00"></div>
+            <div class="field"><label>토요일</label><input type="text" value="10:00 ~ 17:00"></div>
+            <div class="field"><label>일요일</label><input type="text" value="예약제 운영"></div>
+            <div class="field"><label>공휴일</label><input type="text" value="휴무"></div>
+          </div>
+        </div>
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>📱</span> SNS & 채널</div>
+          <div class="field"><label>인스타그램</label><input type="text" value="@tybd_handmade"></div>
+          <div class="field"><label>네이버 블로그</label><input type="url" value="blog.naver.com/tybd"></div>
+          <div class="field"><label>기타 채널</label><textarea>아이디어스: idus.com/tybd</textarea></div>
+        </div>
+        <div class="form-sec">
+          <div class="form-sec-lbl"><span>🗺</span> 플랫폼 등록 현황</div>
+          <div class="field"><label>구글 비즈니스</label><select><option selected>미등록</option><option>등록 완료</option></select></div>
+          <div class="field"><label>네이버 스마트플레이스</label><select><option>미등록</option><option selected>등록 완료</option></select></div>
+        </div>
+      </div>
+      <div class="save-bar"><span class="save-status">저장되지 않은 변경사항</span><button class="btn-save">저장</button></div>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-inner">
+        <div class="preview-lbl">매장 정보 미리보기</div>
+        <div class="catalog-sec">
+          <div class="catalog-sec-title">매장 & 연락처</div>
+          <div class="store-grid">
+            <div class="store-item"><div class="store-lbl">위치</div><div class="store-val">충남 천안시 서북구<br>성환읍 ○○로 ○○</div></div>
+            <div class="store-item"><div class="store-lbl">영업시간</div><div class="store-val">평일 10~18시<br>토 10~17시 · 일 예약제</div></div>
+            <div class="store-item"><div class="store-lbl">연락처</div><div class="store-val">010-XXXX-XXXX<br>tybd@gmail.com</div></div>
+            <div class="store-item"><div class="store-lbl">플랫폼</div><div class="store-val">네이버 플레이스 ✓<br>구글 비즈니스 <span style="color:var(--danger);">미등록</span></div></div>
+          </div>
+          <div class="sns-row"><span class="sns-chip">📸 @tybd_handmade</span><span class="sns-chip">📝 네이버 블로그</span><span class="sns-chip">🛍 아이디어스</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── PAGE: 사이트 관리 (3분할) ────── -->
+  <div id="page-site" class="page panel-3col">
+
+    <!-- LEFT: 파일 + 레퍼런스 -->
+    <div class="col3 col3-left">
+      <div class="col-hd">
+        <div class="col-hd-icon b">📁</div>
+        <div><h3>사이트 파일</h3><p>AI 사이트 ZIP 업로드</p></div>
+      </div>
+      <div class="col-bd">
+        <div class="status-ok"><span>✅</span><div><strong>tybd-s3.zip 업로드 완료</strong>5개 파일 · 2.3MB · 방금 전</div></div>
+        <div class="upload-zone"><div class="ico">📤</div><div class="t1">수정 후 재업로드</div><div class="t2">ZIP 드래그 or <a>파일 선택</a> · 최대 50MB</div></div>
+        <div class="divider"></div>
+        <div class="sec-lbl">📌 레퍼런스 & 메모</div>
+        <div style="font-size:11px; color:var(--ink-light); margin-top:-2px; margin-bottom:4px; line-height:1.6;">참고 사이트를 등록하면 컨설턴트와 공유됩니다</div>
+        <div class="ref-item"><div class="ref-fav">🌿</div><div class="ref-info"><div class="ref-url">leathercraft-seoul.com</div><div class="ref-note">헤더 디자인 참고 · 포트폴리오 구성</div></div><div style="display:flex;gap:3px;"><div class="icon-btn">✏️</div><div class="icon-btn">🗑</div></div></div>
+        <div class="ref-item"><div class="ref-fav">📸</div><div class="ref-info"><div class="ref-url">studioblossom.kr</div><div class="ref-note">예약 버튼 위치, CTA 문구 스타일</div></div><div style="display:flex;gap:3px;"><div class="icon-btn">✏️</div><div class="icon-btn">🗑</div></div></div>
+        <div class="ref-add">+ 레퍼런스 추가</div>
+        <div class="field"><label>메모 (컨설턴트 전달)</label><textarea>가방 제작 과정을 더 잘 보여주고 싶어요. 클래스 신청 버튼이 눈에 잘 안 띄는 것 같습니다.</textarea></div>
+        <div class="admin-note"><span>💡</span><span>컨설턴트 노트: 클래스 신청 CTA를 hero 상단으로 이동 권장. 갤러리 추가 시 체류시간 ↑</span></div>
+        <div class="locked-card"><div class="ico">🤖</div><div class="t1">AI 레퍼런스 자동 분석</div><div class="t2">등록 사이트를 AI가 분석해 개선안 자동 제안</div><button class="btn-sm-p">출시 알림 받기</button></div>
+      </div>
+    </div>
+
+    <!-- MID: SEO + 마케팅 코드 -->
+    <div class="col3 col3-mid">
+      <div class="col-hd">
+        <div class="col-hd-icon g">🔍</div>
+        <div><h3>SEO 검증 & 마케팅 코드</h3><p>검색 최적화 + 분석 코드 설정</p></div>
+      </div>
+      <div class="col-bd">
+        <div style="background:white; border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+          <div class="ring-wrap">
+            <div class="ring"><span class="ring-n">4/5</span></div>
+            <div class="ring-info">
+              <div class="t1">SEO 검증 결과</div>
+              <div class="t2">4개 통과 · 1개 보완 필요<br>배포 가능, 개선 권장</div>
+              <div class="pbar"><div class="pfill" style="width:80%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div class="seo-row pass"><span class="ico">✅</span><div><div class="lbl p">index.html</div><div class="msg">메인 파일 정상 확인</div></div></div>
+          <div class="seo-row fail"><span class="ico">⚠️</span><div><div class="lbl f">robots.txt 없음</div><div class="msg">크롤러가 제대로 파악 못할 수 있음</div><div class="seo-guide">ZIP 최상위에 <code>robots.txt</code> 추가<br><code>User-agent: *</code><br><code>Allow: /</code></div></div></div>
+          <div class="seo-row pass"><span class="ico">✅</span><div><div class="lbl p">sitemap.xml</div><div class="msg">검색엔진 구조 파악 가능</div></div></div>
+          <div class="seo-row pass"><span class="ico">✅</span><div><div class="lbl p">&lt;title&gt; 태그</div><div class="msg">"나의 가방 공방 — 서울 수제 가방 클래스"</div></div></div>
+          <div class="seo-row pass"><span class="ico">✅</span><div><div class="lbl p">meta description</div><div class="msg">검색 결과 설명 문구 설정됨</div></div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sec-lbl">📊 마케팅 코드 설정</div>
+        <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:13px; display:flex; flex-direction:column; gap:8px;">
+          <div class="field"><label>GA4 측정 ID <span class="tag g">연결됨</span></label><input type="text" class="set" value="G-AB1CD2EF3G"></div>
+          <div class="field"><label>Google Ads ID <span class="tag gr">선택</span></label><input type="text" placeholder="AW-XXXXXXXXX"></div>
+          <div class="field"><label>Search Console <span class="tag o">미설정</span></label><input type="text" placeholder='&lt;meta name="google-site-verification" content="..."&gt;'></div>
+          <div class="field"><label>Naver 웹마스터 <span class="tag gr">선택</span></label><input type="text" placeholder='&lt;meta name="naver-site-verification" content="..."&gt;'></div>
+          <div class="field"><label>커스텀 코드 <span class="tag gr">선택</span></label><textarea placeholder="기타 HTML 코드" style="min-height:48px;"></textarea></div>
+        </div>
+        <div class="cta-block edu"><div class="cta-txt"><strong>Search Console 설정이 어려우신가요?</strong><span>등록해야 구글 검색이 시작됩니다</span></div><button class="btn-cta b">교육 신청</button></div>
+        <div style="text-align:center; font-size:11px; color:var(--ink-light);">또는 <a href="#" style="color:var(--accent); font-weight:600;">설정 가이드 보기 →</a></div>
+      </div>
+      <div class="deploy-bar">
+        <button class="btn-deploy sub">재업로드</button>
+        <button class="btn-deploy main">🚀 Prod 배포</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: 배포 사이트 + 인사이트 -->
+    <div class="col3 col3-right">
+      <div class="col-hd">
+        <div class="col-hd-icon p">🌐</div>
+        <div><h3>배포된 사이트</h3><p>검색 미리보기 + 다음 단계</p></div>
+      </div>
+      <div class="col-bd">
+        <div class="thumb-preview">
+          <div class="t-bar"><div class="t-dot" style="background:#f87171"></div><div class="t-dot" style="background:#fbbf24"></div><div class="t-dot" style="background:#34d399"></div><div class="t-url">🔒 my-studio.aiseo.tips</div></div>
+          <div class="t-body"><div class="t-blk" style="width:60%; height:11px; background:#9ca3af;"></div><div class="t-blk" style="width:40%;"></div><div class="t-blk" style="height:38px; background:#e5e7eb;"></div><div class="t-blk" style="width:75%;"></div><div class="t-blk" style="width:50%;"></div></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <a href="#" style="font-size:12px; color:var(--accent); font-weight:600; flex:1;">my-studio.aiseo.tips →</a>
+          <span class="tag g">배포됨</span>
+          <span class="tag o">robots.txt 미흡</span>
+        </div>
+        <div class="sec-lbl">🔗 검색결과 미리보기</div>
+        <div class="og-card"><div class="og-img">👜</div><div class="og-bd"><div class="og-domain">my-studio.aiseo.tips</div><div class="og-title">TYBD 가방 공방 — 천안 수제 가방 클래스</div><div class="og-desc">천안 수제 가죽 가방 제작 클래스. 초보자도 하루에 완성. 원데이·정기 클래스 예약 가능.</div></div></div>
+        <div style="font-size:11px; color:var(--ink-light);">⚠️ OG 이미지 미등록 — SNS 공유 시 이미지 없이 표시</div>
+        <div class="divider"></div>
+        <div class="sec-lbl">💡 인사이트 & 다음 단계</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div class="insight-item"><span class="ico">🔍</span><div><strong>Search Console 미등록</strong><span>등록하면 구글 검색 노출이 시작됩니다</span></div></div>
+          <div class="insight-item"><span class="ico">📊</span><div><strong>GA4 수집 중</strong><span>데이터 쌓이고 있음. 해석 교육 신청하면 광고로 연결됩니다</span></div></div>
+          <div class="insight-item"><span class="ico">🖼</span><div><strong>OG 이미지 없음</strong><span>카카오·인스타 공유 시 빈 카드로 표시됩니다</span></div></div>
+        </div>
+        <div class="cta-block consult2"><div class="cta-txt"><strong>GA4 데이터, 어떻게 봐야 할지 모르겠다면?</strong><span>분석 + 광고 교육 신청</span></div><button class="btn-cta p">상담 신청</button></div>
+        <div class="locked-card"><div class="ico">📈</div><div class="t1">검색 순위 추적 · 경쟁사 분석</div><div class="t2">키워드별 구글 순위 자동 모니터링</div><button class="btn-sm-p">Growth 플랜에서 사용 가능</button></div>
+      </div>
+    </div>
+  </div><!-- /page-site -->
+
+  <!-- ────── PAGE: 성장 로드맵 (placeholder) ────── -->
+  <div id="page-roadmap" class="page" style="align-items:center; justify-content:center; background:var(--bg);">
+    <div style="text-align:center; color:var(--ink-light);">
+      <div style="font-size:40px; margin-bottom:12px;">🗺</div>
+      <div style="font-size:16px; font-weight:700; color:var(--ink); margin-bottom:6px;">성장 로드맵</div>
+      <div style="font-size:13px;">웨딩스냅 / 가방공방 예시 포함된 별도 파일로 제공됩니다</div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+const pageConfig = {
+  brand:   { title: '🏷 브랜드 관리',  action1: '내보내기 PDF', action2: '저장', showChip: false },
+  product: { title: '📦 상품 관리',    action1: '내보내기 PDF', action2: '저장', showChip: false },
+  service: { title: '✂️ 서비스 관리',  action1: '내보내기 PDF', action2: '저장', showChip: false },
+  store:   { title: '📍 매장 관리',    action1: '내보내기 PDF', action2: '저장', showChip: false },
+  site:    { title: '🏠 사이트 관리',  action1: '재업로드',     action2: '🚀 배포',  showChip: true  },
+  roadmap: { title: '🗺 성장 로드맵',  action1: '',             action2: '',    showChip: false },
+};
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const target = document.getElementById('page-' + id);
+  if (target) { target.style.display = 'flex'; target.classList.add('active'); }
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    if (btn.getAttribute('onclick') === `goPage('${id}')`) btn.classList.add('active');
+  });
+
+  const cfg = pageConfig[id] || {};
+  document.getElementById('topbar-title').textContent = cfg.title || '';
+  document.getElementById('topbar-title').style.display = cfg.showChip ? 'none' : 'block';
+  document.getElementById('site-chip').style.display = cfg.showChip ? 'flex' : 'none';
+  document.getElementById('topbar-action1').textContent = cfg.action1 || '';
+  document.getElementById('topbar-action1').style.display = cfg.action1 ? 'block' : 'none';
+  document.getElementById('topbar-action2').textContent = cfg.action2 || '';
+  document.getElementById('topbar-action2').style.display = cfg.action2 ? 'block' : 'none';
+}
+
+// 초기화
+(function() {
+  document.querySelectorAll('.page').forEach(p => { p.style.display = 'none'; });
+  document.getElementById('page-brand').style.display = 'flex';
+  document.getElementById('page-brand').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    if (btn.getAttribute('onclick') === "goPage('brand')") btn.classList.add('active');
+  });
+})();
+</script>
+</body>
+</html>

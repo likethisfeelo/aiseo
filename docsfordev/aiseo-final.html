@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AISEO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Noto+Serif+KR:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #111827; --ink-mid: #374151; --ink-light: #9ca3af;
+  --bg: #f3f4f6; --white: #fff; --border: #e5e7eb; --border-strong: #d1d5db;
+  --accent: #2563eb; --accent-light: #eff6ff; --accent-dim: #bfdbfe;
+  --success: #059669; --success-light: #d1fae5;
+  --warn: #d97706; --warn-light: #fef3c7;
+  --danger: #dc2626; --danger-light: #fee2e2;
+  --purple: #7c3aed; --purple-light: #ede9fe;
+  --orange: #ea580c;
+  --topbar-h: 52px;
+  --sidebar-w: 224px;
+  --edu-w: 360px;
+  --drawer-ease: 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); font-size: 13px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* ════════════════════════════
+   SHARED OVERLAY
+════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0; z-index: 140;
+  background: rgba(0,0,0,.4);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--drawer-ease);
+}
+.overlay.show { opacity: 1; pointer-events: all; }
+
+/* ════════════════════════════
+   LEFT SIDEBAR (nav drawer)
+════════════════════════════ */
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 150;
+  width: var(--sidebar-w);
+  background: white; border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform var(--drawer-ease);
+  overflow-y: auto;
+}
+.sidebar.open { transform: translateX(0); }
+.sidebar::-webkit-scrollbar { width: 0; }
+
+.sb-head { height: var(--topbar-h); padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.sb-logo { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+.sb-logo span { color: var(--accent); }
+.sb-close { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: var(--ink-light); transition: all .15s; }
+.sb-close:hover { background: var(--bg); color: var(--ink); }
+
+.sb-body { flex: 1; padding: 10px 0; }
+.nav-sec { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-light); padding: 9px 16px 5px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 16px; cursor: pointer; color: var(--ink-mid); font-size: 12px; font-weight: 500; position: relative; border: none; background: none; width: 100%; font-family: 'Noto Sans KR', sans-serif; text-align: left; transition: all .15s; }
+.nav-item:hover { background: var(--bg); color: var(--ink); }
+.nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 700; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); border-radius: 0 3px 3px 0; }
+.nav-item.sub { padding-left: 28px; }
+.nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-divider { height: 1px; background: var(--border); margin: 5px 16px; }
+.nbadge { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 100px; margin-left: auto; flex-shrink: 0; }
+.nbadge.new { background: var(--accent); color: white; }
+.nbadge.locked { background: var(--border); color: var(--ink-light); }
+.nbadge.soon { background: var(--purple-light); color: var(--purple); }
+.nbadge.alert { background: var(--danger-light); color: var(--danger); }
+.nbadge.ok { background: var(--success-light); color: var(--success); }
+
+.sb-footer { padding: 10px 14px; border-top: 1px solid var(--border); }
+.stage-card { background: linear-gradient(135deg, var(--accent-light), var(--purple-light)); border: 1px solid var(--accent-dim); border-radius: 9px; padding: 11px; }
+.stage-lbl { font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+.stage-name { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+.stage-bar { height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.stage-fill { height: 100%; background: var(--accent); border-radius: 100px; }
+.stage-sub { font-size: 10px; color: var(--ink-light); margin-top: 4px; }
+
+/* ════════════════════════════
+   RIGHT EDU DRAWER
+════════════════════════════ */
+.edu-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 150;
+  width: var(--edu-w);
+  background: white; border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform var(--drawer-ease);
+}
+.edu-drawer.open { transform: translateX(0); }
+.edu-drawer::-webkit-scrollbar { width: 0; }
+
+.edu-head { height: var(--topbar-h); padding: 0 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.edu-head-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.edu-head-txt { flex: 1; }
+.edu-head-txt h3 { font-size: 14px; font-weight: 700; color: var(--ink); }
+.edu-head-txt p { font-size: 11px; color: var(--ink-light); }
+.edu-close { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: var(--ink-light); transition: all .15s; flex-shrink: 0; }
+.edu-close:hover { background: var(--bg); color: var(--ink); }
+
+.edu-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.edu-body::-webkit-scrollbar { width: 3px; }
+.edu-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+/* edu sections */
+.edu-section-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-light); display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+.edu-divider { height: 1px; background: var(--border); }
+
+/* provided cards */
+.edu-card { background: white; border: 1px solid var(--border); border-radius: 11px; overflow: hidden; cursor: pointer; transition: all .2s; }
+.edu-card:hover { border-color: var(--accent-dim); box-shadow: 0 4px 16px rgba(37,99,235,.1); }
+.edu-card.locked { opacity: 0.55; pointer-events: none; }
+.edu-card-body { padding: 12px 14px; display: flex; gap: 11px; align-items: flex-start; }
+.edu-thumb { width: 40px; height: 40px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.edu-thumb.green { background: var(--success-light); }
+.edu-thumb.blue { background: var(--accent-light); }
+.edu-thumb.orange { background: #fff7ed; }
+.edu-thumb.purple { background: var(--purple-light); }
+.edu-thumb.pink { background: #fce7f3; }
+.edu-info { flex: 1; }
+.edu-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; line-height: 1.4; }
+.edu-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.edu-badge { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
+.edu-badge.provided { background: var(--accent-light); color: var(--accent); }
+.edu-badge.urgent { background: var(--danger-light); color: var(--danger); }
+.edu-badge.done { background: var(--success-light); color: var(--success); }
+.edu-badge.locked { background: var(--border); color: var(--ink-light); }
+.edu-duration { font-size: 11px; color: var(--ink-light); }
+.edu-progress-bar { height: 3px; background: var(--border); margin: 0 14px 12px; border-radius: 100px; overflow: hidden; }
+.edu-progress-fill { height: 100%; border-radius: 100px; }
+.edu-progress-fill.done { background: var(--success); }
+.edu-progress-fill.partial { background: var(--accent); }
+.edu-progress-fill.empty { background: transparent; }
+
+/* action row inside card */
+.edu-card-action { border-top: 1px solid var(--border); padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; }
+.edu-card-action span { font-size: 11px; color: var(--ink-light); }
+.edu-card-action .watch-btn { font-size: 11px; font-weight: 700; color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 4px; background: none; border: none; font-family: 'Noto Sans KR', sans-serif; padding: 0; }
+
+/* external resources */
+.ext-card { border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; background: white; display: flex; gap: 11px; align-items: flex-start; cursor: pointer; transition: all .15s; }
+.ext-card:hover { border-color: var(--accent-dim); background: var(--accent-light); }
+.ext-ico { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.ext-info { flex: 1; }
+.ext-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.ext-desc { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.ext-source { font-size: 10px; color: var(--ink-light); margin-top: 3px; }
+.ext-arr { font-size: 12px; color: var(--accent); flex-shrink: 0; align-self: center; }
+
+/* self-study cta */
+.selflearn-cta { background: linear-gradient(135deg, var(--purple-light), var(--accent-light)); border: 1px solid var(--accent-dim); border-radius: 11px; padding: 14px 16px; text-align: center; }
+.selflearn-cta .ico { font-size: 22px; margin-bottom: 7px; }
+.selflearn-cta h4 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.selflearn-cta p { font-size: 11px; color: var(--ink-mid); line-height: 1.7; margin-bottom: 10px; }
+.btn-selflearn { padding: 7px 18px; border-radius: 7px; font-size: 12px; font-weight: 700; background: var(--purple); color: white; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+
+/* ════════════════════════════
+   TOPBAR
+════════════════════════════ */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--topbar-h); background: white; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 14px; gap: 10px;
+}
+.icon-btn-top { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: var(--ink-mid); transition: all .15s; flex-shrink: 0; }
+.icon-btn-top:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.tb-logo { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.tb-logo span { color: var(--accent); }
+.logo-badge { font-family: 'Noto Sans KR', sans-serif; font-size: 9px; font-weight: 700; background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; }
+.tb-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; }
+.site-chip { display: flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 5px 11px; font-size: 12px; font-weight: 600; color: var(--ink-mid); flex-shrink: 0; }
+.site-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+.site-chip .url { color: var(--accent); }
+
+/* step track */
+.step-track { display: flex; align-items: center; background: var(--bg); border: 1px solid var(--border); border-radius: 100px; padding: 3px; gap: 0; }
+.step-dot { padding: 3px 11px; border-radius: 100px; font-size: 11px; font-weight: 600; color: var(--ink-light); cursor: default; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.step-dot.done { color: var(--success); }
+.step-dot.active { background: var(--accent); color: white; }
+
+.tb-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; }
+.tb-email { font-size: 11px; color: var(--ink-light); }
+
+/* edu trigger btn in topbar */
+.edu-trigger {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 13px; border-radius: 8px;
+  background: var(--accent-light); border: 1px solid var(--accent-dim);
+  color: var(--accent); font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .2s; flex-shrink: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.edu-trigger:hover { background: var(--accent); color: white; }
+.edu-trigger .dot-urgent { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); }
+
+/* ════════════════════════════
+   MAIN 3-COL
+════════════════════════════ */
+.main { position: fixed; top: var(--topbar-h); left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 266px 1fr 292px; overflow: hidden; }
+.col { height: 100%; overflow-y: auto; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: white; }
+.col:last-child { border-right: none; }
+.col::-webkit-scrollbar { width: 3px; }
+.col::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+.col-hd { position: sticky; top: 0; z-index: 10; background: white; border-bottom: 1px solid var(--border); padding: 10px 13px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.col-hd-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.col-hd-icon.b { background: var(--accent-light); }
+.col-hd-icon.g { background: var(--success-light); }
+.col-hd-icon.p { background: var(--purple-light); }
+.col-hd h3 { font-size: 12px; font-weight: 700; color: var(--ink); }
+.col-hd p { font-size: 10px; color: var(--ink-light); }
+.col-bd { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 9px; }
+
+/* ── shared components ── */
+.card { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.sec-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-light); }
+.divider { height: 1px; background: var(--border); margin: 0 -12px; }
+.tag { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; padding: 1px 7px; border-radius: 100px; }
+.tag.g { background: var(--success-light); color: var(--success); }
+.tag.o { background: var(--warn-light); color: var(--warn); }
+.tag.gr { background: var(--border); color: var(--ink-light); }
+.tag.b { background: var(--accent-light); color: var(--accent); }
+.tag.r { background: var(--danger-light); color: var(--danger); }
+input[type=text], textarea { width: 100%; border: 1px solid var(--border-strong); border-radius: 7px; padding: 7px 9px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: var(--ink); background: white; outline: none; transition: border-color .15s; }
+input[type=text]:focus, textarea:focus { border-color: var(--accent); }
+input.set { border-color: #86efac; background: #f0fdf4; }
+textarea { resize: vertical; min-height: 50px; line-height: 1.5; }
+.field { display: flex; flex-direction: column; gap: 3px; }
+.field label { font-size: 11px; font-weight: 700; color: var(--ink-mid); display: flex; align-items: center; gap: 5px; }
+.upload-zone { border: 2px dashed var(--border-strong); border-radius: 9px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all .2s; background: var(--bg); }
+.upload-zone:hover { border-color: var(--accent); background: var(--accent-light); }
+.upload-zone .ico { font-size: 22px; margin-bottom: 6px; }
+.upload-zone .t1 { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.upload-zone .t2 { font-size: 11px; color: var(--ink-light); }
+.upload-zone .t2 a { color: var(--accent); font-weight: 600; }
+.status-ok { background: var(--success-light); border: 1px solid #86efac; border-radius: 8px; padding: 9px 12px; display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: #065f46; }
+.status-ok strong { font-weight: 700; display: block; }
+.ref-item { display: flex; align-items: flex-start; gap: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: white; }
+.ref-fav { width: 22px; height: 22px; border-radius: 5px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+.ref-info { flex: 1; min-width: 0; }
+.ref-url { font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ref-note { font-size: 10px; color: var(--ink-light); line-height: 1.4; }
+.ref-add { border: 1.5px dashed var(--border-strong); border-radius: 8px; padding: 8px; text-align: center; font-size: 11px; color: var(--ink-light); cursor: pointer; transition: all .2s; }
+.ref-add:hover { border-color: var(--accent); color: var(--accent); }
+.iib { width: 22px; height: 22px; border: 1px solid var(--border); background: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; color: var(--ink-light); transition: all .15s; }
+.iib:hover { border-color: var(--accent); color: var(--accent); }
+.admin-note { background: #fefce8; border: 1px solid #fde68a; border-radius: 7px; padding: 8px 10px; font-size: 11px; color: #92400e; display: flex; gap: 6px; }
+.locked-card { background: var(--bg); border: 1.5px dashed var(--border-strong); border-radius: 10px; padding: 15px 12px; text-align: center; }
+.locked-card .ico { font-size: 18px; margin-bottom: 6px; }
+.locked-card .t1 { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.locked-card .t2 { font-size: 11px; color: var(--ink-light); line-height: 1.6; margin-bottom: 8px; }
+.btn-sm { padding: 6px 13px; border-radius: 6px; font-size: 11px; font-weight: 700; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+.btn-sm.accent { background: var(--accent); color: white; }
+.btn-sm.ghost { background: white; color: var(--ink-mid); border: 1px solid var(--border); }
+.seo-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 7px; border: 1px solid var(--border); }
+.seo-row.pass { background: #f0fdf4; border-color: #bbf7d0; }
+.seo-row.fail { background: #fff7ed; border-color: #fed7aa; }
+.seo-ico { font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+.seo-lbl { font-size: 12px; font-weight: 700; }
+.seo-lbl.p { color: #065f46; }
+.seo-lbl.f { color: #9a3412; }
+.seo-msg { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.seo-guide { margin-top: 5px; background: white; border: 1px solid #fed7aa; border-radius: 5px; padding: 6px 8px; font-size: 11px; color: var(--ink-mid); line-height: 1.6; }
+.seo-guide code { font-family: monospace; background: var(--bg); padding: 1px 4px; border-radius: 3px; font-size: 10px; }
+.ring-wrap { display: flex; align-items: center; gap: 12px; padding: 10px 12px; }
+.ring { width: 52px; height: 52px; border-radius: 50%; background: conic-gradient(var(--success) 0% 80%, var(--border) 80% 100%); display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+.ring::after { content: ''; position: absolute; inset: 8px; background: white; border-radius: 50%; }
+.ring-n { position: relative; z-index: 1; font-size: 12px; font-weight: 900; color: var(--ink); }
+.ring-info .t1 { font-size: 12px; font-weight: 700; color: var(--ink); }
+.ring-info .t2 { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.pbar { height: 3px; background: var(--border); border-radius: 100px; overflow: hidden; margin-top: 5px; }
+.pfill { height: 100%; border-radius: 100px; background: var(--accent); }
+.cta-block { border-radius: 9px; padding: 11px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cta-block.edu { background: linear-gradient(135deg, #eff6ff, #e0e7ff); border: 1px solid #c7d2fe; }
+.cta-block.consult { background: linear-gradient(135deg, #fdf4ff, #ede9fe); border: 1px solid #ddd6fe; }
+.cta-txt strong { font-size: 12px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 1px; }
+.cta-txt span { font-size: 11px; color: var(--ink-mid); }
+.btn-cta { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; cursor: pointer; border: none; font-family: 'Noto Sans KR', sans-serif; flex-shrink: 0; }
+.btn-cta.b { background: var(--accent); color: white; }
+.btn-cta.p { background: var(--purple); color: white; }
+.thumb-preview { aspect-ratio: 16/9; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.t-bar { background: #e5e7eb; padding: 6px 9px; display: flex; align-items: center; gap: 5px; }
+.t-dot { width: 7px; height: 7px; border-radius: 50%; }
+.t-url { flex: 1; background: white; border-radius: 3px; padding: 2px 7px; font-size: 10px; color: var(--ink-mid); }
+.t-body { padding: 9px; display: flex; flex-direction: column; gap: 5px; }
+.t-blk { height: 8px; background: #d1d5db; border-radius: 3px; }
+.og-card { background: white; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.og-img { height: 60px; background: linear-gradient(135deg, #dbeafe, #c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.og-bd { padding: 9px 11px; }
+.og-domain { font-size: 9px; color: var(--ink-light); margin-bottom: 2px; }
+.og-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.og-desc { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.insight-item { border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; background: white; display: flex; gap: 8px; align-items: flex-start; }
+.insight-item .ico { font-size: 13px; flex-shrink: 0; }
+.insight-item strong { font-size: 12px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 1px; }
+.insight-item span { font-size: 11px; color: var(--ink-mid); line-height: 1.6; }
+.deploy-bar { position: sticky; bottom: 0; background: white; border-top: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 7px; flex-shrink: 0; }
+.btn-deploy { flex: 1; padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; font-family: 'Noto Sans KR', sans-serif; transition: all .2s; }
+.btn-deploy.main { background: var(--accent); color: white; }
+.btn-deploy.main:hover { background: #1d4ed8; }
+.btn-deploy.sub { background: var(--bg); color: var(--ink-mid); border: 1px solid var(--border); flex: none; padding: 9px 13px; }
+
+/* ── right col "전체 메뉴" btn ── */
+.full-menu-btn {
+  position: sticky; bottom: 0;
+  background: white; border-top: 1px solid var(--border);
+  padding: 10px 12px; flex-shrink: 0;
+}
+.full-menu-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 9px; padding: 10px 14px; cursor: pointer; transition: all .2s;
+}
+.full-menu-inner:hover { background: var(--accent-light); border-color: var(--accent-dim); }
+.full-menu-inner .txt strong { font-size: 12px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 1px; }
+.full-menu-inner .txt span { font-size: 11px; color: var(--ink-light); }
+.full-menu-inner .arr { font-size: 16px; color: var(--ink-light); }
+.full-menu-inner:hover .arr { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ══ SHARED OVERLAY ══ -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- ══ LEFT NAV DRAWER ══ -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">AI<span>SEO</span><span class="logo-badge" style="font-size:9px;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:var(--accent);color:white;padding:2px 6px;border-radius:4px;">BETA</span></div>
+    <div class="sb-close" onclick="closeSidebar()">✕</div>
+  </div>
+  <div class="sb-body">
+    <div class="nav-sec">내 브랜드</div>
+    <button class="nav-item sub"><span class="nav-icon">🏷</span><span>브랜드 관리</span><span class="nbadge ok">입력중</span></button>
+    <button class="nav-item sub"><span class="nav-icon">📦</span><span>상품 관리</span><span class="nbadge alert">2개</span></button>
+    <button class="nav-item sub"><span class="nav-icon">✂️</span><span>서비스 관리</span><span class="nbadge alert">2개</span></button>
+    <button class="nav-item sub"><span class="nav-icon">📍</span><span>매장 관리</span><span class="nbadge alert">미입력</span></button>
+    <div class="nav-divider"></div>
+    <div class="nav-sec">내 사이트</div>
+    <button class="nav-item active"><span class="nav-icon">🏠</span><span>사이트 관리</span></button>
+    <button class="nav-item"><span class="nav-icon">🗺</span><span>성장 로드맵</span></button>
+    <div class="nav-divider"></div>
+    <div class="nav-sec">검색 최적화</div>
+    <button class="nav-item"><span class="nav-icon">🔍</span><span>SEO 현황</span><span class="nbadge alert">미연동</span></button>
+    <button class="nav-item"><span class="nav-icon">📊</span><span>마케팅 분석</span><span class="nbadge new">GA4</span></button>
+    <div class="nav-divider"></div>
+    <div class="nav-sec">광고 & 콘텐츠</div>
+    <button class="nav-item"><span class="nav-icon">📣</span><span>광고 관리</span><span class="nbadge locked">교육 필요</span></button>
+    <button class="nav-item"><span class="nav-icon">✍️</span><span>콘텐츠 자동화</span><span class="nbadge soon">예정</span></button>
+    <div class="nav-divider"></div>
+    <div class="nav-sec">교육 & 지원</div>
+    <button class="nav-item"><span class="nav-icon">🎓</span><span>교육 & 컨설팅</span></button>
+  </div>
+  <div class="sb-footer">
+    <div class="stage-card">
+      <div class="stage-lbl">현재 단계</div>
+      <div class="stage-name">SEO 검증 진행 중</div>
+      <div class="stage-bar"><div class="stage-fill" style="width:35%"></div></div>
+      <div class="stage-sub">전체 여정의 35% 완료 · 다음: Search Console</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RIGHT EDU DRAWER ══ -->
+<div class="edu-drawer" id="edu-drawer">
+  <div class="edu-head">
+    <div class="edu-head-icon">📚</div>
+    <div class="edu-head-txt">
+      <h3>교육 자료</h3>
+      <p>제공 교육 + 자체 학습 리소스</p>
+    </div>
+    <div class="edu-close" onclick="closeEdu()">✕</div>
+  </div>
+  <div class="edu-body">
+
+    <!-- 제공 교육 -->
+    <div class="edu-section-lbl"><span>📘</span> AISEO 제공 교육</div>
+
+    <div class="edu-card">
+      <div class="edu-card-body">
+        <div class="edu-thumb green">🔍</div>
+        <div class="edu-info">
+          <div class="edu-title">SEO 기초 — 검색이 되는 사이트 만들기</div>
+          <div class="edu-meta">
+            <span class="edu-badge done">✓ 완료</span>
+            <span class="edu-duration">동영상 · 23분</span>
+          </div>
+        </div>
+      </div>
+      <div class="edu-progress-bar"><div class="edu-progress-fill done" style="width:100%"></div></div>
+      <div class="edu-card-action">
+        <span>100% 완료</span>
+        <button class="watch-btn">다시 보기 ▶</button>
+      </div>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-card-body">
+        <div class="edu-thumb blue">📊</div>
+        <div class="edu-info">
+          <div class="edu-title">GA4 설치부터 데이터 확인까지</div>
+          <div class="edu-meta">
+            <span class="edu-badge provided">AISEO 제공</span>
+            <span class="edu-duration">동영상 · 31분</span>
+          </div>
+        </div>
+      </div>
+      <div class="edu-progress-bar"><div class="edu-progress-fill partial" style="width:60%"></div></div>
+      <div class="edu-card-action">
+        <span>60% 진행 중</span>
+        <button class="watch-btn">이어 보기 ▶</button>
+      </div>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-card-body">
+        <div class="edu-thumb orange">🗺</div>
+        <div class="edu-info">
+          <div class="edu-title">Search Console 15분 완성 가이드</div>
+          <div class="edu-meta">
+            <span class="edu-badge urgent">지금 필요</span>
+            <span class="edu-duration">동영상 · 15분</span>
+          </div>
+        </div>
+      </div>
+      <div class="edu-progress-bar"><div class="edu-progress-fill empty" style="width:0%"></div></div>
+      <div class="edu-card-action">
+        <span style="color:var(--danger); font-weight:600;">미시청</span>
+        <button class="watch-btn" style="background:var(--accent); color:white; padding:5px 12px; border-radius:6px; font-size:11px; font-weight:700; border:none; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">바로 보기 ▶</button>
+      </div>
+    </div>
+
+    <div class="edu-card locked">
+      <div class="edu-card-body">
+        <div class="edu-thumb purple">📣</div>
+        <div class="edu-info">
+          <div class="edu-title">Google Ads 첫 광고 만들기</div>
+          <div class="edu-meta">
+            <span class="edu-badge locked">🔒 Search Console 완료 후</span>
+          </div>
+        </div>
+      </div>
+      <div class="edu-progress-bar"><div class="edu-progress-fill empty" style="width:0%"></div></div>
+    </div>
+
+    <div class="edu-card locked">
+      <div class="edu-card-body">
+        <div class="edu-thumb pink">📈</div>
+        <div class="edu-info">
+          <div class="edu-title">GA4 데이터로 광고 최적화하기</div>
+          <div class="edu-meta">
+            <span class="edu-badge locked">🔒 Ads 교육 완료 후</span>
+          </div>
+        </div>
+      </div>
+      <div class="edu-progress-bar"><div class="edu-progress-fill empty" style="width:0%"></div></div>
+    </div>
+
+    <div class="edu-divider"></div>
+
+    <!-- 자체 학습 -->
+    <div class="edu-section-lbl" style="margin-top:4px;"><span>🌐</span> 스스로 찾아보기</div>
+
+    <div class="ext-card">
+      <span class="ext-ico">📖</span>
+      <div class="ext-info">
+        <div class="ext-title">구글 Search Console 공식 도움말</div>
+        <div class="ext-desc">사이트 등록, 색인 생성, 성능 리포트 이해</div>
+        <div class="ext-source">🔗 support.google.com</div>
+      </div>
+      <span class="ext-arr">↗</span>
+    </div>
+
+    <div class="ext-card">
+      <span class="ext-ico">🎬</span>
+      <div class="ext-info">
+        <div class="ext-title">GA4 완전 정복 유튜브 강의</div>
+        <div class="ext-desc">설치부터 이벤트 추적까지 무료 3시간</div>
+        <div class="ext-source">🔗 youtube.com · 무료</div>
+      </div>
+      <span class="ext-arr">↗</span>
+    </div>
+
+    <div class="ext-card">
+      <span class="ext-ico">🗝</span>
+      <div class="ext-info">
+        <div class="ext-title">네이버 키워드 도구</div>
+        <div class="ext-desc">월간 검색량으로 업종 핵심 키워드 발굴</div>
+        <div class="ext-source">🔗 searchad.naver.com · 무료</div>
+      </div>
+      <span class="ext-arr">↗</span>
+    </div>
+
+    <div class="ext-card">
+      <span class="ext-ico">📝</span>
+      <div class="ext-info">
+        <div class="ext-title">소상공인 SEO 실전 가이드</div>
+        <div class="ext-desc">지역 기반 소상공인의 구글 상위 노출 전략</div>
+        <div class="ext-source">🔗 moz.com · 영문</div>
+      </div>
+      <span class="ext-arr">↗</span>
+    </div>
+
+    <div class="ext-card">
+      <span class="ext-ico">📊</span>
+      <div class="ext-info">
+        <div class="ext-title">Google Ads 스마트 캠페인 공식 가이드</div>
+        <div class="ext-desc">광고 처음 시작하는 분을 위한 단계별 안내</div>
+        <div class="ext-source">🔗 ads.google.com · 무료</div>
+      </div>
+      <span class="ext-arr">↗</span>
+    </div>
+
+    <div class="selflearn-cta">
+      <div class="ico">🤖</div>
+      <h4>AI에게 직접 물어보세요</h4>
+      <p>SEO나 GA4 설정 중 막히는 게 있으면<br>Claude, ChatGPT에 바로 질문해도 됩니다</p>
+      <button class="btn-selflearn">Claude에게 질문하기</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="icon-btn-top" onclick="openSidebar()" title="전체 메뉴">☰</div>
+  <div class="tb-logo">AI<span>SEO</span><span class="logo-badge">BETA</span></div>
+  <div class="tb-sep"></div>
+  <div class="site-chip"><span class="dot"></span><span class="url">my-studio.aiseo.tips</span></div>
+  <div class="step-track">
+    <div class="step-dot done">✓ 주소</div>
+    <div class="step-dot done">✓ 업로드</div>
+    <div class="step-dot active">◎ SEO</div>
+    <div class="step-dot">○ 연동</div>
+    <div class="step-dot">○ 배포</div>
+  </div>
+  <div class="tb-right">
+    <!-- 교육 자료 트리거 -->
+    <button class="edu-trigger" onclick="openEdu()">
+      <span class="dot-urgent"></span>
+      📚 교육 자료
+    </button>
+    <div class="avatar">P</div>
+    <span class="tb-email">philo.productiongroup@gmail.com</span>
+  </div>
+</div>
+
+<!-- ══ MAIN 3분할 ══ -->
+<div class="main">
+
+  <!-- ── LEFT: 파일 + 레퍼런스 ── -->
+  <div class="col">
+    <div class="col-hd">
+      <div class="col-hd-icon b">📁</div>
+      <div><h3>사이트 파일</h3><p>AI 사이트 ZIP 업로드</p></div>
+    </div>
+    <div class="col-bd">
+      <div class="status-ok"><span>✅</span><div><strong>tybd-s3.zip 업로드 완료</strong>5개 파일 · 2.3MB · 방금 전</div></div>
+      <div class="upload-zone"><div class="ico">📤</div><div class="t1">수정 후 재업로드</div><div class="t2">ZIP 드래그 or <a>파일 선택</a> · 최대 50MB</div></div>
+      <div class="divider"></div>
+      <div class="sec-lbl">📌 레퍼런스 & 메모</div>
+      <div style="font-size:11px; color:var(--ink-light); line-height:1.6;">참고 사이트를 등록하면 컨설턴트와 공유됩니다</div>
+      <div class="ref-item"><div class="ref-fav">🌿</div><div class="ref-info"><div class="ref-url">leathercraft-seoul.com</div><div class="ref-note">헤더 디자인 참고 · 포트폴리오 구성</div></div><div style="display:flex;gap:3px;"><div class="iib">✏️</div><div class="iib">🗑</div></div></div>
+      <div class="ref-item"><div class="ref-fav">📸</div><div class="ref-info"><div class="ref-url">studioblossom.kr</div><div class="ref-note">예약 버튼 위치, CTA 문구 스타일</div></div><div style="display:flex;gap:3px;"><div class="iib">✏️</div><div class="iib">🗑</div></div></div>
+      <div class="ref-add">+ 레퍼런스 추가</div>
+      <div class="field"><label>메모 (컨설턴트 전달)</label><textarea>가방 제작 과정을 더 잘 보여주고 싶어요. 클래스 신청 버튼이 눈에 잘 안 띄는 것 같습니다.</textarea></div>
+      <div class="admin-note"><span>💡</span><span>컨설턴트 노트: 클래스 신청 CTA를 hero 상단 이동 권장</span></div>
+      <div class="locked-card"><div class="ico">🤖</div><div class="t1">AI 레퍼런스 자동 분석</div><div class="t2">등록 사이트를 AI가 분석해 개선안 자동 제안</div><button class="btn-sm accent">출시 알림 받기</button></div>
+    </div>
+  </div>
+
+  <!-- ── MID: SEO + 마케팅 코드 ── -->
+  <div class="col">
+    <div class="col-hd">
+      <div class="col-hd-icon g">🔍</div>
+      <div><h3>SEO 검증 & 마케팅 코드</h3><p>검색 최적화 + 분석 코드 설정</p></div>
+    </div>
+    <div class="col-bd">
+      <div class="card">
+        <div class="ring-wrap">
+          <div class="ring"><span class="ring-n">4/5</span></div>
+          <div class="ring-info"><div class="t1">SEO 검증 결과</div><div class="t2">4개 통과 · 1개 보완 필요</div><div class="pbar"><div class="pfill" style="width:80%"></div></div></div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div class="seo-row pass"><span class="seo-ico">✅</span><div><div class="seo-lbl p">index.html</div><div class="seo-msg">메인 파일 정상 확인</div></div></div>
+        <div class="seo-row fail"><span class="seo-ico">⚠️</span><div><div class="seo-lbl f">robots.txt 없음</div><div class="seo-msg">크롤러가 제대로 파악 못할 수 있음</div><div class="seo-guide">ZIP 최상위에 <code>robots.txt</code> 추가<br><code>User-agent: *</code> / <code>Allow: /</code></div></div></div>
+        <div class="seo-row pass"><span class="seo-ico">✅</span><div><div class="seo-lbl p">sitemap.xml</div><div class="seo-msg">검색엔진 구조 파악 가능</div></div></div>
+        <div class="seo-row pass"><span class="seo-ico">✅</span><div><div class="seo-lbl p">&lt;title&gt; 태그</div><div class="seo-msg">"TYBD 가방 공방 — 천안 수제 가방 클래스"</div></div></div>
+        <div class="seo-row pass"><span class="seo-ico">✅</span><div><div class="seo-lbl p">meta description</div><div class="seo-msg">검색 결과 설명 문구 설정됨</div></div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="sec-lbl">📊 마케팅 코드 설정</div>
+      <div class="card" style="padding:12px; display:flex; flex-direction:column; gap:8px;">
+        <div class="field"><label>GA4 측정 ID <span class="tag g">연결됨</span></label><input type="text" class="set" value="G-AB1CD2EF3G"></div>
+        <div class="field"><label>Google Ads ID <span class="tag gr">선택</span></label><input type="text" placeholder="AW-XXXXXXXXX"></div>
+        <div class="field"><label>Search Console <span class="tag r">미설정</span></label><input type="text" placeholder='&lt;meta name="google-site-verification"&gt;'></div>
+        <div class="field"><label>Naver 웹마스터 <span class="tag gr">선택</span></label><input type="text" placeholder='&lt;meta name="naver-site-verification"&gt;'></div>
+        <div class="field"><label>커스텀 코드 <span class="tag gr">선택</span></label><textarea placeholder="기타 HTML 코드" style="min-height:44px;"></textarea></div>
+      </div>
+      <div class="cta-block edu">
+        <div class="cta-txt"><strong>Search Console 설정이 어려우신가요?</strong><span>15분 교육 영상으로 바로 해결됩니다</span></div>
+        <button class="btn-cta b" onclick="openEdu()">교육 보기</button>
+      </div>
+    </div>
+    <div class="deploy-bar">
+      <button class="btn-deploy sub">재업로드</button>
+      <button class="btn-deploy main">🚀 Prod 배포</button>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: 사이트 현황 ── -->
+  <div class="col" style="background: var(--bg);">
+    <div class="col-hd" style="background:white;">
+      <div class="col-hd-icon p">🌐</div>
+      <div><h3>배포된 사이트</h3><p>검색 미리보기 + 다음 단계</p></div>
+    </div>
+    <div class="col-bd" style="background:var(--bg);">
+      <div class="thumb-preview">
+        <div class="t-bar"><div class="t-dot" style="background:#f87171"></div><div class="t-dot" style="background:#fbbf24"></div><div class="t-dot" style="background:#34d399"></div><div class="t-url">🔒 my-studio.aiseo.tips</div></div>
+        <div class="t-body"><div class="t-blk" style="width:60%; height:11px; background:#9ca3af;"></div><div class="t-blk" style="width:40%;"></div><div class="t-blk" style="height:38px; background:#e5e7eb;"></div><div class="t-blk" style="width:75%;"></div><div class="t-blk" style="width:50%;"></div></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        <a href="#" style="font-size:12px; color:var(--accent); font-weight:600; flex:1;">my-studio.aiseo.tips →</a>
+        <span class="tag g">배포됨</span>
+        <span class="tag o">robots.txt 미흡</span>
+      </div>
+      <div class="sec-lbl">🔗 검색결과 미리보기</div>
+      <div class="og-card"><div class="og-img">👜</div><div class="og-bd"><div class="og-domain">my-studio.aiseo.tips</div><div class="og-title">TYBD 가방 공방 — 천안 수제 가방 클래스</div><div class="og-desc">천안 수제 가죽 가방 제작 클래스. 초보자도 하루에 완성. 원데이·정기 클래스 예약 가능.</div></div></div>
+      <div style="font-size:11px; color:var(--ink-light);">⚠️ OG 이미지 미등록 — SNS 공유 시 빈 카드</div>
+      <div class="divider"></div>
+      <div class="sec-lbl">💡 지금 해야 할 것</div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div class="insight-item"><span class="ico">🔍</span><div><strong>Search Console 등록</strong><span>구글 검색 노출 시작의 첫 단계 — 교육 영상 있어요</span></div></div>
+        <div class="insight-item"><span class="ico">📊</span><div><strong>GA4 데이터 쌓이는 중</strong><span>2주 후 분석 교육 신청 가능합니다</span></div></div>
+        <div class="insight-item"><span class="ico">🖼</span><div><strong>OG 이미지 추가 권장</strong><span>카카오·인스타 공유 시 노출 개선됩니다</span></div></div>
+      </div>
+      <div class="cta-block consult"><div class="cta-txt"><strong>GA4 데이터 어떻게 보나요?</strong><span>분석 + 광고 교육 신청</span></div><button class="btn-cta p">상담 신청</button></div>
+      <div class="locked-card"><div class="ico">📈</div><div class="t1">검색 순위 추적 · 경쟁사 분석</div><div class="t2">키워드별 구글 순위 자동 모니터링</div><button class="btn-sm accent">Growth 플랜에서 가능</button></div>
+    </div>
+
+    <!-- 전체 메뉴 진입 -->
+    <div class="full-menu-btn">
+      <div class="full-menu-inner" onclick="openSidebar()">
+        <div class="txt">
+          <strong>전체 대시보드 보기</strong>
+          <span>브랜드 · 로드맵 · 광고 · 콘텐츠 자동화</span>
+        </div>
+        <span class="arr">☰</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+  // 교육 닫기
+  document.getElementById('edu-drawer').classList.remove('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  if (!document.getElementById('edu-drawer').classList.contains('open')) {
+    document.getElementById('overlay').classList.remove('show');
+  }
+}
+function openEdu() {
+  document.getElementById('edu-drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+  // 사이드바 닫기
+  document.getElementById('sidebar').classList.remove('open');
+}
+function closeEdu() {
+  document.getElementById('edu-drawer').classList.remove('open');
+  if (!document.getElementById('sidebar').classList.contains('open')) {
+    document.getElementById('overlay').classList.remove('show');
+  }
+}
+function closeAll() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('edu-drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+</script>
+</body>
+</html>
