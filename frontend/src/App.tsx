@@ -13,6 +13,7 @@ import { ServicePage } from './pages/ServicePage';
 import { StorePage } from './pages/StorePage';
 import { SiteManagementPage } from './pages/SiteManagementPage';
 import { RoadmapPage } from './pages/RoadmapPage';
+import { ComingSoonPage } from './pages/ComingSoonPage';
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -22,6 +23,10 @@ const PAGE_TITLES: Record<string, string> = {
   '/site/upload': '사이트 업로드',
   '/site/seo': 'SEO 검증',
   '/site/deployed': '배포된 사이트',
+  '/seo-status': 'SEO 현황',
+  '/analytics': '마케팅 분석',
+  '/ads': '광고 관리',
+  '/content': '콘텐츠 자동화',
   '/roadmap': '성장 로드맵',
 };
 
@@ -102,11 +107,16 @@ function SiteIdSetup({ onSiteSelected }: { onSiteSelected: (id: string) => void 
 
 /* ── Main App ── */
 export default function App() {
-  const [authPage] = useState<string | null>(
+  const [authPage, setAuthPage] = useState<string | null>(
     typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('auth') : null
   );
 
-  const { user, loading: meLoading, error: authError, handleLoginSuccess, logout } = useAuth();
+  const { user, loading: meLoading, error: authError, handleLoginSuccess: _handleLoginSuccess, logout } = useAuth();
+
+  const handleLoginSuccess = async () => {
+    await _handleLoginSuccess();
+    setAuthPage(null);
+  };
   const [siteId, setSiteId] = useState('');
   const [pageTitle, setPageTitle] = useState('대시보드');
   const [educationOpen, setEducationOpen] = useState(false);
@@ -168,6 +178,10 @@ export default function App() {
             <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} />} />
             <Route path="/site" element={<Navigate to="/site/upload" replace />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/seo-status" element={<ComingSoonPage title="SEO 현황" description="사이트의 검색 엔진 최적화 현황을 한눈에 확인할 수 있습니다. 키워드 순위, 검색 노출 추이 등이 제공될 예정입니다." icon="🔍" />} />
+            <Route path="/analytics" element={<ComingSoonPage title="마케팅 분석" description="GA4 데이터를 기반으로 방문자 현황, 유입 경로, 전환율 등 핵심 마케팅 지표를 분석합니다." icon="📊" />} />
+            <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
+            <Route path="/content" element={<ComingSoonPage title="콘텐츠 자동화" description="AI를 활용한 SEO 블로그 글 자동 생성, 리뷰 콘텐츠 발행 등 콘텐츠 마케팅을 자동화합니다." icon="✍️" />} />
             <Route path="*" element={<Navigate to="/site/upload" replace />} />
           </Routes>
         </DashboardLayout>
