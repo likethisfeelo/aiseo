@@ -267,6 +267,59 @@ export class CdkStack extends Stack {
     const imageUploadResource = api.root.addResource('image-upload');
     addPost(imageUploadResource, new apigateway.LambdaIntegration(imageUploadHandler));
 
+    // ── Comments table + Lambda handlers ──
+    const commentsTableName = this.node.tryGetContext('commentsTableName') ?? 'aiseo-comments';
+    const commentsTable = new dynamodb.Table(this, 'CommentsTable', {
+      tableName: commentsTableName,
+      partitionKey: { name: 'siteId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'commentId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const adminSitesHandler = new lambda.Function(this, 'AdminSitesFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'admin-sites/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { SITES_TABLE: sitesTableName },
+    });
+    sitesTable.grantReadData(adminSitesHandler);
+
+    const adminCommentHandler = new lambda.Function(this, 'AdminCommentFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'admin-comment/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { COMMENTS_TABLE: commentsTableName },
+    });
+    commentsTable.grantWriteData(adminCommentHandler);
+
+    const commentsHandler = new lambda.Function(this, 'CommentsFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'comments/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { COMMENTS_TABLE: commentsTableName, SITES_TABLE: sitesTableName },
+    });
+    commentsTable.grantReadWriteData(commentsHandler);
+    sitesTable.grantReadData(commentsHandler);
+
+    // Admin API routes
+    const adminResource = api.root.addResource('admin');
+    const adminSitesResource = adminResource.addResource('sites');
+    addGet(adminSitesResource, new apigateway.LambdaIntegration(adminSitesHandler));
+    const adminSiteResource = adminResource.addResource('site');
+    addGet(adminSiteResource, new apigateway.LambdaIntegration(adminSitesHandler));
+    const adminCommentResource = adminResource.addResource('comment');
+    addPost(adminCommentResource, new apigateway.LambdaIntegration(adminCommentHandler));
+
+    // User comments routes
+    const commentsResource = api.root.addResource('comments');
+    const commentsIntegration = new apigateway.LambdaIntegration(commentsHandler);
+    addGet(commentsResource, commentsIntegration);
+    const commentsReadResource = commentsResource.addResource('read');
+    addPost(commentsReadResource, commentsIntegration);
+
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,
       responseHeaders: {

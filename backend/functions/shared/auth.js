@@ -1,4 +1,4 @@
-const { unauthorized } = require('./response');
+const { unauthorized, forbidden } = require('./response');
 
 const getClaims = (event) => {
   const claims = event?.requestContext?.authorizer?.claims;
@@ -31,8 +31,25 @@ const requireUser = (event) => {
   return { user, errorResponse: null };
 };
 
+const isAdmin = (event) => {
+  const claims = getClaims(event);
+  if (!claims) return false;
+  const groups = claims['cognito:groups'] || [];
+  if (Array.isArray(groups)) return groups.includes('admin');
+  return groups === 'admin';
+};
+
+const requireAdmin = (event) => {
+  const { user, errorResponse } = requireUser(event);
+  if (errorResponse) return { user: null, errorResponse };
+  if (!isAdmin(event)) return { user: null, errorResponse: forbidden('Admin access required') };
+  return { user, errorResponse: null };
+};
+
 module.exports = {
   getClaims,
   getUserContext,
   requireUser,
+  isAdmin,
+  requireAdmin,
 };
