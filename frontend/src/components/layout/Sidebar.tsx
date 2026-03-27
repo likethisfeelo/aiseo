@@ -9,11 +9,18 @@ interface SidebarProps {
   onToggleEducation?: () => void;
 }
 
+interface ChildItem {
+  path: string;
+  label: string;
+  section?: string;  // section header before this item
+  locked?: boolean;
+}
+
 interface MenuItem {
   id: string;
   icon: string;
   label: string;
-  children: { path: string; label: string }[];
+  children: ChildItem[];
 }
 
 const MENU: MenuItem[] = [
@@ -32,18 +39,22 @@ const MENU: MenuItem[] = [
     icon: '📊',
     label: '마케팅 관리',
     children: [
-      { path: '/brand', label: '브랜드 관리' },
+      { path: '/brand', label: '브랜드 관리', section: '브랜드' },
       { path: '/products', label: '상품 관리' },
       { path: '/services', label: '서비스 관리' },
       { path: '/store', label: '매장 관리' },
-      { path: '/roadmap', label: '성장 로드맵' },
+      { path: '/seo-status', label: 'SEO 현황', section: '검색 & 분석', locked: true },
+      { path: '/analytics', label: '마케팅 분석', locked: true },
+      { path: '/ads', label: '광고 관리', section: '광고 & 콘텐츠', locked: true },
+      { path: '/content', label: '콘텐츠 자동화', locked: true },
+      { path: '/roadmap', label: '성장 로드맵', section: '성장' },
     ],
   },
 ];
 
 function getExpandedFromPath(pathname: string): string {
   if (pathname.startsWith('/site')) return 'site';
-  if (['/brand', '/products', '/services', '/store', '/roadmap'].some((p) => pathname.startsWith(p))) return 'marketing';
+  if (['/brand', '/products', '/services', '/store', '/roadmap', '/seo-status', '/analytics', '/ads', '/content'].some((p) => pathname.startsWith(p))) return 'marketing';
   return 'site';
 }
 
@@ -112,33 +123,43 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
               expanded={true}
               onClick={() => {}}
             />
-            <div style={{ background: '#fafbfc' }}>
+            <div style={{ background: '#fafbfc', overflowY: 'auto', flex: 1 }}>
               {MENU[expandedIdx].children.map((child) => {
                 const active = location.pathname === child.path;
+                const disabled = child.locked;
                 return (
-                  <button
-                    key={child.path}
-                    onClick={() => navigate(child.path)}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '9px 16px 9px 40px',
-                      border: 'none',
-                      background: active ? '#eff6ff' : 'transparent',
-                      color: active ? '#2563eb' : '#475569',
-                      fontSize: 13,
-                      fontWeight: active ? 600 : 400,
-                      cursor: 'pointer',
-                      borderLeft: active ? '3px solid #2563eb' : '3px solid transparent',
-                      transition: 'background 0.15s, color 0.15s',
-                      fontFamily: 'inherit',
-                    }}
-                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#f1f5f9'; }}
-                    onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
-                  >
-                    {child.label}
-                  </button>
+                  <div key={child.path}>
+                    {child.section && (
+                      <div style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', padding: '10px 16px 3px 40px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                        {child.section}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => !disabled && navigate(child.path)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '8px 16px 8px 40px',
+                        border: 'none',
+                        background: active ? '#eff6ff' : 'transparent',
+                        color: disabled ? '#b0b8c4' : active ? '#2563eb' : '#475569',
+                        fontSize: 13,
+                        fontWeight: active ? 600 : 400,
+                        cursor: disabled ? 'default' : 'pointer',
+                        borderLeft: active ? '3px solid #2563eb' : '3px solid transparent',
+                        transition: 'background 0.15s, color 0.15s',
+                        fontFamily: 'inherit',
+                      }}
+                      onMouseEnter={(e) => { if (!active && !disabled) e.currentTarget.style.background = '#f1f5f9'; }}
+                      onMouseLeave={(e) => { if (!active && !disabled) e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      <span>{child.label}</span>
+                      {disabled && <span style={{ fontSize: 10, color: '#94a3b8', background: '#f1f5f9', padding: '1px 6px', borderRadius: 4 }}>준비 중</span>}
+                    </button>
+                  </div>
                 );
               })}
             </div>
