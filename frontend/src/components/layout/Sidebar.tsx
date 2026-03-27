@@ -1,69 +1,62 @@
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { StatusBadge } from '../common/StatusBadge';
 import { ProgressRing } from '../common/ProgressRing';
-import type { BadgeStatus } from '../../types';
 
 interface SidebarProps {
   siteId: string;
   brandCompleteness: number;
   stageProgress: number;
+  onToggleEducation?: () => void;
 }
 
-interface NavItemDef {
-  path: string;
+interface MenuItem {
+  id: string;
+  icon: string;
   label: string;
-  badge?: BadgeStatus;
-  badgeText?: string;
-  count?: number;
+  children: { path: string; label: string }[];
 }
 
-interface NavSectionDef {
-  title: string;
-  items: NavItemDef[];
-}
-
-const NAV_SECTIONS: NavSectionDef[] = [
+const MENU: MenuItem[] = [
   {
-    title: '내 브랜드',
-    items: [
-      { path: '/brand', label: '브랜드 관리', badge: 'in-progress', badgeText: '입력중' },
-      { path: '/products', label: '상품 관리', badge: 'empty', count: 0 },
-      { path: '/services', label: '서비스 관리', badge: 'empty', count: 0 },
-      { path: '/store', label: '매장 관리', badge: 'empty', badgeText: '미입력' },
+    id: 'site',
+    icon: '🌐',
+    label: '사이트 관리',
+    children: [
+      { path: '/site/upload', label: '사이트 업로드' },
+      { path: '/site/seo', label: 'SEO 검증' },
+      { path: '/site/deployed', label: '배포된 사이트' },
     ],
   },
   {
-    title: '내 사이트',
-    items: [
-      { path: '/site', label: '사이트 관리' },
+    id: 'marketing',
+    icon: '📊',
+    label: '마케팅 관리',
+    children: [
+      { path: '/brand', label: '브랜드 관리' },
+      { path: '/products', label: '상품 관리' },
+      { path: '/services', label: '서비스 관리' },
+      { path: '/store', label: '매장 관리' },
       { path: '/roadmap', label: '성장 로드맵' },
-    ],
-  },
-  {
-    title: '검색 최적화',
-    items: [
-      { path: '#', label: 'SEO 현황', badge: 'coming-soon', badgeText: '미연결' },
-      { path: '#', label: '마케팅 분석', badge: 'coming-soon', badgeText: 'GA4' },
-    ],
-  },
-  {
-    title: '광고 & 콘텐츠',
-    items: [
-      { path: '#', label: '광고 관리', badge: 'needs-education', badgeText: '교육 필요' },
-      { path: '#', label: '콘텐츠 자동화', badge: 'coming-soon', badgeText: '출시 예정' },
-    ],
-  },
-  {
-    title: '교육 & 지원',
-    items: [
-      { path: '#', label: '교육 & 컨설팅' },
     ],
   },
 ];
 
-export function Sidebar({ siteId, brandCompleteness, stageProgress }: SidebarProps) {
+function getExpandedFromPath(pathname: string): string {
+  if (pathname.startsWith('/site')) return 'site';
+  if (['/brand', '/products', '/services', '/store', '/roadmap'].some((p) => pathname.startsWith(p))) return 'marketing';
+  return 'site';
+}
+
+export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEducation }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [expandedId, setExpandedId] = useState(() => getExpandedFromPath(location.pathname));
+
+  useEffect(() => {
+    setExpandedId(getExpandedFromPath(location.pathname));
+  }, [location.pathname]);
+
+  const expandedIdx = MENU.findIndex((m) => m.id === expandedId);
 
   return (
     <nav
@@ -84,16 +77,7 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress }: SidebarPro
           <span style={{ fontSize: 18, fontWeight: 700, color: '#1e293b', fontFamily: "'DM Serif Display', serif" }}>
             AISEO
           </span>
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: '#2563eb',
-              background: '#eff6ff',
-              padding: '2px 6px',
-              borderRadius: 4,
-            }}
-          >
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#2563eb', background: '#eff6ff', padding: '2px 6px', borderRadius: 4 }}>
             BETA
           </span>
         </div>
@@ -104,65 +88,109 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress }: SidebarPro
         )}
       </div>
 
-      {/* Navigation Sections */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-        {NAV_SECTIONS.map((section) => (
-          <div key={section.title} style={{ marginBottom: 4 }}>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: '#94a3b8',
-                padding: '8px 16px 4px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.03em',
-              }}
-            >
-              {section.title}
-            </div>
-            {section.items.map((item) => {
-              const active = location.pathname === item.path;
-              const disabled = item.path === '#';
-              return (
-                <button
-                  key={item.path + item.label}
-                  onClick={() => !disabled && navigate(item.path)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    padding: '8px 16px',
-                    border: 'none',
-                    background: active ? '#eff6ff' : 'transparent',
-                    color: disabled ? '#94a3b8' : active ? '#2563eb' : '#334155',
-                    fontSize: 13,
-                    fontWeight: active ? 600 : 400,
-                    cursor: disabled ? 'default' : 'pointer',
-                    textAlign: 'left',
-                    borderLeft: active ? '3px solid #2563eb' : '3px solid transparent',
-                    transition: 'background 0.15s',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!disabled && !active) e.currentTarget.style.background = '#f8fafc';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!active) e.currentTarget.style.background = 'transparent';
-                  }}
-                >
-                  <span>{item.label}</span>
-                  {item.badge && <StatusBadge status={item.badge} text={item.badgeText} />}
-                  {typeof item.count === 'number' && !item.badge && (
-                    <span style={{ fontSize: 11, color: '#94a3b8' }}>{item.count}</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+      {/* Main nav area */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+        {/* Collapsed menus BEFORE expanded */}
+        {MENU.slice(0, expandedIdx).map((menu) => (
+          <SectionHeader
+            key={menu.id}
+            menu={menu}
+            expanded={false}
+            onClick={() => {
+              setExpandedId(menu.id);
+              navigate(menu.children[0].path);
+            }}
+          />
         ))}
+
+        {/* Expanded menu + children */}
+        {expandedIdx >= 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <SectionHeader
+              menu={MENU[expandedIdx]}
+              expanded={true}
+              onClick={() => {}}
+            />
+            <div style={{ background: '#fafbfc' }}>
+              {MENU[expandedIdx].children.map((child) => {
+                const active = location.pathname === child.path;
+                return (
+                  <button
+                    key={child.path}
+                    onClick={() => navigate(child.path)}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '9px 16px 9px 40px',
+                      border: 'none',
+                      background: active ? '#eff6ff' : 'transparent',
+                      color: active ? '#2563eb' : '#475569',
+                      fontSize: 13,
+                      fontWeight: active ? 600 : 400,
+                      cursor: 'pointer',
+                      borderLeft: active ? '3px solid #2563eb' : '3px solid transparent',
+                      transition: 'background 0.15s, color 0.15s',
+                      fontFamily: 'inherit',
+                    }}
+                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#f1f5f9'; }}
+                    onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    {child.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Collapsed menus AFTER expanded */}
+        {MENU.slice(expandedIdx + 1).map((menu) => (
+          <SectionHeader
+            key={menu.id}
+            menu={menu}
+            expanded={false}
+            onClick={() => {
+              setExpandedId(menu.id);
+              navigate(menu.children[0].path);
+            }}
+          />
+        ))}
+
+        {/* Education - always at bottom */}
+        <button
+          onClick={onToggleEducation}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            width: '100%',
+            padding: '12px 16px',
+            border: 'none',
+            borderTop: '1px solid #f1f5f9',
+            background: 'transparent',
+            color: '#475569',
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: 'pointer',
+            textAlign: 'left',
+            fontFamily: 'inherit',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+        >
+          <span style={{ fontSize: 16 }}>📚</span>
+          <span>교육 안내</span>
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>›</span>
+        </button>
       </div>
 
-      {/* Bottom: Brand Completeness */}
+      {/* Bottom: Completeness */}
       <div
         style={{
           borderTop: '1px solid #e2e8f0',
@@ -190,5 +218,39 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress }: SidebarPro
         </span>
       </div>
     </nav>
+  );
+}
+
+/* ── Section Header (1단계 메뉴) ── */
+function SectionHeader({ menu, expanded, onClick }: { menu: MenuItem; expanded: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        width: '100%',
+        padding: '12px 16px',
+        border: 'none',
+        background: expanded ? '#f1f5f9' : 'transparent',
+        color: expanded ? '#1e293b' : '#475569',
+        fontSize: 14,
+        fontWeight: 600,
+        cursor: expanded ? 'default' : 'pointer',
+        textAlign: 'left',
+        fontFamily: 'inherit',
+        borderBottom: expanded ? '1px solid #e2e8f0' : 'none',
+        transition: 'background 0.2s, color 0.2s',
+      }}
+      onMouseEnter={(e) => { if (!expanded) e.currentTarget.style.background = '#f8fafc'; }}
+      onMouseLeave={(e) => { if (!expanded) e.currentTarget.style.background = 'transparent'; }}
+    >
+      <span style={{ fontSize: 16 }}>{menu.icon}</span>
+      <span>{menu.label}</span>
+      <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8', transition: 'transform 0.2s', transform: expanded ? 'rotate(90deg)' : 'none' }}>
+        ›
+      </span>
+    </button>
   );
 }

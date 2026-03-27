@@ -38,6 +38,7 @@ export function DashboardLayout({
         siteId={siteId}
         brandCompleteness={brandCompleteness}
         stageProgress={stageProgress}
+        onToggleEducation={onToggleEducation}
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <TopBar
