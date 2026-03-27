@@ -19,7 +19,9 @@ const PAGE_TITLES: Record<string, string> = {
   '/products': '상품 관리',
   '/services': '서비스 관리',
   '/store': '매장 관리',
-  '/site': '사이트 관리',
+  '/site/upload': '사이트 업로드',
+  '/site/seo': 'SEO 검증',
+  '/site/deployed': '배포된 사이트',
   '/roadmap': '성장 로드맵',
 };
 
@@ -161,9 +163,12 @@ export default function App() {
             <Route path="/products" element={<ProductPage siteId={siteId} />} />
             <Route path="/services" element={<ServicePage siteId={siteId} />} />
             <Route path="/store" element={<StorePage siteId={siteId} />} />
-            <Route path="/site" element={<SiteManagementPage siteId={siteId} />} />
+            <Route path="/site/upload" element={<SiteManagementPage siteId={siteId} />} />
+            <Route path="/site/seo" element={<SiteManagementPage siteId={siteId} />} />
+            <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} />} />
+            <Route path="/site" element={<Navigate to="/site/upload" replace />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
-            <Route path="*" element={<Navigate to="/brand" replace />} />
+            <Route path="*" element={<Navigate to="/site/upload" replace />} />
           </Routes>
         </DashboardLayout>
         <EducationDrawer open={educationOpen} onClose={() => setEducationOpen(false)} />

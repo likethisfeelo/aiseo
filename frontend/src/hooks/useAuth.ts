@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getMe } from '../api';
 import {
-  buildLogoutUrl,
   consumeCognitoCallbackTokens,
   tokenStore,
 } from '../auth.js';
@@ -44,10 +43,9 @@ export function useAuth() {
   }, [loadMe]);
 
   const logout = useCallback(() => {
-    const url = buildLogoutUrl();
     tokenStore.clear();
     setUser(null);
-    if (url) window.location.href = url;
+    window.location.href = '/';
   }, []);
 
   return { user, loading, error, handleLoginSuccess, logout, setError };
