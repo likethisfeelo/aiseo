@@ -162,9 +162,25 @@ export class CdkStack extends Stack {
     const me = api.root.addResource('me');
     addGet(me, new apigateway.LambdaIntegration(meHandler));
 
+    const siteSettingsHandler = new lambda.Function(this, 'SiteSettingsFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'site-settings/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        SITES_TABLE: this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites',
+      },
+    });
+    sitesTable.grantReadWriteData(siteSettingsHandler);
+
     const site = api.root.addResource('site');
     const siteSelect = site.addResource('select');
     addPost(siteSelect, new apigateway.LambdaIntegration(selectSite));
+
+    const siteSettings = site.addResource('settings');
+    const siteSettingsIntegration = new apigateway.LambdaIntegration(siteSettingsHandler);
+    addGet(siteSettings, siteSettingsIntegration);
+    addPost(siteSettings, siteSettingsIntegration);
 
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,
