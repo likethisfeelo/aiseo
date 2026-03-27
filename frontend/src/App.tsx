@@ -102,11 +102,16 @@ function SiteIdSetup({ onSiteSelected }: { onSiteSelected: (id: string) => void 
 
 /* ── Main App ── */
 export default function App() {
-  const [authPage] = useState<string | null>(
+  const [authPage, setAuthPage] = useState<string | null>(
     typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('auth') : null
   );
 
-  const { user, loading: meLoading, error: authError, handleLoginSuccess, logout } = useAuth();
+  const { user, loading: meLoading, error: authError, handleLoginSuccess: _handleLoginSuccess, logout } = useAuth();
+
+  const handleLoginSuccess = async () => {
+    await _handleLoginSuccess();
+    setAuthPage(null);
+  };
   const [siteId, setSiteId] = useState('');
   const [pageTitle, setPageTitle] = useState('대시보드');
   const [educationOpen, setEducationOpen] = useState(false);
