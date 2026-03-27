@@ -1,7 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createUploadUrl, validateSite, deploySite, getSiteSettings, saveSiteSettings } from '../api';
 import { ProgressRing } from '../components/common/ProgressRing';
 import type { HeadSnippets, ValidateResult, DeployResult } from '../types';
+
+type FocusedColumn = 'left' | 'center' | 'right' | null;
 
 const SEO_FIX_GUIDES: Record<string, string> = {
   'index.html': 'ZIP 파일 최상위에 index.html 파일을 포함해 주세요.',
@@ -14,7 +16,24 @@ const SEO_FIX_GUIDES: Record<string, string> = {
 const inputStyle = { width: '100%', padding: 8, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 8 };
 const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 } as const;
 
-export function SiteManagementPage({ siteId }: { siteId: string }) {
+function getColumnStyle(col: FocusedColumn, focused: FocusedColumn, defaultWidth: string): React.CSSProperties {
+  const isFocused = focused === col;
+  const isOther = focused !== null && focused !== col;
+
+  return {
+    width: focused === null ? defaultWidth : isFocused ? '70%' : '15%',
+    minWidth: isOther ? 0 : undefined,
+    opacity: isOther ? 0.55 : 1,
+    overflow: isOther ? 'hidden' : 'auto',
+    cursor: isOther ? 'pointer' : 'default',
+    transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',
+    flexShrink: 0,
+    position: 'relative' as const,
+  };
+}
+
+export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; initialFocus?: FocusedColumn }) {
+  const [focused, setFocused] = useState<FocusedColumn>(initialFocus || null);
   const [objectKey, setObjectKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -25,13 +44,23 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
   const [snippetMsg, setSnippetMsg] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Sync with route changes
+  useEffect(() => {
+    if (initialFocus) setFocused(initialFocus);
+  }, [initialFocus]);
+
   // Load settings on mount
-  useState(() => {
+  useEffect(() => {
     if (!siteId) return;
     getSiteSettings(siteId)
       .then((data: { headSnippets: HeadSnippets }) => setSnippets(data.headSnippets || {}))
       .catch(() => {});
-  });
+  }, [siteId]);
+
+  const handleColumnClick = (col: FocusedColumn) => {
+    if (focused === col) return; // already focused
+    setFocused(col);
+  };
 
   const handleUpload = async () => {
     const file = fileRef.current?.files?.[0];
@@ -44,8 +73,6 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
       const data = await createUploadUrl({ siteId, fileName: file.name, fileSize: file.size });
       setObjectKey(data.objectKey);
       await fetch(data.uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'application/zip' }, body: file });
-
-      // Auto-validate
       const vResult = await validateSite({ siteId, objectKey: data.objectKey });
       setValidateResult(vResult);
     } catch (e) {
@@ -86,9 +113,27 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
   const total = validateResult?.summary.total || 5;
 
   return (
-    <div style={{ display: 'flex', gap: 0, height: '100%' }}>
-      {/* Left Column: Files & References */}
-      <div style={{ width: 270, borderRight: '1px solid #e2e8f0', overflowY: 'auto', padding: 20, background: '#fff' }}>
+    <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+
+      {/* ── Left Column: Files & References ── */}
+      <div
+        onClick={() => handleColumnClick('left')}
+        style={{
+          ...getColumnStyle('left', focused, '270px'),
+          borderRight: '1px solid #e2e8f0',
+          padding: 20,
+          background: '#fff',
+          overflowY: focused !== null && focused !== 'left' ? 'hidden' : 'auto',
+        }}
+      >
+        {/* Collapse button */}
+        {focused === 'left' && (
+          <button onClick={(e) => { e.stopPropagation(); setFocused(null); }} style={{
+            position: 'absolute', top: 8, right: 8, background: '#f1f5f9', border: 'none',
+            borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: '#64748b', zIndex: 2,
+          }}>✕ 축소</button>
+        )}
+
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#1e293b' }}>사이트 파일</h3>
 
         <div
@@ -96,7 +141,7 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
             border: '2px dashed #cbd5e1', borderRadius: 8, padding: 20, textAlign: 'center',
             background: '#f8fafc', marginBottom: 16, cursor: 'pointer',
           }}
-          onClick={() => fileRef.current?.click()}
+          onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}
         >
           <input ref={fileRef} type="file" accept=".zip" style={{ display: 'none' }} />
           <div style={{ fontSize: 24, marginBottom: 4 }}>📁</div>
@@ -105,7 +150,7 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
         </div>
 
         <button
-          onClick={handleUpload}
+          onClick={(e) => { e.stopPropagation(); handleUpload(); }}
           disabled={loading}
           style={{
             width: '100%', padding: '10px', borderRadius: 6, border: 'none',
@@ -118,21 +163,35 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
 
         {error && <div style={{ fontSize: 12, color: '#dc2626', marginBottom: 12, padding: 8, background: '#fef2f2', borderRadius: 6 }}>{error}</div>}
 
-        {/* Reference Sites */}
         <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 8 }}>레퍼런스 사이트 & 메모</h4>
         <div style={{ padding: 12, borderRadius: 6, background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: 12, color: '#64748b', marginBottom: 12 }}>
           레퍼런스 사이트와 메모를 추가하여 컨설턴트에게 전달할 수 있습니다.
         </div>
 
-        {/* Consultant Notes */}
         <div style={{ padding: 12, borderRadius: 6, background: '#fefce8', border: '1px solid #fde68a', fontSize: 12, color: '#78350f' }}>
           <div style={{ fontWeight: 600, marginBottom: 4 }}>컨설턴트 메모</div>
           아직 등록된 메모가 없습니다.
         </div>
       </div>
 
-      {/* Center Column: SEO & Marketing */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: 20, background: '#fff' }}>
+      {/* ── Center Column: SEO & Marketing ── */}
+      <div
+        onClick={() => handleColumnClick('center')}
+        style={{
+          ...getColumnStyle('center', focused, 'auto'),
+          flex: focused === null ? 1 : undefined,
+          padding: 20,
+          background: '#fff',
+          overflowY: focused !== null && focused !== 'center' ? 'hidden' : 'auto',
+        }}
+      >
+        {focused === 'center' && (
+          <button onClick={(e) => { e.stopPropagation(); setFocused(null); }} style={{
+            position: 'absolute', top: 8, right: 8, background: '#f1f5f9', border: 'none',
+            borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: '#64748b', zIndex: 2,
+          }}>✕ 축소</button>
+        )}
+
         {/* SEO Validation */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
           <ProgressRing value={passed} max={total} size={56} strokeWidth={5} color={passed === total ? '#22c55e' : '#2563eb'} />
@@ -150,9 +209,7 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
                 <span style={{ fontSize: 16 }}>{check.passed ? '✅' : '⚠️'}</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: check.passed ? '#166534' : '#92400e' }}>
-                    {check.reason}
-                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: check.passed ? '#166534' : '#92400e' }}>{check.reason}</div>
                   {!check.passed && check.key && SEO_FIX_GUIDES[check.key] && (
                     <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{SEO_FIX_GUIDES[check.key]}</div>
                   )}
@@ -183,20 +240,36 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
         {snippetMsg && <div style={{ fontSize: 12, color: snippetMsg.includes('실패') ? '#dc2626' : '#059669', marginBottom: 8 }}>{snippetMsg}</div>}
 
         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <button onClick={handleSaveSnippets} disabled={savingSnippets} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 13, cursor: 'pointer' }}>
+          <button onClick={(e) => { e.stopPropagation(); handleSaveSnippets(); }} disabled={savingSnippets} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 13, cursor: 'pointer' }}>
             {savingSnippets ? '저장 중...' : '설정 저장'}
           </button>
-          <button onClick={() => handleDeploy('dev')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', fontSize: 13, cursor: 'pointer', color: '#475569' }}>
+          <button onClick={(e) => { e.stopPropagation(); handleDeploy('dev'); }} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', fontSize: 13, cursor: 'pointer', color: '#475569' }}>
             Dev 배포
           </button>
-          <button onClick={() => handleDeploy('prod')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+          <button onClick={(e) => { e.stopPropagation(); handleDeploy('prod'); }} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
             🚀 Prod 배포
           </button>
         </div>
       </div>
 
-      {/* Right Column: Preview & Insights */}
-      <div style={{ width: 290, borderLeft: '1px solid #e2e8f0', overflowY: 'auto', padding: 20, background: '#f8fafc' }}>
+      {/* ── Right Column: Preview & Insights ── */}
+      <div
+        onClick={() => handleColumnClick('right')}
+        style={{
+          ...getColumnStyle('right', focused, '290px'),
+          borderLeft: '1px solid #e2e8f0',
+          padding: 20,
+          background: '#f8fafc',
+          overflowY: focused !== null && focused !== 'right' ? 'hidden' : 'auto',
+        }}
+      >
+        {focused === 'right' && (
+          <button onClick={(e) => { e.stopPropagation(); setFocused(null); }} style={{
+            position: 'absolute', top: 8, right: 8, background: '#e2e8f0', border: 'none',
+            borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: '#64748b', zIndex: 2,
+          }}>✕ 축소</button>
+        )}
+
         {/* Deployed Site Preview */}
         <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>배포된 사이트</h4>
         {deployResult ? (
@@ -219,7 +292,7 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
           </div>
         )}
 
-        {/* Search Preview (OG Card) */}
+        {/* Search Preview */}
         <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>검색 결과 미리보기</h4>
         <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', padding: 12, marginBottom: 16 }}>
           <div style={{ fontSize: 11, color: '#059669', marginBottom: 2 }}>{siteId}.aiseo.tips</div>
@@ -245,7 +318,7 @@ export function SiteManagementPage({ siteId }: { siteId: string }) {
         <div style={{ marginTop: 16, padding: 16, borderRadius: 8, background: 'linear-gradient(135deg, #eff6ff, #f0fdf4)', textAlign: 'center' }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>Search Console 설정이 어려우신가요?</div>
           <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>15분 가이드 영상을 시청해 보세요</div>
-          <button style={{ padding: '6px 14px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 12, cursor: 'pointer' }}>
+          <button onClick={(e) => e.stopPropagation()} style={{ padding: '6px 14px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 12, cursor: 'pointer' }}>
             교육 신청
           </button>
         </div>
