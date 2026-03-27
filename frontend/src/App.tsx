@@ -36,7 +36,7 @@ function LandingPage({ authError }: { authError: string }) {
     <div style={{ maxWidth: 640, margin: '40px auto', fontFamily: 'system-ui, sans-serif', padding: '0 20px' }}>
       <h1 style={{ fontSize: 28, marginBottom: 4 }}>AISEO</h1>
       <p style={{ fontSize: 15, color: '#2563eb', marginBottom: 24, fontWeight: 500 }}>
-        AI 웹사이트를 SEO 최적화하고, 한 번에 배포하세요.
+        AI 웹사이트를 SEO 최적화하고, 한 번에 배포하세요. (v2)
       </p>
 
       {authError && (
