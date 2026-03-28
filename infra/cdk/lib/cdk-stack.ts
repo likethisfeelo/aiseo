@@ -218,7 +218,9 @@ export class CdkStack extends Stack {
       code: lambda.Code.fromAsset(functionsRoot),
       handler: 'me/handler.handler',
       timeout: Duration.seconds(10),
+      environment: { SITES_TABLE: sitesTableName },
     });
+    sitesTable.grantReadData(meHandler);
 
     const me = api.root.addResource('me');
     addGet(me, new apigateway.LambdaIntegration(meHandler));

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
-import { selectSite } from './api';
+import { selectSite, getMe } from './api';
 import { tokenStore } from './auth.js';
 import { APP_ENV } from './config.js';
 
@@ -127,12 +127,22 @@ export default function App() {
   const [pageTitle, setPageTitle] = useState('대시보드');
   const [educationOpen, setEducationOpen] = useState(false);
 
-  // Try to get siteId from user profile or local storage
+  // Get siteId: server first, then localStorage fallback
   useEffect(() => {
-    if (user) {
+    if (!user) return;
+    // Try server-side siteId (from /me response)
+    getMe().then((data: { siteId?: string }) => {
+      if (data.siteId) {
+        setSiteId(data.siteId);
+        localStorage.setItem('aiseo.siteId', data.siteId);
+      } else {
+        const stored = localStorage.getItem('aiseo.siteId');
+        if (stored) setSiteId(stored);
+      }
+    }).catch(() => {
       const stored = localStorage.getItem('aiseo.siteId');
       if (stored) setSiteId(stored);
-    }
+    });
   }, [user]);
 
   const handleSiteSelected = (id: string) => {
