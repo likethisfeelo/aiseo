@@ -23,6 +23,10 @@ export class CdkStack extends Stack {
 
     const devOrigin = this.node.tryGetContext('devOrigin') ?? process.env.DEV_ORIGIN ?? 'https://dev.aiseo.tips';
     const prodOrigin = this.node.tryGetContext('prodOrigin') ?? process.env.PROD_ORIGIN ?? 'https://aiseo.tips';
+    const siteDevOrigin = 'https://site.dev.aiseo.tips';
+    const siteProdOrigin = 'https://site.aiseo.tips';
+    const b2bDevOrigin = 'https://b2b.dev.aiseo.tips';
+    const b2bProdOrigin = 'https://b2b.aiseo.tips';
 
     const userPoolArn = this.node.tryGetContext('cognitoUserPoolArn') ?? process.env.COGNITO_USER_POOL_ARN;
 
@@ -114,7 +118,7 @@ export class CdkStack extends Stack {
       description: 'AISEO API for upload/validate/deploy flow',
       deploy: false,
       defaultCorsPreflightOptions: {
-        allowOrigins: [devOrigin, prodOrigin],
+        allowOrigins: [devOrigin, prodOrigin, siteDevOrigin, siteProdOrigin, b2bDevOrigin, b2bProdOrigin],
         allowMethods: ['GET', 'POST', 'OPTIONS'],
         allowHeaders: ['Content-Type', 'Authorization'],
       },

@@ -14,7 +14,7 @@ const PROD_API_BASE_URL = readEnv('VITE_API_BASE_URL_PROD', 'https://api.aiseo.t
 export const API_BASE_URL = APP_ENV === 'prod' ? PROD_API_BASE_URL : DEV_API_BASE_URL;
 
 const defaultRedirectUri =
-  APP_ENV === 'prod' ? 'https://aiseo.tips' : 'https://dev.aiseo.tips';
+  APP_ENV === 'prod' ? 'https://site.aiseo.tips' : 'https://site.dev.aiseo.tips';
 
 export const COGNITO = {
   userPoolId: readEnv('VITE_COGNITO_USER_POOL_ID'),

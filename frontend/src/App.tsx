@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { useAuth } from './hooks/useAuth';
 import { selectSite } from './api';
 import { tokenStore } from './auth.js';
+import { APP_ENV } from './config.js';
+
+const BASE_DOMAIN = APP_ENV === 'prod' ? 'aiseo.tips' : 'dev.${BASE_DOMAIN}';
 import { ForgotPasswordPage, LoginPage, SignupPage } from './auth-pages';
 import { LandingPage } from './pages/LandingPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
@@ -91,13 +94,13 @@ function SiteIdSetup({ onSiteSelected }: { onSiteSelected: (id: string) => void 
 
       {siteIdInput.trim() && (
         <p style={{ fontSize: 13, color: siteIdValid ? '#065f46' : '#dc2626', margin: '4px 0' }}>
-          {siteIdValid ? `https://${siteIdInput.trim()}.aiseo.tips` : '영문 소문자, 숫자, 하이픈(-) 3~63자만 가능합니다.'}
+          {siteIdValid ? `https://${siteIdInput.trim()}.${BASE_DOMAIN}` : '영문 소문자, 숫자, 하이픈(-) 3~63자만 가능합니다.'}
         </p>
       )}
 
       {confirming && (
         <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 6, padding: 10, marginTop: 8, fontSize: 13, color: '#dc2626' }}>
-          <strong>https://{siteIdInput.trim()}.aiseo.tips</strong> 로 확정하시겠습니까? "정말 확정" 버튼을 다시 눌러주세요.
+          <strong>https://{siteIdInput.trim()}.${BASE_DOMAIN}</strong> 로 확정하시겠습니까? "정말 확정" 버튼을 다시 눌러주세요.
         </div>
       )}
 
