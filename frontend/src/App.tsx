@@ -159,7 +159,7 @@ export default function App() {
 
   // Authenticated dashboard
   return (
-    <BrowserRouter basename="/site">
+    <BrowserRouter>
       <PageTitleProvider setPageTitle={setPageTitle}>
         <DashboardLayout
           user={user}
