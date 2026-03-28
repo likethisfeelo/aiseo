@@ -42,7 +42,7 @@ exports.handler = async (event) => {
     const method = event.httpMethod || event.requestContext?.http?.method;
     const path = event.path || event.rawPath || '';
 
-    if (method === 'GET' && path.includes('/site')) return handleGet(event, sitesTable);
+    if (method === 'GET' && event.queryStringParameters?.siteId) return handleGet(event, sitesTable);
     if (method === 'GET') return handleList(event, sitesTable);
 
     return badRequest('Unsupported method');
