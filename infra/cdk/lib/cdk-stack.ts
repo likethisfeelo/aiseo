@@ -339,6 +339,8 @@ export class CdkStack extends Stack {
     });
 
     const deployment = new apigateway.Deployment(this, 'AiseoApiDeployment', { api });
+    // Force redeployment when resources change
+    deployment.addToLogicalId(new Date().toISOString());
 
     new apigateway.Stage(this, 'DevApiStage', {
       deployment,
