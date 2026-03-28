@@ -19,8 +19,21 @@ function handler(event) {
   }
 
   if (siteId) {
-    // Subdomain request -- prepend siteId as S3 prefix
     var uri = request.uri;
+
+    // SPA fallback for 'site' subdomain — route non-asset paths to /site/index.html
+    if (siteId === 'site') {
+      // If it's an asset file (has extension like .js, .css, .png), serve normally
+      if (uri.match(/\.\w+$/)) {
+        request.uri = '/' + siteId + uri;
+      } else {
+        // SPA route — serve index.html
+        request.uri = '/' + siteId + '/index.html';
+      }
+      return request;
+    }
+
+    // Normal subdomain routing
     if (uri === '/' || uri === '') {
       request.uri = '/' + siteId + '/index.html';
     } else if (uri.endsWith('/')) {

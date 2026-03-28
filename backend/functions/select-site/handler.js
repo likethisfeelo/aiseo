@@ -12,6 +12,7 @@ const parseBody = (event) => {
 };
 
 const SITE_ID_REGEX = /^[a-z0-9-]{3,63}$/;
+const RESERVED_IDS = ['b2b', 'site', 'admin', 'api', 'www', 'mail', 'app', 'dev', 'staging', 'prod', 'test'];
 
 exports.handler = async (event) => {
   try {
@@ -25,6 +26,9 @@ exports.handler = async (event) => {
     if (!siteId) return badRequest('siteId is required');
     if (!SITE_ID_REGEX.test(siteId)) {
       return badRequest('siteId must be 3-63 chars with lowercase letters, numbers, hyphen');
+    }
+    if (RESERVED_IDS.includes(siteId)) {
+      return badRequest('This siteId is reserved and cannot be used');
     }
 
     const existing = await ddb.send(
