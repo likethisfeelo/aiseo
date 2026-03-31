@@ -45,6 +45,9 @@ const resolveTarget = (env) => {
   };
 };
 
+const escapeAttr = (str) =>
+  String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 const normalizeEntryName = (entryName) => String(entryName).replace(/^\/+/, '');
 
 const detectContentType = (path) => {
@@ -83,6 +86,27 @@ const buildHeadInjection = (snippets) => {
   if (snippets.gscMeta) parts.push(String(snippets.gscMeta).slice(0, 500));
   if (snippets.naverMeta) parts.push(String(snippets.naverMeta).slice(0, 500));
   if (snippets.customHead) parts.push(String(snippets.customHead).slice(0, 2000));
+
+  // OG meta tags
+  if (snippets.ogTitle) parts.push(`<meta property="og:title" content="${escapeAttr(snippets.ogTitle)}">`);
+  if (snippets.ogDescription) parts.push(`<meta property="og:description" content="${escapeAttr(snippets.ogDescription)}">`);
+  if (snippets.ogImage) parts.push(`<meta property="og:image" content="${escapeAttr(snippets.ogImage)}">`);
+  if (snippets.ogType) parts.push(`<meta property="og:type" content="${escapeAttr(snippets.ogType)}">`);
+  if (snippets.metaKeywords) parts.push(`<meta name="keywords" content="${escapeAttr(snippets.metaKeywords)}">`);
+
+  // Twitter Card meta tags (falls back to OG values)
+  if (snippets.twitterCard || snippets.ogTitle) {
+    parts.push(`<meta name="twitter:card" content="${escapeAttr(snippets.twitterCard || 'summary_large_image')}">`);
+  }
+  if (snippets.twitterTitle || snippets.ogTitle) {
+    parts.push(`<meta name="twitter:title" content="${escapeAttr(snippets.twitterTitle || snippets.ogTitle)}">`);
+  }
+  if (snippets.twitterDescription || snippets.ogDescription) {
+    parts.push(`<meta name="twitter:description" content="${escapeAttr(snippets.twitterDescription || snippets.ogDescription)}">`);
+  }
+  if (snippets.twitterImage || snippets.ogImage) {
+    parts.push(`<meta name="twitter:image" content="${escapeAttr(snippets.twitterImage || snippets.ogImage)}">`);
+  }
 
   return parts.join('\n');
 };

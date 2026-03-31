@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { createUploadUrl, validateSite, deploySite, getSiteSettings, saveSiteSettings } from '../api';
 import { ProgressRing } from '../components/common/ProgressRing';
+import { OgTagEditor } from '../components/og/OgTagEditor';
+import { OgPreviewCards } from '../components/og/OgPreviewCards';
 import type { HeadSnippets, ValidateResult, DeployResult } from '../types';
 
 type FocusedColumn = 'left' | 'center' | 'right' | null;
@@ -210,6 +212,9 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             </div>
           )}
 
+          <OgTagEditor snippets={snippets} siteId={siteId} onChange={setSnippets} />
+          <OgPreviewCards snippets={snippets} siteId={siteId} />
+
           <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, color: '#1e293b' }}>마케팅 코드 설정</h3>
 
           <label style={labelStyle}>GA4 측정 ID</label>
@@ -283,8 +288,8 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
           <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>검색 결과 미리보기</h4>
           <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', padding: 12, marginBottom: 16 }}>
             <div style={{ fontSize: 11, color: '#059669', marginBottom: 2 }}>{siteId}.aiseo.tips</div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#1a0dab', marginBottom: 2 }}>사이트 제목</div>
-            <div style={{ fontSize: 12, color: '#545454' }}>사이트 설명이 여기에 표시됩니다...</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#1a0dab', marginBottom: 2 }}>{snippets.ogTitle || '사이트 제목'}</div>
+            <div style={{ fontSize: 12, color: '#545454' }}>{snippets.ogDescription || '사이트 설명이 여기에 표시됩니다...'}</div>
           </div>
 
           <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>💡 인사이트 & 다음 단계</h4>

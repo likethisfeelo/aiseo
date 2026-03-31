@@ -78,6 +78,17 @@ export interface HeadSnippets {
   googleAdsId?: string;
   naverMeta?: string;
   customHead?: string;
+  // OG tags
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  ogType?: string;
+  metaKeywords?: string;
+  // Twitter card overrides
+  twitterCard?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
 }
 
 export interface SiteData {
