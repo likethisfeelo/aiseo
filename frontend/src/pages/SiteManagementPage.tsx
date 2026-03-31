@@ -7,12 +7,27 @@ import type { HeadSnippets, ValidateResult, DeployResult } from '../types';
 
 type FocusedColumn = 'left' | 'center' | 'right' | null;
 
-const SEO_FIX_GUIDES: Record<string, string> = {
-  'index.html': 'ZIP 파일 최상위에 index.html 파일을 포함해 주세요.',
-  'robots.txt': 'ZIP 파일 최상위에 robots.txt 파일을 추가하세요.',
-  'sitemap.xml': 'ZIP 파일 최상위에 sitemap.xml 파일을 추가하세요.',
-  'title': 'index.html의 <head> 안에 <title> 태그를 추가하세요.',
-  'meta-description': 'index.html의 <head> 안에 <meta name="description"> 태그를 추가하세요.',
+const SEO_FIX_GUIDES: Record<string, { guide: string; tooltip: string }> = {
+  'index.html': {
+    guide: 'ZIP 파일 최상위에 index.html 파일을 포함해 주세요.',
+    tooltip: '현황: index.html 파일이 없습니다.\n할일: HTML 파일의 이름을 index.html로 변경하거나 새로 생성하세요.',
+  },
+  'robots.txt': {
+    guide: 'ZIP 파일 최상위에 robots.txt 파일을 추가하세요.',
+    tooltip: '현황: robots.txt가 없어 검색엔진이 크롤링 규칙을 알 수 없습니다.\n할일: robots.txt 파일을 다운로드하여 ZIP에 포함하세요.',
+  },
+  'sitemap.xml': {
+    guide: 'ZIP 파일 최상위에 sitemap.xml 파일을 추가하세요.',
+    tooltip: '현황: sitemap.xml이 없어 검색엔진이 페이지 구조를 파악하기 어렵습니다.\n할일: sitemap.xml 파일을 다운로드하여 ZIP에 포함하세요.',
+  },
+  'title': {
+    guide: 'index.html의 <head> 안에 <title> 태그를 추가하세요.',
+    tooltip: '현황: <title> 태그가 없어 검색 결과에 페이지 제목이 표시되지 않습니다.\n할일: <head> 섹션에 <title>페이지 제목</title>을 추가하세요.',
+  },
+  'meta-description': {
+    guide: 'index.html의 <head> 안에 <meta name="description"> 태그를 추가하세요.',
+    tooltip: '현황: meta description이 없어 검색 결과에 설명이 표시되지 않습니다.\n할일: <head> 섹션에 <meta name="description" content="설명">을 추가하세요.',
+  },
 };
 
 const inputStyle = { width: '100%', padding: 8, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 8 };
@@ -49,6 +64,9 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
   const [snippets, setSnippets] = useState<HeadSnippets>({});
   const [savingSnippets, setSavingSnippets] = useState(false);
   const [snippetMsg, setSnippetMsg] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -61,6 +79,25 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
       .then((data: { headSnippets: HeadSnippets }) => setSnippets(data.headSnippets || {}))
       .catch(() => {});
   }, [siteId]);
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFile(e.target.files?.[0] || null);
+  };
+
+  const handleReupload = () => {
+    setUploadedFileName('');
+    setSelectedFile(null);
+    setValidateResult(null);
+    setObjectKey('');
+    if (fileRef.current) fileRef.current.value = '';
+    setTimeout(() => fileRef.current?.click(), 100);
+  };
 
   const handleUpload = async () => {
     const file = fileRef.current?.files?.[0];
@@ -75,6 +112,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
       await fetch(data.uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'application/zip' }, body: file });
       const vResult = await validateSite({ siteId, objectKey: data.objectKey });
       setValidateResult(vResult);
+      setUploadedFileName(file.name);
       setFocused('center');
     } catch (e) {
       setError(e instanceof Error ? e.message : '업로드/검증 실패');
@@ -140,22 +178,63 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
 
           <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#1e293b' }}>사이트 파일</h3>
 
-          <div
-            style={{ border: '2px dashed #cbd5e1', borderRadius: 8, padding: 20, textAlign: 'center', background: '#f8fafc', marginBottom: 16, cursor: 'pointer' }}
-            onClick={() => fileRef.current?.click()}
-          >
-            <input ref={fileRef} type="file" accept=".zip" style={{ display: 'none' }} />
-            <div style={{ fontSize: 24, marginBottom: 4 }}>📁</div>
-            <div style={{ fontSize: 12, color: '#64748b' }}>ZIP 파일을 선택하세요</div>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>최대 50MB</div>
-          </div>
+          <input ref={fileRef} type="file" accept=".zip" style={{ display: 'none' }} onChange={handleFileChange} />
 
-          <button onClick={handleUpload} disabled={loading} style={{
-            width: '100%', padding: '10px', borderRadius: 6, border: 'none',
-            background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 16,
-          }}>
-            {loading ? '처리 중...' : '업로드 & 검증'}
-          </button>
+          {uploadedFileName ? (
+            <>
+              <div style={{ borderRadius: 8, padding: 16, background: '#f0fdf4', border: '1px solid #bbf7d0', marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 18 }}>✅</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#166534' }}>업로드 완료</span>
+                </div>
+                <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>{uploadedFileName}</div>
+                {validateResult && (
+                  <div style={{ fontSize: 11, color: '#64748b' }}>
+                    검증: {validateResult.summary.passed}/{validateResult.summary.total} 항목 통과
+                  </div>
+                )}
+              </div>
+              <button onClick={handleReupload} style={{
+                width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #d1d5db',
+                background: '#fff', color: '#475569', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 16,
+              }}>
+                재업로드
+              </button>
+            </>
+          ) : (
+            <>
+              <div
+                style={{
+                  border: `2px dashed ${selectedFile ? '#2563eb' : '#cbd5e1'}`,
+                  borderRadius: 8, padding: 20, textAlign: 'center',
+                  background: selectedFile ? '#eff6ff' : '#f8fafc',
+                  marginBottom: 16, cursor: 'pointer', transition: 'all 0.2s',
+                }}
+                onClick={() => fileRef.current?.click()}
+              >
+                {selectedFile ? (
+                  <>
+                    <div style={{ fontSize: 24, marginBottom: 4 }}>📦</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', wordBreak: 'break-all' }}>{selectedFile.name}</div>
+                    <div style={{ fontSize: 11, color: '#2563eb', marginTop: 4 }}>{formatFileSize(selectedFile.size)}</div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 24, marginBottom: 4 }}>📁</div>
+                    <div style={{ fontSize: 12, color: '#64748b' }}>ZIP 파일을 선택하세요</div>
+                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>최대 50MB</div>
+                  </>
+                )}
+              </div>
+
+              <button onClick={handleUpload} disabled={loading} style={{
+                width: '100%', padding: '10px', borderRadius: 6, border: 'none',
+                background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 16,
+              }}>
+                {loading ? '처리 중...' : '업로드 & 검증'}
+              </button>
+            </>
+          )}
 
           {error && <div style={{ fontSize: 12, color: '#dc2626', marginBottom: 12, padding: 8, background: '#fef2f2', borderRadius: 6 }}>{error}</div>}
 
@@ -201,10 +280,42 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
               {validateResult.checks.map((check, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
                   <span style={{ fontSize: 16 }}>{check.passed ? '✅' : '⚠️'}</span>
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, color: check.passed ? '#166534' : '#92400e' }}>{check.reason}</div>
                     {!check.passed && check.key && SEO_FIX_GUIDES[check.key] && (
-                      <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{SEO_FIX_GUIDES[check.key]}</div>
+                      <>
+                        <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{SEO_FIX_GUIDES[check.key].guide}</div>
+                        <div style={{ position: 'relative', display: 'inline-block', marginTop: 6 }}>
+                          <button
+                            className="seo-guide-btn"
+                            onClick={() => {/* 추후 실제 다운로드 연결 */}}
+                            onMouseEnter={(e) => {
+                              const tip = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (tip) tip.style.display = 'block';
+                            }}
+                            onMouseLeave={(e) => {
+                              const tip = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (tip) tip.style.display = 'none';
+                            }}
+                            style={{
+                              padding: '3px 10px', fontSize: 11, borderRadius: 4,
+                              border: '1px solid #fbbf24', background: '#fffbeb', color: '#92400e',
+                              cursor: 'pointer', fontWeight: 500,
+                            }}
+                          >
+                            📥 가이드 다운로드
+                          </button>
+                          <div style={{
+                            display: 'none', position: 'absolute', bottom: '100%', left: 0,
+                            marginBottom: 6, padding: '10px 12px', borderRadius: 6,
+                            background: '#fef9c3', border: '1px solid #fde68a',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 11, color: '#78350f',
+                            whiteSpace: 'pre-line', minWidth: 220, zIndex: 10, lineHeight: 1.5,
+                          }}>
+                            {SEO_FIX_GUIDES[check.key].tooltip}
+                          </div>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
@@ -267,9 +378,15 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
           <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>배포된 사이트</h4>
           {deployResult ? (
             <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden', marginBottom: 16 }}>
-              <div style={{ height: 160, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#94a3b8' }}>
-                사이트 미리보기
-              </div>
+              {snippets.ogImage ? (
+                <div style={{ height: 160, overflow: 'hidden' }}>
+                  <img src={snippets.ogImage} alt="사이트 대표 이미지" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ) : (
+                <div style={{ height: 160, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#94a3b8' }}>
+                  사이트 미리보기
+                </div>
+              )}
               <div style={{ padding: 12 }}>
                 <a href={deployResult.deployedUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#2563eb', wordBreak: 'break-all' }}>
                   {deployResult.deployedUrl}
@@ -290,6 +407,33 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             <div style={{ fontSize: 11, color: '#059669', marginBottom: 2 }}>{siteId}.aiseo.tips</div>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#1a0dab', marginBottom: 2 }}>{snippets.ogTitle || '사이트 제목'}</div>
             <div style={{ fontSize: 12, color: '#545454' }}>{snippets.ogDescription || '사이트 설명이 여기에 표시됩니다...'}</div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="검색어 입력"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}+site:${siteId}.aiseo.tips`, '_blank');
+                }
+              }}
+              style={{ flex: 1, padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 12 }}
+            />
+            <button
+              onClick={() => {
+                if (searchQuery.trim()) {
+                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}+site:${siteId}.aiseo.tips`, '_blank');
+                }
+              }}
+              style={{
+                padding: '6px 12px', borderRadius: 6, border: 'none',
+                background: '#4285f4', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+              }}
+            >
+              Google
+            </button>
           </div>
 
           <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>💡 인사이트 & 다음 단계</h4>
