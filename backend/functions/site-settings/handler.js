@@ -11,7 +11,11 @@ const parseBody = (event) => {
   return event.body;
 };
 
-const ALLOWED_SNIPPET_KEYS = ['ga4Id', 'gscMeta', 'googleAdsId', 'naverMeta', 'customHead'];
+const ALLOWED_SNIPPET_KEYS = [
+  'ga4Id', 'gscMeta', 'googleAdsId', 'naverMeta', 'customHead',
+  'ogTitle', 'ogDescription', 'ogImage', 'ogType', 'metaKeywords',
+  'twitterCard', 'twitterTitle', 'twitterDescription', 'twitterImage',
+];
 
 const sanitizeSnippets = (input) => {
   if (!input || typeof input !== 'object') return {};
