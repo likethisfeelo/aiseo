@@ -185,6 +185,21 @@ export class CdkStack extends Stack {
     });
     sitesTable.grantReadWriteData(seoSnapshotHandler);
 
+    const seoAutoCheckHandler = new lambda.Function(this, 'SeoAutoCheckFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'seo-auto-check/handler.handler',
+      timeout: Duration.seconds(30),
+      environment: {
+        SITES_TABLE: sitesTableName,
+        NAVER_CLIENT_ID: process.env.NAVER_CLIENT_ID ?? '',
+        NAVER_CLIENT_SECRET: process.env.NAVER_CLIENT_SECRET ?? '',
+        GOOGLE_CSE_API_KEY: process.env.GOOGLE_CSE_API_KEY ?? '',
+        GOOGLE_CSE_ENGINE_ID: process.env.GOOGLE_CSE_ENGINE_ID ?? '',
+      },
+    });
+    sitesTable.grantReadWriteData(seoAutoCheckHandler);
+
     const imageUploadHandler = new lambda.Function(this, 'ImageUploadHandlerFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset(functionsRoot),
@@ -285,6 +300,8 @@ export class CdkStack extends Stack {
     addPost(seoSnapshotsResource, seoSnapshotsIntegration);
     const seoSnapshotsDeleteResource = seoSnapshotsResource.addResource('delete');
     addPost(seoSnapshotsDeleteResource, seoSnapshotsIntegration);
+    const seoAutoCheckResource = seoSnapshotsResource.addResource('auto-check');
+    addPost(seoAutoCheckResource, new apigateway.LambdaIntegration(seoAutoCheckHandler));
 
     const imageUploadResource = api.root.addResource('image-upload');
     addPost(imageUploadResource, new apigateway.LambdaIntegration(imageUploadHandler));

@@ -19,7 +19,7 @@ export const selectSite = (input: { siteId: string }) =>
 export const getSiteSettings = (siteId: string) =>
   getJson(`/site/settings?siteId=${encodeURIComponent(siteId)}`);
 
-export const saveSiteSettings = (input: { siteId: string; headSnippets: HeadSnippets }) =>
+export const saveSiteSettings = (input: { siteId: string; headSnippets?: HeadSnippets; seoKeywords?: string[] }) =>
   postJson('/site/settings', input);
 
 // ── Brand APIs ──
@@ -65,6 +65,9 @@ export const saveSeoSnapshot = (input: { siteId: string; snapshot: Record<string
 
 export const deleteSeoSnapshot = (input: { siteId: string; snapshotId: string }) =>
   postJson('/seo-snapshots/delete', input);
+
+export const triggerSeoAutoCheck = (input: { siteId: string }) =>
+  postJson('/seo-snapshots/auto-check', input);
 
 // ── Image Upload API ──
 export const createImageUploadUrl = (input: { siteId: string; fileName: string; fileType: string }) =>
