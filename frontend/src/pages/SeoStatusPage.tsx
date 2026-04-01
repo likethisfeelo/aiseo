@@ -171,21 +171,21 @@ function AddSnapshotForm({ siteId, onSaved }: { siteId: string; onSaved: () => v
                 <input type="checkbox" checked={entries[ch]?.isExposed ?? true} onChange={(e) => updateEntry(ch, 'isExposed', e.target.checked)} /> 노출됨
               </label>
               {(isSearch || isImage) && (
-                <input type="number" placeholder="페이지" min={1} value={entries[ch]?.pageNumber || ''} onChange={(e) => updateEntry(ch, 'pageNumber', Number(e.target.value) || undefined)} style={{ width: 70, ...inputStyle, marginBottom: 0 }} />
+                <input type="number" placeholder="페이지" min={1} value={entries[ch]?.pageNumber || ''} onChange={(e) => updateEntry(ch, 'pageNumber', Number(e.target.value) || undefined)} style={{ ...inputStyle, width: 70, marginBottom: 0 }} />
               )}
               {isSearch && (
-                <input type="number" placeholder="순위" min={1} value={entries[ch]?.rank || ''} onChange={(e) => updateEntry(ch, 'rank', Number(e.target.value) || undefined)} style={{ width: 70, ...inputStyle, marginBottom: 0 }} />
+                <input type="number" placeholder="순위" min={1} value={entries[ch]?.rank || ''} onChange={(e) => updateEntry(ch, 'rank', Number(e.target.value) || undefined)} style={{ ...inputStyle, width: 70, marginBottom: 0 }} />
               )}
               {isImage && (
-                <input type="number" placeholder="이미지 수" min={0} value={entries[ch]?.imageCount || ''} onChange={(e) => updateEntry(ch, 'imageCount', Number(e.target.value) || undefined)} style={{ width: 80, ...inputStyle, marginBottom: 0 }} />
+                <input type="number" placeholder="이미지 수" min={0} value={entries[ch]?.imageCount || ''} onChange={(e) => updateEntry(ch, 'imageCount', Number(e.target.value) || undefined)} style={{ ...inputStyle, width: 80, marginBottom: 0 }} />
               )}
               {isSns && (
-                <input type="number" placeholder="게시물 수" min={0} value={entries[ch]?.postCount || ''} onChange={(e) => updateEntry(ch, 'postCount', Number(e.target.value) || undefined)} style={{ width: 80, ...inputStyle, marginBottom: 0 }} />
+                <input type="number" placeholder="게시물 수" min={0} value={entries[ch]?.postCount || ''} onChange={(e) => updateEntry(ch, 'postCount', Number(e.target.value) || undefined)} style={{ ...inputStyle, width: 80, marginBottom: 0 }} />
               )}
               {isMap && (
                 <>
-                  <input type="number" placeholder="리뷰 수" min={0} value={entries[ch]?.reviewCount || ''} onChange={(e) => updateEntry(ch, 'reviewCount', Number(e.target.value) || undefined)} style={{ width: 80, ...inputStyle, marginBottom: 0 }} />
-                  <input type="number" placeholder="별점" min={0} max={5} step={0.1} value={entries[ch]?.starRating || ''} onChange={(e) => updateEntry(ch, 'starRating', Number(e.target.value) || undefined)} style={{ width: 70, ...inputStyle, marginBottom: 0 }} />
+                  <input type="number" placeholder="리뷰 수" min={0} value={entries[ch]?.reviewCount || ''} onChange={(e) => updateEntry(ch, 'reviewCount', Number(e.target.value) || undefined)} style={{ ...inputStyle, width: 80, marginBottom: 0 }} />
+                  <input type="number" placeholder="별점" min={0} max={5} step={0.1} value={entries[ch]?.starRating || ''} onChange={(e) => updateEntry(ch, 'starRating', Number(e.target.value) || undefined)} style={{ ...inputStyle, width: 70, marginBottom: 0 }} />
                 </>
               )}
               <input placeholder="메모" value={entries[ch]?.note || ''} onChange={(e) => updateEntry(ch, 'note', e.target.value)} style={{ flex: 1, minWidth: 100, ...inputStyle, marginBottom: 0 }} />
