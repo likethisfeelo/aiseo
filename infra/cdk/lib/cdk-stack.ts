@@ -200,6 +200,15 @@ export class CdkStack extends Stack {
     });
     sitesTable.grantReadWriteData(seoAutoCheckHandler);
 
+    const domainChangeHandler = new lambda.Function(this, 'DomainChangeHandlerFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'domain-change/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { SITES_TABLE: sitesTableName },
+    });
+    sitesTable.grantReadWriteData(domainChangeHandler);
+
     const imageUploadHandler = new lambda.Function(this, 'ImageUploadHandlerFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset(functionsRoot),
@@ -302,6 +311,19 @@ export class CdkStack extends Stack {
     addPost(seoSnapshotsDeleteResource, seoSnapshotsIntegration);
     const seoAutoCheckResource = seoSnapshotsResource.addResource('auto-check');
     addPost(seoAutoCheckResource, new apigateway.LambdaIntegration(seoAutoCheckHandler));
+
+    const domainChangeResource = api.root.addResource('domain-change');
+    const domainChangeIntegration = new apigateway.LambdaIntegration(domainChangeHandler);
+    addGet(domainChangeResource, domainChangeIntegration);
+    addPost(domainChangeResource, domainChangeIntegration);
+    const domainChangeAdminResource = domainChangeResource.addResource('admin');
+    addGet(domainChangeAdminResource, domainChangeIntegration);
+    const domainChangeApproveResource = domainChangeAdminResource.addResource('approve');
+    addPost(domainChangeApproveResource, domainChangeIntegration);
+    const domainChangeRejectResource = domainChangeAdminResource.addResource('reject');
+    addPost(domainChangeRejectResource, domainChangeIntegration);
+    const domainChangeDeactivateResource = domainChangeAdminResource.addResource('deactivate');
+    addPost(domainChangeDeactivateResource, domainChangeIntegration);
 
     const imageUploadResource = api.root.addResource('image-upload');
     addPost(imageUploadResource, new apigateway.LambdaIntegration(imageUploadHandler));

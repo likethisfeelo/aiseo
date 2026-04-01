@@ -20,6 +20,7 @@ import { ComingSoonPage } from './pages/ComingSoonPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { SeoStatusPage } from './pages/SeoStatusPage';
 import { ContentAutomationPage } from './pages/ContentAutomationPage';
+import { DomainSettingsPage } from './pages/DomainSettingsPage';
 import { AdminSiteListPage } from './pages/admin/AdminSiteListPage';
 import { AdminSiteDetailPage } from './pages/admin/AdminSiteDetailPage';
 
@@ -36,6 +37,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/ads': '광고 관리',
   '/content': '콘텐츠 자동화',
   '/roadmap': '성장 로드맵',
+  '/domain': '도메인 설정',
   '/admin': '관리자',
 };
 
@@ -201,6 +203,7 @@ export default function App() {
             <Route path="/analytics" element={<AnalyticsPage siteId={siteId} />} />
             <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
             <Route path="/content" element={<ContentAutomationPage />} />
+            <Route path="/domain" element={<DomainSettingsPage siteId={siteId} />} />
             <Route path="/admin" element={<AdminSiteListPage />} />
             <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
             <Route path="*" element={<Navigate to="/site/upload" replace />} />

@@ -1,4 +1,5 @@
 import type { UserProfile } from '../../types';
+import { useNavigate } from 'react-router-dom';
 
 interface TopBarProps {
   pageTitle: string;
@@ -46,6 +47,7 @@ function ProgressTracker({ currentStep }: { currentStep: number }) {
 }
 
 export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggleEducation }: TopBarProps) {
+  const navigate = useNavigate();
   return (
     <header
       style={{
@@ -97,6 +99,7 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
         <h1 style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', margin: 0, whiteSpace: 'nowrap' }}>{pageTitle}</h1>
         {siteId && (
           <div
+            onClick={() => navigate('/domain')}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -108,7 +111,11 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
               fontSize: 12,
               color: '#475569',
               whiteSpace: 'nowrap',
+              cursor: 'pointer',
+              transition: 'background 0.2s',
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = '#bfdbfe'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
           >
             <span
               style={{
