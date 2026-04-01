@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminGetSites } from '../../api';
+import { getJson, postJson } from '../../api-client.js';
 
 interface SiteSummary {
   siteId: string;
@@ -8,6 +9,110 @@ interface SiteSummary {
   createdAt: string;
   updatedAt: string;
   brandCompleteness: number;
+}
+
+interface DomainRequest {
+  siteId: string;
+  ownerEmail: string;
+  currentSiteId: string;
+  requestedSiteId: string;
+  reason: string;
+  status: string;
+  createdAt: string;
+}
+
+function DomainChangeRequests() {
+  const [requests, setRequests] = useState<DomainRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actionMsg, setActionMsg] = useState('');
+
+  const loadRequests = () => {
+    getJson('/domain-change/admin')
+      .then((data: { requests: DomainRequest[] }) => setRequests(data.requests || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { loadRequests(); }, []);
+
+  const handleApprove = async (siteId: string) => {
+    if (!confirm('이 도메인 변경 요청을 승인하시겠습니까? 기존 주소의 데이터가 새 주소로 이전됩니다.')) return;
+    try {
+      const data = await postJson('/domain-change/admin/approve', { siteId });
+      setActionMsg(data.message || '승인 완료');
+      loadRequests();
+    } catch (e) {
+      setActionMsg(e instanceof Error ? e.message : '승인 실패');
+    }
+  };
+
+  const handleReject = async (siteId: string) => {
+    const note = prompt('거절 사유 (선택):');
+    try {
+      await postJson('/domain-change/admin/reject', { siteId, reviewNote: note || '' });
+      setActionMsg('거절 완료');
+      loadRequests();
+    } catch (e) {
+      setActionMsg(e instanceof Error ? e.message : '거절 실패');
+    }
+  };
+
+  const handleDeactivate = async (siteId: string) => {
+    if (!confirm(`"${siteId}" 서브도메인을 비활성화하시겠습니까?`)) return;
+    try {
+      await postJson('/domain-change/admin/deactivate', { siteId });
+      setActionMsg(`${siteId} 비활성화 완료`);
+    } catch (e) {
+      setActionMsg(e instanceof Error ? e.message : '비활성화 실패');
+    }
+  };
+
+  if (loading) return null;
+  if (requests.length === 0) return null;
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <h3 style={{ fontSize: 16, fontWeight: 700, color: '#92400e', marginBottom: 12 }}>
+        도메인 변경 요청 ({requests.length}건)
+      </h3>
+      {actionMsg && (
+        <div style={{ padding: 10, borderRadius: 6, background: '#f0fdf4', border: '1px solid #bbf7d0', fontSize: 12, color: '#166534', marginBottom: 12 }}>
+          {actionMsg}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {requests.map((req) => (
+          <div key={req.siteId || req.currentSiteId} style={{
+            padding: 16, borderRadius: 10, background: '#fffbeb', border: '1px solid #fde68a',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#92400e' }}>
+                  {req.currentSiteId}.aiseo.tips → <span style={{ color: '#2563eb' }}>{req.requestedSiteId}.aiseo.tips</span>
+                </div>
+                <div style={{ fontSize: 12, color: '#78350f', marginTop: 4 }}>{req.ownerEmail}</div>
+                {req.reason && <div style={{ fontSize: 12, color: '#a16207', marginTop: 4 }}>사유: {req.reason}</div>}
+                <div style={{ fontSize: 11, color: '#a16207', marginTop: 4 }}>
+                  {new Date(req.createdAt).toLocaleDateString('ko-KR')} 요청
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => handleApprove(req.currentSiteId)} style={{
+                padding: '6px 16px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              }}>승인</button>
+              <button onClick={() => handleReject(req.currentSiteId)} style={{
+                padding: '6px 16px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#475569', fontSize: 12, cursor: 'pointer',
+              }}>거절</button>
+              <button onClick={() => handleDeactivate(req.currentSiteId)} style={{
+                padding: '6px 16px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff', color: '#dc2626', fontSize: 12, cursor: 'pointer',
+              }}>기존 주소 비활성화</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function AdminSiteListPage() {
@@ -34,6 +139,8 @@ export function AdminSiteListPage() {
           <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>전체 {sites.length}개 사이트</p>
         </div>
       </div>
+
+      <DomainChangeRequests />
 
       <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
         {/* Table Header */}
