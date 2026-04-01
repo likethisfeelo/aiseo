@@ -139,7 +139,10 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
       {/* Spacer */}
       <div style={{ flex: 1 }} />
 
-      {/* 4. Education Button (우측 정렬, 크게) */}
+      {/* 4. Version tag */}
+      <span style={{ fontSize: 10, color: '#94a3b8', marginRight: 12, flexShrink: 0 }}>v.0401-1</span>
+
+      {/* 5. Education Button (우측 정렬, 크게) */}
       {onToggleEducation && (
         <button
           onClick={onToggleEducation}
