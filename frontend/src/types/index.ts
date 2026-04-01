@@ -153,6 +153,36 @@ export interface NavSection {
   items: NavItem[];
 }
 
+// ── SEO Snapshot ──
+export type SnapshotChannel =
+  | 'google-search' | 'naver-search' | 'google-image' | 'naver-image'
+  | 'instagram-hashtag' | 'naver-blog'
+  | 'google-map' | 'naver-place';
+
+export interface SnapshotEntry {
+  channel: SnapshotChannel;
+  pageNumber?: number;
+  rank?: number;
+  isExposed?: boolean;
+  imageCount?: number;
+  postCount?: number;
+  reviewCount?: number;
+  starRating?: number;
+  note?: string;
+}
+
+export interface SeoSnapshot {
+  id: string;
+  siteId: string;
+  date: string;
+  entries: SnapshotEntry[];
+  memo?: string;
+  images?: string[];
+  source: 'manual' | 'automated';
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ── Education ──
 export interface EducationItem {
   id: string;

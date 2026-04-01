@@ -18,6 +18,7 @@ import { SiteManagementPage } from './pages/SiteManagementPage';
 import { RoadmapPage } from './pages/RoadmapPage';
 import { ComingSoonPage } from './pages/ComingSoonPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
+import { SeoStatusPage } from './pages/SeoStatusPage';
 import { AdminSiteListPage } from './pages/admin/AdminSiteListPage';
 import { AdminSiteDetailPage } from './pages/admin/AdminSiteDetailPage';
 
@@ -195,7 +196,7 @@ export default function App() {
             <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} initialFocus="right" />} />
             <Route path="/site" element={<Navigate to="/site/upload" replace />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
-            <Route path="/seo-status" element={<ComingSoonPage title="SEO 현황" description="사이트의 검색 엔진 최적화 현황을 한눈에 확인할 수 있습니다. 키워드 순위, 검색 노출 추이 등이 제공될 예정입니다." icon="🔍" />} />
+            <Route path="/seo-status" element={<SeoStatusPage siteId={siteId} />} />
             <Route path="/analytics" element={<AnalyticsPage siteId={siteId} />} />
             <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
             <Route path="/content" element={<ComingSoonPage title="콘텐츠 자동화" description="AI를 활용한 SEO 블로그 글 자동 생성, 리뷰 콘텐츠 발행 등 콘텐츠 마케팅을 자동화합니다." icon="✍️" />} />

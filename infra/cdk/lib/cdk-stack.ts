@@ -176,6 +176,15 @@ export class CdkStack extends Stack {
     });
     sitesTable.grantReadWriteData(storeHandler);
 
+    const seoSnapshotHandler = new lambda.Function(this, 'SeoSnapshotHandlerFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'seo-snapshot/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { SITES_TABLE: sitesTableName },
+    });
+    sitesTable.grantReadWriteData(seoSnapshotHandler);
+
     const imageUploadHandler = new lambda.Function(this, 'ImageUploadHandlerFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset(functionsRoot),
@@ -269,6 +278,13 @@ export class CdkStack extends Stack {
     const storeIntegration = new apigateway.LambdaIntegration(storeHandler);
     addGet(storeResource, storeIntegration);
     addPost(storeResource, storeIntegration);
+
+    const seoSnapshotsResource = api.root.addResource('seo-snapshots');
+    const seoSnapshotsIntegration = new apigateway.LambdaIntegration(seoSnapshotHandler);
+    addGet(seoSnapshotsResource, seoSnapshotsIntegration);
+    addPost(seoSnapshotsResource, seoSnapshotsIntegration);
+    const seoSnapshotsDeleteResource = seoSnapshotsResource.addResource('delete');
+    addPost(seoSnapshotsDeleteResource, seoSnapshotsIntegration);
 
     const imageUploadResource = api.root.addResource('image-upload');
     addPost(imageUploadResource, new apigateway.LambdaIntegration(imageUploadHandler));
