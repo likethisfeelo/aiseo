@@ -15,6 +15,7 @@ const ALLOWED_SNIPPET_KEYS = [
   'ga4Id', 'gscMeta', 'googleAdsId', 'naverMeta', 'customHead',
   'ogTitle', 'ogDescription', 'ogImage', 'ogType', 'metaKeywords',
   'twitterCard', 'twitterTitle', 'twitterDescription', 'twitterImage',
+  'gtmId', 'metaPixelId', 'kakaoPixelId', 'kakaoChannelId',
 ];
 
 const sanitizeSnippets = (input) => {

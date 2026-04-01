@@ -409,30 +409,37 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             <div style={{ fontSize: 12, color: '#545454' }}>{snippets.ogDescription || '사이트 설명이 여기에 표시됩니다...'}</div>
           </div>
 
-          <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="검색어 입력"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && searchQuery.trim()) {
-                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}+site:${siteId}.aiseo.tips`, '_blank');
+                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}`, '_blank');
                 }
               }}
               style={{ flex: 1, padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 12 }}
             />
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
             <button
-              onClick={() => {
-                if (searchQuery.trim()) {
-                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}+site:${siteId}.aiseo.tips`, '_blank');
-                }
-              }}
-              style={{
-                padding: '6px 12px', borderRadius: 6, border: 'none',
-                background: '#4285f4', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-              }}
+              onClick={() => { if (searchQuery.trim()) window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}`, '_blank'); }}
+              style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#4285f4', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}
             >
               Google
+            </button>
+            <button
+              onClick={() => { if (searchQuery.trim()) window.open(`https://search.naver.com/search.naver?query=${encodeURIComponent(searchQuery.trim())}`, '_blank'); }}
+              style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#03C75A', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}
+            >
+              Naver
+            </button>
+            <button
+              onClick={() => { if (searchQuery.trim()) window.open(`https://search.daum.net/search?q=${encodeURIComponent(searchQuery.trim())}`, '_blank'); }}
+              style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#FEE500', color: '#3C1E1E', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}
+            >
+              Kakao
             </button>
           </div>
 

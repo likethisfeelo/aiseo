@@ -89,6 +89,11 @@ export interface HeadSnippets {
   twitterTitle?: string;
   twitterDescription?: string;
   twitterImage?: string;
+  // Marketing pixels
+  gtmId?: string;
+  metaPixelId?: string;
+  kakaoPixelId?: string;
+  kakaoChannelId?: string;
 }
 
 export interface SiteData {
