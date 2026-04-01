@@ -44,6 +44,7 @@ export function useAuth() {
 
   const logout = useCallback(() => {
     tokenStore.clear();
+    localStorage.removeItem('aiseo.siteId');
     setUser(null);
     window.location.href = '/';
   }, []);
