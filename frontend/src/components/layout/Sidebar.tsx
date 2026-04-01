@@ -209,6 +209,62 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
           <span>교육 안내</span>
           <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>›</span>
         </button>
+
+        {/* Domain Settings */}
+        <button
+          onClick={() => navigate('/domain')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            width: '100%',
+            padding: '12px 16px',
+            border: 'none',
+            borderTop: '1px solid #f1f5f9',
+            background: 'transparent',
+            color: '#475569',
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: 'pointer',
+            textAlign: 'left',
+            fontFamily: 'inherit',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+        >
+          <span style={{ fontSize: 16 }}>🌐</span>
+          <span>도메인 수정 신청</span>
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>›</span>
+        </button>
+
+        {/* Consulting */}
+        <button
+          onClick={() => window.open('#', '_blank')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            width: '100%',
+            padding: '12px 16px',
+            border: 'none',
+            borderTop: '1px solid #f1f5f9',
+            background: 'transparent',
+            color: '#2563eb',
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: 'pointer',
+            textAlign: 'left',
+            fontFamily: 'inherit',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = '#eff6ff'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+        >
+          <span style={{ fontSize: 16 }}>💬</span>
+          <span>상담 신청</span>
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>›</span>
+        </button>
       </div>
 
       {/* Bottom: Completeness */}
