@@ -44,7 +44,7 @@ const MENU: MenuItem[] = [
       { path: '/services', label: '서비스 관리' },
       { path: '/store', label: '매장 관리' },
       { path: '/seo-status', label: 'SEO 현황', section: '검색 & 분석', locked: true },
-      { path: '/analytics', label: '마케팅 분석', locked: true },
+      { path: '/analytics', label: '마케팅 분석' },
       { path: '/ads', label: '광고 관리', section: '광고 & 콘텐츠', locked: true },
       { path: '/content', label: '콘텐츠 자동화', locked: true },
       { path: '/roadmap', label: '성장 로드맵', section: '성장' },
