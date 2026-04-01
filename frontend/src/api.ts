@@ -56,6 +56,16 @@ export const getStore = (siteId: string) =>
 export const saveStore = (input: { siteId: string; store: Partial<Store> }) =>
   postJson('/store', input);
 
+// ── SEO Snapshot APIs ──
+export const getSeoSnapshots = (siteId: string) =>
+  getJson(`/seo-snapshots?siteId=${encodeURIComponent(siteId)}`);
+
+export const saveSeoSnapshot = (input: { siteId: string; snapshot: Record<string, unknown> }) =>
+  postJson('/seo-snapshots', input);
+
+export const deleteSeoSnapshot = (input: { siteId: string; snapshotId: string }) =>
+  postJson('/seo-snapshots/delete', input);
+
 // ── Image Upload API ──
 export const createImageUploadUrl = (input: { siteId: string; fileName: string; fileType: string }) =>
   postJson('/image-upload', input);
