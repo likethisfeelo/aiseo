@@ -161,6 +161,8 @@ export type SnapshotChannel =
 
 export interface SnapshotEntry {
   channel: SnapshotChannel;
+  keyword?: string;
+  resultUrl?: string;
   pageNumber?: number;
   rank?: number;
   isExposed?: boolean;

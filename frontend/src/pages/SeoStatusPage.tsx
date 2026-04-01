@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSeoSnapshots, saveSeoSnapshot, deleteSeoSnapshot, getSiteSettings, createImageUploadUrl } from '../api';
+import { getSeoSnapshots, saveSeoSnapshot, deleteSeoSnapshot, getSiteSettings, saveSiteSettings, createImageUploadUrl, triggerSeoAutoCheck } from '../api';
 import { ProgressRing } from '../components/common/ProgressRing';
 import type { HeadSnippets, SeoSnapshot, SnapshotEntry, SnapshotChannel } from '../types';
 
@@ -234,29 +234,66 @@ function AddSnapshotForm({ siteId, onSaved }: { siteId: string; onSaved: () => v
 
 /* ── Snapshot Card ── */
 function SnapshotCard({ snapshot, onDelete }: { snapshot: SeoSnapshot; onDelete: () => void }) {
-  const grouped: Record<string, SnapshotEntry[]> = {};
-  snapshot.entries.forEach((e) => {
-    const groupLabel = e.channel.includes('search') || e.channel.includes('image') ? '검색엔진' : (e.channel.includes('map') || e.channel.includes('place') ? '지도' : 'SNS');
-    if (!grouped[groupLabel]) grouped[groupLabel] = [];
-    grouped[groupLabel].push(e);
-  });
+  const isAuto = snapshot.source === 'automated';
 
-  return (
-    <div style={cardStyle}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>{snapshot.date}</span>
-        <button onClick={onDelete} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 13 }}>🗑️</button>
-      </div>
-      {Object.entries(grouped).map(([group, entries]) => (
-        <div key={group} style={{ marginBottom: 8 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', marginBottom: 4 }}>{group}</div>
+  // For automated snapshots, group by keyword; for manual, group by channel category
+  const renderEntries = () => {
+    if (isAuto) {
+      const byKeyword: Record<string, SnapshotEntry[]> = {};
+      snapshot.entries.forEach((e) => {
+        const kw = e.keyword || '(키워드 없음)';
+        if (!byKeyword[kw]) byKeyword[kw] = [];
+        byKeyword[kw].push(e);
+      });
+      return Object.entries(byKeyword).map(([kw, entries]) => (
+        <div key={kw} style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#1e293b', marginBottom: 4, paddingLeft: 4 }}>"{kw}"</div>
           {entries.map((e, i) => (
-            <div key={i} style={{ fontSize: 12, color: '#475569', padding: '3px 0', paddingLeft: 8 }}>
-              <strong>{CHANNEL_LABEL[e.channel]}:</strong> {formatEntry(e)}
+            <div key={i} style={{ fontSize: 12, padding: '2px 0', paddingLeft: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ color: e.isExposed ? '#166534' : '#991b1b' }}>
+                {e.isExposed ? '●' : '○'}
+              </span>
+              <strong style={{ color: '#475569' }}>{CHANNEL_LABEL[e.channel]}:</strong>
+              <span style={{ color: e.isExposed ? '#166534' : '#991b1b' }}>
+                {e.isExposed === false ? '노출 없음' : (e.rank ? `${e.rank}위${e.pageNumber ? ` (${e.pageNumber}페이지)` : ''}` : '노출됨')}
+              </span>
             </div>
           ))}
         </div>
-      ))}
+      ));
+    }
+
+    // Manual: group by channel category (existing logic)
+    const grouped: Record<string, SnapshotEntry[]> = {};
+    snapshot.entries.forEach((e) => {
+      const groupLabel = e.channel.includes('search') || e.channel.includes('image') ? '검색엔진' : (e.channel.includes('map') || e.channel.includes('place') ? '지도' : 'SNS');
+      if (!grouped[groupLabel]) grouped[groupLabel] = [];
+      grouped[groupLabel].push(e);
+    });
+    return Object.entries(grouped).map(([group, entries]) => (
+      <div key={group} style={{ marginBottom: 8 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', marginBottom: 4 }}>{group}</div>
+        {entries.map((e, i) => (
+          <div key={i} style={{ fontSize: 12, color: '#475569', padding: '3px 0', paddingLeft: 8 }}>
+            <strong>{CHANNEL_LABEL[e.channel]}:</strong> {formatEntry(e)}
+          </div>
+        ))}
+      </div>
+    ));
+  };
+
+  return (
+    <div style={{ ...cardStyle, borderLeft: isAuto ? '3px solid #2563eb' : undefined }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>{snapshot.date}</span>
+          {isAuto && (
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#2563eb', background: '#eff6ff', padding: '2px 8px', borderRadius: 10 }}>자동 확인</span>
+          )}
+        </div>
+        <button onClick={onDelete} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 13 }}>🗑️</button>
+      </div>
+      {renderEntries()}
       {snapshot.images && snapshot.images.length > 0 && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
           {snapshot.images.map((url, i) => (
@@ -271,8 +308,122 @@ function SnapshotCard({ snapshot, onDelete }: { snapshot: SeoSnapshot; onDelete:
   );
 }
 
+/* ── Keyword Settings ── */
+function KeywordSettings({ siteId, keywords, onSaved }: { siteId: string; keywords: string[]; onSaved: (kw: string[]) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = () => {
+    setDraft(keywords.join(', '));
+    setEditing(true);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const newKw = draft.split(',').map((k) => k.trim()).filter(Boolean).slice(0, 10);
+    try {
+      await saveSiteSettings({ siteId, seoKeywords: newKw });
+      onSaved(newKw);
+      setEditing(false);
+    } catch { /* ignore */ }
+    setSaving(false);
+  };
+
+  return (
+    <div style={{ ...cardStyle, background: '#fafbfc' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>추적 키워드</span>
+        {!editing && (
+          <button onClick={startEdit} style={{ fontSize: 11, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer' }}>
+            {keywords.length > 0 ? '수정' : '+ 키워드 추가'}
+          </button>
+        )}
+      </div>
+
+      {editing ? (
+        <div>
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="키워드1, 키워드2, 키워드3 (쉼표로 구분, 최대 10개)"
+            style={inputStyle}
+          />
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={handleSave} disabled={saving} style={{
+              padding: '5px 14px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 12, cursor: 'pointer',
+            }}>{saving ? '저장 중...' : '저장'}</button>
+            <button onClick={() => setEditing(false)} style={{
+              padding: '5px 14px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#475569', fontSize: 12, cursor: 'pointer',
+            }}>취소</button>
+          </div>
+        </div>
+      ) : keywords.length > 0 ? (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {keywords.map((kw, i) => (
+            <span key={i} style={{
+              padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 500,
+              background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe',
+            }}>{kw}</span>
+          ))}
+        </div>
+      ) : (
+        <div style={{ fontSize: 12, color: '#94a3b8' }}>자동 확인을 위해 추적할 키워드를 설정하세요</div>
+      )}
+    </div>
+  );
+}
+
+/* ── Auto Check Button ── */
+function AutoCheckButton({ siteId, hasKeywords, onDone }: { siteId: string; hasKeywords: boolean; onDone: () => void }) {
+  const [checking, setChecking] = useState(false);
+  const [result, setResult] = useState<{ foundCount: number; totalChecks: number } | null>(null);
+  const [error, setError] = useState('');
+
+  const handleCheck = async () => {
+    setChecking(true);
+    setError('');
+    setResult(null);
+    try {
+      const data = await triggerSeoAutoCheck({ siteId });
+      setResult({ foundCount: data.summary.foundCount, totalChecks: data.summary.totalChecks });
+      onDone();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '자동 확인 실패');
+    }
+    setChecking(false);
+  };
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <button onClick={handleCheck} disabled={checking || !hasKeywords} style={{
+        width: '100%', padding: 14, borderRadius: 8, border: 'none',
+        background: hasKeywords ? (checking ? '#93c5fd' : '#2563eb') : '#e2e8f0',
+        color: hasKeywords ? '#fff' : '#94a3b8',
+        fontSize: 14, fontWeight: 700, cursor: hasKeywords ? 'pointer' : 'default',
+        transition: 'background 0.2s',
+      }}>
+        {checking ? '확인 중... (약 10초 소요)' : '검색 결과 자동 확인'}
+      </button>
+      {result && (
+        <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: '#f0fdf4', border: '1px solid #bbf7d0', fontSize: 12, color: '#166534' }}>
+          {result.totalChecks}건 검색 완료 — {result.foundCount}건 노출 확인
+        </div>
+      )}
+      {error && (
+        <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: '#fef2f2', border: '1px solid #fecaca', fontSize: 12, color: '#991b1b' }}>
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Tab 1: Snapshot Timeline ── */
-function SnapshotTimeline({ siteId, snapshots, onRefresh }: { siteId: string; snapshots: SeoSnapshot[]; onRefresh: () => void }) {
+function SnapshotTimeline({ siteId, snapshots, keywords, onRefresh, onKeywordsChange }: {
+  siteId: string; snapshots: SeoSnapshot[]; keywords: string[];
+  onRefresh: () => void; onKeywordsChange: (kw: string[]) => void;
+}) {
   const handleDelete = async (id: string) => {
     await deleteSeoSnapshot({ siteId, snapshotId: id });
     onRefresh();
@@ -280,10 +431,12 @@ function SnapshotTimeline({ siteId, snapshots, onRefresh }: { siteId: string; sn
 
   return (
     <div>
+      <KeywordSettings siteId={siteId} keywords={keywords} onSaved={onKeywordsChange} />
+      <AutoCheckButton siteId={siteId} hasKeywords={keywords.length > 0} onDone={onRefresh} />
       <AddSnapshotForm siteId={siteId} onSaved={onRefresh} />
       {snapshots.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8', fontSize: 13 }}>
-          아직 기록된 스냅샷이 없습니다.<br />위 버튼을 눌러 첫 검색 결과를 기록하세요.
+          아직 기록된 스냅샷이 없습니다.
         </div>
       ) : (
         snapshots.map((s) => <SnapshotCard key={s.id} snapshot={s} onDelete={() => handleDelete(s.id)} />)
@@ -399,16 +552,18 @@ export function SeoStatusPage({ siteId }: { siteId: string }) {
   const [tab, setTab] = useState<Tab>('snapshot');
   const [snapshots, setSnapshots] = useState<SeoSnapshot[]>([]);
   const [snippets, setSnippets] = useState<HeadSnippets>({});
+  const [keywords, setKeywords] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = () => {
     if (!siteId) return;
     Promise.all([
       getSeoSnapshots(siteId).catch(() => ({ snapshots: [] })),
-      getSiteSettings(siteId).catch(() => ({ headSnippets: {} })),
+      getSiteSettings(siteId).catch(() => ({ headSnippets: {}, seoKeywords: [] })),
     ]).then(([snapData, settingsData]) => {
       setSnapshots(snapData.snapshots || []);
       setSnippets(settingsData.headSnippets || {});
+      setKeywords(settingsData.seoKeywords || []);
     }).finally(() => setLoading(false));
   };
 
@@ -424,7 +579,7 @@ export function SeoStatusPage({ siteId }: { siteId: string }) {
         <button style={tabBtnStyle(tab === 'tools')} onClick={() => setTab('tools')}>외부 도구</button>
       </div>
 
-      {tab === 'snapshot' && <SnapshotTimeline siteId={siteId} snapshots={snapshots} onRefresh={loadData} />}
+      {tab === 'snapshot' && <SnapshotTimeline siteId={siteId} snapshots={snapshots} keywords={keywords} onRefresh={loadData} onKeywordsChange={setKeywords} />}
       {tab === 'health' && <SeoHealthCheck snippets={snippets} />}
       {tab === 'tools' && <ExternalTools />}
     </div>

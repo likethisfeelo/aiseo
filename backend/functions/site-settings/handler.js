@@ -46,6 +46,7 @@ const handleGet = async (event, sitesTable) => {
   return ok({
     siteId: result.Item.siteId,
     headSnippets: result.Item.headSnippets || {},
+    seoKeywords: result.Item.seoKeywords || [],
   });
 };
 
@@ -53,7 +54,7 @@ const handlePost = async (event, sitesTable) => {
   const { user, errorResponse } = requireUser(event);
   if (errorResponse) return errorResponse;
 
-  const { siteId, headSnippets } = parseBody(event);
+  const { siteId, headSnippets, seoKeywords } = parseBody(event);
   if (!siteId) return badRequest('siteId is required');
 
   const existing = await ddb.send(
@@ -63,21 +64,35 @@ const handlePost = async (event, sitesTable) => {
   if (!existing.Item) return badRequest('Site not found');
   if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site');
 
-  const sanitized = sanitizeSnippets(headSnippets);
+  const updateParts = ['updatedAt = :now'];
+  const exprValues = { ':now': new Date().toISOString() };
+
+  if (headSnippets) {
+    const sanitized = sanitizeSnippets(headSnippets);
+    updateParts.push('headSnippets = :snippets');
+    exprValues[':snippets'] = sanitized;
+  }
+
+  if (Array.isArray(seoKeywords)) {
+    const sanitizedKw = seoKeywords.slice(0, 10).map((k) => String(k).slice(0, 50)).filter(Boolean);
+    updateParts.push('seoKeywords = :keywords');
+    exprValues[':keywords'] = sanitizedKw;
+  }
 
   await ddb.send(
     new UpdateCommand({
       TableName: sitesTable,
       Key: { siteId },
-      UpdateExpression: 'SET headSnippets = :snippets, updatedAt = :now',
-      ExpressionAttributeValues: {
-        ':snippets': sanitized,
-        ':now': new Date().toISOString(),
-      },
+      UpdateExpression: 'SET ' + updateParts.join(', '),
+      ExpressionAttributeValues: exprValues,
     }),
   );
 
-  return ok({ siteId, headSnippets: sanitized });
+  return ok({
+    siteId,
+    headSnippets: headSnippets ? sanitizeSnippets(headSnippets) : (existing.Item.headSnippets || {}),
+    seoKeywords: Array.isArray(seoKeywords) ? seoKeywords.slice(0, 10).map((k) => String(k).slice(0, 50)).filter(Boolean) : (existing.Item.seoKeywords || []),
+  });
 };
 
 exports.handler = async (event) => {
