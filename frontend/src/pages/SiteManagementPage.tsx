@@ -416,7 +416,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
               placeholder="검색어 입력"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && searchQuery.trim()) {
-                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}+site:${siteId}.aiseo.tips`, '_blank');
+                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}`, '_blank');
                 }
               }}
               style={{ flex: 1, padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 12 }}
@@ -424,7 +424,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             <button
               onClick={() => {
                 if (searchQuery.trim()) {
-                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}+site:${siteId}.aiseo.tips`, '_blank');
+                  window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}`, '_blank');
                 }
               }}
               style={{
