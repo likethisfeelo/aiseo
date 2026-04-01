@@ -57,6 +57,7 @@ function SiteIdSetup({ onSiteSelected }: { onSiteSelected: (id: string) => void 
   const [confirming, setConfirming] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [existingSiteId, setExistingSiteId] = useState('');
   const siteIdValid = /^[a-z0-9-]{3,63}$/.test(siteIdInput.trim());
 
   const handleLock = async () => {
@@ -67,9 +68,15 @@ function SiteIdSetup({ onSiteSelected }: { onSiteSelected: (id: string) => void 
 
     setConfirming(false);
     setLoading(true);
+    setError('');
+    setExistingSiteId('');
     try {
       const data = await selectSite({ siteId: normalized });
-      onSiteSelected(data.siteId);
+      if (data.alreadyOwned) {
+        setExistingSiteId(data.siteId);
+      } else {
+        onSiteSelected(data.siteId);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : '사이트 주소 확정 실패');
     } finally {
@@ -80,37 +87,63 @@ function SiteIdSetup({ onSiteSelected }: { onSiteSelected: (id: string) => void 
   return (
     <div style={{ maxWidth: 500, margin: '60px auto', fontFamily: 'system-ui, sans-serif', padding: '0 20px' }}>
       <h2 style={{ fontSize: 20, marginBottom: 8 }}>내 사이트 주소 선택</h2>
-      <p style={{ color: '#9a3412', fontSize: 13, marginBottom: 16 }}>한번 확정하면 변경할 수 없습니다. 신중하게 선택해 주세요.</p>
+      <p style={{ color: '#9a3412', fontSize: 13, marginBottom: 4 }}>한번 확정하면 변경할 수 없습니다. 신중하게 선택해 주세요.</p>
+      <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>이미 사이트를 등록하셨다면 기존 주소를 입력해 보세요.</p>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-        <input
-          value={siteIdInput}
-          onChange={(e) => { setSiteIdInput(e.target.value.toLowerCase()); setConfirming(false); }}
-          placeholder="my-site"
-          style={{ flex: 1, padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 14 }}
-        />
-        <button onClick={handleLock} disabled={loading || (!confirming && !siteIdValid)} style={{
-          background: confirming ? '#dc2626' : '#ea580c', color: '#fff', border: 'none',
-          borderRadius: 6, padding: '10px 20px', cursor: 'pointer', fontSize: 14, whiteSpace: 'nowrap',
-        }}>
-          {loading ? '확정 중...' : confirming ? '정말 확정' : '주소 확정'}
-        </button>
-      </div>
-
-      {siteIdInput.trim() && (
-        <p style={{ fontSize: 13, color: siteIdValid ? '#065f46' : '#dc2626', margin: '4px 0' }}>
-          {siteIdValid ? `https://${siteIdInput.trim()}.${BASE_DOMAIN}` : '영문 소문자, 숫자, 하이픈(-) 3~63자만 가능합니다.'}
-        </p>
-      )}
-
-      {confirming && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 6, padding: 10, marginTop: 8, fontSize: 13, color: '#dc2626' }}>
-          <strong>https://{siteIdInput.trim()}.${BASE_DOMAIN}</strong> 로 확정하시겠습니까? "정말 확정" 버튼을 다시 눌러주세요.
+      {existingSiteId ? (
+        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 20, textAlign: 'center' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#166534', marginBottom: 8 }}>
+            이미 등록된 사이트 주소가 있습니다
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+            https://{existingSiteId}.{BASE_DOMAIN}
+          </div>
+          <div style={{ fontSize: 12, color: '#64748b', marginBottom: 16 }}>
+            새로운 주소를 생성할 수 없습니다. 변경이 필요하시면 로그인 후 도메인 설정에서 변경 요청해 주세요.
+          </div>
+          <button
+            onClick={() => onSiteSelected(existingSiteId)}
+            style={{
+              background: '#2563eb', color: '#fff', border: 'none',
+              borderRadius: 6, padding: '12px 28px', cursor: 'pointer', fontSize: 14, fontWeight: 600,
+            }}
+          >
+            이 주소로 계속하기 →
+          </button>
         </div>
-      )}
+      ) : (
+        <>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <input
+              value={siteIdInput}
+              onChange={(e) => { setSiteIdInput(e.target.value.toLowerCase()); setConfirming(false); setError(''); }}
+              placeholder="my-site"
+              style={{ flex: 1, padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 14 }}
+            />
+            <button onClick={handleLock} disabled={loading || (!confirming && !siteIdValid)} style={{
+              background: confirming ? '#dc2626' : '#ea580c', color: '#fff', border: 'none',
+              borderRadius: 6, padding: '10px 20px', cursor: 'pointer', fontSize: 14, whiteSpace: 'nowrap',
+            }}>
+              {loading ? '확정 중...' : confirming ? '정말 확정' : '주소 확정'}
+            </button>
+          </div>
 
-      {error && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 12, marginTop: 12, color: '#dc2626' }}>{error}</div>
+          {siteIdInput.trim() && (
+            <p style={{ fontSize: 13, color: siteIdValid ? '#065f46' : '#dc2626', margin: '4px 0' }}>
+              {siteIdValid ? `https://${siteIdInput.trim()}.${BASE_DOMAIN}` : '영문 소문자, 숫자, 하이픈(-) 3~63자만 가능합니다.'}
+            </p>
+          )}
+
+          {confirming && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 6, padding: 10, marginTop: 8, fontSize: 13, color: '#dc2626' }}>
+              <strong>https://{siteIdInput.trim()}.${BASE_DOMAIN}</strong> 로 확정하시겠습니까? "정말 확정" 버튼을 다시 눌러주세요.
+            </div>
+          )}
+
+          {error && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 12, marginTop: 12, color: '#dc2626' }}>{error}</div>
+          )}
+        </>
       )}
     </div>
   );
