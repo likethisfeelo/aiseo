@@ -162,25 +162,35 @@ export default function App() {
     setAuthPage(null);
   };
   const [siteId, setSiteId] = useState('');
+  const [siteIdLoading, setSiteIdLoading] = useState(true);
+  const [siteIdError, setSiteIdError] = useState('');
   const [pageTitle, setPageTitle] = useState('대시보드');
   const [educationOpen, setEducationOpen] = useState(false);
 
   // Get siteId: server first, then localStorage fallback
   useEffect(() => {
-    if (!user) return;
+    if (!user) { setSiteIdLoading(false); return; }
+    setSiteIdLoading(true);
+    setSiteIdError('');
     // Try server-side siteId (from /me response)
     getMe().then((data: { siteId?: string }) => {
       if (data.siteId) {
         setSiteId(data.siteId);
         localStorage.setItem('aiseo.siteId', data.siteId);
       } else {
+        // Server returned no siteId — user genuinely has no site
         const stored = localStorage.getItem('aiseo.siteId');
         if (stored) setSiteId(stored);
       }
     }).catch(() => {
+      // API failed — use localStorage but show warning if also empty
       const stored = localStorage.getItem('aiseo.siteId');
-      if (stored) setSiteId(stored);
-    });
+      if (stored) {
+        setSiteId(stored);
+      } else {
+        setSiteIdError('서버 연결에 실패했습니다. 새로고침하거나 잠시 후 다시 시도해 주세요.');
+      }
+    }).finally(() => setSiteIdLoading(false));
   }, [user]);
 
   const handleSiteSelected = (id: string) => {
@@ -204,6 +214,35 @@ export default function App() {
 
   // Not logged in
   if (!user) return <LandingPage authError={authError} />;
+
+  // Loading siteId from server
+  if (siteIdLoading) {
+    return (
+      <div style={{ maxWidth: 640, margin: '40px auto', fontFamily: 'system-ui, sans-serif', textAlign: 'center', padding: '60px 20px', color: '#666' }}>
+        사이트 정보 불러오는 중...
+      </div>
+    );
+  }
+
+  // Server failed and no localStorage — show error, NOT SiteIdSetup
+  if (siteIdError && !siteId) {
+    return (
+      <div style={{ maxWidth: 500, margin: '60px auto', fontFamily: 'system-ui, sans-serif', padding: '0 20px', textAlign: 'center' }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+        <h2 style={{ fontSize: 18, marginBottom: 8, color: '#1e293b' }}>서버 연결 실패</h2>
+        <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>{siteIdError}</p>
+        <button onClick={() => window.location.reload()} style={{
+          padding: '10px 24px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 14, cursor: 'pointer',
+        }}>새로고침</button>
+        <div style={{ marginTop: 24, borderTop: '1px solid #e2e8f0', paddingTop: 16 }}>
+          <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>처음 사용하시는 분이라면 아래에서 사이트를 등록하세요.</p>
+          <button onClick={() => setSiteIdError('')} style={{
+            padding: '8px 20px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#475569', fontSize: 13, cursor: 'pointer',
+          }}>사이트 주소 등록하기</button>
+        </div>
+      </div>
+    );
+  }
 
   // No site selected yet
   if (!siteId) return <SiteIdSetup onSiteSelected={handleSiteSelected} />;
