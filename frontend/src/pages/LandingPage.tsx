@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import './landing.css';
 
 interface Props {
@@ -5,314 +6,1185 @@ interface Props {
 }
 
 export function LandingPage({ authError }: Props) {
+  useEffect(() => {
+    // ── Mobile hamburger menu ──
+    const btn = document.getElementById('navHamburger');
+    const menu = document.getElementById('navMobileMenu');
+    const hamburgerHandler = () => {
+      if (!btn || !menu) return;
+      const isOpen = menu.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    };
+    if (btn) btn.addEventListener('click', hamburgerHandler);
+    const mobileLinks = menu?.querySelectorAll('.nmm-link') || [];
+    const closeMobileMenu = () => {
+      menu?.classList.remove('open');
+      btn?.classList.remove('open');
+      document.body.style.overflow = '';
+    };
+    mobileLinks.forEach((a: Element) => a.addEventListener('click', closeMobileMenu));
+
+    // ── Mobile persona carousel ──
+    const mpTrack = document.getElementById('mpTrack');
+    const mpDots = document.querySelectorAll('#mpDots .mp-dot');
+    const mpPrev = document.getElementById('mpPrev');
+    const mpNext = document.getElementById('mpNext');
+    let mpCurrent = 0;
+    const MP_TOTAL = 3;
+    let mpAutoTimer: ReturnType<typeof setInterval>;
+    function mpGoTo(idx: number) {
+      mpCurrent = ((idx % MP_TOTAL) + MP_TOTAL) % MP_TOTAL;
+      if (mpTrack) mpTrack.style.transform = 'translateX(-' + (mpCurrent * 100) + '%)';
+      mpDots.forEach((d, i) => d.classList.toggle('active', i === mpCurrent));
+    }
+    function mpStartAuto() {
+      clearInterval(mpAutoTimer);
+      mpAutoTimer = setInterval(() => mpGoTo(mpCurrent + 1), 3800);
+    }
+    if (mpPrev) mpPrev.addEventListener('click', () => { mpGoTo(mpCurrent - 1); mpStartAuto(); });
+    if (mpNext) mpNext.addEventListener('click', () => { mpGoTo(mpCurrent + 1); mpStartAuto(); });
+    mpDots.forEach(d => d.addEventListener('click', () => { mpGoTo(+(d as HTMLElement).dataset.idx!); mpStartAuto(); }));
+    let mpStartX = 0;
+    mpTrack?.addEventListener('touchstart', (e: Event) => { mpStartX = (e as TouchEvent).touches[0].clientX; }, { passive: true });
+    mpTrack?.addEventListener('touchend', (e: Event) => {
+      const dx = (e as TouchEvent).changedTouches[0].clientX - mpStartX;
+      if (Math.abs(dx) > 40) { mpGoTo(dx < 0 ? mpCurrent + 1 : mpCurrent - 1); mpStartAuto(); }
+    }, { passive: true });
+    if (mpTrack) mpStartAuto();
+
+    // ── NAV scroll ──
+    const nav = document.getElementById('mainNav');
+    const testiEl = document.querySelector('.testi-section');
+    function getNavThreshold() {
+      const videoEl = document.getElementById('videoRevealSection');
+      if (videoEl) return videoEl.offsetTop + videoEl.offsetHeight - window.innerHeight;
+      if (!testiEl) return window.innerHeight * 0.9;
+      return testiEl.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.6;
+    }
+    let navThreshold = getNavThreshold();
+    const resizeNavHandler = () => { navThreshold = getNavThreshold(); };
+    window.addEventListener('resize', resizeNavHandler, { passive: true } as EventListenerOptions);
+    const scrollNavHandler = () => {
+      if (window.scrollY >= navThreshold) nav?.classList.add('scrolled');
+      else nav?.classList.remove('scrolled');
+    };
+    window.addEventListener('scroll', scrollNavHandler, { passive: true } as EventListenerOptions);
+
+    // ── Scroll reveal ──
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          (e.target as HTMLElement).style.transitionDelay = (i * 0.08) + 's';
+          e.target.classList.add('visible');
+          revealObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => revealObserver.observe(el));
+
+    // ── Persona tabs ──
+    const psTabs = document.querySelectorAll('.ps-tab');
+    const psPanels = document.querySelectorAll('.ps-panel');
+    function psActivate(idx: number) {
+      psTabs.forEach((t, i) => t.classList.toggle('active', i === idx));
+      psPanels.forEach((p, i) => p.classList.toggle('active', i === idx));
+    }
+    psTabs.forEach((tab, i) => tab.addEventListener('click', () => psActivate(i)));
+    let psTimer = setInterval(() => {
+      const active = Array.from(psTabs).findIndex(t => t.classList.contains('active'));
+      psActivate((active + 1) % psTabs.length);
+    }, 4000);
+    const psWrap = document.querySelector('.ps-wrap');
+    psWrap?.addEventListener('mouseenter', () => clearInterval(psTimer));
+    psWrap?.addEventListener('mouseleave', () => {
+      clearInterval(psTimer);
+      psTimer = setInterval(() => {
+        const active = Array.from(psTabs).findIndex(t => t.classList.contains('active'));
+        psActivate((active + 1) % psTabs.length);
+      }, 4000);
+    });
+
+    // ── Scroll features stacked accordion ──
+    const sfSection = document.getElementById('scrollFeatures');
+    const sfStack = document.getElementById('sfStack');
+    const sfCards = sfStack ? Array.from(sfStack.querySelectorAll('.sf-card')) : [];
+    const SF_TOTAL = sfCards.length;
+    const SF_HDR = 52;
+    const SF_GAP = 6;
+    const SF_STEP = SF_HDR + SF_GAP;
+    let sfCurrent = -1;
+    function sfBodyH(idx: number) {
+      const stackH = sfStack?.offsetHeight || 0;
+      const used = idx * SF_STEP + SF_HDR;
+      return Math.max(160, stackH - used);
+    }
+    function sfSetActive(idx: number) {
+      if (idx === sfCurrent) return;
+      sfCurrent = idx;
+      sfCards.forEach((card, i) => {
+        const body = card.querySelector('.sf-card-bd') as HTMLElement;
+        card.classList.remove('sf-past', 'sf-active', 'sf-future');
+        if (i < idx) {
+          card.classList.add('sf-past');
+          (card as HTMLElement).style.height = SF_HDR + 'px';
+          if (body) body.style.height = '0px';
+        } else if (i === idx) {
+          card.classList.add('sf-active');
+          const h = sfBodyH(idx);
+          (card as HTMLElement).style.height = (SF_HDR + h) + 'px';
+          if (body) body.style.height = h + 'px';
+        } else {
+          card.classList.add('sf-future');
+          (card as HTMLElement).style.height = '0px';
+          if (body) body.style.height = '0px';
+        }
+      });
+    }
+    function sfProgress() {
+      if (!sfSection) return 0;
+      const rect = sfSection.getBoundingClientRect();
+      const scrollable = sfSection.offsetHeight - window.innerHeight;
+      if (scrollable <= 0) return 0;
+      return Math.max(0, Math.min(1, -rect.top / scrollable));
+    }
+    let sfRaf: number;
+    const sfScrollHandler = () => {
+      cancelAnimationFrame(sfRaf);
+      sfRaf = requestAnimationFrame(() => {
+        const p = sfProgress();
+        const idx = Math.min(Math.floor(p * SF_TOTAL), SF_TOTAL - 1);
+        sfSetActive(idx);
+      });
+    };
+    window.addEventListener('scroll', sfScrollHandler, { passive: true } as EventListenerOptions);
+    window.addEventListener('resize', () => {
+      if (sfCurrent >= 0) {
+        sfCurrent = -1;
+        sfSetActive(Math.min(Math.floor(sfProgress() * SF_TOTAL), SF_TOTAL - 1));
+      }
+    }, { passive: true } as EventListenerOptions);
+    sfCards.forEach((card, i) => {
+      card.querySelector('.sf-card-hd')?.addEventListener('click', () => {
+        if (!sfSection) return;
+        const scrollable = sfSection.offsetHeight - window.innerHeight;
+        const target = sfSection.offsetTop + (i / SF_TOTAL) * scrollable + 4;
+        window.scrollTo({ top: target, behavior: 'smooth' });
+      });
+    });
+    requestAnimationFrame(() => requestAnimationFrame(() => sfSetActive(0)));
+
+    // ── Testimonial carousel ──
+    const tTrack = document.getElementById('testimonialTrack');
+    const tDotsWrap = document.getElementById('carouselDots');
+    const tSlides = tTrack ? Array.from(tTrack.querySelectorAll('.testimonial-slide')) : [];
+    const tTotal = tSlides.length;
+    let tCurrent = 0;
+    if (tTrack && tDotsWrap) {
+      tSlides.forEach((_, i) => {
+        const d = document.createElement('button');
+        d.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        d.setAttribute('aria-label', 'Slide ' + (i + 1));
+        d.addEventListener('click', () => { tGoTo(i); tResetAuto(); });
+        tDotsWrap.appendChild(d);
+      });
+    }
+    function tGoTo(idx: number) {
+      tCurrent = ((idx % tTotal) + tTotal) % tTotal;
+      if (tSlides[0]) {
+        const slideW = (tSlides[0] as HTMLElement).offsetWidth + 24;
+        if (tTrack) tTrack.style.transform = 'translateX(-' + (tCurrent * slideW) + 'px)';
+      }
+      tDotsWrap?.querySelectorAll('.carousel-dot').forEach((d, i) =>
+        d.classList.toggle('active', i === tCurrent)
+      );
+    }
+    let tAuto = setInterval(() => tGoTo(tCurrent + 1), 4500);
+    function tResetAuto() { clearInterval(tAuto); tAuto = setInterval(() => tGoTo(tCurrent + 1), 4500); }
+    tTrack?.parentElement?.addEventListener('mouseenter', () => clearInterval(tAuto));
+    tTrack?.parentElement?.addEventListener('mouseleave', tResetAuto);
+    window.addEventListener('resize', () => tGoTo(tCurrent), { passive: true } as EventListenerOptions);
+
+    // ── Count up ──
+    function countUp(el: HTMLElement, target: number, duration: number) {
+      const start = performance.now();
+      (function frame(now: number) {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = String(Math.round(eased * target));
+        if (t < 1) requestAnimationFrame(frame);
+        else el.textContent = String(target);
+      })(start);
+    }
+    const counters = [
+      { id: 'c1', target: 5200, dur: 2000 },
+      { id: 'c2', target: 78, dur: 1600 },
+      { id: 'c3', target: 3, dur: 1200 },
+      { id: 'c4', target: 10, dur: 1400 },
+      { id: 'r1', target: 320, dur: 2000 },
+      { id: 'r2', target: 3, dur: 1000 },
+      { id: 'r3', target: 12, dur: 1400 },
+      { id: 'r4', target: 850, dur: 2000 },
+    ];
+    const countObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const cfg = counters.find(c => c.id === e.target.id);
+        if (cfg) countUp(e.target as HTMLElement, cfg.target, cfg.dur);
+        countObserver.unobserve(e.target);
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(c => {
+      const el = document.getElementById(c.id);
+      if (el) countObserver.observe(el);
+    });
+
+    // ── Bento flip ──
+    document.querySelectorAll('.bento-flip').forEach(card => {
+      card.addEventListener('click', function(this: HTMLElement, e: Event) {
+        if ((e.target as HTMLElement).closest('.bento-back-link')) return;
+        if (window.matchMedia('(hover: none)').matches) {
+          this.classList.toggle('flipped');
+        }
+      });
+    });
+
+    // ── Mouse gradient blob ──
+    const CONFIGS = [
+      { size: 600, blur: 38, alphaScale: 1.00, lerp: 0.055 },
+      { size: 460, blur: 52, alphaScale: 0.55, lerp: 0.034 },
+      { size: 320, blur: 62, alphaScale: 0.28, lerp: 0.018 },
+    ];
+    const PALETTES = [
+      ['rgba(167,139,250,0.56)', 'rgba(196,181,253,0.36)', 'rgba(155,184,248,0.24)', 'rgba(196,168,245,0.12)'],
+      ['rgba(134,239,172,0.44)', 'rgba(167,243,208,0.28)', 'rgba(52,211,153,0.16)', 'rgba(16,185,129,0.08)'],
+      ['rgba(253,186,116,0.44)', 'rgba(254,215,170,0.28)', 'rgba(251,146,60,0.16)', 'rgba(234,88,12,0.08)'],
+      ['rgba(249,168,212,0.48)', 'rgba(252,207,232,0.30)', 'rgba(236,72,153,0.16)', 'rgba(219,39,119,0.08)'],
+      ['rgba(147,197,253,0.48)', 'rgba(191,219,254,0.30)', 'rgba(59,130,246,0.16)', 'rgba(37,99,235,0.08)'],
+    ];
+    function makeGradient(p: string[], scale: number) {
+      const s = (rgba: string) => rgba.replace(/([\d.]+)\)$/, (_, a) =>
+        Math.min(parseFloat(a) * scale, 1).toFixed(2) + ')');
+      return `radial-gradient(circle at center, ${s(p[0])} 0%, ${s(p[1])} 22%, ${s(p[2])} 45%, ${s(p[3])} 62%, transparent 78%)`;
+    }
+    let paletteIdx = 0, lastSwitch = 0;
+    const blobs = CONFIGS.map((cfg) => {
+      const el = document.createElement('div');
+      Object.assign(el.style, {
+        position: 'fixed', pointerEvents: 'none', zIndex: '0',
+        width: cfg.size + 'px', height: cfg.size + 'px', borderRadius: '50%',
+        transform: 'translate(-50%, -50%)', filter: `blur(${cfg.blur}px)`,
+        mixBlendMode: 'normal', transition: 'opacity 0.7s ease', opacity: '0',
+        left: '0', top: '0', willChange: 'left, top',
+      });
+      document.body.appendChild(el);
+      return { el, x: innerWidth / 2, y: innerHeight / 2, cfg };
+    });
+    function applyPalette() {
+      const p = PALETTES[paletteIdx];
+      blobs.forEach(b => { b.el.style.background = makeGradient(p, b.cfg.alphaScale); });
+    }
+    applyPalette();
+    let mouseX = innerWidth / 2, mouseY = innerHeight / 2;
+    let blobVisible = false;
+    const mouseMoveHandler = (e: MouseEvent) => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      if (!blobVisible) { blobVisible = true; blobs.forEach(b => b.el.style.opacity = '1'); }
+    };
+    const mouseLeaveHandler = () => { blobVisible = false; blobs.forEach(b => b.el.style.opacity = '0'); };
+    document.addEventListener('mousemove', mouseMoveHandler, { passive: true } as EventListenerOptions);
+    document.addEventListener('mouseleave', mouseLeaveHandler);
+    let blobRaf: number;
+    (function tick(now: number) {
+      blobRaf = requestAnimationFrame(tick);
+      if (now - lastSwitch > 3000) {
+        paletteIdx = (paletteIdx + 1) % PALETTES.length;
+        lastSwitch = now;
+        applyPalette();
+      }
+      let targetX = mouseX, targetY = mouseY;
+      blobs.forEach(b => {
+        b.x += (targetX - b.x) * b.cfg.lerp;
+        b.y += (targetY - b.y) * b.cfg.lerp;
+        b.el.style.left = b.x.toFixed(1) + 'px';
+        b.el.style.top = b.y.toFixed(1) + 'px';
+        targetX = b.x; targetY = b.y;
+      });
+    })(0);
+
+    // ── Video reveal ──
+    const vidSection = document.getElementById('videoRevealSection');
+    const vidWrap = document.getElementById('videoFrameWrap');
+    const vidLabel = document.getElementById('videoRevealLabel');
+    const vidHint = document.getElementById('videoScrollHint');
+    const vidGlow = document.getElementById('videoBgGlow');
+    const ytPlayer = document.getElementById('ytPlayer') as HTMLIFrameElement | null;
+    const vidProgressBar = document.getElementById('videoProgressBar');
+    const vidThumbnail = document.getElementById('videoThumbnail');
+    let videoStarted = false;
+    let vidRaf: number;
+    function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
+    function lerpV(a: number, b: number, t: number) { return a + (b - a) * t; }
+    function vidGetProgress() {
+      if (!vidSection) return 0;
+      const rect = vidSection.getBoundingClientRect();
+      const total = vidSection.offsetHeight - window.innerHeight;
+      return clamp(-rect.top / total, 0, 1);
+    }
+    function vidApplyProgress(p: number) {
+      if (!vidWrap || !vidLabel || !vidHint || !vidGlow || !vidProgressBar) return;
+      const growEnd = 0.78;
+      const phase1 = clamp(p / growEnd, 0, 1);
+      const ease = (t: number) => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+      const e1 = ease(phase1);
+      vidLabel.style.opacity = '0';
+      vidLabel.style.marginBottom = '0px';
+      vidHint.style.opacity = String(Math.max(0, 1 - p * 6));
+      const scaleVal = lerpV(0.68, 1, e1);
+      vidWrap.style.transform = 'scale(' + scaleVal + ')';
+      vidWrap.style.borderRadius = Math.round(lerpV(20, 0, e1)) + 'px';
+      const sh = lerpV(0.14, 0.02, e1);
+      vidWrap.style.boxShadow = '0 ' + Math.round(lerpV(20,2,e1)) + 'px ' + Math.round(lerpV(80,12,e1)) + 'px rgba(0,0,0,' + sh.toFixed(2) + ')';
+      const glowVal = clamp((p - 0.65) / 0.35, 0, 1);
+      vidGlow.style.opacity = ease(glowVal).toFixed(3);
+      if (vidThumbnail) {
+        const fadeStart = 0.70;
+        const fadeEnd = 0.90;
+        const thumbOpacity = clamp(1 - (p - fadeStart) / (fadeEnd - fadeStart), 0, 1);
+        vidThumbnail.style.opacity = thumbOpacity.toFixed(3);
+        if (p >= 0.82 && !videoStarted && ytPlayer) {
+          videoStarted = true;
+          ytPlayer.src = 'https://www.youtube.com/embed/mXlMAkHhgYs?autoplay=1&rel=0&modestbranding=1&color=white&enablejsapi=1';
+          ytPlayer.style.pointerEvents = 'auto';
+        }
+      }
+      vidProgressBar.style.width = (p * 100) + '%';
+    }
+    function vidTick() {
+      vidApplyProgress(vidGetProgress());
+      vidRaf = requestAnimationFrame(vidTick);
+    }
+    let vidObs: IntersectionObserver | undefined;
+    if (vidSection) {
+      vidObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) vidRaf = requestAnimationFrame(vidTick);
+          else cancelAnimationFrame(vidRaf);
+        });
+      }, { rootMargin: '200px' });
+      vidObs.observe(vidSection);
+    }
+    if (vidThumbnail) {
+      vidThumbnail.addEventListener('click', () => {
+        vidThumbnail.style.opacity = '0';
+        vidThumbnail.style.pointerEvents = 'none';
+        if (!videoStarted && ytPlayer) {
+          videoStarted = true;
+          ytPlayer.src = 'https://www.youtube.com/embed/mXlMAkHhgYs?autoplay=1&rel=0&modestbranding=1&color=white&enablejsapi=1';
+          ytPlayer.style.pointerEvents = 'auto';
+        }
+      });
+    }
+
+    // ── Cleanup ──
+    return () => {
+      clearInterval(mpAutoTimer);
+      clearInterval(psTimer);
+      clearInterval(tAuto);
+      cancelAnimationFrame(sfRaf);
+      cancelAnimationFrame(blobRaf);
+      cancelAnimationFrame(vidRaf);
+      revealObserver.disconnect();
+      countObserver.disconnect();
+      vidObs?.disconnect();
+      window.removeEventListener('scroll', scrollNavHandler);
+      window.removeEventListener('resize', resizeNavHandler);
+      window.removeEventListener('scroll', sfScrollHandler);
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseleave', mouseLeaveHandler);
+      blobs.forEach(b => b.el.remove());
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
     <>
       {/* NAV */}
-      <nav className="lp-nav">
-        <div className="nav-logo">AI<span>SEO</span></div>
-        <div className="nav-links">
-          <a href="#flow">이용 방법</a>
-          <a href="#packages">서비스 구성</a>
-          <a href="#trust">자주 묻는 질문</a>
-          <a href="/?auth=login" className="btn-nav">무료로 시작하기 →</a>
+      <nav id="mainNav">
+        <div className="nav-inner">
+          <a href="#" className="nav-logo">AISEO</a>
+          <div className="nav-links">
+            <a href="#copilot-intro">기능</a>
+            <a href="#scrollFeatures">플랫폼</a>
+            <a href="#persona">대상</a>
+            <a href="#results">성과</a>
+            <a href="#">요금제</a>
+          </div>
+          <div className="nav-cta">
+            <a href="/?auth=login" className="btn-ghost">로그인</a>
+            <a href="/?auth=login" className="btn-primary">지금 시작하기</a>
+          </div>
+          <button className="nav-hamburger" id="navHamburger" aria-label="메뉴 열기">
+            <span></span><span></span><span></span>
+          </button>
         </div>
       </nav>
 
+      {/* Mobile dropdown menu */}
+      <div className="nav-mobile-menu" id="navMobileMenu">
+        <nav className="nmm-links">
+          <a href="#copilot-intro" className="nmm-link">기능</a>
+          <a href="#scrollFeatures" className="nmm-link">플랫폼</a>
+          <a href="#persona" className="nmm-link">대상</a>
+          <a href="#results" className="nmm-link">성과</a>
+          <a href="#" className="nmm-link">요금제</a>
+        </nav>
+        <div className="nmm-cta">
+          <a href="/?auth=login" className="nmm-btn-ghost">로그인</a>
+          <a href="/?auth=login" className="nmm-btn-primary">지금 시작하기</a>
+        </div>
+      </div>
+
       {/* HERO */}
-      <section style={{ paddingTop: 0, paddingBottom: 0 }}>
-        <div className="hero">
-          <div>
-            <div className="hero-badge">소상공인 맞춤 · AI SEO 플랫폼</div>
-            <h1>내 사업, <em>검색되는</em><br />홈페이지로<br />5분 만에 완성</h1>
-            <p className="hero-sub">
-              AI로 만든 웹사이트를 SEO 최적화 검증 후<br />
-              <strong>원클릭으로 배포</strong>하는 올인원 플랫폼.<br />
-              가방 공방, 웨딩스냅, 공예 클래스… 내 업종에 맞게.
-            </p>
-            {authError && (
-              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 12, marginBottom: 16, color: '#dc2626' }}>
-                {authError}
-              </div>
-            )}
-            <div className="hero-cta">
-              <a href="/?auth=signup" className="btn-primary">무료로 시작하기 →</a>
-              <a href="#packages" className="btn-ghost">서비스 구성 보기</a>
-            </div>
-            <div className="hero-stats">
-              <div className="stat">
-                <span className="stat-num">5분</span>
-                <span className="stat-label">평균 배포 소요 시간</span>
-              </div>
-              <div className="stat">
-                <span className="stat-num">5가지</span>
-                <span className="stat-label">SEO 자동 검증 항목</span>
-              </div>
-              <div className="stat">
-                <span className="stat-num">0원</span>
-                <span className="stat-label">호스팅 별도 비용</span>
-              </div>
-            </div>
+      <section className="hero" id="hero">
+        <div className="hero-bg"></div>
+        <div className="hero-noise"></div>
+        <div className="hero-grid"></div>
+        <div className="hero-content">
+          <div className="hero-badge">
+            <div className="hero-badge-dot"></div>
+            AI시대에 맞는 소상공인들을 위한 AISEO.TIPS
           </div>
+          <h1 className="hero-h1">
+            <span className="word w1">AI로 만들고,</span><br/>
+            <span className="word w2 accent-text">검색에 올리고,</span><br/>
+            <span className="word w3">온라인 마케팅을 시작하세요</span>
+          </h1>
+          <p className="hero-sub">
+            AI로 원하는 사이트를 만들고, 10년 전문가의 핵심 SEO 노하우로 검색엔진에서 쉽게 찾아지도록 만들어드립니다.
+          </p>
+          {authError && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 12, marginBottom: 16, color: '#dc2626' }}>
+              {authError}
+            </div>
+          )}
+          <div className="hero-mobile-cta">
+            <a href="/?auth=signup" className="hero-mobile-btn-primary">수강신청하기 →</a>
+          </div>
+        </div>
+      </section>
 
-          <div className="hero-visual">
-            <div className="float-chip c1">🚀 배포 완료!</div>
-            <div className="float-chip c2">🔍 Google 검색 등록</div>
-            <div className="float-chip c3">📊 GA4 연동됨</div>
-            <div className="site-preview">
-              <div className="preview-bar">
-                <div className="dot r"></div>
-                <div className="dot y"></div>
-                <div className="dot g"></div>
-                <div className="preview-url">🔒 my-studio.aiseo.tips</div>
-              </div>
-              <div className="preview-content">
-                <div className="seo-check">
-                  <div className="check-item pass"><span className="check-icon">✅</span>index.html 존재 여부</div>
-                  <div className="check-item pass"><span className="check-icon">✅</span>&lt;title&gt; 태그 확인</div>
-                  <div className="check-item pass"><span className="check-icon">✅</span>meta description 존재</div>
-                  <div className="check-item fail"><span className="check-icon">⚠️</span>robots.txt — 추가 권장</div>
-                  <div className="check-item pass"><span className="check-icon">✅</span>sitemap.xml 존재</div>
+      {/* VIDEO REVEAL */}
+      <div className="video-reveal-section" id="videoRevealSection">
+        <div className="video-reveal-sticky" id="videoRevealSticky">
+          <div className="video-bg-glow" id="videoBgGlow"></div>
+          <div className="video-reveal-label" id="videoRevealLabel" style={{display:'none',margin:0}}></div>
+          <div className="video-frame-wrap" id="videoFrameWrap">
+            <div id="videoThumbnail">
+              <div className="vt-placeholder">
+                <div className="vt-play-ring">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5L19 12L8 19V5Z"/></svg>
                 </div>
-                <div className="deploy-badge">
-                  <div>
-                    <div>배포 완료 — 4/5 통과</div>
-                    <div className="deploy-url">https://my-studio.aiseo.tips</div>
+                <span className="vt-label">AISEO 데모 영상 · 5분</span>
+              </div>
+            </div>
+            <div className="video-play-overlay" id="videoPlayOverlay"></div>
+            <iframe
+              id="ytPlayer"
+              src="https://www.youtube.com/embed/mXlMAkHhgYs?enablejsapi=1&rel=0&modestbranding=1&color=white"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+            <div className="video-progress-bar" id="videoProgressBar"></div>
+          </div>
+          <div className="video-scroll-hint" id="videoScrollHint">
+            <span>스크롤해서 열기</span>
+            <svg className="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color:'var(--text-muted)'}}>
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* TESTIMONIAL */}
+      <div className="testi-section reveal">
+        <div className="testi-inner">
+          <p className="testi-quote">
+            링크만 생기는 AI 사이트, 막상 운영하려니 매달 나가는 호스팅비, 하지만 여전히 아무도 못 찾아오는 내 사이트. 이 세 가지를 한 번에 해결하기 위해 소상공인, 1인대표, 스타트업을 위해 만든 서비스입니다.
+          </p>
+          <div className="testi-divider"></div>
+          <div className="testi-footer">
+            <div className="testi-author">
+              <div className="testi-avatar">🙋</div>
+              <div>
+                <div className="testi-author-name">Jin &amp; Philo</div>
+                <div className="testi-author-role">AISEO.TIPS 컨설턴트</div>
+              </div>
+            </div>
+            <div className="testi-brand">AISEO.TIPS</div>
+          </div>
+        </div>
+      </div>
+
+      {/* AI COPILOT INTRO */}
+      <section className="copilot-intro" id="copilot-intro">
+        <div className="copilot-intro-inner">
+          <div className="copilot-intro-text reveal">
+            <div className="section-eyebrow">AI SEO TIPS</div>
+            <h2 className="section-h2">1시간이면 완벽한 사이트로<br/>온라인 마케팅을 시작할 수 있습니다</h2>
+            <p className="section-sub">AI로 사이트를 만드는 프롬프트부터 SEO 기본 셋팅을 위한 프로그램까지 — 계정 생성 연동까지 쉽고 꼭 필요한 핵심만 쏙쏙. 1시간 강의면 실행까지 충분합니다. AI 시대 자동화 마케팅, 그 시작을 준비하세요.</p>
+          </div>
+          <div className="copilot-visual reveal">
+            {/* Desktop Dashboard mockup */}
+            <div className="copilot-mockup-wrap copilot-desktop-only">
+              <div className="copilot-fc fc-tl">
+                <div className="float-card-icon">🚀</div>
+                <div className="float-card-label">SEO Score</div>
+                <div className="float-card-sub">+34점 상승 · 이번 주</div>
+              </div>
+              <div className="copilot-fc fc-bl">
+                <div className="float-card-icon">📈</div>
+                <div className="float-card-label">트래픽 증가</div>
+                <div className="float-card-sub">3.2x 지난달 대비</div>
+              </div>
+              <div className="copilot-fc fc-tr">
+                <div className="float-card-icon">🤖</div>
+                <div className="float-card-label">AI 최적화</div>
+                <div className="float-card-sub">자동 완료</div>
+              </div>
+              <div className="hero-mockup">
+                <div className="mockup-bar">
+                  <div className="mockup-dot r"></div><div className="mockup-dot y"></div><div className="mockup-dot g"></div>
+                  <div className="mockup-url">app.aiseo.tips/dashboard</div>
+                </div>
+                <div className="mockup-screen">
+                  <div className="mockup-sidebar">
+                    <div className="mockup-nav-item active"><div className="mockup-nav-icon"></div><div className="mockup-nav-label"></div></div>
+                    <div className="mockup-nav-item"><div className="mockup-nav-icon"></div><div className="mockup-nav-label"></div></div>
+                    <div className="mockup-nav-item"><div className="mockup-nav-icon"></div><div className="mockup-nav-label"></div></div>
+                    <div className="mockup-nav-item"><div className="mockup-nav-icon"></div><div className="mockup-nav-label"></div></div>
+                    <div className="mockup-nav-item"><div className="mockup-nav-icon"></div><div className="mockup-nav-label"></div></div>
                   </div>
-                  <span>→</span>
+                  <div className="mockup-main">
+                    <div className="mockup-row">
+                      <div className="mockup-stat highlight"><div className="mockup-stat-num">94</div><div className="mockup-stat-label">SEO 점수</div></div>
+                      <div className="mockup-stat"><div className="mockup-stat-num">4.8k</div><div className="mockup-stat-label">월 방문자</div></div>
+                      <div className="mockup-chart">
+                        <div className="bar a"></div><div className="bar b"></div><div className="bar c"></div><div className="bar d"></div><div className="bar e"></div><div className="bar f"></div><div className="bar g"></div><div className="bar h"></div>
+                      </div>
+                    </div>
+                    <div className="mockup-table">
+                      <div className="mockup-tr"><div className="mockup-avatar"></div><div className="mockup-name"></div><div style={{flex:1,height:9,background:'var(--border-soft)',borderRadius:4,marginLeft:6}}></div><div className="mockup-tag">1위</div></div>
+                      <div className="mockup-tr"><div className="mockup-avatar"></div><div className="mockup-name"></div><div style={{flex:1,height:9,background:'var(--border-soft)',borderRadius:4,marginLeft:6}}></div><div className="mockup-tag orange">3위</div></div>
+                      <div className="mockup-tr"><div className="mockup-avatar"></div><div className="mockup-name"></div><div style={{flex:1,height:9,background:'var(--border-soft)',borderRadius:4,marginLeft:6}}></div><div className="mockup-tag">2위</div></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* WHO IS THIS FOR */}
-      <section className="who">
-        <div className="section-inner">
-          <div className="section-tag">대상 고객</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
-            <div>
-              <h2 className="section-title">이런 분들께 딱 맞습니다</h2>
-              <p className="section-sub">개발자 없이 직접 영업·홍보·제작을 다 하시는<br />1인 기업 대표님을 위한 서비스입니다.</p>
-            </div>
-          </div>
-          <div className="who-grid">
-            <div className="who-card">
-              <span className="who-emoji">👜</span>
-              <h3>가방 공방 / 공예 클래스</h3>
-              <p>"인스타는 있는데 홈페이지가 없어요. 구글에서 검색하면 안 나와요."</p>
-              <span className="who-tag">검색 노출 0 → 시작</span>
-            </div>
-            <div className="who-card">
-              <span className="who-emoji">📸</span>
-              <h3>웨딩스냅 / 작가 스튜디오</h3>
-              <p>"포트폴리오 사이트는 만들었는데, 문의가 잘 안 와요."</p>
-              <span className="who-tag">SEO 최적화 필요</span>
-            </div>
-            <div className="who-card">
-              <span className="who-emoji">🌿</span>
-              <h3>플리마켓 / 소규모 브랜드</h3>
-              <p>"AI로 홈페이지 뚝딱 만들었는데, 어떻게 올리는지 모르겠어요."</p>
-              <span className="who-tag">배포 + 마케팅 연동</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FLOW */}
-      <section className="flow" id="flow">
-        <div className="section-inner">
-          <div className="section-tag">이용 방법</div>
-          <h2 className="section-title">딱 5단계, 어렵지 않아요</h2>
-          <p className="section-sub">개발 지식 없이도 따라할 수 있습니다.<br />평균 소요 시간: 5~15분</p>
-          <div className="flow-steps">
-            {[
-              { num: '01', icon: '👤', title: '회원가입 &\n로그인', desc: '이메일로 30초 만에 가입' },
-              { num: '02', icon: '🔗', title: '내 사이트\n주소 선택', desc: 'my-shop.aiseo.tips 형태로 원하는 주소 확정' },
-              { num: '03', icon: '📤', title: 'AI 사이트\nZIP 업로드', desc: 'ChatGPT·Claude로 만든 사이트를 ZIP으로 압축 후 업로드' },
-              { num: '04', icon: '🔍', title: 'SEO 자동\n검증', desc: '5개 핵심 항목 자동 체크 + 실패 시 해결 가이드 제공' },
-              { num: '05', icon: '🚀', title: '원클릭\n배포 완료!', desc: 'GA4·서치콘솔 자동 연동 후 즉시 접속 가능' },
-            ].map((s, i) => (
-              <div className="flow-step" key={s.num}>
-                <div className="flow-num">{s.num}</div>
-                <span className="flow-icon">{s.icon}</span>
-                <h3 dangerouslySetInnerHTML={{ __html: s.title.replace('\n', '<br/>') }} />
-                <p>{s.desc}</p>
-                {i < 4 && <div className="flow-arrow">→</div>}
+            {/* Mobile compact dashboard */}
+            <div className="copilot-mobile-mockup">
+              <div className="cmm-bar">
+                <div className="mockup-dot r"></div><div className="mockup-dot y"></div><div className="mockup-dot g"></div>
+                <div className="cmm-url">app.aiseo.tips/dashboard</div>
               </div>
+              <div className="cmm-stats">
+                <div className="cmm-stat cmm-stat-hl">
+                  <div className="cmm-stat-num">94</div>
+                  <div className="cmm-stat-label">SEO 점수</div>
+                </div>
+                <div className="cmm-stat">
+                  <div className="cmm-stat-num">4.8k</div>
+                  <div className="cmm-stat-label">월 방문자</div>
+                </div>
+                <div className="cmm-stat">
+                  <div className="cmm-chart">
+                    <div className="cmm-bar-col" style={{height:'35%'}}></div>
+                    <div className="cmm-bar-col" style={{height:'55%'}}></div>
+                    <div className="cmm-bar-col" style={{height:'40%'}}></div>
+                    <div className="cmm-bar-col" style={{height:'70%'}}></div>
+                    <div className="cmm-bar-col" style={{height:'50%'}}></div>
+                    <div className="cmm-bar-col cmm-bar-accent" style={{height:'88%'}}></div>
+                    <div className="cmm-bar-col cmm-bar-mid" style={{height:'72%'}}></div>
+                  </div>
+                  <div className="cmm-stat-label">트래픽</div>
+                </div>
+              </div>
+              <div className="cmm-table">
+                <div className="cmm-tr">
+                  <div className="cmm-avatar"></div>
+                  <div className="cmm-lines"><div className="cmm-line" style={{width:'60%'}}></div><div className="cmm-line" style={{width:'40%',marginTop:4,opacity:0.5}}></div></div>
+                  <div className="mockup-tag">1위</div>
+                </div>
+                <div className="cmm-tr">
+                  <div className="cmm-avatar"></div>
+                  <div className="cmm-lines"><div className="cmm-line" style={{width:'70%'}}></div><div className="cmm-line" style={{width:'35%',marginTop:4,opacity:0.5}}></div></div>
+                  <div className="mockup-tag orange">3위</div>
+                </div>
+                <div className="cmm-tr">
+                  <div className="cmm-avatar"></div>
+                  <div className="cmm-lines"><div className="cmm-line" style={{width:'55%'}}></div><div className="cmm-line" style={{width:'45%',marginTop:4,opacity:0.5}}></div></div>
+                  <div className="mockup-tag">2위</div>
+                </div>
+              </div>
+              <div className="cmm-badges">
+                <div className="cmm-badge">🚀 SEO +34점</div>
+                <div className="cmm-badge">📈 트래픽 3.2x</div>
+                <div className="cmm-badge">🤖 AI 자동화</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TRUSTED */}
+      <div className="trusted">
+        <div className="trusted-label">5,200+ 팀이 신뢰하는 AI SEO 플랫폼</div>
+        <div className="marquee-wrap">
+          <div className="marquee-track" id="marquee">
+            {['스타트업 스튜디오','크리에이터 에이전시','마케팅 솔루션','이커머스 그룹','디지털 미디어','브랜드 컨설팅','콘텐츠 팩토리','로컬 비즈니스'].map((name, i) => (
+              <div className="marquee-item" key={`m1-${i}`}><div className="logo-pill">{name}</div></div>
+            ))}
+            {['스타트업 스튜디오','크리에이터 에이전시','마케팅 솔루션','이커머스 그룹','디지털 미디어','브랜드 컨설팅','콘텐츠 팩토리','로컬 비즈니스'].map((name, i) => (
+              <div className="marquee-item" key={`m2-${i}`}><div className="logo-pill">{name}</div></div>
             ))}
           </div>
         </div>
-      </section>
-
-      {/* PACKAGES */}
-      <section className="packages" id="packages">
-        <div className="section-inner">
-          <div className="pkg-header">
-            <div>
-              <div className="section-tag">서비스 구성</div>
-              <h2 className="section-title">지금 어느 단계에 계세요?</h2>
-              <p className="section-sub">브랜드 준비 상태에 따라 시작점이 달라집니다.<br />어디서든 시작할 수 있어요.</p>
-            </div>
+        <div className="stats-row">
+          <div className="stat-item reveal">
+            <div className="stat-num"><span id="c1">0</span><span>+</span></div>
+            <div className="stat-label">누적 가입자</div>
           </div>
-          <div className="pkg-grid">
-            <div className="pkg-card">
-              <div className="pkg-badge">기초 패키지</div>
-              <span className="pkg-icon">🌱</span>
-              <div className="pkg-name">Starter</div>
-              <div className="pkg-title">홈페이지를<br />처음 만들어요</div>
-              <p className="pkg-desc">브랜드 방향 잡기부터 사이트 배포까지. 아무것도 없어도 괜찮아요.</p>
-              <div className="pkg-target">
-                <strong>이런 분께 맞아요</strong>
-                홈페이지 자체가 없거나, AI로 만들었는데 어떻게 올릴지 모르는 분
+          <div className="stat-item reveal">
+            <div className="stat-num"><span id="c2">0</span><span>%</span></div>
+            <div className="stat-label">SEO 상위 노출률</div>
+          </div>
+          <div className="stat-item reveal">
+            <div className="stat-num"><span id="c3">0</span><span>x</span></div>
+            <div className="stat-label">평균 트래픽 증가</div>
+          </div>
+          <div className="stat-item reveal">
+            <div className="stat-num"><span id="c4">0</span><span>시간</span></div>
+            <div className="stat-label">주당 절약 시간</div>
+          </div>
+        </div>
+      </div>
+
+      {/* SCROLL FEATURES */}
+      <div className="sf-section" id="scrollFeatures">
+        <div className="sf-sticky">
+          <div className="sf-header">
+            <div className="section-eyebrow">ALL-IN-ONE PLATFORM</div>
+            <h2 className="sf-title">온라인마케팅의 시작 AISEO.TIPS</h2>
+            <p className="sf-sub">시작부터 분석까지 AISEO에서 모두 함께 시작하세요.</p>
+          </div>
+          <div className="sf-stack" id="sfStack">
+            {/* Card 0: AI 홈페이지 제작 */}
+            <div className="sf-card" data-idx="0">
+              <div className="sf-card-hd">
+                <span className="sf-dot" style={{background:'#C4A8F5',boxShadow:'0 0 0 3px rgba(196,168,245,0.15)'}}></span>
+                <span className="sf-label">AI 홈페이지 제작</span>
+                <span className="sf-hd-sub">내 비즈니스에 맞는 사이트를 AI로</span>
               </div>
-              <ul className="pkg-items">
-                <li>브랜드 방향 1회 진단 (업종 공식 기반)</li>
-                <li>SEO 관점 사이트 구조 설계 안내</li>
-                <li>AI 사이트 제작 가이드 제공</li>
-                <li>AISEO 플랫폼으로 배포 (직접 진행)</li>
-                <li>GA4 + 서치콘솔 세팅 교육</li>
-              </ul>
-              <a href="/?auth=signup" className="btn-pkg outline">상담 신청하기</a>
+              <div className="sf-card-bd">
+                <div className="sf-card-text">
+                  <h3>프롬프트 하나로<br/>내 사이트가 완성됩니다</h3>
+                  <p>AI 홈페이지 제작 프롬프트 &amp; 템플릿을 제공합니다. 내 비즈니스에 맞는 사이트를 만드는 비법을 쉽고 빠르게 익히고 바로 적용하세요.</p>
+                  <ul className="sf-feature-list">
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>업종별 AI 프롬프트 템플릿 제공</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>ChatGPT · Claude로 페이지 즉시 생성</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>모바일/PC 반응형 자동 적용</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>비개발자도 1시간 안에 완성</span></li>
+                  </ul>
+                </div>
+                <div className="sf-card-img" style={{'--card-bg1':'#F0EBFF','--card-bg2':'#EBE4FF'} as React.CSSProperties}>
+                  <div className="sf-img-placeholder">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C4A8F5" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h4"/><circle cx="17" cy="17" r="3"/><path d="M19.5 19.5L22 22"/></svg>
+                    <span>이미지 영역</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="pkg-card featured">
-              <div className="pkg-badge">가장 많이 선택</div>
-              <span className="pkg-icon">⚡</span>
-              <div className="pkg-name">Standard</div>
-              <div className="pkg-title">브랜드는 있는데<br />검색이 안 돼요</div>
-              <p className="pkg-desc">브랜드와 콘텐츠는 갖춰진 상태. SEO 최적화와 마케팅 연동이 핵심.</p>
-              <div className="pkg-target">
-                <strong>이런 분께 맞아요</strong>
-                인스타·블로그는 운영 중인데, 구글 검색에서 안 나오는 분
+            {/* Card 1: 도메인 & 호스팅 */}
+            <div className="sf-card" data-idx="1">
+              <div className="sf-card-hd">
+                <span className="sf-dot" style={{background:'#10B981',boxShadow:'0 0 0 3px rgba(16,185,129,0.15)'}}></span>
+                <span className="sf-label">도메인 &amp; 호스팅</span>
+                <span className="sf-hd-sub">서브도메인 무료 · 업로드 한 번으로 서비스 시작</span>
               </div>
-              <ul className="pkg-items">
-                <li>업종 키워드 시장조사 리포트</li>
-                <li>SEO 기반 사이트 구조 재설계</li>
-                <li>AI 사이트 제작 + AISEO 배포</li>
-                <li>GA4 · Google Ads · 서치콘솔 세팅</li>
-                <li>Naver 웹마스터 연동</li>
-                <li>배포 후 2주 피드백 지원</li>
-              </ul>
-              <a href="/?auth=signup" className="btn-pkg primary">상담 신청하기 →</a>
+              <div className="sf-card-bd">
+                <div className="sf-card-text">
+                  <h3>만든 사이트를<br/>바로 세상에 올리세요</h3>
+                  <p>12개월 무료 서브도메인과 1G 호스팅을 제공합니다. 파일 업로드 한 번으로 내 사이트가 실제 인터넷에 서비스됩니다. 매달 나가는 호스팅 비용 걱정 없이 시작하세요.</p>
+                  <ul className="sf-feature-list">
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>12개월 무료 서브도메인 제공 (yourname.aiseo.tips)</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>1G 웹호스팅 무료 제공</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>파일 업로드 한 번으로 즉시 서비스</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>SSL 보안 인증서 자동 적용</span></li>
+                  </ul>
+                </div>
+                <div className="sf-card-img" style={{'--card-bg1':'#D1FAE5','--card-bg2':'#A7F3D0'} as React.CSSProperties}>
+                  <div className="sf-img-placeholder">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="1.5"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+                    <span>이미지 영역</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="pkg-card">
-              <div className="pkg-badge yellow">성장 패키지</div>
-              <span className="pkg-icon">📈</span>
-              <div className="pkg-name">Growth</div>
-              <div className="pkg-title">사이트는 있는데<br />매출이 정체예요</div>
-              <p className="pkg-desc">이미 기반은 갖춰진 상태. 데이터 분석과 광고, AEO로 다음 단계로.</p>
-              <div className="pkg-target">
-                <strong>이런 분께 맞아요</strong>
-                홈페이지 운영 중이나 방문자·전환율 성장이 멈춘 분
+            {/* Card 2: SEO 핵심강의 */}
+            <div className="sf-card" data-idx="2">
+              <div className="sf-card-hd">
+                <span className="sf-dot" style={{background:'#F59E0B',boxShadow:'0 0 0 3px rgba(245,158,11,0.15)'}}></span>
+                <span className="sf-label">SEO 핵심강의</span>
+                <span className="sf-hd-sub">기술적 SEO · 한번에 그리고 쉽게</span>
               </div>
-              <ul className="pkg-items">
-                <li>GA4 데이터 분석 리뷰 (월 or 분기)</li>
-                <li>Google Ads 광고 세팅 교육</li>
-                <li>AEO(AI 검색 최적화) 방향 컨설팅</li>
-                <li>경쟁사 SEO 벤치마킹 리포트</li>
-                <li>콘텐츠 전략 제안</li>
-                <li>지속 성장을 위한 월별 리뷰</li>
-              </ul>
-              <a href="/?auth=signup" className="btn-pkg outline">상담 신청하기</a>
+              <div className="sf-card-bd">
+                <div className="sf-card-text">
+                  <h3>10년 노하우를<br/>핵심만 쏙쏙 배웁니다</h3>
+                  <p>검색노출을 위한 SEO 핵심강의를 제공합니다. 기술적 SEO의 복잡함을 없애고, 소상공인·1인 대표도 바로 적용할 수 있는 핵심만 담았습니다.</p>
+                  <ul className="sf-feature-list">
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#FEF3C7',color:'#D97706'}}>✓</div><span>sitemap · robots · 메타태그 완전 정복</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#FEF3C7',color:'#D97706'}}>✓</div><span>네이버 · 구글 동시 상위 노출 전략</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#FEF3C7',color:'#D97706'}}>✓</div><span>키워드 리서치 실전 가이드</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#FEF3C7',color:'#D97706'}}>✓</div><span>강의 수강 후 즉시 적용 가능한 체크리스트</span></li>
+                  </ul>
+                </div>
+                <div className="sf-card-img" style={{'--card-bg1':'#FEF3C7','--card-bg2':'#FDE68A'} as React.CSSProperties}>
+                  <div className="sf-img-placeholder">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="1.5"><path d="M12 3L2 9l10 6 10-6-10-6z"/><path d="M2 15l10 6 10-6"/><path d="M2 12l10 6 10-6"/></svg>
+                    <span>이미지 영역</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: 성과 분석 & 마케팅 자동화 */}
+            <div className="sf-card" data-idx="3">
+              <div className="sf-card-hd">
+                <span className="sf-dot" style={{background:'#9BB8F8',boxShadow:'0 0 0 3px rgba(155,184,248,0.15)'}}></span>
+                <span className="sf-label">성과 분석 &amp; 마케팅 자동화</span>
+                <span className="sf-hd-sub">순위 추적 · 성과 비교 · 자동화</span>
+              </div>
+              <div className="sf-card-bd">
+                <div className="sf-card-text">
+                  <h3>순위 추적부터<br/>자동화 교육까지</h3>
+                  <p>검색 순위를 실시간으로 추적하고 경쟁사와 성과를 비교합니다. AI를 활용한 콘텐츠 제작·배포 자동화 교육으로 반복 업무를 줄이고 마케팅 효율을 높이세요.</p>
+                  <ul className="sf-feature-list">
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#EBF2FF',color:'#5B8DEF'}}>✓</div><span>키워드 순위 실시간 추적 대시보드</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#EBF2FF',color:'#5B8DEF'}}>✓</div><span>경쟁사 대비 성과 비교 리포트</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#EBF2FF',color:'#5B8DEF'}}>✓</div><span>AI 콘텐츠 제작 &amp; SNS 배포 자동화 교육</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#EBF2FF',color:'#5B8DEF'}}>✓</div><span>월간 성과 리포트 자동 생성 · 실전 운영 가이드</span></li>
+                  </ul>
+                </div>
+                <div className="sf-card-img" style={{'--card-bg1':'#EBF2FF','--card-bg2':'#DBEAFE'} as React.CSSProperties}>
+                  <div className="sf-img-placeholder">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9BB8F8" strokeWidth="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><polyline points="7 10 10 7 13 10 17 6"/></svg>
+                    <span>이미지 영역</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* TECH */}
-      <section className="tech" id="tech">
+      {/* PERSONA */}
+      <section className="persona" id="persona">
         <div className="section-inner">
-          <div className="section-tag">기술 인프라</div>
-          <h2 className="section-title">안정적인 인프라,<br />개발자 없이도 가능합니다</h2>
-          <div className="tech-grid">
-            <div className="tech-list">
+          <div className="persona-header reveal">
+            <div className="section-eyebrow">WHO IS IT FOR</div>
+            <h2 className="section-h2">나에게 맞는 솔루션</h2>
+            <p className="section-sub">소상공인부터 크리에이터까지 — 모든 역할에 맞게 설계된 AI SEO 플랫폼입니다.</p>
+          </div>
+
+          <div className="ps-wrap reveal">
+            <div className="ps-tabs" id="psTabs">
               {[
-                { icon: '🔍', title: 'SEO 5대 항목 자동 검증', desc: 'index.html, robots.txt, sitemap.xml, title 태그, meta description을 업로드 즉시 자동으로 체크합니다.' },
-                { icon: '📊', title: '마케팅 코드 원클릭 삽입', desc: 'GA4 측정 ID, Google Ads, 서치콘솔, 네이버 웹마스터 코드를 ID만 입력하면 자동 삽입됩니다.' },
-                { icon: '🚀', title: 'AWS 기반 글로벌 CDN 배포', desc: 'S3 + CloudFront로 즉시 HTTPS 배포. 별도 호스팅 비용 없이 {내이름}.aiseo.tips로 접속 가능합니다.' },
-                { icon: '🔒', title: 'SSL 자동 적용', desc: '배포 즉시 HTTPS 인증서 자동 발급. 검색엔진 신뢰도와 보안 모두 해결됩니다.' },
-              ].map((t) => (
-                <div className="tech-item" key={t.title}>
-                  <div className="tech-dot">{t.icon}</div>
-                  <div>
-                    <h4>{t.title}</h4>
-                    <p>{t.desc}</p>
+                { label: '소상공인', blob: 'radial-gradient(ellipse,#FF6B6B 0%,#8B5CF6 100%)', svg: <svg width="60" height="72" viewBox="0 0 60 72" fill="none" className="ps-icon"><rect x="10" y="28" width="40" height="32" rx="2" stroke="#1F2937" strokeWidth="1.5"/><path d="M6 28h48l-5-10H11L6 28Z" stroke="#1F2937" strokeWidth="1.5" strokeLinejoin="round"/><rect x="24" y="42" width="12" height="18" rx="2" stroke="#1F2937" strokeWidth="1.5"/><rect x="12" y="34" width="10" height="7" rx="1" stroke="#1F2937" strokeWidth="1.5"/><rect x="38" y="34" width="10" height="7" rx="1" stroke="#1F2937" strokeWidth="1.5"/><circle cx="30" cy="14" r="5" stroke="#1F2937" strokeWidth="1.5"/><path d="M26 19c0 0 1 3 4 3s4-3 4-3" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/></svg> },
+                { label: '프리랜서', blob: 'radial-gradient(ellipse,#60A5FA 0%,#34D399 100%)', svg: <svg width="60" height="72" viewBox="0 0 60 72" fill="none" className="ps-icon"><rect x="8" y="24" width="44" height="28" rx="3" stroke="#1F2937" strokeWidth="1.5"/><rect x="14" y="30" width="32" height="16" rx="1" stroke="#1F2937" strokeWidth="1.4" strokeDasharray="3 2"/><path d="M4 52h52l-4 6H8L4 52Z" stroke="#1F2937" strokeWidth="1.5" strokeLinejoin="round"/><circle cx="43" cy="16" r="5" stroke="#1F2937" strokeWidth="1.5"/><path d="M39 21c1 2 2 3 4 3s3-1 4-3" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/><path d="M37 24v-4" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/><path d="M49 24v-4" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/></svg> },
+                { label: '스타트업', blob: 'radial-gradient(ellipse,#FBBF24 0%,#F97316 100%)', svg: <svg width="60" height="72" viewBox="0 0 60 72" fill="none" className="ps-icon"><path d="M30 8c0 0 12 8 12 22v12H18V30C18 16 30 8 30 8Z" stroke="#1F2937" strokeWidth="1.5" strokeLinejoin="round"/><path d="M18 34c-4 2-8 6-8 10l8-2" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M42 34c4 2 8 6 8 10l-8-2" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><rect x="22" y="42" width="16" height="10" rx="2" stroke="#1F2937" strokeWidth="1.5"/><circle cx="30" cy="26" r="4" stroke="#1F2937" strokeWidth="1.5"/><path d="M18 56h24" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/><path d="M46 10l4-4M48 14l4-2M44 7l2-4" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/></svg> },
+                { label: '마케터', blob: 'radial-gradient(ellipse,#2DD4BF 0%,#9BB8F8 100%)', svg: <svg width="60" height="72" viewBox="0 0 60 72" fill="none" className="ps-icon"><path d="M14 30h4l22-12v28L18 34h-4a4 4 0 0 1 0-8v0" stroke="#1F2937" strokeWidth="1.5" strokeLinejoin="round"/><path d="M18 34l4 12h6l-4-12" stroke="#1F2937" strokeWidth="1.5" strokeLinejoin="round"/><path d="M40 22c4 2 6 6 6 8s-2 6-6 8" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/><path d="M44 17c6 4 9 9 9 13s-3 9-9 13" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/><circle cx="30" cy="12" r="5" stroke="#1F2937" strokeWidth="1.5"/><path d="M26 17c1 2 2 3 4 3s3-1 4-3" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/></svg> },
+                { label: '크리에이터', blob: 'radial-gradient(ellipse,#C084FC 0%,#F472B6 100%)', svg: <svg width="60" height="72" viewBox="0 0 60 72" fill="none" className="ps-icon"><rect x="10" y="26" width="40" height="28" rx="3" stroke="#1F2937" strokeWidth="1.5"/><circle cx="30" cy="40" r="8" stroke="#1F2937" strokeWidth="1.5"/><circle cx="30" cy="40" r="3" stroke="#1F2937" strokeWidth="1.5"/><rect x="18" y="20" width="10" height="8" rx="2" stroke="#1F2937" strokeWidth="1.5"/><circle cx="44" cy="32" r="2" stroke="#1F2937" strokeWidth="1.5"/><circle cx="19" cy="12" r="4" stroke="#1F2937" strokeWidth="1.5"/><path d="M16 16c0 0 1 3 3 3s3-3 3-3" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/><path d="M40 10l3 4M46 8l-3 4M43 14l4 1" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/></svg> },
+              ].map((tab, i) => (
+                <div className={`ps-tab${i === 0 ? ' active' : ''}`} data-idx={String(i)} key={tab.label}>
+                  <div className="ps-tab-inner">
+                    <div className="ps-blob" style={{background: tab.blob}}></div>
+                    {tab.svg}
+                  </div>
+                  <span className="ps-tab-label">{tab.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="ps-panels" id="psPanels">
+              {[
+                { title: '동네 가게도\n검색 1위가 됩니다', desc: 'IT 전문 지식 없이도 홈페이지 만들고, 네이버·구글 검색 상위 노출까지 한 번에. 마케팅 비용은 줄이고 고객은 늘어납니다.', cta: '소상공인 솔루션 알아보기 →', b1: '고객 문의 3배 증가', b1d: 'AI SEO 자동화로 검색 상위 노출을 달성하고 네이버·구글에서 새 고객이 직접 찾아오게 만드세요.', b2: '온라인 광고 이제 직접 시작하세요', b2d: 'SNS 광고, 검색 광고를 전문가 없이도 직접 운영하세요. AI가 타겟 설정부터 카피 작성까지 도와드립니다.' },
+                { title: '포트폴리오가\n스스로 영업합니다', desc: '전문가 포트폴리오 사이트를 AI로 제작하고, SEO 최적화로 검색을 통한 클라이언트 자동 유입 채널을 만드세요.', cta: '프리랜서 솔루션 알아보기 →', b1: '클라이언트 문의 5배 증가', b1d: '검색으로 찾아오는 잠재 고객을 자동으로 끌어들이고 더 좋은 프로젝트를 선택할 수 있는 여유를 만드세요.', b2: '나를 꼭 필요로 하는 클라이언트가 찾아오도록', b2d: '검색으로 나를 발견한 클라이언트는 이미 나를 원하는 사람입니다. SEO로 질 좋은 문의만 자동으로 받으세요.' },
+                { title: '마케터 없이도\n유기 트래픽을 키웁니다', desc: '초기 팀에게 SEO 전담 인력은 사치입니다. AISEO가 콘텐츠 마케팅 전략부터 실행까지 자동화합니다.', cta: '스타트업 솔루션 알아보기 →', b1: '유기 트래픽 4배 증가', b1d: '광고비 없이 검색엔진에서 찾아오는 트래픽을 4배로 늘리고 지속 가능한 성장 채널을 구축하세요.', b2: '담당자 없이도 꼭 필요한 마케팅을 놓치지 않도록', b2d: '마케팅 자동화로 채용 없이도 핵심 채널을 빠짐없이 운영하세요. 런웨이를 지키면서 성장 채널을 확보합니다.' },
+                { title: 'SEO 보고서 작성\n자동화로 해방되세요', desc: '키워드 리서치, 경쟁사 분석, 성과 리포트까지 — 반복 업무를 AI에게 넘기고 전략에 집중하세요.', cta: '마케터 솔루션 알아보기 →', b1: '주당 12시간 업무 자동화', b1d: '키워드 분석, 콘텐츠 최적화, 리포팅까지 AI가 대신합니다. 전략 수립에만 집중하세요.', b2: '상위 노출 성공률 78%', b2d: 'AI 기반 콘텐츠 최적화와 기술적 SEO 자동화로 목표 키워드 1페이지 달성률을 극대화하세요.' },
+                { title: '콘텐츠가 검색으로\n스스로 퍼져나갑니다', desc: '유튜브, 블로그, 뉴스레터 — 모든 콘텐츠를 SEO 최적화해 검색 유입을 극대화하고 새로운 팬을 만나세요.', cta: '크리에이터 솔루션 알아보기 →', b1: '검색 노출 2.8배 증가', b1d: '기존 콘텐츠를 AI가 SEO 최적화해 검색엔진에서 더 많이 발견되고 새 구독자가 자연스럽게 유입됩니다.', b2: '한 번 만든 콘텐츠도 계속해서 찾아오도록', b2d: '제목, 설명, 태그를 SEO 최적화해 오래된 콘텐츠도 검색에서 계속 발견됩니다. 업로드 후에도 트래픽이 쌓입니다.' },
+              ].map((panel, i) => (
+                <div className={`ps-panel${i === 0 ? ' active' : ''}`} data-idx={String(i)} key={`panel-${i}`}>
+                  <div className="ps-left">
+                    <h2 className="ps-title" dangerouslySetInnerHTML={{ __html: panel.title.replace('\n', '<br/>') }} />
+                    <p className="ps-desc">{panel.desc}</p>
+                    <a href="/?auth=login" className="ps-cta">{panel.cta}</a>
+                  </div>
+                  <div className="ps-right">
+                    <div className="ps-benefit">
+                      <h4>{panel.b1}</h4>
+                      <p>{panel.b1d}</p>
+                    </div>
+                    <div className="ps-divider"></div>
+                    <div className="ps-benefit">
+                      <h4>{panel.b2}</h4>
+                      <p>{panel.b2d}</p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="tech-visual">
-              <div className="seo-result">
-                <div className="seo-result-title">
-                  SEO 검증 결과
-                  <span className="seo-score">4/5 통과</span>
+          </div>
+
+          {/* Mobile persona carousel */}
+          <div className="mobile-persona" id="mobilePersona">
+            <div className="mp-track-wrap">
+              <div className="mp-track" id="mpTrack">
+                {[
+                  { icon: '🏪', tag: '소상공인', title: '동네 가게도\n검색 1위가 됩니다', desc: 'IT 전문 지식 없이도 홈페이지 만들고, 네이버·구글 검색 상위 노출까지 한 번에. 마케팅 비용은 줄이고 고객은 늘어납니다.', b1i: '📈', b1: '고객 문의 3배 증가', b2i: '📣', b2: '온라인 광고 이제 직접 시작하세요', cta: '소상공인 솔루션 알아보기 →' },
+                  { icon: '💻', tag: '프리랜서', title: '포트폴리오가\n스스로 영업합니다', desc: '전문가 포트폴리오 사이트를 AI로 제작하고, SEO 최적화로 검색을 통한 클라이언트 자동 유입 채널을 만드세요.', b1i: '🤝', b1: '클라이언트 문의 5배 증가', b2i: '🎯', b2: '나를 꼭 필요로 하는 클라이언트가 찾아오도록', cta: '프리랜서 솔루션 알아보기 →' },
+                  { icon: '🚀', tag: '스타트업', title: '마케터 없이도\n유기 트래픽을 키웁니다', desc: '초기 팀에게 SEO 전담 인력은 사치입니다. AISEO가 콘텐츠 마케팅 전략부터 실행까지 자동화합니다.', b1i: '📊', b1: '유기 트래픽 4배 증가', b2i: '⚙️', b2: '담당자 없이 꼭 필요한 마케팅을 놓치지 않도록', cta: '스타트업 솔루션 알아보기 →' },
+                ].map((card, i) => (
+                  <div className="mp-card" key={`mp-${i}`}>
+                    <span className="mp-card-icon">{card.icon}</span>
+                    <span className="mp-card-tag">{card.tag}</span>
+                    <h3 dangerouslySetInnerHTML={{ __html: card.title.replace('\n', '<br/>') }} />
+                    <p>{card.desc}</p>
+                    <div className="mp-benefit-item"><span className="mp-benefit-icon">{card.b1i}</span><span>{card.b1}</span></div>
+                    <div className="mp-benefit-item"><span className="mp-benefit-icon">{card.b2i}</span><span>{card.b2}</span></div>
+                    <a href="/?auth=login" className="mp-card-cta">{card.cta}</a>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mp-nav">
+              <button className="mp-arrow" id="mpPrev">&#8592;</button>
+              <div className="mp-dots" id="mpDots">
+                <button className="mp-dot active" data-idx="0"></button>
+                <button className="mp-dot" data-idx="1"></button>
+                <button className="mp-dot" data-idx="2"></button>
+              </div>
+              <button className="mp-arrow" id="mpNext">&#8594;</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* RESULTS */}
+      <section className="results" id="results">
+        <div className="section-inner">
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:48,flexWrap:'wrap',gap:20}} className="reveal">
+            <div>
+              <div className="section-eyebrow">REAL RESULTS</div>
+              <h2 className="section-h2" style={{marginBottom:0}}>실제 고객들의<br/>진짜 성과</h2>
+            </div>
+            <a href="#results" style={{fontSize:14,fontWeight:600,color:'var(--accent)',textDecoration:'none'}}>모든 사례 보기 →</a>
+          </div>
+          <div className="results-metrics reveal">
+            <div className="results-metric">
+              <div className="results-metric-num"><span id="r1" className="accent">0</span><span className="accent">%+</span></div>
+              <div className="results-metric-label">평균 유기 트래픽 증가율<br/>AISEO 도입 3개월 후</div>
+            </div>
+            <div className="results-metric">
+              <div className="results-metric-num"><span id="r2">0</span><span>위</span></div>
+              <div className="results-metric-label">대표 키워드 평균<br/>검색 순위</div>
+            </div>
+            <div className="results-metric">
+              <div className="results-metric-num"><span id="r3">0</span><span className="accent">시간</span></div>
+              <div className="results-metric-label">주당 SEO 작업 절약<br/>자동화 효과</div>
+            </div>
+            <div className="results-metric">
+              <div className="results-metric-num"><span id="r4">0</span><span>+</span></div>
+              <div className="results-metric-label">성공 사례<br/>다양한 업종</div>
+            </div>
+          </div>
+          <div className="results-carousel reveal">
+            <div className="testimonial-track" id="testimonialTrack">
+              {[
+                { quote: '"AISEO 도입 한 달 만에 \'홍대 맛집\' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다."', avatar: '🍜', name: '강동현', role: '홍대 라멘집 운영', badge: '소상공인' },
+                { quote: '"SEO 에이전시에 매달 150만원 쓰던 걸 AISEO로 대체했어요. 오히려 성과는 더 좋아졌고 비용은 10분의 1로 줄었습니다. 팀 전체가 만족합니다."', avatar: '💻', name: '윤서진', role: 'SaaS 스타트업 마케팅 리드', badge: '스타트업' },
+                { quote: '"프리랜서로 일하면서 영업이 가장 힘들었는데, AISEO로 포트폴리오 사이트 최적화하고 나서 매달 안정적으로 클라이언트가 검색으로 들어와요."', avatar: '🎨', name: '이수아', role: '브랜딩 디자이너', badge: '프리랜서' },
+                { quote: '"콘텐츠 발행하면 AI가 자동으로 SEO 최적화해주니까 글 쓰는 데만 집중할 수 있어요. 구독자가 6개월 만에 5배 늘었습니다."', avatar: '✍️', name: '박지민', role: '테크 블로거', badge: '크리에이터' },
+                { quote: '"월 리포트 작성에 이틀씩 쓰던 게 이제 30분으로 줄었어요. AI가 데이터 분석하고 인사이트까지 뽑아주니 진짜 전략에만 집중할 수 있습니다."', avatar: '📈', name: '한지현', role: '이커머스 SEO 매니저', badge: '마케터' },
+              ].map((t, i) => (
+                <div className="testimonial-slide" key={`t-${i}`}>
+                  <p className="testimonial-quote">{t.quote}</p>
+                  <div className="testimonial-author">
+                    <div className="testimonial-avatar">{t.avatar}</div>
+                    <div><div className="testimonial-name">{t.name}</div><div className="testimonial-role">{t.role}</div></div>
+                    <div className="testimonial-badge">{t.badge}</div>
+                  </div>
                 </div>
-                <div className="seo-bars">
-                  {[
-                    { label: 'index.html', pct: 100, pass: true },
-                    { label: 'robots.txt', pct: 30, pass: false },
-                    { label: 'sitemap.xml', pct: 100, pass: true },
-                    { label: 'title 태그', pct: 100, pass: true },
-                    { label: 'meta desc', pct: 100, pass: true },
-                  ].map((b) => (
-                    <div className="seo-bar-item" key={b.label}>
-                      <span style={{ width: 120, flexShrink: 0 }}>{b.label}</span>
-                      <div className="seo-bar-bg"><div className={`seo-bar-fill${b.pass ? '' : ' fail'}`} style={{ width: `${b.pct}%` }}></div></div>
-                      <span>{b.pass ? '✅' : '⚠️'}</span>
-                    </div>
-                  ))}
+              ))}
+            </div>
+            <div className="carousel-controls" id="carouselDots"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* BENTO STORIES */}
+      <section className="bento-section" id="stories">
+        <div className="section-inner" style={{maxWidth:1100}}>
+          <div className="bento-header reveal">
+            <div className="section-eyebrow">CUSTOMER STORIES</div>
+            <h2 className="section-h2">성과로 증명합니다</h2>
+            <p className="section-sub">실제 고객들이 AISEO로 만들어낸 숫자들</p>
+          </div>
+          <div className="bento-grid reveal">
+            <div className="bento-flip bento-span2" data-href="#">
+              <div className="bento-flip-inner">
+                <div className="bento-front" style={{background:'#FEF08A'}}>
+                  <div className="bento-stat-num">320%<span style={{fontSize:36}}>+</span></div>
+                  <div className="bento-stat-label">평균 트래픽 증가</div>
+                  <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
+                </div>
+                <div className="bento-back">
+                  <p className="bento-back-desc">AISEO 도입 3개월 만에 달성한 실제 평균 유기 트래픽 증가율입니다. 광고 없이 검색으로만 이루어낸 성과입니다.</p>
+                  <a href="#results" className="bento-back-link">사례 보기 →</a>
                 </div>
               </div>
-              <div style={{ background: '#f0fdf4', borderRadius: 10, padding: 16, fontSize: 13, color: '#15803d', lineHeight: 1.6 }}>
-                <strong style={{ display: 'block', marginBottom: 6 }}>💡 robots.txt 해결 가이드</strong>
-                ZIP 파일 최상위에 robots.txt를 추가하세요.<br />
-                <code style={{ fontSize: 11, background: 'white', padding: '2px 6px', borderRadius: 4 }}>User-agent: *<br />Allow: /</code>
+            </div>
+            <div className="bento-flip bento-span2" data-href="#">
+              <div className="bento-flip-inner">
+                <div className="bento-front" style={{background:'#A7F3D0'}}>
+                  <div className="bento-stat-num">78%</div>
+                  <div className="bento-stat-label">검색 상위 노출 성공률</div>
+                  <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
+                </div>
+                <div className="bento-back">
+                  <p className="bento-back-desc">목표 키워드를 구글·네이버 1페이지에 올린 고객 비율. AI 최적화가 만들어낸 일관된 성과입니다.</p>
+                  <a href="#results" className="bento-back-link">사례 보기 →</a>
+                </div>
+              </div>
+            </div>
+            <div className="bento-quote bento-span3">
+              <p className="bento-quote-text">AISEO 도입 한 달 만에 '홍대 맛집' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다.</p>
+              <div className="bento-author">
+                <div className="bento-avatar">🍜</div>
+                <div>
+                  <div className="bento-author-name">강동현</div>
+                  <div className="bento-author-role">홍대 라멘집 운영</div>
+                </div>
+                <div className="bento-quote-logo"><div className="bento-logo-placeholder">로고 영역</div></div>
+              </div>
+            </div>
+            <div className="bento-quote bento-span3">
+              <p className="bento-quote-text">SEO 에이전시에 매달 150만원 쓰던 걸 AISEO로 대체했어요. 오히려 성과는 더 좋아졌고 비용은 10분의 1로 줄었습니다. 팀 전체가 만족합니다.</p>
+              <div className="bento-author">
+                <div className="bento-avatar">💻</div>
+                <div>
+                  <div className="bento-author-name">윤서진</div>
+                  <div className="bento-author-role">SaaS 스타트업 마케팅 리드</div>
+                </div>
+                <div className="bento-quote-logo"><div className="bento-logo-placeholder">로고 영역</div></div>
+              </div>
+            </div>
+            <div className="bento-flip bento-span2" data-href="#">
+              <div className="bento-flip-inner">
+                <div className="bento-front" style={{background:'#FEF08A'}}>
+                  <div className="bento-stat-num">10<span style={{fontSize:32,fontWeight:700}}>h</span></div>
+                  <div className="bento-stat-label">주당 SEO 업무 절약</div>
+                  <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
+                </div>
+                <div className="bento-back">
+                  <p className="bento-back-desc">AI 자동화로 절약된 주당 평균 SEO 작업 시간. 그 시간을 핵심 비즈니스에 다시 투자하세요.</p>
+                  <a href="#results" className="bento-back-link">사례 보기 →</a>
+                </div>
+              </div>
+            </div>
+            <div className="bento-flip bento-span2" data-href="#">
+              <div className="bento-flip-inner">
+                <div className="bento-front" style={{background:'#FBCFE8'}}>
+                  <div className="bento-stat-num">3x</div>
+                  <div className="bento-stat-label">고객 문의 증가</div>
+                  <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
+                </div>
+                <div className="bento-back">
+                  <p className="bento-back-desc">SEO 최적화 후 평균 고객 문의 증가율. 검색으로 찾아오는 고객은 전환율도 높습니다.</p>
+                  <a href="#results" className="bento-back-link">사례 보기 →</a>
+                </div>
+              </div>
+            </div>
+            <div className="bento-quote bento-span3">
+              <p className="bento-quote-text">프리랜서로 일하면서 영업이 가장 힘들었는데, AISEO로 포트폴리오 사이트 최적화하고 나서 매달 안정적으로 클라이언트가 검색으로 들어와요.</p>
+              <div className="bento-author">
+                <div className="bento-avatar">🎨</div>
+                <div>
+                  <div className="bento-author-name">이수아</div>
+                  <div className="bento-author-role">브랜딩 디자이너</div>
+                </div>
+                <div className="bento-quote-logo"><div className="bento-logo-placeholder">로고 영역</div></div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* TRUST / FAQ */}
-      <section className="trust" id="trust">
-        <div className="section-inner">
-          <div className="section-tag">자주 묻는 질문</div>
-          <h2 className="section-title">궁금한 점이 있으신가요?</h2>
-          <div className="trust-grid">
-            {[
-              { q: '🤔 개발을 전혀 몰라도 되나요?', a: '네, 완전히 가능합니다. AI(ChatGPT, Claude)로 만든 웹사이트 파일을 ZIP으로 압축해서 올리기만 하면 됩니다. AI 사이트 제작 방법도 패키지에 포함됩니다.' },
-              { q: '🌐 별도 도메인이나 호스팅이 필요한가요?', a: '필요 없습니다. {내이름}.aiseo.tips 주소로 즉시 접속 가능하며, 호스팅 비용도 없습니다. 향후 커스텀 도메인 연결도 지원 예정입니다.' },
-              { q: '📱 사이트 수정이 필요하면 어떻게 하나요?', a: 'AI로 수정한 후 다시 ZIP으로 업로드하면 됩니다. 마케팅 코드 설정은 저장되어 있어 재배포 시 자동으로 적용됩니다.' },
-              { q: '📊 GA4를 연결하면 뭘 볼 수 있나요?', a: '내 사이트 방문자 수, 어디서 왔는지(검색/SNS/직접), 어느 페이지를 오래 보는지 등을 확인할 수 있습니다. 광고 효과 측정도 가능합니다.' },
-              { q: '🔍 배포하면 바로 구글에 나오나요?', a: '배포 후 Google Search Console에 제출하면 수일~수주 내 검색 결과에 노출됩니다. 서치콘솔 등록 방법은 배포 완료 후 안내드립니다.' },
-              { q: '💡 1인 기업인데 어떤 패키지가 맞나요?', a: '홈페이지가 아예 없으면 기초 패키지, 인스타·블로그는 있는데 검색이 안 되면 스탠다드, 운영 중인데 성장이 멈췄으면 성장 패키지를 추천드립니다.' },
-            ].map((faq) => (
-              <div className="trust-card" key={faq.q}>
-                <h4>{faq.q}</h4>
-                <p>{faq.a}</p>
+      {/* CTA */}
+      <div className="cta-section">
+        <div className="cta-inner reveal">
+          <div className="section-eyebrow" style={{textAlign:'center'}}>GET STARTED FREE</div>
+          <h2 className="cta-h2">지금 바로 시작하세요</h2>
+          <p className="cta-sub">지금 AI시대에 맞춘 온라인 마케팅을 시작하세요.<br/>1시간이면 첫 번째 SEO 최적화 웹사이트가 완성됩니다.</p>
+          <div className="cta-row">
+            <a href="/?auth=signup" className="btn-primary-lg">수강신청하기 →</a>
+            <a href="/?auth=signup" className="btn-outline-lg">1:1 상담문의</a>
+          </div>
+          <p style={{marginTop:20,fontSize:13,color:'var(--text-muted)'}}>✓ 사업자만 신청가능 · ✓ 12개월 사이트를 한번만 결제 · ✓ 업종별 컨설팅 포함</p>
+        </div>
+      </div>
+
+      {/* BLOG/NEWS */}
+      <section className="blog-section" id="blog">
+        <div className="blog-head">
+          <span className="blog-head-title">SEO 인사이트 &amp; 가이드</span>
+          <a href="#" className="blog-all-btn">모든 아티클 보기 →</a>
+        </div>
+        <div className="blog-grid">
+          <a href="#" className="blog-card" style={{textDecoration:'none'}}>
+            <div className="blog-thumb">
+              <div className="blog-thumb-inner blog-thumb-1">
+                <div className="blog-thumb-tag">PLAYBOOK</div>
+                <div className="blog-thumb-headline">THE AI SEO<br/>PLAYBOOK<br/>2026</div>
               </div>
-            ))}
-          </div>
+            </div>
+            <p className="blog-card-title">AI로 완성하는 2026 SEO 전략 플레이북: 웹사이트 제작부터 상위 노출까지</p>
+          </a>
+          <a href="#" className="blog-card" style={{textDecoration:'none'}}>
+            <div className="blog-thumb">
+              <div className="blog-thumb-inner blog-thumb-2" style={{justifyContent:'flex-start',padding:14}}>
+                <div className="blog-thumb-tag">GUIDE</div>
+                <div style={{marginTop:24,width:'100%'}}>
+                  <div style={{fontSize:13,fontWeight:600,color:'var(--text-primary)',marginBottom:8,lineHeight:1.4}}>ChatGPT로 키워드 리서치하는<br/>5가지 프롬프트</div>
+                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
+                    <div style={{width:24,height:24,borderRadius:'50%',background:'var(--accent-light)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10}}>K</div>
+                    <div style={{fontSize:10,color:'var(--text-muted)'}}>AISEO 콘텐츠팀</div>
+                  </div>
+                  <div className="blog-mock-rows">
+                    <div className="blog-mock-row" style={{width:'100%'}}></div>
+                    <div className="blog-mock-row accent"></div>
+                    <div className="blog-mock-row" style={{width:'80%'}}></div>
+                    <div className="blog-mock-row" style={{width:'50%',background:'var(--accent)',opacity:0.3}}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="blog-card-title">ChatGPT와 AISEO를 활용한 키워드 리서치 자동화 5가지 방법 (2026)</p>
+          </a>
+          <a href="#" className="blog-card" style={{textDecoration:'none'}}>
+            <div className="blog-thumb">
+              <div className="blog-thumb-inner blog-thumb-3" style={{justifyContent:'center',alignItems:'center'}}>
+                <div className="blog-thumb-tag">TECHNICAL</div>
+                <div className="blog-thumb-headline" style={{textAlign:'center'}}>기술적 SEO란<br/>무엇인가?</div>
+              </div>
+            </div>
+            <p className="blog-card-title">기술적 SEO 완전 정복: AI가 자동화하는 핵심 요소와 체크리스트</p>
+          </a>
+          <a href="#" className="blog-card" style={{textDecoration:'none'}}>
+            <div className="blog-thumb">
+              <div className="blog-thumb-inner blog-thumb-4">
+                <div className="blog-thumb-tag" style={{background:'rgba(0,0,0,0.1)',color:'#1C1917'}}>PRICING</div>
+                <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',textAlign:'center',width:'90%'}}>
+                  <div style={{fontFamily:'var(--font-en)',fontSize:13,color:'rgba(0,0,0,0.45)',marginBottom:4}}>진짜</div>
+                  <div style={{fontFamily:'var(--font-ko)',fontSize:22,fontWeight:800,color:'#1C1917',lineHeight:1.2,letterSpacing:-1}}>SEO 비용은<br/>얼마일까?</div>
+                </div>
+              </div>
+            </div>
+            <p className="blog-card-title">SEO 에이전시 vs AI 자동화: 2026년 비용 완전 비교 가이드</p>
+          </a>
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <section className="cta-final">
-        <div>
-          <h2>오늘, 검색되는<br />홈페이지를 시작하세요</h2>
-          <p>가방 공방, 웨딩스냅, 공예 클래스… 어떤 업종이든 가능합니다.</p>
-          <div className="cta-buttons">
-            <a href="/?auth=signup" className="btn-white">무료로 시작하기 →</a>
-            <a href="#packages" className="btn-ghost-white">서비스 구성 보기</a>
+      {/* FOOTER */}
+      <footer>
+        <div className="hero-bg" style={{position:'absolute',inset:0,zIndex:0}}></div>
+        <div className="footer-inner">
+          <div className="footer-cta">
+            <div className="footer-cta-label">지금 시작하세요</div>
+            <h2>온라인마케팅의 시작<br/><span>AISEO.TIPS</span></h2>
+            <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+              <a href="/?auth=signup" className="btn-primary-lg" style={{fontSize:16,padding:'16px 36px'}}>수강신청하기 →</a>
+              <a href="/?auth=signup" style={{fontSize:15,fontWeight:600,color:'rgba(255,255,255,0.75)',textDecoration:'none',padding:'16px 28px',border:'1.5px solid rgba(255,255,255,0.2)',borderRadius:12,backdropFilter:'blur(8px)'}}>1:1 상담문의</a>
+            </div>
+          </div>
+          <div className="footer-top">
+            <div className="footer-brand">
+              <div className="footer-logo">AISEO</div>
+              <p>시작부터 분석까지 AISEO에서 모두 함께 시작하세요.</p>
+            </div>
+            <div className="footer-col">
+              <h5>제품</h5>
+              <a href="#">AI 웹빌더</a>
+              <a href="#">SEO 자동화</a>
+              <a href="#">콘텐츠 생성</a>
+              <a href="#">성과 분석</a>
+              <a href="#">요금제</a>
+            </div>
+            <div className="footer-col">
+              <h5>리소스</h5>
+              <a href="#">블로그</a>
+              <a href="#">가이드</a>
+              <a href="#">성공 사례</a>
+              <a href="#">도움말</a>
+              <a href="#">API</a>
+            </div>
+            <div className="footer-col">
+              <h5>회사</h5>
+              <a href="#">소개</a>
+              <a href="#">채용</a>
+              <a href="#">파트너</a>
+              <a href="#">문의</a>
+            </div>
+          </div>
+          <div className="footer-mobile">
+            <div className="footer-logo" style={{marginBottom:4}}>AISEO</div>
+            <p className="footer-mobile-desc">AI로 만들고, 검색에서 찾히는 비즈니스.</p>
+            <details className="footer-acc">
+              <summary>제품</summary>
+              <div className="footer-acc-links">
+                <a href="#">AI 웹빌더</a><a href="#">SEO 자동화</a>
+                <a href="#">콘텐츠 생성</a><a href="#">요금제</a>
+              </div>
+            </details>
+            <details className="footer-acc">
+              <summary>리소스</summary>
+              <div className="footer-acc-links">
+                <a href="#">블로그</a><a href="#">가이드</a>
+                <a href="#">성공 사례</a><a href="#">도움말</a>
+              </div>
+            </details>
+            <details className="footer-acc">
+              <summary>회사</summary>
+              <div className="footer-acc-links">
+                <a href="#">소개</a><a href="#">채용</a>
+                <a href="#">파트너</a><a href="#">문의</a>
+              </div>
+            </details>
+          </div>
+          <div className="footer-bottom">
+            <span>&copy; 2026 AISEO. All rights reserved.</span>
+            <div style={{display:'flex',gap:24}}>
+              <a href="#">개인정보처리방침</a>
+              <a href="#">이용약관</a>
+              <a href="#">쿠키 정책</a>
+            </div>
           </div>
         </div>
-      </section>
-
-      <footer className="lp-footer">
-        <strong>AISEO</strong> — AI 웹사이트 SEO 최적화 배포 플랫폼<br />
-        <span style={{ marginTop: 6, display: 'block' }}>prod: aiseo.tips | 사업자 문의: philo.productiongroup@gmail.com</span>
       </footer>
     </>
   );
