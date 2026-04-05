@@ -158,7 +158,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
     focused === null ? defaultWidth : isExpanded(col) ? '100%' : undefined;
 
   return (
-    <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: '100%', overflow: 'hidden', minWidth: 0 }}>
 
       {/* ── Left Column ── */}
       {isCollapsed('left') ? (
@@ -167,7 +167,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
         <div style={{
           width: colWidth('left', '270px'), flex: isExpanded('left') ? 1 : undefined,
           borderRight: '1px solid #e2e8f0', padding: 20, background: '#fff', overflowY: 'auto',
-          position: 'relative', transition: 'flex 0.3s ease', flexShrink: 0,
+          position: 'relative', transition: 'flex 0.3s ease', minWidth: 0,
         }}>
           {isExpanded('left') && (
             <button onClick={() => setFocused(null)} style={{
@@ -366,7 +366,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
         <div style={{
           width: colWidth('right', '290px'), flex: isExpanded('right') ? 1 : undefined,
           borderLeft: '1px solid #e2e8f0', padding: 20, background: '#f8fafc', overflowY: 'auto',
-          position: 'relative', transition: 'flex 0.3s ease', flexShrink: 0,
+          position: 'relative', transition: 'flex 0.3s ease', minWidth: 0,
         }}>
           {isExpanded('right') && (
             <button onClick={() => setFocused(null)} style={{
