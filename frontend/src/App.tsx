@@ -231,10 +231,14 @@ export default function App() {
       'events': '이벤트',
       'blog': '블로그',
     };
-    if (currentHash && subPages[currentHash]) {
-      return <PublicSubPage pageKey={currentHash} title={subPages[currentHash]} />;
-    }
-    return <LandingPage authError={authError} />;
+    const pageKey = currentHash && subPages[currentHash] ? currentHash : 'landing';
+    return (
+      <div className="page-transition" key={pageKey}>
+        {pageKey !== 'landing'
+          ? <PublicSubPage pageKey={pageKey} title={subPages[pageKey]} />
+          : <LandingPage authError={authError} />}
+      </div>
+    );
   }
 
   // Loading siteId from server
