@@ -349,17 +349,7 @@ export function LandingPage({ authError }: Props) {
       vidWrap.style.boxShadow = '0 ' + Math.round(lerpV(20,2,e1)) + 'px ' + Math.round(lerpV(80,12,e1)) + 'px rgba(0,0,0,' + sh.toFixed(2) + ')';
       const glowVal = clamp((p - 0.65) / 0.35, 0, 1);
       vidGlow.style.opacity = ease(glowVal).toFixed(3);
-      if (vidThumbnail) {
-        const fadeStart = 0.70;
-        const fadeEnd = 0.90;
-        const thumbOpacity = clamp(1 - (p - fadeStart) / (fadeEnd - fadeStart), 0, 1);
-        vidThumbnail.style.opacity = thumbOpacity.toFixed(3);
-        if (p >= 0.82 && !videoStarted && ytPlayer) {
-          videoStarted = true;
-          ytPlayer.src = 'https://www.youtube.com/embed/mXlMAkHhgYs?autoplay=1&rel=0&modestbranding=1&color=white&enablejsapi=1';
-          ytPlayer.style.pointerEvents = 'auto';
-        }
-      }
+      // Thumbnail stays visible until user clicks play — no auto-fade
       vidProgressBar.style.width = (p * 100) + '%';
     }
     function vidTick() {
@@ -376,6 +366,7 @@ export function LandingPage({ authError }: Props) {
       }, { rootMargin: '200px' });
       vidObs.observe(vidSection);
     }
+    // Click thumbnail to start video (only way to play)
     if (vidThumbnail) {
       vidThumbnail.addEventListener('click', () => {
         vidThumbnail.style.opacity = '0';
@@ -384,8 +375,30 @@ export function LandingPage({ authError }: Props) {
           videoStarted = true;
           ytPlayer.src = 'https://www.youtube.com/embed/mXlMAkHhgYs?autoplay=1&rel=0&modestbranding=1&color=white&enablejsapi=1';
           ytPlayer.style.pointerEvents = 'auto';
+          vidWrap?.classList.add('playing');
         }
       });
+    }
+
+    // Auto-pause when video scrolls out of view, resume thumbnail when paused
+    let vidVisObs: IntersectionObserver | undefined;
+    if (vidWrap && ytPlayer) {
+      vidVisObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (!e.isIntersecting && videoStarted) {
+            // Pause by removing autoplay src, show thumbnail again
+            ytPlayer.src = 'https://www.youtube.com/embed/mXlMAkHhgYs?enablejsapi=1&rel=0&modestbranding=1&color=white';
+            ytPlayer.style.pointerEvents = 'none';
+            vidWrap.classList.remove('playing');
+            videoStarted = false;
+            if (vidThumbnail) {
+              vidThumbnail.style.opacity = '1';
+              vidThumbnail.style.pointerEvents = 'auto';
+            }
+          }
+        });
+      }, { threshold: 0.1 });
+      vidVisObs.observe(vidWrap);
     }
 
     // ── Cleanup ──
@@ -399,6 +412,7 @@ export function LandingPage({ authError }: Props) {
       revealObserver.disconnect();
       countObserver.disconnect();
       vidObs?.disconnect();
+      vidVisObs?.disconnect();
       window.removeEventListener('scroll', scrollNavHandler);
       window.removeEventListener('resize', resizeNavHandler);
       window.removeEventListener('scroll', sfScrollHandler);
