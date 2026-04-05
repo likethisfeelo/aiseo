@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import '../landing.css';
+import { CoursePage } from './CoursePage';
 
 interface Props {
   pageKey: string;
@@ -72,58 +73,62 @@ export function PublicSubPage({ pageKey, title }: Props) {
       </div>
 
       {/* Page content */}
-      <div style={{
-        minHeight: '80vh',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        paddingTop: 72, padding: '120px 24px 80px',
-        textAlign: 'center',
-        fontFamily: 'var(--font-ko)',
-      }}>
-        <div className="section-eyebrow" style={{ textAlign: 'center', marginBottom: 24 }}>
-          {pageKey.toUpperCase()}
-        </div>
-        <h1 style={{
-          fontFamily: 'var(--font-ko)',
-          fontSize: 'clamp(36px, 5vw, 56px)',
-          fontWeight: 800,
-          letterSpacing: -2,
-          color: 'var(--text-primary)',
-          lineHeight: 1.15,
-          marginBottom: 32,
-        }}>
-          {title}
-        </h1>
+      {pageKey === 'course' ? (
+        <CoursePage />
+      ) : (
         <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 12,
-          background: 'var(--accent-light)',
-          border: '1px solid rgba(196,168,245,0.25)',
-          borderRadius: 'var(--radius-xl)',
-          padding: '20px 40px',
-          marginBottom: 40,
+          minHeight: '80vh',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          paddingTop: 72, padding: '120px 24px 80px',
+          textAlign: 'center',
+          fontFamily: 'var(--font-ko)',
         }}>
-          <span style={{ fontSize: 28 }}>🚧</span>
-          <span style={{
-            fontSize: 18, fontWeight: 600,
-            color: 'var(--accent-dark)',
-            letterSpacing: -0.3,
+          <div className="section-eyebrow" style={{ textAlign: 'center', marginBottom: 24 }}>
+            {pageKey.toUpperCase()}
+          </div>
+          <h1 style={{
+            fontFamily: 'var(--font-ko)',
+            fontSize: 'clamp(36px, 5vw, 56px)',
+            fontWeight: 800,
+            letterSpacing: -2,
+            color: 'var(--text-primary)',
+            lineHeight: 1.15,
+            marginBottom: 32,
           }}>
-            준비중입니다
-          </span>
+            {title}
+          </h1>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 12,
+            background: 'var(--accent-light)',
+            border: '1px solid rgba(196,168,245,0.25)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '20px 40px',
+            marginBottom: 40,
+          }}>
+            <span style={{ fontSize: 28 }}>🚧</span>
+            <span style={{
+              fontSize: 18, fontWeight: 600,
+              color: 'var(--accent-dark)',
+              letterSpacing: -0.3,
+            }}>
+              준비중입니다
+            </span>
+          </div>
+          <p style={{
+            fontSize: 15, color: 'var(--text-muted)',
+            lineHeight: 1.7, maxWidth: 400,
+          }}>
+            더 나은 서비스를 위해 준비하고 있습니다.<br />
+            빠른 시일 내에 찾아뵙겠습니다.
+          </p>
+          <a href="/" className="btn-primary" style={{
+            marginTop: 40, textDecoration: 'none',
+          }}>
+            ← 홈으로 돌아가기
+          </a>
         </div>
-        <p style={{
-          fontSize: 15, color: 'var(--text-muted)',
-          lineHeight: 1.7, maxWidth: 400,
-        }}>
-          더 나은 서비스를 위해 준비하고 있습니다.<br />
-          빠른 시일 내에 찾아뵙겠습니다.
-        </p>
-        <a href="/" className="btn-primary" style={{
-          marginTop: 40, textDecoration: 'none',
-        }}>
-          ← 홈으로 돌아가기
-        </a>
-      </div>
+      )}
 
       {/* Footer */}
       <footer style={{ minHeight: 'auto', padding: '48px 40px' }}>

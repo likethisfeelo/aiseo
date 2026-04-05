@@ -1074,6 +1074,63 @@ export function LandingPage({ authError }: Props) {
         </div>
       </section>
 
+      {/* ENTRY SERVICE — 핵심 진입 서비스 */}
+      <section className="entry-section">
+        <div className="entry-inner reveal">
+          <div className="entry-eyebrow">핵심 진입 서비스</div>
+          <h2 className="entry-h2">AI로 만든 홈페이지,<br/>오늘 바로 공개하세요</h2>
+          <p className="entry-sub">
+            드래그&amp;드롭 한 번으로 배포까지. 5분이면 됩니다.<br/>
+            기술 지식 없어도, 도메인이 없어도, 지금 당장 시작할 수 있습니다.
+          </p>
+
+          <div className="entry-steps">
+            <div className="entry-step">
+              <div className="entry-step-num">① AI로 제작</div>
+              <div className="entry-step-title">어떤 도구든 OK</div>
+              <div className="entry-step-desc">Framer, Claude, Webflow, Figma 어디서 만들든 ZIP으로 내보내면 됩니다</div>
+            </div>
+            <div className="entry-arrow">→</div>
+            <div className="entry-step active">
+              <div className="entry-step-num">② AISEO에 올리고</div>
+              <div className="entry-step-title">드래그&amp;드롭</div>
+              <div className="entry-step-desc">ZIP 파일 하나면 끝. 업로드하는 순간 SEO 자동 검증까지 완료</div>
+            </div>
+            <div className="entry-arrow">→</div>
+            <div className="entry-step">
+              <div className="entry-step-num">③ 즉시 라이브</div>
+              <div className="entry-step-title">완전 공개</div>
+              <div className="entry-step-desc">서브도메인으로 바로 공개, 검색엔진 등록 · 측정코드 설정까지 당일 완성</div>
+            </div>
+          </div>
+
+          <div className="entry-features">
+            <div className="entry-feat">
+              <div className="entry-feat-icon">🔍</div>
+              <div>
+                <div className="entry-feat-title">SEO 5가지 자동 검증</div>
+                <div className="entry-feat-desc">업로드 즉시 기술적 SEO 핵심 항목을 자동으로 점검합니다</div>
+              </div>
+            </div>
+            <div className="entry-feat">
+              <div className="entry-feat-icon">📡</div>
+              <div>
+                <div className="entry-feat-title">원클릭 서비스 연결</div>
+                <div className="entry-feat-desc">GA4 · Search Console · 네이버 웹마스터를 강의와 함께 직접 세팅</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="entry-price-bar">
+            <div>
+              <div className="entry-price-amount">10만원</div>
+              <div className="entry-price-meta">1회 완결 · 당일 배포 · 실습 포함</div>
+            </div>
+            <button className="entry-price-btn" disabled>배포 교육 신청하기 →</button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <div className="cta-section">
         <div className="cta-inner reveal">
