@@ -168,6 +168,16 @@ export default function App() {
   const [pageTitle, setPageTitle] = useState('대시보드');
   const [educationOpen, setEducationOpen] = useState(false);
 
+  // Reactive hash state for public sub-page routing
+  const [currentHash, setCurrentHash] = useState(
+    typeof window !== 'undefined' ? window.location.hash.replace('#', '') : ''
+  );
+  useEffect(() => {
+    const onHashChange = () => setCurrentHash(window.location.hash.replace('#', ''));
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
   // Get siteId: server first, then localStorage fallback
   useEffect(() => {
     if (!user) { setSiteIdLoading(false); return; }
@@ -215,15 +225,14 @@ export default function App() {
 
   // Not logged in — hash-based routing for public sub-pages
   if (!user) {
-    const hash = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '';
     const subPages: Record<string, string> = {
       'course': '수강안내',
       'support': '지원서비스',
       'events': '이벤트',
       'blog': '블로그',
     };
-    if (hash && subPages[hash]) {
-      return <PublicSubPage pageKey={hash} title={subPages[hash]} />;
+    if (currentHash && subPages[currentHash]) {
+      return <PublicSubPage pageKey={currentHash} title={subPages[currentHash]} />;
     }
     return <LandingPage authError={authError} />;
   }
