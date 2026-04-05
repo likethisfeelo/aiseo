@@ -414,13 +414,12 @@ export function LandingPage({ authError }: Props) {
       {/* NAV */}
       <nav id="mainNav">
         <div className="nav-inner">
-          <a href="#" className="nav-logo">AISEO</a>
+          <a href="/" className="nav-logo">AISEO</a>
           <div className="nav-links">
-            <a href="#copilot-intro">기능</a>
-            <a href="#scrollFeatures">플랫폼</a>
-            <a href="#persona">대상</a>
-            <a href="#results">성과</a>
-            <a href="#">요금제</a>
+            <a href="/course">수강안내</a>
+            <a href="/support">지원서비스</a>
+            <a href="/events">이벤트</a>
+            <a href="/blog">블로그</a>
           </div>
           <div className="nav-cta">
             <a href="/?auth=login" className="btn-ghost">로그인</a>
@@ -435,11 +434,10 @@ export function LandingPage({ authError }: Props) {
       {/* Mobile dropdown menu */}
       <div className="nav-mobile-menu" id="navMobileMenu">
         <nav className="nmm-links">
-          <a href="#copilot-intro" className="nmm-link">기능</a>
-          <a href="#scrollFeatures" className="nmm-link">플랫폼</a>
-          <a href="#persona" className="nmm-link">대상</a>
-          <a href="#results" className="nmm-link">성과</a>
-          <a href="#" className="nmm-link">요금제</a>
+          <a href="/course" className="nmm-link">수강안내</a>
+          <a href="/support" className="nmm-link">지원서비스</a>
+          <a href="/events" className="nmm-link">이벤트</a>
+          <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
           <a href="/?auth=login" className="nmm-btn-ghost">로그인</a>
@@ -1016,6 +1014,33 @@ export function LandingPage({ authError }: Props) {
                 </div>
                 <div className="bento-back">
                   <p className="bento-back-desc">SEO 최적화 후 평균 고객 문의 증가율. 검색으로 찾아오는 고객은 전환율도 높습니다.</p>
+                  <a href="#results" className="bento-back-link">사례 보기 →</a>
+                </div>
+              </div>
+            </div>
+            {/* ROW 3: stat(lavender) | stat(pink) | quote */}
+            <div className="bento-flip bento-span2" data-href="#">
+              <div className="bento-flip-inner">
+                <div className="bento-front" style={{background:'#DDD6FE'}}>
+                  <div className="bento-stat-num">5,200<span style={{fontSize:32}}>+</span></div>
+                  <div className="bento-stat-label">누적 가입자</div>
+                  <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
+                </div>
+                <div className="bento-back">
+                  <p className="bento-back-desc">다양한 업종의 5,200개 이상 팀이 AISEO로 SEO를 자동화하고 있습니다.</p>
+                  <a href="#results" className="bento-back-link">사례 보기 →</a>
+                </div>
+              </div>
+            </div>
+            <div className="bento-flip bento-span2" data-href="#">
+              <div className="bento-flip-inner">
+                <div className="bento-front" style={{background:'#FBCFE8'}}>
+                  <div className="bento-stat-num">94<span style={{fontSize:32,fontWeight:700}}>점</span></div>
+                  <div className="bento-stat-label">평균 SEO 점수</div>
+                  <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
+                </div>
+                <div className="bento-back">
+                  <p className="bento-back-desc">AISEO AI 최적화 적용 후 고객 사이트의 평균 SEO 점수. 업계 평균(58점) 대비 월등한 수치입니다.</p>
                   <a href="#results" className="bento-back-link">사례 보기 →</a>
                 </div>
               </div>

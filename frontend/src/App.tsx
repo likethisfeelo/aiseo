@@ -8,6 +8,10 @@ import { APP_ENV } from './config.js';
 const BASE_DOMAIN = APP_ENV === 'prod' ? 'aiseo.tips' : 'dev.${BASE_DOMAIN}';
 import { ForgotPasswordPage, LoginPage, SignupPage } from './auth-pages';
 import { LandingPage } from './pages/LandingPage';
+import { CoursePage } from './pages/public/CoursePage';
+import { SupportPage } from './pages/public/SupportPage';
+import { EventsPage } from './pages/public/EventsPage';
+import { BlogPage } from './pages/public/BlogPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { EducationDrawer } from './components/education/EducationDrawer';
 import { BrandPage } from './pages/BrandPage';
@@ -212,8 +216,15 @@ export default function App() {
     );
   }
 
-  // Not logged in
-  if (!user) return <LandingPage authError={authError} />;
+  // Not logged in — public pages with routing
+  if (!user) {
+    const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+    if (path === '/course') return <CoursePage />;
+    if (path === '/support') return <SupportPage />;
+    if (path === '/events') return <EventsPage />;
+    if (path === '/blog') return <BlogPage />;
+    return <LandingPage authError={authError} />;
+  }
 
   // Loading siteId from server
   if (siteIdLoading) {
