@@ -1020,6 +1020,33 @@ export function LandingPage({ authError }: Props) {
                 </div>
               </div>
             </div>
+            {/* ROW 3: stat(lavender) | stat(pink) | quote */}
+            <div className="bento-flip bento-span2" data-href="#">
+              <div className="bento-flip-inner">
+                <div className="bento-front" style={{background:'#DDD6FE'}}>
+                  <div className="bento-stat-num">5,200<span style={{fontSize:32}}>+</span></div>
+                  <div className="bento-stat-label">누적 가입자</div>
+                  <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
+                </div>
+                <div className="bento-back">
+                  <p className="bento-back-desc">다양한 업종의 5,200개 이상 팀이 AISEO로 SEO를 자동화하고 있습니다.</p>
+                  <a href="#results" className="bento-back-link">사례 보기 →</a>
+                </div>
+              </div>
+            </div>
+            <div className="bento-flip bento-span2" data-href="#">
+              <div className="bento-flip-inner">
+                <div className="bento-front" style={{background:'#FBCFE8'}}>
+                  <div className="bento-stat-num">94<span style={{fontSize:32,fontWeight:700}}>점</span></div>
+                  <div className="bento-stat-label">평균 SEO 점수</div>
+                  <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
+                </div>
+                <div className="bento-back">
+                  <p className="bento-back-desc">AISEO AI 최적화 적용 후 고객 사이트의 평균 SEO 점수. 업계 평균(58점) 대비 월등한 수치입니다.</p>
+                  <a href="#results" className="bento-back-link">사례 보기 →</a>
+                </div>
+              </div>
+            </div>
             <div className="bento-quote bento-span3">
               <p className="bento-quote-text">프리랜서로 일하면서 영업이 가장 힘들었는데, AISEO로 포트폴리오 사이트 최적화하고 나서 매달 안정적으로 클라이언트가 검색으로 들어와요.</p>
               <div className="bento-author">
