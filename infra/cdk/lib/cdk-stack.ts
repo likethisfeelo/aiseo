@@ -404,7 +404,13 @@ export class CdkStack extends Stack {
 
     // Consultation routes
     const consultationIntegration = new apigateway.LambdaIntegration(consultationHandler);
-    const consultationResource = api.root.addResource('consultation');
+    const consultationResource = api.root.addResource('consultation', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: [devOrigin, prodOrigin, siteDevOrigin, siteProdOrigin, b2bDevOrigin, b2bProdOrigin],
+        allowMethods: ['GET', 'POST', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+      },
+    });
     consultationResource.addMethod('POST', consultationIntegration, {
       authorizationType: apigateway.AuthorizationType.NONE,
     });
