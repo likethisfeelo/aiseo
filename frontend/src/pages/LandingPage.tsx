@@ -429,7 +429,7 @@ export function LandingPage({ authError }: Props) {
   return (
     <>
       {/* NAV */}
-      <nav id="mainNav">
+      <nav id="mainNav" className="landing-nav">
         <div className="nav-inner">
           <a href="/" className="nav-logo">AISEO</a>
           <div className="nav-links">
