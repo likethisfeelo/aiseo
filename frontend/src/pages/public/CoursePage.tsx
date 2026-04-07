@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
 /* ── Path data per state ── */
 interface Step { label: string; value: string; special?: boolean }
@@ -115,6 +116,17 @@ export function CoursePage() {
 
   const svcTotal = [...selectedSvcs.values()].reduce((s, v) => s + v.price, 0);
   const hasMonthly = [...selectedSvcs.values()].some(v => v.monthly);
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+    let formatted = digits;
+    if (digits.length > 7) {
+      formatted = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+    } else if (digits.length > 3) {
+      formatted = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    }
+    setFormPhone(formatted);
+  };
 
   const submitForm = () => {
     if (!formName.trim() || !formPhone.trim()) { alert('이름과 연락처를 입력해주세요.'); return; }
@@ -348,8 +360,8 @@ export function CoursePage() {
         </div>
       )}
 
-      {/* ═══ Inquiry Modal ═══ */}
-      {modalOpen && (
+      {/* ═══ Inquiry Modal (Portal to body to escape transform ancestor) ═══ */}
+      {modalOpen && ReactDOM.createPortal(
         <div className="crs-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setModalOpen(false); }}>
           <div className="crs-modal">
             <button className="crs-modal-close" onClick={() => setModalOpen(false)}>×</button>
@@ -367,12 +379,13 @@ export function CoursePage() {
               </div>
             </div>
             <div className="crs-form-row"><label className="crs-form-label">이름 <span style={{color:'#993c1d'}}>*</span></label><input className="crs-form-input" value={formName} onChange={e => setFormName(e.target.value)} placeholder="홍길동" /></div>
-            <div className="crs-form-row"><label className="crs-form-label">연락처 <span style={{color:'#993c1d'}}>*</span></label><input className="crs-form-input" value={formPhone} onChange={e => setFormPhone(e.target.value)} type="tel" placeholder="010-0000-0000" /></div>
+            <div className="crs-form-row"><label className="crs-form-label">연락처 <span style={{color:'#993c1d'}}>*</span></label><input className="crs-form-input" value={formPhone} onChange={handlePhoneChange} type="tel" placeholder="010-0000-0000" /></div>
             <div className="crs-form-row"><label className="crs-form-label">카카오톡 ID (선택)</label><input className="crs-form-input" value={formKakao} onChange={e => setFormKakao(e.target.value)} placeholder="kakao_id" /></div>
             <div className="crs-form-row"><label className="crs-form-label">현재 상태 / 문의 내용</label><textarea className="crs-form-textarea" value={formMessage} onChange={e => setFormMessage(e.target.value)} placeholder="현재 운영 중인 사이트 주소나 상황을 간략히 적어주세요" /></div>
             <button className="crs-form-submit" onClick={submitForm}>상담 신청하기</button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>
