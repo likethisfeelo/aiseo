@@ -256,7 +256,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
       ) : (
         <div style={{
           flex: 1, padding: 20, background: '#fff', overflowY: 'auto',
-          position: 'relative', transition: 'flex 0.3s ease',
+          position: 'relative', transition: 'flex 0.3s ease', minWidth: 0,
         }}>
           {isExpanded('center') && (
             <button onClick={() => setFocused(null)} style={{

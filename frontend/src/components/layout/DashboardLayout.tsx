@@ -49,7 +49,7 @@ export function DashboardLayout({
           onLogout={onLogout}
           onToggleEducation={onToggleEducation}
         />
-        <main style={{ flex: 1, overflow: 'auto' }}>
+        <main style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
           {children}
         </main>
       </div>

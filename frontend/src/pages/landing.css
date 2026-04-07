@@ -7,7 +7,7 @@
     animation: pageFadeIn .5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  .page-transition *, .page-transition *::before, .page-transition *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
     --accent: #C4A8F5;
@@ -33,12 +33,12 @@
     --font-en: 'Plus Jakarta Sans', sans-serif;
   }
 
-  html { scroll-behavior: smooth; }
-  body { font-family: var(--font-ko); background: var(--bg); color: var(--text-primary); overflow-x: hidden; }
+  /* smooth scroll only for landing page - applied via JS or class */
+  .page-transition { font-family: var(--font-ko); background: var(--bg); color: var(--text-primary); overflow-x: hidden; }
 
   /* ── NAV ── */
   /* nav 자체는 full-width 고정, padding 애니메이션으로 inset 처리 */
-  nav {
+  .landing-nav {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
@@ -48,7 +48,7 @@
     /* padding 단일 속성만 변환 → 가장 부드러운 수축 */
     transition: padding .48s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
-  nav.scrolled {
+  .landing-nav.scrolled {
     padding: 10px clamp(24px, calc((100% - 1100px) / 2), 600px);
   }
   /* 시각적 필 컨테이너 */
