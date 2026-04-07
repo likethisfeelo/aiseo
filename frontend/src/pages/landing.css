@@ -304,7 +304,7 @@
   .aio-viz-val { font-size: 12px; font-weight: 700; color: var(--accent-dark); width: 36px; text-align: right; }
 
   /* ── PERSONA ── */
-  .persona { background: transparent; }
+  .persona { position: relative; z-index: 1; background: var(--bg); }
   .persona-header { text-align: center; margin-bottom: 48px; }
   .persona-header .section-sub { margin: 16px auto 0; }
 
@@ -422,7 +422,7 @@
   }
 
   /* ── RESULTS ── */
-  .results { background: transparent; padding: 100px 40px; }
+  .results { position: relative; z-index: 1; background: var(--bg); padding: 100px 40px; }
   .results .section-inner { max-width: 1100px; }
   .results-metrics {
     display: flex; justify-content: center; gap: 64px;
@@ -697,7 +697,7 @@
   }
 
   /* ── CTA ── */
-  .cta-section { padding: 120px 40px; background: transparent; }
+  .cta-section { padding: 120px 40px; position: relative; z-index: 1; background: var(--bg); }
   .cta-inner { max-width: 700px; margin: 0 auto; text-align: center; background: linear-gradient(135deg, var(--accent-light), rgba(155,184,248,0.15)); border: 1px solid rgba(196,168,245,0.2); border-radius: var(--radius-xl); padding: 80px 60px; position: relative; overflow: hidden; }
   .cta-inner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(196,168,245,0.1), transparent 60%); }
   .cta-inner > * { position: relative; z-index: 1; }
@@ -1047,7 +1047,8 @@
 
   /* ── AI COPILOT INTRO ── */
   .copilot-intro {
-    background: transparent;
+    position: relative; z-index: 1;
+    background: var(--bg);
     padding: 100px 40px 120px;
   }
   .copilot-intro-inner {
