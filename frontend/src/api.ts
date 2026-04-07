@@ -84,6 +84,29 @@ export const getComments = (siteId: string, targetType?: string, targetId?: stri
 export const markCommentsRead = (input: { siteId: string; commentIds: string[] }) =>
   postJson('/comments/read', input);
 
+// ── Consultation APIs ──
+export const submitConsultation = async (input: {
+  name: string;
+  phone: string;
+  contentConfirmed: boolean;
+  selectedServices: string[];
+  businessRegistered: string;
+  specialIndustry: string;
+  kakaoConsent: boolean;
+}) => {
+  const { API_BASE_URL } = await import('./config.js');
+  const res = await fetch(`${API_BASE_URL}/consultation`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  const payload = await res.json();
+  if (!res.ok || !payload.success) throw new Error(payload.error || 'Submission failed');
+  return payload.data;
+};
+
+export const adminGetConsultations = () => getJson('/admin/consultations');
+
 // ── Admin APIs ──
 export const adminGetSites = () => getJson('/admin/sites');
 
