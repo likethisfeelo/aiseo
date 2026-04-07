@@ -1,11 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './landing.css';
+import { ConsultationWidget } from '../components/ConsultationWidget';
 
 interface Props {
   authError: string;
 }
 
 export function LandingPage({ authError }: Props) {
+  const [consultOpen, setConsultOpen] = useState(false);
+
   useEffect(() => {
     // ── Mobile hamburger menu ──
     const btn = document.getElementById('navHamburger');
@@ -1126,7 +1129,7 @@ export function LandingPage({ authError }: Props) {
               <div className="entry-price-amount">10만원</div>
               <div className="entry-price-meta">1회 완결 · 당일 배포 · 실습 포함</div>
             </div>
-            <button className="entry-price-btn" disabled>배포 교육 신청하기 →</button>
+            <button className="entry-price-btn" onClick={() => setConsultOpen(true)}>배포 교육 신청하기 →</button>
           </div>
         </div>
       </section>
@@ -1282,6 +1285,8 @@ export function LandingPage({ authError }: Props) {
           </div>
         </div>
       </footer>
+
+      <ConsultationWidget open={consultOpen} onClose={() => setConsultOpen(false)} />
     </>
   );
 }

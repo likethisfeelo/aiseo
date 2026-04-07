@@ -328,6 +328,27 @@ export class CdkStack extends Stack {
     const imageUploadResource = api.root.addResource('image-upload');
     addPost(imageUploadResource, new apigateway.LambdaIntegration(imageUploadHandler));
 
+    // ── Consultations table + Lambda ──
+    const consultationsTableName = 'aiseo-consultations';
+    const consultationsTable = new dynamodb.Table(this, 'ConsultationsTable', {
+      tableName: consultationsTableName,
+      partitionKey: { name: 'consultationId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const consultationHandler = new lambda.Function(this, 'ConsultationFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'consultation/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        CONSULTATIONS_TABLE: consultationsTableName,
+        SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL ?? '',
+      },
+    });
+    consultationsTable.grantReadWriteData(consultationHandler);
+
     // ── Comments table + Lambda handlers ──
     const commentsTableName = this.node.tryGetContext('commentsTableName') ?? 'aiseo-comments';
     const commentsTable = new dynamodb.Table(this, 'CommentsTable', {
@@ -380,6 +401,15 @@ export class CdkStack extends Stack {
     addGet(commentsResource, commentsIntegration);
     const commentsReadResource = commentsResource.addResource('read');
     addPost(commentsReadResource, commentsIntegration);
+
+    // Consultation routes
+    const consultationIntegration = new apigateway.LambdaIntegration(consultationHandler);
+    const consultationResource = api.root.addResource('consultation');
+    consultationResource.addMethod('POST', consultationIntegration, {
+      authorizationType: apigateway.AuthorizationType.NONE,
+    });
+    const adminConsultationsResource = adminResource.addResource('consultations');
+    addGet(adminConsultationsResource, consultationIntegration);
 
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,
