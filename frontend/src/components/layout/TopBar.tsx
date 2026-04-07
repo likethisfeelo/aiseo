@@ -56,25 +56,27 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
         borderBottom: '1px solid #e2e8f0',
         display: 'flex',
         alignItems: 'center',
-        padding: '0 20px',
+        padding: '0 16px',
         flexShrink: 0,
         fontFamily: "'Noto Sans KR', system-ui, sans-serif",
         gap: 0,
+        overflow: 'hidden',
+        minWidth: 0,
       }}
     >
       {/* 1. Profile (로그인 정보) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingRight: 16, borderRight: '1px solid #e2e8f0', marginRight: 16, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 12, borderRight: '1px solid #e2e8f0', marginRight: 12, flexShrink: 0 }}>
         <div
           style={{
-            width: 32,
-            height: 32,
+            width: 28,
+            height: 28,
             borderRadius: '50%',
             background: '#2563eb',
             color: '#fff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: 700,
             flexShrink: 0,
           }}
@@ -82,12 +84,12 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
           {(user.email || '?')[0].toUpperCase()}
         </div>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 120 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#1e293b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 90 }}>
             {user.name || user.email}
           </div>
           <button
             onClick={onLogout}
-            style={{ fontSize: 11, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{ fontSize: 10, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
             로그아웃
           </button>
@@ -95,8 +97,8 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
       </div>
 
       {/* 2. Deployed Site Status (좌측 정렬) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-        <h1 style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', margin: 0, whiteSpace: 'nowrap' }}>{pageTitle}</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexShrink: 1 }}>
+        <h1 style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pageTitle}</h1>
         {siteId && (
           <div
             onClick={() => navigate('/domain')}
@@ -147,11 +149,11 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
         <button
           onClick={onToggleEducation}
           style={{
-            padding: '10px 24px',
-            borderRadius: 10,
+            padding: '8px 16px',
+            borderRadius: 8,
             border: '1.5px solid #2563eb',
             background: '#eff6ff',
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: 700,
             cursor: 'pointer',
             color: '#2563eb',
