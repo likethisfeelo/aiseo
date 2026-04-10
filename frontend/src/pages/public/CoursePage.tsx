@@ -921,15 +921,14 @@ export function CoursePage() {
   const totalLabel = totalSelected.toLocaleString('ko-KR') + '원';
   const hasMonthly = [...selectedSvcs.values()].some(s => s.priceLabel.includes('월'));
 
-  // Suppress unused warnings until Phase 7-8 wire them up
-  void MODULES; void SERVICE_GROUPS; void PACKAGES; void ADDONS;
-  void openAccId; void setOpenAccId;
+  // Suppress unused warnings until Phase 8 wires them up
+  void PACKAGES; void ADDONS;
   void modalOpen;
   void formEmail; void setFormEmail;
   void formMemo; void setFormMemo;
-  void toggleSvc; void clearServices; void handlePhoneChange;
-  void openModal; void closeModal; void submitForm;
-  void totalLabel; void hasMonthly;
+  void handlePhoneChange;
+  void closeModal; void submitForm;
+  void hasMonthly;
   void ReactDOM;
 
   const route = selectedState ? ROUTES[selectedState] : null;
@@ -1103,7 +1102,208 @@ export function CoursePage() {
         </div>
       </section>
 
-      {/* Step 2/3/4/CTA/modal rendered in later phases */}
+      {/* ══ STEP 2: EDUCATION MODULES ══ */}
+      <section className="aiv5-section" id="modules">
+        <div className="aiv5-section-head">
+          <div className="aiv5-step-badge"><span className="aiv5-step-dot"></span> Step 2</div>
+          <h2 className="aiv5-section-title">교육 내용 상세 안내</h2>
+          <p className="aiv5-section-sub">
+            한 번 배우면 매달 나가는 돈이 줄어듭니다. 배운 것은 비용이 아니라 계속 쓸 수 있는 자산이 됩니다.
+          </p>
+        </div>
+
+        <div className="aiv5-accordion">
+          {MODULES.map((cat, ci) => (
+            <div key={ci}>
+              <div className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}`}>
+                <span className="aiv5-acc-category-icon">{cat.icon}</span>
+                <div>
+                  <strong>{cat.title}</strong>
+                  <span>{cat.sub}</span>
+                </div>
+              </div>
+
+              {cat.items.map(item => {
+                const isOpen = openAccId === item.id;
+                return (
+                  <div
+                    key={item.id}
+                    className={`aiv5-acc-item${isOpen ? ' open' : ''}`}
+                    id={item.id}
+                  >
+                    <button
+                      type="button"
+                      className="aiv5-acc-trigger"
+                      aria-expanded={isOpen}
+                      onClick={() => setOpenAccId(isOpen ? null : item.id)}
+                    >
+                      <div className={`aiv5-acc-num${item.numClass ? ' ' + item.numClass : ''}`}>
+                        {item.num}
+                      </div>
+                      <div className="aiv5-acc-meta">
+                        <span className={`aiv5-acc-code-chip ${item.chipClass}`}>{item.chip}</span>
+                        <span className="aiv5-acc-name">{item.name}</span>
+                        <div className="aiv5-acc-tagrow">
+                          {item.tags.map((t, i) => (
+                            <span key={i} className="aiv5-acc-tag">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="aiv5-acc-right">
+                        <span className="aiv5-acc-price-chip">{item.price}</span>
+                        <div className="aiv5-acc-chevron">▾</div>
+                      </div>
+                    </button>
+
+                    <div className="aiv5-acc-body" role="region">
+                      <div className="aiv5-acc-body-inner">
+                        <div className="aiv5-acc-body-content">
+                          <div>
+                            <p className="aiv5-acc-desc">
+                              {item.desc.split('\n').map((line, i, arr) => (
+                                <span key={i}>
+                                  {line}
+                                  {i < arr.length - 1 && <><br /><br /></>}
+                                </span>
+                              ))}
+                            </p>
+                            <span className="aiv5-acc-who-label">{item.whoTitle}</span>
+                            <div className="aiv5-acc-who-list">
+                              {item.who.map((w, i) => (
+                                <div key={i} className="aiv5-acc-who-item">
+                                  <div className="aiv5-acc-who-dot"></div>
+                                  {w}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="aiv5-acc-outcomes">
+                            <div className="aiv5-acc-outcome-group">
+                              <h5>{item.learnTitle}</h5>
+                              <div className="aiv5-acc-learn-list">
+                                {item.learn.map((l, i) => (
+                                  <div key={i} className="aiv5-acc-learn-item">{l}</div>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="aiv5-acc-divider-h"></div>
+                            <div className="aiv5-acc-outcome-group">
+                              <h5>진행 방식</h5>
+                              <div className="aiv5-acc-info-row">
+                                {item.metaChips.map((m, i) => (
+                                  <span key={i} className="aiv5-acc-info-chip">{m}</span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ STEP 3: INDIVIDUAL SERVICES ══ */}
+      <section className="aiv5-section" id="services">
+        <div className="aiv5-section-head">
+          <div className="aiv5-step-badge"><span className="aiv5-step-dot"></span> Step 3</div>
+          <h2 className="aiv5-section-title">
+            지금 궁금하고 필요한 것들이<br />어느 정도인지 확인해보세요
+          </h2>
+          <p className="aiv5-section-sub">
+            전부 들을 필요 없습니다. 지금 당장 필요한 부분만 선택해서 예산을 먼저 확인하고, 전문 컨설턴트와 상의하세요. 꼭 필요한 과정만 안내해드립니다.
+          </p>
+          <div className="aiv5-pc-notice">
+            <span className="aiv5-pc-notice-icon">🖥</span>
+            <span>항목을 직접 선택하면 우측에서 실시간으로 예산이 계산됩니다. 조합을 만든 뒤 바로 문의할 수 있습니다.</span>
+          </div>
+        </div>
+
+        <div className="aiv5-services-layout">
+          <div className="aiv5-service-groups">
+            {SERVICE_GROUPS.map((group, gi) => (
+              <div
+                key={gi}
+                className={`aiv5-service-group${group.title.startsWith('CORE') || group.title.startsWith('⭐') ? ' is-core' : ''}`}
+              >
+                <div className="aiv5-sg-head">
+                  <h3>{group.icon} {group.title}</h3>
+                </div>
+                <div className="aiv5-service-grid">
+                  {group.items.map(item => {
+                    const checked = selectedSvcs.has(item.id);
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className={`aiv5-svc-item${checked ? ' checked' : ''}`}
+                        onClick={() => toggleSvc(item)}
+                      >
+                        <div className="aiv5-svc-top">
+                          <div className="aiv5-svc-cb">✓</div>
+                          <span className="aiv5-svc-price">{item.priceLabel}</span>
+                        </div>
+                        <div className={`aiv5-svc-code ${item.codeClass}`}>{item.code}</div>
+                        <div className="aiv5-svc-name">{item.name}</div>
+                        <div className="aiv5-svc-desc">{item.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Sticky Sidebar */}
+          <aside className="aiv5-sticky-sidebar">
+            <h3 className="aiv5-ss-title">선택한 서비스</h3>
+            <p className="aiv5-ss-desc">
+              체크한 항목이 여기서 정리됩니다. 문의 전에 구성과 예산을 한 번 더 확인할 수 있습니다.
+            </p>
+
+            <div className="aiv5-ss-tags">
+              {selectedSvcs.size === 0 ? (
+                <span className="aiv5-ss-empty-hint">선택된 항목이 없습니다</span>
+              ) : (
+                [...selectedSvcs.values()].map(s => (
+                  <span key={s.id} className="aiv5-ss-tag">{s.code} {s.name}</span>
+                ))
+              )}
+            </div>
+
+            <div className="aiv5-ss-total-box">
+              <div className="aiv5-ss-total-label">Total Estimate</div>
+              <div className="aiv5-ss-total-num">
+                {selectedSvcs.size > 0 ? totalLabel : '0원'}
+              </div>
+              <div className="aiv5-ss-total-sub">
+                {selectedSvcs.size > 0
+                  ? `총 ${selectedSvcs.size}개 항목 선택됨 ${hasMonthly ? '(월정액 포함)' : ''}`
+                  : '선택한 서비스가 없습니다.'}
+              </div>
+            </div>
+
+            <div className="aiv5-ss-actions">
+              <button type="button" className="aiv5-btn aiv5-btn-primary aiv5-btn-block" onClick={openModal}>
+                이 조합으로 문의하기
+              </button>
+              <button type="button" className="aiv5-btn aiv5-btn-ghost aiv5-btn-block" onClick={clearServices}>
+                선택 초기화
+              </button>
+            </div>
+
+            <div className="aiv5-ss-note">
+              실제 제안 시에는 업종, 현재 사이트 상태, 예산 규모에 따라 묶음 구성과 순서를 다시 조정할 수 있습니다.
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      {/* Step 4/CTA/modal rendered in Phase 8 */}
     </div>
   );
 }
