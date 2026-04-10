@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import ReactDOM from 'react-dom';
 
 // ============================================================================
@@ -2253,7 +2253,284 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
   /* Hide placeholder styling's result-panel on mobile since it's not rendered */
   .aiv5-state-panel { padding: 12px; }
 }
+
+/* ═══════════════════════════════════════════
+   MOBILE JS — Phase 3: Step 2 edu swipe + cat collapse
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Horizontal swipe edu cards container */
+  .aiv5-mob-edu-swipe {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 28px;
+  }
+  .aiv5-mob-edu-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .aiv5-mob-edu-section.is-highlight .aiv5-mob-edu-section-head {
+    color: var(--accent-dark);
+  }
+  .aiv5-mob-edu-section-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 2px;
+  }
+  .aiv5-mob-edu-section-icon { font-size: 18px; }
+  .aiv5-mob-edu-section-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-2);
+    letter-spacing: -.2px;
+  }
+  .aiv5-mob-edu-section.is-highlight .aiv5-mob-edu-section-label {
+    color: var(--accent-dark);
+  }
+
+  .aiv5-mob-edu-swipe-inner {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0 4px;
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .aiv5-mob-edu-swipe-inner::-webkit-scrollbar { display: none; }
+  .aiv5-mob-edu-swipe-inner {
+    scrollbar-width: none;
+  }
+  .aiv5-mob-edu-swipe-inner .aiv5-mob-edu-card {
+    flex: 0 0 82vw;
+    max-width: 320px;
+    scroll-snap-align: center;
+  }
+  .aiv5-mob-edu-swipe-inner:has(.aiv5-mob-edu-card:only-child) .aiv5-mob-edu-card {
+    flex: 1 1 auto;
+    max-width: none;
+    width: 100%;
+  }
+
+  .aiv5-mob-edu-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-sm);
+  }
+  .aiv5-mob-edu-card.is-core {
+    border-color: var(--accent-line);
+    background: linear-gradient(135deg, rgba(196,168,245,.06), white);
+  }
+  .aiv5-mob-edu-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .aiv5-mob-edu-code {
+    font-family: var(--font-en);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .aiv5-mob-edu-code.core {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent-deep));
+    color: white;
+  }
+  .aiv5-mob-edu-code.mnt {
+    background: rgba(100,116,139,.12);
+    color: #475569;
+    border: 1px solid rgba(100,116,139,.2);
+  }
+  .aiv5-mob-edu-code.pre {
+    background: rgba(16,185,129,.1);
+    color: #059669;
+    border: 1px solid rgba(16,185,129,.2);
+  }
+  .aiv5-mob-edu-code.str {
+    background: rgba(245,158,11,.1);
+    color: #B45309;
+    border: 1px solid rgba(245,158,11,.2);
+  }
+  .aiv5-mob-edu-code.ads {
+    background: rgba(239,68,68,.1);
+    color: #DC2626;
+    border: 1px solid rgba(239,68,68,.2);
+  }
+  .aiv5-mob-edu-price {
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-3);
+  }
+  .aiv5-mob-edu-cat {
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-4);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .aiv5-mob-edu-name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -.3px;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .aiv5-mob-edu-desc {
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.65;
+    flex: 1;
+  }
+  .aiv5-mob-edu-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .aiv5-mob-edu-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    background: var(--bg-soft);
+    border-radius: 999px;
+    color: var(--text-3);
+  }
+
+  .aiv5-mob-edu-swipe-dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 6px;
+  }
+  .aiv5-mob-edu-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--line);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .aiv5-mob-edu-dot.active {
+    background: var(--accent-dark);
+    width: 16px;
+    border-radius: 999px;
+  }
+
+  /* Category header — clickable on mobile */
+  .aiv5-acc-category-header {
+    position: relative;
+    user-select: none;
+  }
+  .aiv5-acc-category-header::after {
+    content: '›';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 18px;
+    color: var(--text-4);
+    transition: transform .25s;
+  }
+  .aiv5-acc-category-header.mob-cat-collapsed::after {
+    transform: translateY(-50%) rotate(0deg);
+  }
+
+  /* Category group collapse container */
+  .aiv5-mob-cat-group {
+    overflow: hidden;
+    max-height: 20000px;
+    transition: max-height .4s cubic-bezier(.4,0,.2,1);
+  }
+  .aiv5-mob-cat-group.collapsed {
+    max-height: 0 !important;
+  }
+}
 `;
+
+// ============================================================================
+// Mobile swipe carousel helper (Phase 3)
+// ============================================================================
+
+function EduSwipe({ section }: { section: EduSection }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const hasDots = section.cards.length > 1;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !hasDots) return;
+    const onScroll = () => {
+      const cardEl = el.querySelector<HTMLDivElement>('.aiv5-mob-edu-card');
+      const w = cardEl?.offsetWidth || 1;
+      const idx = Math.round(el.scrollLeft / (w + 12));
+      setActiveIdx(idx);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [hasDots]);
+
+  const goTo = (idx: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardEl = el.querySelector<HTMLDivElement>('.aiv5-mob-edu-card');
+    const w = cardEl?.offsetWidth || 0;
+    el.scrollTo({ left: idx * (w + 12), behavior: 'smooth' });
+  };
+
+  return (
+    <div className={`aiv5-mob-edu-section${section.highlight ? ' is-highlight' : ''}`}>
+      <div className="aiv5-mob-edu-section-head">
+        <span className="aiv5-mob-edu-section-icon">{section.icon}</span>
+        <span className="aiv5-mob-edu-section-label">{section.label}</span>
+      </div>
+      <div className="aiv5-mob-edu-swipe-inner" ref={scrollRef}>
+        {section.cards.map((card, i) => (
+          <div
+            key={i}
+            className={`aiv5-mob-edu-card${card.codeType === 'core' ? ' is-core' : ''}`}
+          >
+            <div className="aiv5-mob-edu-card-top">
+              <span className={`aiv5-mob-edu-code ${card.codeType}`}>{card.code}</span>
+              <span className="aiv5-mob-edu-price">{card.price}</span>
+            </div>
+            <div className="aiv5-mob-edu-cat">{card.cat}</div>
+            <div className="aiv5-mob-edu-name">{card.name}</div>
+            <div className="aiv5-mob-edu-desc">{card.desc}</div>
+            <div className="aiv5-mob-edu-tags">
+              {card.tags.map((t, j) => (
+                <span key={j} className="aiv5-mob-edu-tag">{t}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      {hasDots && (
+        <div className="aiv5-mob-edu-swipe-dots">
+          {section.cards.map((_, i) => (
+            <span
+              key={i}
+              className={`aiv5-mob-edu-dot${i === activeIdx ? ' active' : ''}`}
+              onClick={() => goTo(i)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ============================================================================
 // Component
@@ -2371,6 +2648,11 @@ export function CoursePage() {
   const totalLabel = totalSelected.toLocaleString('ko-KR') + '원';
   const hasMonthly = [...selectedSvcs.values()].some(s => s.priceLabel.includes('월'));
 
+  // ── Phase 3: Step 2 mobile category collapse handler ──
+  const toggleCatCollapsed = (catKey: string) => {
+    setCatCollapsedMap(prev => ({ ...prev, [catKey]: !prev[catKey] }));
+  };
+
   // ── Phase 2: Step 1 mobile handlers ──
   const applyPreset = (key: string) => {
     setSelectedState(key);
@@ -2400,11 +2682,8 @@ export function CoursePage() {
   void ReactDOM;
 
   // Phase 1: mobile data/state declared but not yet consumed — suppress until later phases
-  void EDU_SECTIONS;
   void WIZ_STEPS;
   void MOB_TABS;
-  void catCollapsedMap;
-  void setCatCollapsedMap;
   void wizCurrent;
   void setWizCurrent;
   void wizSelectedSet;
@@ -2642,10 +2921,26 @@ export function CoursePage() {
           </p>
         </div>
 
+        {/* Mobile: horizontal swipe edu cards by section */}
+        {isMobile && (
+          <div className="aiv5-mob-edu-swipe">
+            {EDU_SECTIONS.map(sec => (
+              <EduSwipe key={sec.id} section={sec} />
+            ))}
+          </div>
+        )}
+
         <div className="aiv5-accordion">
-          {MODULES.map((cat, ci) => (
+          {MODULES.map((cat, ci) => {
+            const catKey = `cat-${ci}`;
+            const collapsed = isMobile && !!catCollapsedMap[catKey];
+            return (
             <div key={ci}>
-              <div className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}`}>
+              <div
+                className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}${collapsed ? ' mob-cat-collapsed' : ''}`}
+                onClick={() => isMobile && toggleCatCollapsed(catKey)}
+                style={isMobile ? { cursor: 'pointer' } : undefined}
+              >
                 <span className="aiv5-acc-category-icon">{cat.icon}</span>
                 <div>
                   <strong>{cat.title}</strong>
@@ -2653,6 +2948,7 @@ export function CoursePage() {
                 </div>
               </div>
 
+              <div className={`aiv5-mob-cat-group${collapsed ? ' collapsed' : ''}`}>
               {cat.items.map(item => {
                 const isOpen = openAccId === item.id;
                 return (
@@ -2732,8 +3028,10 @@ export function CoursePage() {
                   </div>
                 );
               })}
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
