@@ -2147,6 +2147,112 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
   .aiv5-modal { padding: 28px 22px; border-radius: 24px; }
   .aiv5-section { margin-bottom: 72px; }
 }
+
+/* ═══════════════════════════════════════════
+   MOBILE JS — Phase 2: Step 1 diag accordion
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .aiv5-mob-diag-placeholder {
+    text-align: center;
+    padding: 32px 20px;
+    background: var(--bg-soft);
+    border: 1px dashed var(--line);
+    border-radius: var(--r-lg);
+  }
+  .aiv5-mob-diag-ph-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+  .aiv5-mob-diag-ph-text {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .aiv5-mob-diag-accordion {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .42s cubic-bezier(.4,0,.2,1);
+    margin-bottom: 12px;
+  }
+  .aiv5-mob-diag-accordion.open {
+    max-height: 1600px;
+  }
+  .aiv5-mob-diag-acc-inner {
+    background: white;
+    border: 1px solid var(--accent-line);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    box-shadow: var(--sh-sm);
+  }
+
+  .aiv5-mob-result-inline .aiv5-result-body {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    padding: 0;
+  }
+  .aiv5-mob-result-inline .aiv5-result-top { padding: 16px 16px 0; }
+  .aiv5-mob-result-inline .aiv5-result-meta { margin: 10px 16px 0; }
+  .aiv5-mob-result-inline .aiv5-route-steps {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .aiv5-mob-result-inline .aiv5-result-estimate { margin: 0 16px 14px; }
+  .aiv5-mob-result-inline .aiv5-result-cta {
+    margin: 0 16px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .aiv5-mob-result-inline .aiv5-result-cta .aiv5-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 13px;
+    padding: 11px;
+  }
+  .aiv5-mob-result-inline .aiv5-result-h { font-size: 16px; }
+  .aiv5-mob-result-inline .aiv5-result-desc { font-size: 13px; }
+  .aiv5-mob-result-inline .aiv5-route-step-card::after { display: none; }
+  .aiv5-mob-result-inline .aiv5-route-step-card strong { font-size: 12px; }
+  .aiv5-mob-result-inline .aiv5-route-step-card p { font-size: 11px; }
+
+  /* Mobile result choice soft buttons */
+  .aiv5-mob-result-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .aiv5-wiz-soft-btn {
+    padding: 12px 14px;
+    border-radius: var(--r-md);
+    font-family: var(--font-ko);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+    border: 1.5px solid var(--line);
+    background: white;
+    color: var(--text-2);
+  }
+  .aiv5-wiz-soft-btn:active { transform: scale(.98); }
+  .aiv5-wiz-soft-consult {
+    background: linear-gradient(135deg, rgba(139,111,212,.1), rgba(109,40,217,.05));
+    border-color: var(--accent-line);
+    color: var(--accent-deep);
+  }
+  .aiv5-wiz-soft-skip {
+    background: var(--bg-soft);
+    color: var(--text-3);
+  }
+
+  /* Hide placeholder styling's result-panel on mobile since it's not rendered */
+  .aiv5-state-panel { padding: 12px; }
+}
 `;
 
 // ============================================================================
@@ -2265,17 +2371,38 @@ export function CoursePage() {
   const totalLabel = totalSelected.toLocaleString('ko-KR') + '원';
   const hasMonthly = [...selectedSvcs.values()].some(s => s.priceLabel.includes('월'));
 
+  // ── Phase 2: Step 1 mobile handlers ──
+  const applyPreset = (key: string) => {
+    setSelectedState(key);
+    if (isMobile) {
+      if (diagCurrentKey && diagCurrentKey !== key) {
+        setDiagMobOpen(false);
+      }
+      setDiagCurrentKey(key);
+    }
+  };
+
+  const onStateCardClick = (key: string) => {
+    if (isMobile) {
+      setSelectedState(key);
+      if (diagCurrentKey === key && diagMobOpen) {
+        setDiagMobOpen(false);
+      } else {
+        setDiagCurrentKey(key);
+        setDiagMobOpen(true);
+      }
+    } else {
+      setSelectedState(key);
+    }
+  };
+
   // Suppress unused warnings until Phase 8 wires them up
   void ReactDOM;
 
-  // Phase 1: mobile data/state declared but not yet consumed — suppress until Phase 2+
+  // Phase 1: mobile data/state declared but not yet consumed — suppress until later phases
   void EDU_SECTIONS;
   void WIZ_STEPS;
   void MOB_TABS;
-  void diagCurrentKey;
-  void setDiagCurrentKey;
-  void diagMobOpen;
-  void setDiagMobOpen;
   void catCollapsedMap;
   void setCatCollapsedMap;
   void wizCurrent;
@@ -2284,9 +2411,83 @@ export function CoursePage() {
   void setWizSelectedSet;
   void currentTab;
   void setCurrentTab;
-  void isMobile;
 
   const route = selectedState ? ROUTES[selectedState] : null;
+
+  // Phase 2: Reusable result body JSX (used by desktop right panel + mobile inline accordion)
+  const resultBody = route && (
+    <div className="aiv5-result-body">
+      <div className="aiv5-result-top">
+        <div className="aiv5-result-kicker">
+          {route.pills.map((p, i) => (
+            <span key={i} className="aiv5-kicker-pill">{p}</span>
+          ))}
+        </div>
+        <h3 className="aiv5-result-h">{route.title}</h3>
+        <p className="aiv5-result-desc">{route.desc}</p>
+      </div>
+
+      <div className="aiv5-result-meta">
+        {route.meta.map((m, i) => (
+          <span key={i} className="aiv5-meta-chip">{m}</span>
+        ))}
+      </div>
+
+      <div className="aiv5-route-steps">
+        {route.steps.map((s, i) => (
+          <div key={i} className="aiv5-route-step-card">
+            <div className="aiv5-step-n">{s.n}</div>
+            <strong>{s.title}</strong>
+            <p>{s.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="aiv5-result-estimate">
+        <div className="aiv5-estimate-header">
+          <span className="aiv5-estimate-label">Estimate</span>
+          <span className="aiv5-estimate-total">{route.totalEst}</span>
+        </div>
+        <div className="aiv5-estimate-rows">
+          {route.estimate.map((r, i) => (
+            <div key={i} className="aiv5-estimate-row">
+              <span>{r.label}</span>
+              <span>{r.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="aiv5-result-cta">
+        {route.note && <p className="aiv5-result-cta-note">{route.note}</p>}
+        <button
+          type="button"
+          className="aiv5-btn aiv5-btn-primary"
+          onClick={() => scrollToId('services')}
+        >
+          이 경로로 상담 문의하기
+        </button>
+        {isMobile && (
+          <div className="aiv5-mob-result-choices">
+            <button
+              type="button"
+              className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
+              onClick={() => scrollToId('services')}
+            >
+              💬 상담이 필요해요
+            </button>
+            <button
+              type="button"
+              className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
+              onClick={() => scrollToId('modules')}
+            >
+              ✓ 준비됐어요 · 교육 보기
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="aiv5-page">
@@ -2361,7 +2562,7 @@ export function CoursePage() {
               key={p.id}
               type="button"
               className={`aiv5-preset-btn${selectedState === p.id ? ' active' : ''}`}
-              onClick={() => setSelectedState(p.id)}
+              onClick={() => applyPreset(p.id)}
             >
               <span className="aiv5-preset-icon">{p.icon}</span> {p.label}
             </button>
@@ -2371,89 +2572,63 @@ export function CoursePage() {
         <div className="aiv5-diagnosis-layout">
           {/* Left: State Cards */}
           <div className="aiv5-state-panel">
-            {STATES.map(s => (
-              <button
-                key={s.id}
-                type="button"
-                className={`aiv5-state-card${selectedState === s.id ? ' active' : ''}`}
-                onClick={() => setSelectedState(s.id)}
-              >
-                <div className={`aiv5-state-icon ${s.iconClass}`}>{s.icon}</div>
-                <div className="aiv5-state-text">
-                  <strong>{s.title}</strong>
-                  <span>{s.sub}</span>
-                </div>
-                <div className="aiv5-state-arrow">›</div>
-              </button>
-            ))}
-          </div>
-
-          {/* Right: Result Panel */}
-          <div className="aiv5-result-panel">
-            {!route ? (
-              <div className="aiv5-result-empty">
-                <div className="aiv5-result-empty-inner">
-                  <div className="aiv5-result-empty-icon">🗂️</div>
-                  <strong>현재 상태를 선택해 주세요</strong>
-                  <p>선택 즉시 추천 경로, 단계별 교육 내용, 예상 비용이 표시됩니다.</p>
-                </div>
+            {/* Mobile: placeholder shown before any preset selected */}
+            {isMobile && !diagCurrentKey && (
+              <div className="aiv5-mob-diag-placeholder">
+                <div className="aiv5-mob-diag-ph-icon">🔍</div>
+                <p className="aiv5-mob-diag-ph-text">
+                  위 버튼으로 현재 상황을 선택하면<br />
+                  딱 맞는 추천 경로가 나타납니다
+                </p>
               </div>
-            ) : (
-              <div className="aiv5-result-body">
-                <div className="aiv5-result-top">
-                  <div className="aiv5-result-kicker">
-                    {route.pills.map((p, i) => (
-                      <span key={i} className="aiv5-kicker-pill">{p}</span>
-                    ))}
-                  </div>
-                  <h3 className="aiv5-result-h">{route.title}</h3>
-                  <p className="aiv5-result-desc">{route.desc}</p>
-                </div>
+            )}
 
-                <div className="aiv5-result-meta">
-                  {route.meta.map((m, i) => (
-                    <span key={i} className="aiv5-meta-chip">{m}</span>
-                  ))}
-                </div>
-
-                <div className="aiv5-route-steps">
-                  {route.steps.map((s, i) => (
-                    <div key={i} className="aiv5-route-step-card">
-                      <div className="aiv5-step-n">{s.n}</div>
-                      <strong>{s.title}</strong>
-                      <p>{s.desc}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="aiv5-result-estimate">
-                  <div className="aiv5-estimate-header">
-                    <span className="aiv5-estimate-label">Estimate</span>
-                    <span className="aiv5-estimate-total">{route.totalEst}</span>
-                  </div>
-                  <div className="aiv5-estimate-rows">
-                    {route.estimate.map((r, i) => (
-                      <div key={i} className="aiv5-estimate-row">
-                        <span>{r.label}</span>
-                        <span>{r.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="aiv5-result-cta">
-                  {route.note && <p className="aiv5-result-cta-note">{route.note}</p>}
-                  <button
-                    type="button"
-                    className="aiv5-btn aiv5-btn-primary"
-                    onClick={() => scrollToId('services')}
-                  >
-                    이 경로로 상담 문의하기
-                  </button>
+            {/* Mobile: inline accordion with route result (opens below state card) */}
+            {isMobile && diagCurrentKey && (
+              <div className={`aiv5-mob-diag-accordion${diagMobOpen ? ' open' : ''}`}>
+                <div className="aiv5-mob-diag-acc-inner">
+                  {diagMobOpen && resultBody && (
+                    <div className="aiv5-mob-result-inline">{resultBody}</div>
+                  )}
                 </div>
               </div>
             )}
+
+            {STATES
+              .filter(s => !isMobile || s.id === diagCurrentKey)
+              .map(s => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`aiv5-state-card${selectedState === s.id ? ' active' : ''}`}
+                  onClick={() => onStateCardClick(s.id)}
+                >
+                  <div className={`aiv5-state-icon ${s.iconClass}`}>{s.icon}</div>
+                  <div className="aiv5-state-text">
+                    <strong>{s.title}</strong>
+                    <span>{s.sub}</span>
+                  </div>
+                  <div className="aiv5-state-arrow">›</div>
+                </button>
+              ))}
           </div>
+
+          {/* Right: Result Panel (desktop only) */}
+          {!isMobile && (
+            <div className="aiv5-result-panel">
+              {!route ? (
+                <div className="aiv5-result-empty">
+                  <div className="aiv5-result-empty-inner">
+                    <div className="aiv5-result-empty-icon">🗂️</div>
+                    <strong>현재 상태를 선택해 주세요</strong>
+                    <p>선택 즉시 추천 경로, 단계별 교육 내용, 예상 비용이 표시됩니다.</p>
+                  </div>
+                </div>
+              ) : (
+                resultBody
+              )}
+            </div>
+          )}
         </div>
       </section>
 
