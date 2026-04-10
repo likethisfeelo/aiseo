@@ -96,14 +96,6 @@ interface PkgCard {
   tags?: string[];
 }
 
-interface AddOn {
-  code: string;
-  codeClass: string;
-  name: string;
-  desc: string;
-  price: string;
-}
-
 // ── Mobile-only types ──
 
 interface EduCard {
@@ -838,37 +830,6 @@ const PACKAGES: PkgCard[] = [
       '광고 즉시 실행 준비 완성',
     ],
     tags: ['상태 C · 광고 올인원'],
-  },
-];
-
-const ADDONS: AddOn[] = [
-  {
-    code: '001',
-    codeClass: 'pre',
-    name: 'SEO 검색노출전략 점검',
-    desc: '업종·키워드·경쟁군 분석 포함',
-    price: '+20만원',
-  },
-  {
-    code: '002',
-    codeClass: 'pre',
-    name: '홈페이지 및 콘텐츠 기획·내용 설계',
-    desc: '메뉴 구조·CTA·소개문장 설계',
-    price: '+10만원',
-  },
-  {
-    code: 'MNT 2',
-    codeClass: 'mnt',
-    name: '독립 도메인 연결 지원',
-    desc: '1회 직접 연결 대행',
-    price: '+10만원',
-  },
-  {
-    code: 'MNT 4',
-    codeClass: 'mnt',
-    name: '월간 점검 관리',
-    desc: '백업 + 월 1회 보고',
-    price: '+10만원/월',
   },
 ];
 
@@ -1763,7 +1724,7 @@ const COURSE_CSS = `
 }
 
 /* ═══════════════════════════════════════════
-   STEP 4 — PACKAGES + ADDONS
+   STEP 4 — PACKAGES
 ═══════════════════════════════════════════ */
 .aiv5-pkg-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
@@ -1818,43 +1779,6 @@ const COURSE_CSS = `
   font-family: var(--aiv5-font-en); letter-spacing: .03em;
 }
 
-.aiv5-pkg-addon-block {
-  margin-top: 20px; border: 1.5px dashed var(--accent-line);
-  border-radius: var(--r-xl); padding: 20px 24px;
-  background: rgba(196,168,245,.04);
-}
-.aiv5-pkg-addon-header { margin-bottom: 16px; }
-.aiv5-pkg-addon-label {
-  font-family: var(--aiv5-font-en); font-size: 11px; font-weight: 800;
-  letter-spacing: .08em; text-transform: uppercase; color: var(--accent-dark);
-  display: block; margin-bottom: 4px;
-}
-.aiv5-pkg-addon-sub { font-size: 13px; color: var(--text-3); }
-.aiv5-pkg-addon-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-}
-.aiv5-pkg-addon-item {
-  background: white; border: 1px solid var(--line);
-  border-radius: var(--r-md); padding: 14px;
-  display: flex; flex-direction: column; gap: 5px;
-}
-.aiv5-pkg-addon-code {
-  display: inline-flex; align-items: center;
-  font-family: var(--aiv5-font-en); font-size: 10px; font-weight: 800;
-  letter-spacing: .04em; padding: 2px 8px; border-radius: 999px;
-  width: fit-content; margin-bottom: 2px;
-}
-.aiv5-pkg-addon-code.core { background: linear-gradient(135deg,var(--accent-dark),var(--accent-deep)); color: white; }
-.aiv5-pkg-addon-code.mnt  { background: rgba(100,116,139,.12); color: #475569; border:1px solid rgba(100,116,139,.2); }
-.aiv5-pkg-addon-code.pre  { background: rgba(16,185,129,.1); color: #059669; border:1px solid rgba(16,185,129,.2); }
-.aiv5-pkg-addon-code.str  { background: rgba(245,158,11,.1); color: #B45309; border:1px solid rgba(245,158,11,.2); }
-.aiv5-pkg-addon-code.ads  { background: rgba(239,68,68,.1); color: #DC2626; border:1px solid rgba(239,68,68,.2); }
-.aiv5-pkg-addon-name { font-size: 13px; font-weight: 700; color: var(--text); }
-.aiv5-pkg-addon-desc { font-size: 12px; color: var(--text-3); line-height: 1.5; flex: 1; }
-.aiv5-pkg-addon-price {
-  font-family: var(--aiv5-font-en); font-size: 13px; font-weight: 800;
-  color: var(--accent-dark); margin-top: 6px;
-}
 .aiv5-pkg-note-row {
   margin-top: 18px; padding: 14px 18px;
   background: var(--bg-soft); border: 1px solid var(--line-soft);
@@ -2104,7 +2028,6 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
   .aiv5-route-steps { grid-template-columns: 1fr 1fr; }
   .aiv5-route-step-card:nth-child(2)::after { display: none; }
   .aiv5-pkg-grid { grid-template-columns: 1fr; }
-  .aiv5-pkg-addon-grid { grid-template-columns: repeat(2, 1fr); }
   .aiv5-cta-inner {
     grid-template-columns: 1fr;
     padding: 44px 36px;
@@ -2123,7 +2046,6 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
   .aiv5-hero-left { padding: 28px 22px; }
   .aiv5-route-steps { grid-template-columns: 1fr; }
   .aiv5-route-step-card::after { display: none; }
-  .aiv5-pkg-addon-grid { grid-template-columns: 1fr; }
   .aiv5-cta-inner { padding: 36px 24px; }
   .aiv5-cta-title { font-size: 26px; }
   .aiv5-state-panel { padding: 14px; }
@@ -2842,12 +2764,6 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
   .aiv5-pkg-name { font-size: 17px; }
   .aiv5-pkg-list li { font-size: 12px; }
   .aiv5-pkg-note-row p { font-size: 11px; }
-  .aiv5-pkg-addon-block { padding: 16px; }
-  .aiv5-pkg-addon-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .aiv5-pkg-addon-item { padding: 11px; }
-  .aiv5-pkg-addon-name { font-size: 12px; }
-  .aiv5-pkg-addon-desc { font-size: 11px; }
-  .aiv5-pkg-addon-price { font-size: 12px; }
 }
 `;
 
@@ -3877,23 +3793,6 @@ export function CoursePage() {
             ))}
           </div>
         )}
-
-        <div className="aiv5-pkg-addon-block">
-          <div className="aiv5-pkg-addon-header">
-            <span className="aiv5-pkg-addon-label">Add-on · 추가 선택 가능 항목</span>
-            <span className="aiv5-pkg-addon-sub">패키지에 개별 항목을 더해 맞춤 구성할 수 있습니다</span>
-          </div>
-          <div className="aiv5-pkg-addon-grid">
-            {ADDONS.map((a, i) => (
-              <div key={i} className="aiv5-pkg-addon-item">
-                <span className={`aiv5-pkg-addon-code ${a.codeClass}`}>{a.code}</span>
-                <span className="aiv5-pkg-addon-name">{a.name}</span>
-                <span className="aiv5-pkg-addon-desc">{a.desc}</span>
-                <span className="aiv5-pkg-addon-price">{a.price}</span>
-              </div>
-            ))}
-          </div>
-        </div>
 
         <div className="aiv5-pkg-note-row">
           <p>모든 서비스는 현재 상태와 콘텐츠 준비도에 따라 범위가 조정될 수 있습니다 · 콘텐츠 기획부터 필요한 경우 별도 견적이 추가됩니다 · 실제 광고비, 외부 툴 사용료, 도메인 구입비는 별도입니다.</p>
