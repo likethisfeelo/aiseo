@@ -794,6 +794,13 @@ const SERVICE_GROUPS: SvcGroup[] = [
   },
 ];
 
+// Flat lookup: service key → SvcItem (used by Phase 4 wizard sync + result rendering)
+const SVC_LOOKUP: Record<string, SvcItem> = (() => {
+  const map: Record<string, SvcItem> = {};
+  SERVICE_GROUPS.forEach(g => g.items.forEach(it => { map[it.id] = it; }));
+  return map;
+})();
+
 const PACKAGES: PkgCard[] = [
   {
     id: 'basic',
@@ -2458,6 +2465,322 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
     max-height: 0 !important;
   }
 }
+
+/* ═══════════════════════════════════════════
+   MOBILE JS — Phase 4: Step 3 wizard
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .aiv5-mob-wizard {
+    display: block;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--r-xl);
+    padding: 24px 20px;
+    box-shadow: var(--sh-sm);
+  }
+
+  .aiv5-wiz-progress {
+    width: 100%;
+    height: 3px;
+    background: var(--line);
+    border-radius: 999px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .aiv5-wiz-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-dark), var(--accent-deep));
+    border-radius: 999px;
+    transition: width .35s cubic-bezier(.4,0,.2,1);
+  }
+  .aiv5-wiz-step-counter {
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-4);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .aiv5-wiz-steps {
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+  }
+  .aiv5-wiz-step {
+    animation: aiv5WizFadeIn .28s ease;
+  }
+  @keyframes aiv5WizFadeIn {
+    from { opacity: 0; transform: translateX(18px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .aiv5-wiz-cat-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border-radius: var(--r-lg);
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    margin-bottom: 14px;
+  }
+  .aiv5-wiz-cat-icon { font-size: 24px; flex-shrink: 0; }
+  .aiv5-wiz-cat-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .aiv5-wiz-cat-desc {
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.5;
+  }
+  .aiv5-wiz-cat-head.is-core {
+    background: linear-gradient(135deg, rgba(139,111,212,.1), rgba(109,40,217,.05));
+    border-color: var(--accent-line);
+  }
+
+  .aiv5-wiz-svc-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: white;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-lg);
+    cursor: pointer;
+    transition: all .16s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .aiv5-wiz-svc-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 3px rgba(196,168,245,.12);
+  }
+  .aiv5-wiz-svc-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--line);
+    background: white;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    color: transparent;
+    font-weight: 800;
+    transition: all .14s;
+  }
+  .aiv5-wiz-svc-card.selected .aiv5-wiz-svc-check {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+    color: white;
+  }
+  .aiv5-wiz-svc-info { flex: 1; min-width: 0; }
+  .aiv5-wiz-svc-code {
+    font-family: var(--font-en);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-bottom: 4px;
+    display: inline-block;
+  }
+  .aiv5-wiz-svc-code.core {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent-deep));
+    color: white;
+  }
+  .aiv5-wiz-svc-code.mnt {
+    background: rgba(100,116,139,.12);
+    color: #475569;
+    border: 1px solid rgba(100,116,139,.2);
+  }
+  .aiv5-wiz-svc-code.pre {
+    background: rgba(16,185,129,.1);
+    color: #059669;
+    border: 1px solid rgba(16,185,129,.2);
+  }
+  .aiv5-wiz-svc-code.str {
+    background: rgba(245,158,11,.1);
+    color: #B45309;
+    border: 1px solid rgba(245,158,11,.2);
+  }
+  .aiv5-wiz-svc-code.ads {
+    background: rgba(239,68,68,.1);
+    color: #DC2626;
+    border: 1px solid rgba(239,68,68,.2);
+  }
+  .aiv5-wiz-svc-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 2px;
+  }
+  .aiv5-wiz-svc-price {
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-3);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .aiv5-wiz-svc-card.selected .aiv5-wiz-svc-price { color: var(--accent-dark); }
+
+  .aiv5-wiz-soft-opts {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .aiv5-wiz-result-head {
+    text-align: center;
+    padding: 20px 0 16px;
+  }
+  .aiv5-wiz-result-icon { font-size: 40px; margin-bottom: 10px; }
+  .aiv5-wiz-result-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    margin-bottom: 6px;
+  }
+  .aiv5-wiz-result-sub {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.7;
+    margin: 0;
+  }
+  .aiv5-wiz-result-empty {
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    color: var(--text-3);
+    background: var(--bg-soft);
+    border: 1px dashed var(--line);
+    border-radius: var(--r-lg);
+    margin: 16px 0;
+    line-height: 1.7;
+  }
+  .aiv5-wiz-result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .aiv5-wiz-result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-md);
+  }
+  .aiv5-wiz-result-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+  .aiv5-wiz-result-item-price {
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--accent-dark);
+  }
+  .aiv5-wiz-result-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 16px;
+    margin-top: 4px;
+    background: linear-gradient(135deg, rgba(139,111,212,.08), rgba(109,40,217,.04));
+    border: 1.5px solid var(--accent-line);
+    border-radius: var(--r-lg);
+  }
+  .aiv5-wiz-result-total-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+  .aiv5-wiz-result-total-price {
+    font-family: var(--font-en);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent-dark);
+  }
+  .aiv5-wiz-result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .aiv5-wiz-result-restart {
+    background: none;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 12px;
+    font-family: var(--font-ko);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-3);
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .aiv5-wiz-nav {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .aiv5-wiz-btn-skip {
+    flex: 1;
+    padding: 13px 12px;
+    background: var(--bg-soft);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-md);
+    font-family: var(--font-ko);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-3);
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+  }
+  .aiv5-wiz-btn-skip:active { background: var(--line-soft); }
+  .aiv5-wiz-btn-next {
+    flex: 2;
+    padding: 13px 16px;
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent-deep));
+    border: none;
+    border-radius: var(--r-md);
+    font-family: var(--font-ko);
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(109,40,217,.28);
+    transition: all .15s;
+  }
+  .aiv5-wiz-btn-next:active { transform: scale(.98); }
+  .aiv5-wiz-btn-next.is-last {
+    background: linear-gradient(135deg, #059669, #047857);
+    box-shadow: 0 6px 20px rgba(5,150,105,.28);
+  }
+
+  /* Hide PC notice on mobile */
+  .aiv5-pc-notice { display: none; }
+}
 `;
 
 // ============================================================================
@@ -2653,6 +2976,73 @@ export function CoursePage() {
     setCatCollapsedMap(prev => ({ ...prev, [catKey]: !prev[catKey] }));
   };
 
+  // ── Phase 4: Step 3 mobile wizard handlers ──
+  const wizToggle = (key: string) => {
+    setWizSelectedSet(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const wizSyncToMain = (setOverride?: Set<string>) => {
+    const src = setOverride ?? wizSelectedSet;
+    setSelectedSvcs(prev => {
+      const next = new Map(prev);
+      WIZ_STEPS.forEach(step =>
+        step.services.forEach(s => {
+          if (src.has(s.key)) {
+            const item = SVC_LOOKUP[s.key];
+            if (item) next.set(s.key, item);
+          } else {
+            next.delete(s.key);
+          }
+        }),
+      );
+      return next;
+    });
+  };
+
+  const wizNext = () => {
+    wizSyncToMain();
+    setWizCurrent(c => c + 1);
+  };
+
+  const wizBack = () => {
+    setWizCurrent(c => Math.max(0, c - 1));
+  };
+
+  const wizSoftChoice = (type: 'consult' | 'skip') => {
+    setWizSelectedSet(prev => {
+      const next = new Set(prev);
+      if (type === 'consult') next.add('__consult__' + wizCurrent);
+      WIZ_STEPS[wizCurrent]?.services.forEach(s => next.delete(s.key));
+      wizSyncToMain(next);
+      return next;
+    });
+    setWizCurrent(c => c + 1);
+  };
+
+  const wizRestart = () => {
+    setWizCurrent(0);
+    setWizSelectedSet(new Set());
+    clearServices();
+  };
+
+  const wizInquire = () => {
+    wizSyncToMain();
+    // Defer modal open so the state update flushes first
+    setTimeout(() => {
+      if ([...wizSelectedSet].some(k => !k.startsWith('__consult__'))) {
+        setModalOpen(true);
+        document.body.style.overflow = 'hidden';
+      } else {
+        alert('서비스를 하나 이상 선택해주세요.');
+      }
+    }, 0);
+  };
+
   // ── Phase 2: Step 1 mobile handlers ──
   const applyPreset = (key: string) => {
     setSelectedState(key);
@@ -2682,12 +3072,7 @@ export function CoursePage() {
   void ReactDOM;
 
   // Phase 1: mobile data/state declared but not yet consumed — suppress until later phases
-  void WIZ_STEPS;
   void MOB_TABS;
-  void wizCurrent;
-  void setWizCurrent;
-  void wizSelectedSet;
-  void setWizSelectedSet;
   void currentTab;
   void setCurrentTab;
 
@@ -3051,7 +3436,185 @@ export function CoursePage() {
           </div>
         </div>
 
-        <div className="aiv5-services-layout">
+        {/* ── Mobile: Wizard ── */}
+        {isMobile && (() => {
+          const total = WIZ_STEPS.length;
+          const isResult = wizCurrent >= total;
+          const pct = isResult ? 100 : Math.round((wizCurrent / total) * 100);
+          const step = WIZ_STEPS[wizCurrent];
+
+          // Result screen computations
+          const resultItems = [...wizSelectedSet]
+            .filter(k => !k.startsWith('__consult__'))
+            .map(k => SVC_LOOKUP[k])
+            .filter((x): x is SvcItem => !!x);
+          const resultTotal = resultItems.reduce((sum, it) => sum + it.price, 0);
+          const resultHasMonthly = resultItems.some(it => it.priceLabel.includes('월'));
+          const consultCount = [...wizSelectedSet].filter(k => k.startsWith('__consult__')).length;
+
+          return (
+            <div className="aiv5-mob-wizard">
+              <div className="aiv5-wiz-progress">
+                <div className="aiv5-wiz-progress-bar" style={{ width: pct + '%' }} />
+              </div>
+              <div className="aiv5-wiz-step-counter">
+                {isResult ? '✓ 선택 완료' : `${wizCurrent + 1} / ${total}`}
+              </div>
+
+              <div className="aiv5-wiz-steps">
+                {isResult ? (
+                  <div className="aiv5-wiz-step">
+                    <div className="aiv5-wiz-result-head">
+                      <div className="aiv5-wiz-result-icon">✨</div>
+                      <div className="aiv5-wiz-result-title">선택하신 구성</div>
+                      <p className="aiv5-wiz-result-sub">
+                        아래 내용으로 문의를 보내시면 전문 컨설턴트가 1영업일 내 연락드립니다.
+                      </p>
+                    </div>
+
+                    {resultItems.length === 0 ? (
+                      <div className="aiv5-wiz-result-empty">
+                        선택한 서비스가 없습니다.
+                        {consultCount > 0 && <><br />상담 요청 {consultCount}건이 기록됐습니다.</>}
+                      </div>
+                    ) : (
+                      <>
+                        <div className="aiv5-wiz-result-list">
+                          {resultItems.map(it => (
+                            <div key={it.id} className="aiv5-wiz-result-item">
+                              <span className="aiv5-wiz-result-item-name">{it.code} {it.name}</span>
+                              <span className="aiv5-wiz-result-item-price">{it.priceLabel}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="aiv5-wiz-result-total">
+                          <span className="aiv5-wiz-result-total-label">
+                            예상 총액 {resultHasMonthly && '(월정액 포함)'}
+                          </span>
+                          <span className="aiv5-wiz-result-total-price">
+                            {resultTotal.toLocaleString('ko-KR')}원
+                          </span>
+                        </div>
+                      </>
+                    )}
+
+                    <div className="aiv5-wiz-result-actions">
+                      <button
+                        type="button"
+                        className="aiv5-wiz-btn-next"
+                        onClick={wizInquire}
+                      >
+                        이 구성으로 문의하기 →
+                      </button>
+                      <button
+                        type="button"
+                        className="aiv5-wiz-result-restart"
+                        onClick={wizRestart}
+                      >
+                        처음부터 다시하기
+                      </button>
+                    </div>
+                  </div>
+                ) : step ? (
+                  <div className="aiv5-wiz-step">
+                    <div className={`aiv5-wiz-cat-head${step.isCore ? ' is-core' : ''}`}>
+                      <span className="aiv5-wiz-cat-icon">{step.icon}</span>
+                      <div>
+                        <div className="aiv5-wiz-cat-title">{step.cat}</div>
+                        <div className="aiv5-wiz-cat-desc">{step.desc}</div>
+                      </div>
+                    </div>
+
+                    {step.services.map(s => {
+                      const sel = wizSelectedSet.has(s.key);
+                      return (
+                        <div
+                          key={s.key}
+                          className={`aiv5-wiz-svc-card${sel ? ' selected' : ''}`}
+                          onClick={() => wizToggle(s.key)}
+                        >
+                          <div className="aiv5-wiz-svc-check">✓</div>
+                          <div className="aiv5-wiz-svc-info">
+                            <span className={`aiv5-wiz-svc-code ${s.codeType}`}>{s.code}</span>
+                            <div className="aiv5-wiz-svc-name">{s.label}</div>
+                          </div>
+                          <div className="aiv5-wiz-svc-price">{s.priceStr}</div>
+                        </div>
+                      );
+                    })}
+
+                    {step.optionType === 'pre' && (
+                      <div className="aiv5-wiz-soft-opts">
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
+                          onClick={() => wizSoftChoice('consult')}
+                        >
+                          💬 잘 모르겠어요, 상담이 필요해요
+                        </button>
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
+                          onClick={() => wizSoftChoice('skip')}
+                        >
+                          ✓ 이미 준비됐어요 · 해당없음
+                        </button>
+                      </div>
+                    )}
+                    {step.optionType === 'core1' && (
+                      <div className="aiv5-wiz-soft-opts">
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
+                          onClick={() => wizSoftChoice('skip')}
+                        >
+                          ✓ 이 단계 준비완료 · 해당없음
+                        </button>
+                      </div>
+                    )}
+                    {step.optionType === 'general' && (
+                      <div className="aiv5-wiz-soft-opts">
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
+                          onClick={() => wizSoftChoice('consult')}
+                        >
+                          💬 상담이 필요해요
+                        </button>
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
+                          onClick={() => wizSoftChoice('skip')}
+                        >
+                          ✓ 필요없음
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+
+              {!isResult && (
+                <div className="aiv5-wiz-nav">
+                  {wizCurrent > 0 && (
+                    <button type="button" className="aiv5-wiz-btn-skip" onClick={wizBack}>
+                      ← 이전 단계로
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={`aiv5-wiz-btn-next${wizCurrent === total - 1 ? ' is-last' : ''}`}
+                    onClick={wizNext}
+                  >
+                    {wizCurrent === total - 1 ? '결과 보기 ✓' : '다음 →'}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {!isMobile && <div className="aiv5-services-layout">
           <div className="aiv5-service-groups">
             {SERVICE_GROUPS.map((group, gi) => (
               <div
@@ -3128,7 +3691,7 @@ export function CoursePage() {
               실제 제안 시에는 업종, 현재 사이트 상태, 예산 규모에 따라 묶음 구성과 순서를 다시 조정할 수 있습니다.
             </div>
           </aside>
-        </div>
+        </div>}
       </section>
 
       {/* ══ STEP 4: PACKAGES ══ */}
