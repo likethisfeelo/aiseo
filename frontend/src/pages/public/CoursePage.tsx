@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import ReactDOM from 'react-dom';
 
 // ============================================================================
@@ -857,22 +857,253 @@ export function CoursePage() {
     document.head.appendChild(style);
   }, []);
 
-  // Suppress unused warnings until later phases wire them up
-  void PRESETS; void STATES; void ROUTES; void MODULES;
-  void SERVICE_GROUPS; void PACKAGES; void ADDONS;
-  void selectedState; void setSelectedState;
+  // ── Handlers ──
+  const scrollToId = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 64;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
+  const toggleSvc = (svc: SvcItem) => {
+    setSelectedSvcs(prev => {
+      const next = new Map(prev);
+      if (next.has(svc.id)) next.delete(svc.id);
+      else next.set(svc.id, svc);
+      return next;
+    });
+  };
+
+  const clearServices = () => setSelectedSvcs(new Map());
+
+  const handlePhoneChange = (v: string) => {
+    const digits = v.replace(/\D/g, '').slice(0, 11);
+    let formatted = digits;
+    if (digits.length > 3 && digits.length <= 7) {
+      formatted = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    } else if (digits.length > 7) {
+      formatted = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+    }
+    setFormPhone(formatted);
+  };
+
+  const openModal = () => {
+    if (selectedSvcs.size === 0) {
+      alert('서비스를 하나 이상 선택해주세요.');
+      return;
+    }
+    setModalOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    document.body.style.overflow = '';
+  };
+
+  const submitForm = (e: FormEvent) => {
+    e.preventDefault();
+    if (!formName.trim() || !formPhone.trim()) {
+      alert('이름과 연락처를 입력해주세요.');
+      return;
+    }
+    const name = formName;
+    closeModal();
+    clearServices();
+    setFormName('');
+    setFormPhone('');
+    setFormEmail('');
+    setFormMemo('');
+    alert(`${name}님, 상담 신청이 완료되었습니다.\n1영업일 내 연락드리겠습니다.`);
+  };
+
+  const totalSelected = [...selectedSvcs.values()].reduce((sum, s) => sum + s.price, 0);
+  const totalLabel = totalSelected.toLocaleString('ko-KR') + '원';
+  const hasMonthly = [...selectedSvcs.values()].some(s => s.priceLabel.includes('월'));
+
+  // Suppress unused warnings until Phase 7-8 wire them up
+  void MODULES; void SERVICE_GROUPS; void PACKAGES; void ADDONS;
   void openAccId; void setOpenAccId;
-  void selectedSvcs; void setSelectedSvcs;
-  void modalOpen; void setModalOpen;
-  void formName; void setFormName;
-  void formPhone; void setFormPhone;
+  void modalOpen;
   void formEmail; void setFormEmail;
   void formMemo; void setFormMemo;
+  void toggleSvc; void clearServices; void handlePhoneChange;
+  void openModal; void closeModal; void submitForm;
+  void totalLabel; void hasMonthly;
   void ReactDOM;
+
+  const route = selectedState ? ROUTES[selectedState] : null;
 
   return (
     <div className="aiv5-page">
-      {/* Phase 1 skeleton — sections rendered in later phases */}
+      {/* ══ HERO ══ */}
+      <div className="aiv5-hero">
+        <div className="aiv5-hero-left">
+          <span className="aiv5-eyebrow">AI로 쉽게 만들고, 제대로 된 SEO로 — 구독료 없이</span>
+          <h1 className="aiv5-hero-h1">
+            지금 당장 필요한 것만<br />
+            맞춤형으로 <em>배우고, 바로 실행하세요.</em>
+          </h1>
+          <p className="aiv5-hero-desc">
+            비싼 에이전시도, 매달 나가는 구독료도 필요 없습니다.
+            AI로 직접 만들고, 검색으로 고객이 먼저 찾아오는 구조를 만드는 법을 배웁니다.
+            어디서 막혔는지 고르면 거기서 바로 시작할 수 있습니다.
+          </p>
+          <div className="aiv5-hero-btns">
+            <button className="aiv5-btn aiv5-btn-primary" onClick={() => scrollToId('diagnosis')}>
+              내 상태 진단하기 →
+            </button>
+            <button className="aiv5-btn aiv5-btn-ghost" onClick={() => scrollToId('services')}>
+              개별 서비스 보기
+            </button>
+          </div>
+        </div>
+
+        <div className="aiv5-hero-right">
+          <p className="aiv5-hero-right-title">Instructor · 강사 소개</p>
+
+          <div className="aiv5-instructor-card">
+            <div className="aiv5-instructor-avatar av-philo">P</div>
+            <div className="aiv5-instructor-info">
+              <div className="aiv5-instructor-name">
+                Philo <span className="aiv5-instructor-role">마케팅 · SEO</span>
+              </div>
+              <ul className="aiv5-instructor-list">
+                <li>온라인 마케팅 전문 경력 10년+, 2016 대한민국마케팅앱대상 수상</li>
+                <li>한국지능정보사회교육원 데잇걸즈4 마케팅 운영 · 서울시청년청 데이터 드리븐 마케팅 컨설턴트</li>
+                <li>대구연구특구 마케팅 멘토 · SEO 기반 인바운드 마케팅 전문</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="aiv5-instructor-card">
+            <div className="aiv5-instructor-avatar av-jin">J</div>
+            <div className="aiv5-instructor-info">
+              <div className="aiv5-instructor-name">
+                Jin <span className="aiv5-instructor-role">PM · 기획</span>
+              </div>
+              <ul className="aiv5-instructor-list">
+                <li>IT 프로덕트 기획 및 PM · 글로벌 IT 서비스 PM</li>
+                <li>AI 아트데이터 공공서비스 (이미지 키워드 분석) QA</li>
+                <li>사용자 중심 서비스 QA 및 운영 전문</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ══ STEP 1: DIAGNOSIS ══ */}
+      <section className="aiv5-section" id="diagnosis">
+        <div className="aiv5-section-head">
+          <div className="aiv5-step-badge"><span className="aiv5-step-dot"></span> Step 1</div>
+          <h2 className="aiv5-section-title">맞춤형 진단</h2>
+          <p className="aiv5-section-sub">현재 상황을 고르면 무엇부터 해야 하는지, 얼마나 걸리는지 바로 확인됩니다.</p>
+        </div>
+
+        {/* Quick Presets */}
+        <div className="aiv5-preset-row">
+          {PRESETS.map(p => (
+            <button
+              key={p.id}
+              type="button"
+              className={`aiv5-preset-btn${selectedState === p.id ? ' active' : ''}`}
+              onClick={() => setSelectedState(p.id)}
+            >
+              <span className="aiv5-preset-icon">{p.icon}</span> {p.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="aiv5-diagnosis-layout">
+          {/* Left: State Cards */}
+          <div className="aiv5-state-panel">
+            {STATES.map(s => (
+              <button
+                key={s.id}
+                type="button"
+                className={`aiv5-state-card${selectedState === s.id ? ' active' : ''}`}
+                onClick={() => setSelectedState(s.id)}
+              >
+                <div className={`aiv5-state-icon ${s.iconClass}`}>{s.icon}</div>
+                <div className="aiv5-state-text">
+                  <strong>{s.title}</strong>
+                  <span>{s.sub}</span>
+                </div>
+                <div className="aiv5-state-arrow">›</div>
+              </button>
+            ))}
+          </div>
+
+          {/* Right: Result Panel */}
+          <div className="aiv5-result-panel">
+            {!route ? (
+              <div className="aiv5-result-empty">
+                <div className="aiv5-result-empty-inner">
+                  <div className="aiv5-result-empty-icon">🗂️</div>
+                  <strong>현재 상태를 선택해 주세요</strong>
+                  <p>선택 즉시 추천 경로, 단계별 교육 내용, 예상 비용이 표시됩니다.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="aiv5-result-body">
+                <div className="aiv5-result-top">
+                  <div className="aiv5-result-kicker">
+                    {route.pills.map((p, i) => (
+                      <span key={i} className="aiv5-kicker-pill">{p}</span>
+                    ))}
+                  </div>
+                  <h3 className="aiv5-result-h">{route.title}</h3>
+                  <p className="aiv5-result-desc">{route.desc}</p>
+                </div>
+
+                <div className="aiv5-result-meta">
+                  {route.meta.map((m, i) => (
+                    <span key={i} className="aiv5-meta-chip">{m}</span>
+                  ))}
+                </div>
+
+                <div className="aiv5-route-steps">
+                  {route.steps.map((s, i) => (
+                    <div key={i} className="aiv5-route-step-card">
+                      <div className="aiv5-step-n">{s.n}</div>
+                      <strong>{s.title}</strong>
+                      <p>{s.desc}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="aiv5-result-estimate">
+                  <div className="aiv5-estimate-header">
+                    <span className="aiv5-estimate-label">Estimate</span>
+                    <span className="aiv5-estimate-total">{route.totalEst}</span>
+                  </div>
+                  <div className="aiv5-estimate-rows">
+                    {route.estimate.map((r, i) => (
+                      <div key={i} className="aiv5-estimate-row">
+                        <span>{r.label}</span>
+                        <span>{r.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="aiv5-result-cta">
+                  {route.note && <p className="aiv5-result-cta-note">{route.note}</p>}
+                  <button
+                    type="button"
+                    className="aiv5-btn aiv5-btn-primary"
+                    onClick={() => scrollToId('services')}
+                  >
+                    이 경로로 상담 문의하기
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Step 2/3/4/CTA/modal rendered in later phases */}
     </div>
   );
 }
