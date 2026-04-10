@@ -104,6 +104,51 @@ interface AddOn {
   price: string;
 }
 
+// ── Mobile-only types ──
+
+interface EduCard {
+  code: string;
+  codeType: 'pre' | 'core' | 'mnt' | 'str' | 'ads';
+  cat: string;
+  name: string;
+  price: string;
+  desc: string;
+  tags: string[];
+}
+
+interface EduSection {
+  id: string;
+  label: string;
+  icon: string;
+  highlight?: boolean;
+  cards: EduCard[];
+}
+
+interface WizService {
+  key: string;
+  code: string;
+  codeType: 'pre' | 'core' | 'mnt' | 'str' | 'ads';
+  label: string;
+  price: number;
+  priceStr: string;
+  monthly?: boolean;
+}
+
+interface WizStep {
+  cat: string;
+  icon: string;
+  isCore?: boolean;
+  optionType: 'pre' | 'core1' | 'general';
+  desc: string;
+  services: WizService[];
+}
+
+interface MobTab {
+  id: string;
+  icon: string;
+  label: string;
+}
+
 // ============================================================================
 // Data (populated in later phases)
 // ============================================================================
@@ -824,6 +869,254 @@ const ADDONS: AddOn[] = [
     desc: '백업 + 월 1회 보고',
     price: '+10만원/월',
   },
+];
+
+// ============================================================================
+// Mobile data (Phase 1 — 모바일 JS 전용)
+// ============================================================================
+
+const EDU_SECTIONS: EduSection[] = [
+  {
+    id: 'edu-pre',
+    label: '사전준비',
+    icon: '🔍',
+    highlight: false,
+    cards: [
+      {
+        code: '001',
+        codeType: 'pre',
+        cat: 'Pre-launch',
+        name: 'SEO 검색노출전략 점검',
+        price: '20만원',
+        tags: ['#업종분석', '#키워드전략', '#경쟁군분석'],
+        desc: '홈페이지 제작 전 업종·키워드·경쟁군을 분석해 검색 전략을 먼저 잡습니다.',
+      },
+      {
+        code: '002',
+        codeType: 'pre',
+        cat: 'Pre-launch',
+        name: '홈페이지 및 콘텐츠 기획·내용 설계',
+        price: '20만원',
+        tags: ['#메뉴구조', '#CTA작성', '#콘텐츠기획'],
+        desc: '홈페이지에 담을 내용의 구조와 문장을 설계합니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-core1',
+    label: 'CORE 1',
+    icon: '⭐',
+    highlight: true,
+    cards: [
+      {
+        code: 'CORE 1',
+        codeType: 'core',
+        cat: 'Deployment',
+        name: 'AI 홈페이지 즉시 배포 + 기술적 SEO 셋팅',
+        price: '10만원',
+        tags: ['#즉시배포', '#서치콘솔', '#GA4연동'],
+        desc: 'AI 홈페이지를 배포하고 Search Console·GA4·네이버까지 한 번에 세팅합니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-core2',
+    label: 'CORE 2',
+    icon: '⭐',
+    highlight: true,
+    cards: [
+      {
+        code: 'CORE 2',
+        codeType: 'core',
+        cat: 'Paid Ads',
+        name: '구글·메타 광고 고급 세팅 교육',
+        price: '50만원',
+        tags: ['#픽셀', '#GA4', '#캠페인'],
+        desc: '픽셀·전환 추적 설정부터 캠페인 구조 설계까지 실전 교육입니다.',
+      },
+      {
+        code: '201',
+        codeType: 'ads',
+        cat: 'Ads Package',
+        name: '광고 실행 준비 패키지',
+        price: '100만원',
+        tags: ['#AI소재', '#5회'],
+        desc: 'AI 도구로 소재 5종 제작, 5회 진행 후 바로 광고 집행 가능합니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-core3',
+    label: 'CORE 3',
+    icon: '⭐',
+    highlight: true,
+    cards: [
+      {
+        code: 'CORE 3',
+        codeType: 'core',
+        cat: 'Automation',
+        name: '인스타·네이버 자동화 교육',
+        price: '30만원',
+        tags: ['#노코드', '#자동화'],
+        desc: '노코드 툴로 SNS 게시·알림·운영을 자동화하는 구조를 만듭니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-mnt',
+    label: 'MNT',
+    icon: '🔧',
+    highlight: false,
+    cards: [
+      {
+        code: 'MNT 1',
+        codeType: 'mnt',
+        cat: 'Maintenance',
+        name: '독립 도메인 직접 연결 교육',
+        price: '10만원',
+        tags: ['#Route53', '#DNS'],
+        desc: '브랜드 도메인을 직접 연결하는 방법을 익힙니다.',
+      },
+      {
+        code: 'MNT 2',
+        codeType: 'mnt',
+        cat: 'Maintenance',
+        name: '독립 도메인 연결 지원',
+        price: '10만원',
+        tags: ['#1회대행'],
+        desc: '직접 진행하기 어려울 경우 1회 대행 지원합니다.',
+      },
+      {
+        code: 'MNT 3',
+        codeType: 'mnt',
+        cat: 'Maintenance',
+        name: '후속 기술 지원',
+        price: '10만원',
+        tags: ['#오픈후관리'],
+        desc: '오픈 후 문제 발생 시 빠른 기술 지원을 제공합니다.',
+      },
+      {
+        code: 'MNT 4',
+        codeType: 'mnt',
+        cat: 'Maintenance',
+        name: '월간 점검 관리',
+        price: '월 10만원',
+        tags: ['#월정기관리', '#백업'],
+        desc: '월 1회 백업 및 상태 점검 보고서를 제공합니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-str',
+    label: '전략 · 컨설팅',
+    icon: '💡',
+    highlight: false,
+    cards: [
+      {
+        code: '101',
+        codeType: 'str',
+        cat: 'Consulting',
+        name: '1:1 성장 로드맵 컨설팅',
+        price: '20만원',
+        tags: ['#맞춤전략', '#로드맵'],
+        desc: '현재 상태와 예산을 기반으로 단계별 실행 로드맵을 설계합니다.',
+      },
+      {
+        code: '102',
+        codeType: 'str',
+        cat: 'Strategy',
+        name: 'SEO 전략 정리·마케팅 방향 수립',
+        price: '10만원',
+        tags: ['#검색유입', '#키워드'],
+        desc: '페이지 구조와 키워드 전략을 SEO 관점에서 재정비합니다.',
+      },
+    ],
+  },
+];
+
+const WIZ_STEPS: WizStep[] = [
+  {
+    cat: '사전준비',
+    icon: '🔍',
+    isCore: false,
+    optionType: 'pre',
+    desc: '홈페이지 제작 전, 검색 전략과 콘텐츠 구조를 먼저 잡는 단계입니다.',
+    services: [
+      { key: 'sp1', code: '001', codeType: 'pre', label: 'SEO 검색노출전략 점검', price: 200000, priceStr: '20만원' },
+      { key: 'sp2', code: '002', codeType: 'pre', label: '홈페이지 및 콘텐츠 기획·내용 설계', price: 200000, priceStr: '20만원' },
+    ],
+  },
+  {
+    cat: 'CORE 1',
+    icon: '⭐',
+    isCore: true,
+    optionType: 'core1',
+    desc: 'AI 홈페이지를 실제 웹에 올리고 기술적 SEO까지 한 번에 완성하는 핵심 교육입니다.',
+    services: [
+      { key: 's1', code: 'CORE 1', codeType: 'core', label: 'AI 홈페이지 즉시 배포 + 기술적 SEO 셋팅', price: 100000, priceStr: '10만원' },
+    ],
+  },
+  {
+    cat: 'MNT — 도메인·유지관리',
+    icon: '🔧',
+    isCore: false,
+    optionType: 'general',
+    desc: '독립 도메인 연결부터 월간 점검까지, 사이트 운영을 이어가는 서비스입니다.',
+    services: [
+      { key: 's2', code: 'MNT 1', codeType: 'mnt', label: '독립 도메인 직접 연결 교육', price: 100000, priceStr: '10만원' },
+      { key: 's3', code: 'MNT 2', codeType: 'mnt', label: '독립 도메인 연결 지원', price: 100000, priceStr: '10만원' },
+      { key: 's4', code: 'MNT 3', codeType: 'mnt', label: '후속 기술 지원', price: 100000, priceStr: '10만원' },
+      { key: 's5', code: 'MNT 4', codeType: 'mnt', label: '월간 점검 관리', price: 100000, priceStr: '월 10만원', monthly: true },
+    ],
+  },
+  {
+    cat: '전략 · 컨설팅',
+    icon: '💡',
+    isCore: false,
+    optionType: 'general',
+    desc: '검색 유입 구조와 마케팅 로드맵을 설계하는 단계입니다.',
+    services: [
+      { key: 's6', code: '101', codeType: 'str', label: '1:1 성장 로드맵 컨설팅', price: 200000, priceStr: '20만원' },
+      { key: 's7', code: '102', codeType: 'str', label: 'SEO · 마케팅 전략 정리', price: 100000, priceStr: '10만원' },
+    ],
+  },
+  {
+    cat: 'CORE 2',
+    icon: '⭐',
+    isCore: true,
+    optionType: 'general',
+    desc: '구글·메타 광고 구조를 직접 세팅하고 데이터를 읽는 핵심 실습 교육입니다.',
+    services: [
+      { key: 's8', code: 'CORE 2', codeType: 'core', label: '구글 · 메타 광고 고급 세팅 교육', price: 500000, priceStr: '50만원' },
+    ],
+  },
+  {
+    cat: '광고 실행 준비',
+    icon: '🎯',
+    isCore: false,
+    optionType: 'general',
+    desc: 'AI 도구로 소재를 제작하고 광고를 바로 집행할 수 있는 상태로 만드는 패키지입니다.',
+    services: [
+      { key: 's9', code: '201', codeType: 'ads', label: '광고 실행 준비 패키지', price: 1000000, priceStr: '100만원' },
+    ],
+  },
+  {
+    cat: 'CORE 3',
+    icon: '⭐',
+    isCore: true,
+    optionType: 'general',
+    desc: '콘텐츠를 한 번 만들면 여러 채널에 자동으로 올라가는 구조를 만드는 핵심 교육입니다.',
+    services: [
+      { key: 's10', code: 'CORE 3', codeType: 'core', label: '인스타 · 네이버 자동화 교육', price: 300000, priceStr: '30만원' },
+    ],
+  },
+];
+
+const MOB_TABS: MobTab[] = [
+  { id: 'diagnosis', icon: '🔍', label: '진단' },
+  { id: 'modules', icon: '📚', label: '교육' },
+  { id: 'services', icon: '✅', label: '서비스' },
+  { id: 'packages', icon: '📦', label: '패키지' },
 ];
 
 // ============================================================================
@@ -1870,6 +2163,17 @@ export function CoursePage() {
   const [formEmail, setFormEmail] = useState('');
   const [formMemo, setFormMemo] = useState('');
 
+  // ── Mobile state (Phase 1) ──
+  const [isMobile, setIsMobile] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.innerWidth <= 768,
+  );
+  const [diagCurrentKey, setDiagCurrentKey] = useState<string | null>(null);
+  const [diagMobOpen, setDiagMobOpen] = useState<boolean>(false);
+  const [catCollapsedMap, setCatCollapsedMap] = useState<Record<string, boolean>>({});
+  const [wizCurrent, setWizCurrent] = useState<number>(0);
+  const [wizSelectedSet, setWizSelectedSet] = useState<Set<string>>(new Set());
+  const [currentTab, setCurrentTab] = useState<string>('diagnosis');
+
   useEffect(() => {
     const styleId = 'aiv5-course-styles';
     if (document.getElementById(styleId)) return;
@@ -1878,6 +2182,24 @@ export function CoursePage() {
     style.textContent = COURSE_CSS;
     document.head.appendChild(style);
   }, []);
+
+  // ── Resize listener: breakpoint detection ──
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // ── Reset mobile-only state when crossing breakpoint back to desktop ──
+  useEffect(() => {
+    if (!isMobile) {
+      setDiagMobOpen(false);
+      setDiagCurrentKey(null);
+      setWizCurrent(0);
+      setWizSelectedSet(new Set());
+      setCatCollapsedMap({});
+    }
+  }, [isMobile]);
 
   // ── Handlers ──
   const scrollToId = (id: string) => {
@@ -1945,6 +2267,24 @@ export function CoursePage() {
 
   // Suppress unused warnings until Phase 8 wires them up
   void ReactDOM;
+
+  // Phase 1: mobile data/state declared but not yet consumed — suppress until Phase 2+
+  void EDU_SECTIONS;
+  void WIZ_STEPS;
+  void MOB_TABS;
+  void diagCurrentKey;
+  void setDiagCurrentKey;
+  void diagMobOpen;
+  void setDiagMobOpen;
+  void catCollapsedMap;
+  void setCatCollapsedMap;
+  void wizCurrent;
+  void setWizCurrent;
+  void wizSelectedSet;
+  void setWizSelectedSet;
+  void currentTab;
+  void setCurrentTab;
+  void isMobile;
 
   const route = selectedState ? ROUTES[selectedState] : null;
 
