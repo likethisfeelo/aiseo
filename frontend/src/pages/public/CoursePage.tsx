@@ -508,10 +508,323 @@ const MODULES: AccCategory[] = [
       },
     ],
   },
+  // ── CORE 2 ──
+  {
+    icon: '⭐',
+    title: 'CORE 2 — 핵심 교육',
+    sub: '광고 구조를 직접 세팅하고 데이터를 읽는 핵심 실습입니다',
+    core: true,
+    items: [
+      {
+        id: 'acc-5',
+        num: 'CORE 2',
+        numClass: 'is-core',
+        chip: 'CORE 2 · Paid Ads',
+        chipClass: 'core',
+        name: '구글 · 메타 광고 고급 세팅 교육',
+        tags: ['#픽셀세팅', '#캠페인구조', '#전환최적화'],
+        price: '50만원',
+        desc: '광고를 "켜두는" 것이 아니라, 데이터를 보고 성과가 나는 지점을 찾아 확장하는 구조를 만듭니다. 구글 Ads와 메타 광고를 동시에 다루며, 두 플랫폼의 알고리즘 차이와 역할 분리 전략을 함께 배웁니다.\n\n픽셀 및 전환 추적 설정부터 캠페인 구조 설계, 타겟 세팅, 예산 배분, 실제 데이터 읽는 법까지 실전 중심으로 진행합니다.',
+        whoTitle: '이런 분께 추천합니다',
+        who: [
+          '광고를 집행해봤지만 ROAS가 낮고 이유를 모르는 분',
+          '에이전시 없이 직접 광고를 운영하고 싶은 분',
+          'GA4·픽셀 세팅이 안 되어 있어 데이터가 안 쌓이는 분',
+        ],
+        learnTitle: '배우게 되는 것',
+        learn: [
+          '메타 픽셀 · GA4 · GTM 연동 및 전환 이벤트 설정',
+          '구글 검색·디스플레이 캠페인 구조 설계',
+          '메타 타겟 세그먼트 · 유사 타겟 설정',
+          '예산 배분 공식 및 소재 A/B 테스트 방법',
+          '광고 데이터 읽는 법 (CTR · CPC · ROAS 해석)',
+        ],
+        metaChips: ['⏱ 약 120~150분', '💻 화상 실습', '📋 세팅 체크리스트'],
+      },
+      {
+        id: 'acc-8',
+        num: '201',
+        chip: '201 · Ads Package',
+        chipClass: 'ads',
+        name: '광고 실행 준비 패키지',
+        tags: ['#소재제작', '#5회진행', '#즉시실행'],
+        price: '100만원 (5회)',
+        desc: '광고를 당장 집행할 수 있는 상태로 만드는 패키지입니다. 5회에 걸쳐 전략 설계부터 소재 5종 제작까지 순차적으로 진행하며, 세션이 끝날 때 바로 광고를 켤 수 있는 준비를 완성합니다.\n\n소재 제작은 단순 디자인이 아닙니다. ChatGPT · Claude · Midjourney · Canva AI · CapCut AI 등 다양한 AI 도구를 조합해 텍스트·이미지·영상 소재를 빠르게 뽑아내는 방법을 함께 익힙니다. AI를 활용하면 에이전시 비용의 일부로 고품질 소재를 직접 만들 수 있습니다.',
+        whoTitle: '이런 분께 추천합니다',
+        who: [
+          '광고를 처음 시작하고 소재부터 세팅까지 한 번에 준비하고 싶은 분',
+          '광고 소재 제작 역량이 부족해 집행을 미루고 있던 분',
+        ],
+        learnTitle: '포함 내용',
+        learn: [
+          '광고 전략 방향 설계 — 채널 선정·타겟·예산 (1회)',
+          'AI 카피라이팅 — ChatGPT·Claude로 광고 문구 대량 생성 (1회)',
+          'AI 이미지·영상 소재 제작 — Midjourney·Canva AI·CapCut AI 활용 (2회)',
+          '캠페인 구조 세팅 및 소재 업로드·최종 점검 (1회)',
+        ],
+        metaChips: ['⏱ 총 5회', '💻 화상 + 작업', '🎨 소재 5종 포함'],
+      },
+    ],
+  },
+  // ── CORE 3 ──
+  {
+    icon: '⭐',
+    title: 'CORE 3 — 핵심 교육',
+    sub: '콘텐츠 운영을 자동화하는 핵심 실습입니다',
+    core: true,
+    items: [
+      {
+        id: 'acc-6',
+        num: 'CORE 3',
+        numClass: 'is-core',
+        chip: 'CORE 3 · Automation',
+        chipClass: 'core',
+        name: '인스타 · 네이버 게시 자동화 교육',
+        tags: ['#노코드', '#게시자동화', '#운영효율'],
+        price: '30만원',
+        desc: '콘텐츠를 한 번 만들면 여러 채널에 자동으로 올라가는 구조를 만듭니다. 노코드 기반 자동화 툴(Make, Zapier 등)을 활용해 인스타그램 예약 게시, 네이버 블로그 연동, 문의 접수 → 알림 워크플로우까지 설계합니다.\n\n반복 업무를 줄이고 운영에 쓸 시간을 확보하는 것이 핵심입니다.',
+        whoTitle: '이런 분께 추천합니다',
+        who: [
+          '매일 SNS 게시물을 올리는 것이 부담스러운 분',
+          '콘텐츠는 있는데 업로드 루틴이 없어 중단되는 분',
+          '코딩 없이 업무 자동화를 처음 시도해보고 싶은 분',
+        ],
+        learnTitle: '배우게 되는 것',
+        learn: [
+          'Make(Integromat) / Zapier 기본 워크플로우 구조',
+          '인스타그램 예약 게시 자동화 설정',
+          '노션·구글 시트 → SNS 게시 연동 파이프라인',
+          '문의 폼 → 카카오·슬랙 알림 자동화',
+          '자동화 시나리오 오류 모니터링 방법',
+        ],
+        metaChips: ['⏱ 약 90~120분', '💻 화상 실습', '🔧 워크플로우 템플릿'],
+      },
+    ],
+  },
 ];
-const SERVICE_GROUPS: SvcGroup[] = [];
-const PACKAGES: PkgCard[] = [];
-const ADDONS: AddOn[] = [];
+const SERVICE_GROUPS: SvcGroup[] = [
+  {
+    icon: '🔍',
+    title: '사전준비',
+    items: [
+      {
+        id: 'sp1',
+        code: '001',
+        codeClass: 'pre',
+        name: 'SEO 검색노출전략 점검',
+        desc: '업종 포지셔닝·경쟁군 분석·메인/서브 키워드 선정·검색 의도 분류',
+        price: 200000,
+        priceLabel: '20만원',
+      },
+      {
+        id: 'sp2',
+        code: '002',
+        codeClass: 'pre',
+        name: '홈페이지 및 콘텐츠 기획·내용 설계',
+        desc: '홈페이지 구조·서비스 설명·소개 문장/CTA·콘텐츠 방향 설계',
+        price: 200000,
+        priceLabel: '20만원',
+      },
+    ],
+  },
+  {
+    icon: '⭐',
+    title: 'CORE 1',
+    items: [
+      {
+        id: 's1',
+        code: 'CORE 1',
+        codeClass: 'core',
+        name: 'AI 홈페이지 즉시 배포 + 기술적 SEO 셋팅',
+        desc: 'ZIP 업로드, 서브도메인 배포, 기본 SEO/측정코드 설정 실습',
+        price: 100000,
+        priceLabel: '10만원',
+      },
+    ],
+  },
+  {
+    icon: '🔧',
+    title: 'MNT — 도메인 연결 · 유지관리',
+    items: [
+      {
+        id: 's2',
+        code: 'MNT 1',
+        codeClass: 'mnt',
+        name: '독립 도메인 직접 연결 교육',
+        desc: 'Route 53 기반 도메인 직접 연결 실습 (40~60분)',
+        price: 100000,
+        priceLabel: '10만원',
+      },
+      {
+        id: 's3',
+        code: 'MNT 2',
+        codeClass: 'mnt',
+        name: '독립 도메인 연결 지원',
+        desc: '1회 직접 연결 지원, 유지보수 의무 없음',
+        price: 100000,
+        priceLabel: '10만원',
+      },
+      {
+        id: 's4',
+        code: 'MNT 3',
+        codeClass: 'mnt',
+        name: '후속 기술 지원',
+        desc: '오픈 후 문제 발생 시 추가 지원/상담 (약 40분)',
+        price: 100000,
+        priceLabel: '10만원',
+      },
+      {
+        id: 's5',
+        code: 'MNT 4',
+        codeClass: 'mnt',
+        name: '월간 점검 관리',
+        desc: '월 1회 백업 + 월 1회 점검/보고',
+        price: 100000,
+        priceLabel: '월 10만원',
+      },
+    ],
+  },
+  {
+    icon: '💡',
+    title: '전략 · 컨설팅',
+    items: [
+      {
+        id: 's6',
+        code: '101',
+        codeClass: 'str',
+        name: '1:1 성장 로드맵 컨설팅',
+        desc: '검색 현황, 경쟁 분석, SEO 방향, 타겟, 예산별 전략 / 30분 × 3회',
+        price: 200000,
+        priceLabel: '20만원',
+      },
+      {
+        id: 's7',
+        code: '102',
+        codeClass: 'str',
+        name: 'SEO · 마케팅 전략 정리',
+        desc: '로드맵이 있는 고객 대상, SEO 및 예산별 전략 1회 정리',
+        price: 100000,
+        priceLabel: '10만원',
+      },
+    ],
+  },
+  {
+    icon: '⭐',
+    title: 'CORE 2',
+    items: [
+      {
+        id: 's8',
+        code: 'CORE 2',
+        codeClass: 'core',
+        name: '구글 · 메타 광고 고급 세팅 교육',
+        desc: '전환, 픽셀, 캠페인 구조, 타겟/예산 설정 등 실전 교육',
+        price: 500000,
+        priceLabel: '50만원',
+      },
+      {
+        id: 's9',
+        code: '201',
+        codeClass: 'ads',
+        name: '광고 실행 준비 패키지',
+        desc: '총 5회, 광고 소재 5종 제작 포함',
+        price: 1000000,
+        priceLabel: '100만원',
+      },
+    ],
+  },
+  {
+    icon: '⭐',
+    title: 'CORE 3',
+    items: [
+      {
+        id: 's10',
+        code: 'CORE 3',
+        codeClass: 'core',
+        name: '인스타 · 네이버 자동화 교육',
+        desc: '기존 콘텐츠가 정리된 고객 대상 자동화 실습',
+        price: 300000,
+        priceLabel: '30만원',
+      },
+    ],
+  },
+];
+
+const PACKAGES: PkgCard[] = [
+  {
+    id: 'basic',
+    tier: 'Basic',
+    name: '기본 패키지',
+    price: '100만원',
+    duration: '3~4주 완성',
+    includes: [
+      '1:1 성장 로드맵 컨설팅 (30분 × 3회)',
+      'SEO 전략 정리',
+      'AI 홈페이지 즉시 배포 교육',
+      '독립 도메인 연결 교육',
+      'SNS 자동화 기초 교육',
+    ],
+    tags: ['Z1 · Z2 · A · B 최적 시작점'],
+  },
+  {
+    id: 'standard',
+    featured: true,
+    tier: 'Standard',
+    name: '표준 패키지',
+    price: '150만원',
+    duration: '4~6주 완성',
+    includes: [
+      '기본 패키지 전체 포함',
+      '구글·메타 광고 고급 세팅 교육',
+      'GA4 · GTM · 픽셀 세팅',
+      '캠페인 구조 · 타겟·예산 컨설팅',
+    ],
+    tags: ['SEO → 광고 풀 셋업 완성'],
+  },
+  {
+    id: 'extended',
+    tier: 'Extended',
+    name: '확장 패키지',
+    price: '200~300만원',
+    duration: '5~8주 완성',
+    includes: [
+      '표준 패키지 전체 포함',
+      '광고 소재 5종 제작 포함',
+      '광고 즉시 실행 준비 완성',
+    ],
+    tags: ['상태 C · 광고 올인원'],
+  },
+];
+
+const ADDONS: AddOn[] = [
+  {
+    code: '001',
+    codeClass: 'pre',
+    name: 'SEO 검색노출전략 점검',
+    desc: '업종·키워드·경쟁군 분석 포함',
+    price: '+20만원',
+  },
+  {
+    code: '002',
+    codeClass: 'pre',
+    name: '홈페이지 및 콘텐츠 기획·내용 설계',
+    desc: '메뉴 구조·CTA·소개문장 설계',
+    price: '+10만원',
+  },
+  {
+    code: 'MNT 2',
+    codeClass: 'mnt',
+    name: '독립 도메인 연결 지원',
+    desc: '1회 직접 연결 대행',
+    price: '+10만원',
+  },
+  {
+    code: 'MNT 4',
+    codeClass: 'mnt',
+    name: '월간 점검 관리',
+    desc: '백업 + 월 1회 보고',
+    price: '+10만원/월',
+  },
+];
 
 // ============================================================================
 // Scoped CSS (populated in Phase 9-10)
