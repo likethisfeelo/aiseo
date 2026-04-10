@@ -2781,6 +2781,62 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
   /* Hide PC notice on mobile */
   .aiv5-pc-notice { display: none; }
 }
+
+/* ═══════════════════════════════════════════
+   MOBILE JS — Phase 5: Step 4 pkg swipe carousel
+═══════════════════════════════════════════ */
+.aiv5-pkg-swipe-dots {
+  display: none;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+.aiv5-pkg-dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--line);
+  transition: all .2s;
+  cursor: pointer;
+}
+.aiv5-pkg-dot.active {
+  background: var(--accent-dark);
+  width: 18px;
+  border-radius: 999px;
+}
+@media (max-width: 768px) {
+  .aiv5-pkg-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding: 4px 0 12px;
+    margin-top: 20px;
+    scroll-padding-left: 0;
+  }
+  .aiv5-pkg-grid::-webkit-scrollbar { display: none; }
+  .aiv5-pkg-card {
+    flex: 0 0 85vw;
+    scroll-snap-align: center;
+    border-radius: var(--r-xl);
+    padding: 22px 20px;
+  }
+  .aiv5-pkg-swipe-dots { display: flex; }
+  .aiv5-pkg-price { font-size: 28px; }
+  .aiv5-pkg-name { font-size: 17px; }
+  .aiv5-pkg-list li { font-size: 12px; }
+  .aiv5-pkg-note-row p { font-size: 11px; }
+  .aiv5-pkg-addon-block { padding: 16px; }
+  .aiv5-pkg-addon-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .aiv5-pkg-addon-item { padding: 11px; }
+  .aiv5-pkg-addon-name { font-size: 12px; }
+  .aiv5-pkg-addon-desc { font-size: 11px; }
+  .aiv5-pkg-addon-price { font-size: 12px; }
+}
 `;
 
 // ============================================================================
@@ -2879,6 +2935,9 @@ export function CoursePage() {
   const [wizCurrent, setWizCurrent] = useState<number>(0);
   const [wizSelectedSet, setWizSelectedSet] = useState<Set<string>>(new Set());
   const [currentTab, setCurrentTab] = useState<string>('diagnosis');
+  const [pkgActiveIdx, setPkgActiveIdx] = useState<number>(0);
+  const pkgGridRef = useRef<HTMLDivElement>(null);
+  const pkgUserInteractedRef = useRef<boolean>(false);
 
   useEffect(() => {
     const styleId = 'aiv5-course-styles';
@@ -2904,8 +2963,58 @@ export function CoursePage() {
       setWizCurrent(0);
       setWizSelectedSet(new Set());
       setCatCollapsedMap({});
+      setPkgActiveIdx(0);
+      pkgUserInteractedRef.current = false;
     }
   }, [isMobile]);
+
+  // ── Step 4 pkg auto-slide carousel (mobile only) ──
+  useEffect(() => {
+    if (!isMobile) return;
+    const grid = pkgGridRef.current;
+    if (!grid) return;
+
+    pkgUserInteractedRef.current = false;
+    const total = PACKAGES.length;
+    let idx = 0;
+
+    const timer = window.setInterval(() => {
+      if (pkgUserInteractedRef.current) return;
+      idx = (idx + 1) % total;
+      const card = grid.querySelector<HTMLElement>('.aiv5-pkg-card');
+      const cardW = card?.offsetWidth ?? 0;
+      grid.scrollTo({ left: idx * (cardW + 12), behavior: 'smooth' });
+    }, 3200);
+
+    const onTouchStart = () => {
+      pkgUserInteractedRef.current = true;
+    };
+    grid.addEventListener('touchstart', onTouchStart, { passive: true });
+
+    const onScroll = () => {
+      const card = grid.querySelector<HTMLElement>('.aiv5-pkg-card');
+      const cardW = card?.offsetWidth ?? 1;
+      const activeIdx = Math.round(grid.scrollLeft / (cardW + 12));
+      idx = activeIdx;
+      setPkgActiveIdx(activeIdx);
+    };
+    grid.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      window.clearInterval(timer);
+      grid.removeEventListener('touchstart', onTouchStart);
+      grid.removeEventListener('scroll', onScroll);
+    };
+  }, [isMobile]);
+
+  const onPkgDotClick = (idx: number) => {
+    pkgUserInteractedRef.current = true;
+    const grid = pkgGridRef.current;
+    if (!grid) return;
+    const card = grid.querySelector<HTMLElement>('.aiv5-pkg-card');
+    const cardW = card?.offsetWidth ?? 0;
+    grid.scrollTo({ left: idx * (cardW + 12), behavior: 'smooth' });
+  };
 
   // ── Handlers ──
   const scrollToId = (id: string) => {
@@ -3706,7 +3815,7 @@ export function CoursePage() {
           </p>
         </div>
 
-        <div className="aiv5-pkg-grid">
+        <div className="aiv5-pkg-grid" ref={pkgGridRef}>
           {PACKAGES.map(pkg => (
             <div key={pkg.id} className={`aiv5-pkg-card${pkg.featured ? ' featured' : ''}`}>
               {pkg.featured && <div className="aiv5-pkg-rec-badge">⭐ 가장 많이 선택</div>}
@@ -3724,6 +3833,22 @@ export function CoursePage() {
             </div>
           ))}
         </div>
+
+        {isMobile && (
+          <div className="aiv5-pkg-swipe-dots" role="tablist" aria-label="패키지 선택">
+            {PACKAGES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={`aiv5-pkg-dot${pkgActiveIdx === i ? ' active' : ''}`}
+                aria-label={`패키지 ${i + 1}`}
+                aria-selected={pkgActiveIdx === i}
+                role="tab"
+                onClick={() => onPkgDotClick(i)}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="aiv5-pkg-addon-block">
           <div className="aiv5-pkg-addon-header">
