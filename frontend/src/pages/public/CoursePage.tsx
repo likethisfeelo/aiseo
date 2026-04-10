@@ -3698,6 +3698,17 @@ export function CoursePage() {
                           : '필요없음';
                       return (
                         <>
+                          <div
+                            className={`aiv5-wiz-svc-card aiv5-wiz-svc-skip${skipSel ? ' selected' : ''}`}
+                            onClick={wizToggleSkip}
+                            role="button"
+                            aria-pressed={skipSel}
+                          >
+                            <div className="aiv5-wiz-svc-check">✓</div>
+                            <div className="aiv5-wiz-svc-info">
+                              <div className="aiv5-wiz-svc-name">{skipLabel}</div>
+                            </div>
+                          </div>
                           {step.optionType !== 'core1' && (
                             <div className="aiv5-wiz-soft-opts">
                               <button
@@ -3713,17 +3724,6 @@ export function CoursePage() {
                               </div>
                             </div>
                           )}
-                          <div
-                            className={`aiv5-wiz-svc-card aiv5-wiz-svc-skip${skipSel ? ' selected' : ''}`}
-                            onClick={wizToggleSkip}
-                            role="button"
-                            aria-pressed={skipSel}
-                          >
-                            <div className="aiv5-wiz-svc-check">✓</div>
-                            <div className="aiv5-wiz-svc-info">
-                              <div className="aiv5-wiz-svc-name">{skipLabel}</div>
-                            </div>
-                          </div>
                         </>
                       );
                     })()}
