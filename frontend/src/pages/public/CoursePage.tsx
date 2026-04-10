@@ -143,12 +143,6 @@ interface WizStep {
   services: WizService[];
 }
 
-interface MobTab {
-  id: string;
-  icon: string;
-  label: string;
-}
-
 // ============================================================================
 // Data (populated in later phases)
 // ============================================================================
@@ -1117,13 +1111,6 @@ const WIZ_STEPS: WizStep[] = [
       { key: 's10', code: 'CORE 3', codeType: 'core', label: '인스타 · 네이버 자동화 교육', price: 300000, priceStr: '30만원' },
     ],
   },
-];
-
-const MOB_TABS: MobTab[] = [
-  { id: 'diagnosis', icon: '🔍', label: '진단' },
-  { id: 'modules', icon: '📚', label: '교육' },
-  { id: 'services', icon: '✅', label: '서비스' },
-  { id: 'packages', icon: '📦', label: '패키지' },
 ];
 
 // ============================================================================
@@ -2934,7 +2921,6 @@ export function CoursePage() {
   const [catCollapsedMap, setCatCollapsedMap] = useState<Record<string, boolean>>({});
   const [wizCurrent, setWizCurrent] = useState<number>(0);
   const [wizSelectedSet, setWizSelectedSet] = useState<Set<string>>(new Set());
-  const [currentTab, setCurrentTab] = useState<string>('diagnosis');
   const [pkgActiveIdx, setPkgActiveIdx] = useState<number>(0);
   const pkgGridRef = useRef<HTMLDivElement>(null);
   const pkgUserInteractedRef = useRef<boolean>(false);
@@ -3176,14 +3162,6 @@ export function CoursePage() {
       setSelectedState(key);
     }
   };
-
-  // Suppress unused warnings until Phase 8 wires them up
-  void ReactDOM;
-
-  // Phase 1: mobile data/state declared but not yet consumed — suppress until later phases
-  void MOB_TABS;
-  void currentTab;
-  void setCurrentTab;
 
   const route = selectedState ? ROUTES[selectedState] : null;
 
