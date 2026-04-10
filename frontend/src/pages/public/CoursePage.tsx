@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import ReactDOM from 'react-dom';
 
 // ============================================================================
@@ -102,6 +102,45 @@ interface AddOn {
   name: string;
   desc: string;
   price: string;
+}
+
+// ── Mobile-only types ──
+
+interface EduCard {
+  code: string;
+  codeType: 'pre' | 'core' | 'mnt' | 'str' | 'ads';
+  cat: string;
+  name: string;
+  price: string;
+  desc: string;
+  tags: string[];
+}
+
+interface EduSection {
+  id: string;
+  label: string;
+  icon: string;
+  highlight?: boolean;
+  cards: EduCard[];
+}
+
+interface WizService {
+  key: string;
+  code: string;
+  codeType: 'pre' | 'core' | 'mnt' | 'str' | 'ads';
+  label: string;
+  price: number;
+  priceStr: string;
+  monthly?: boolean;
+}
+
+interface WizStep {
+  cat: string;
+  icon: string;
+  isCore?: boolean;
+  optionType: 'pre' | 'core1' | 'general';
+  desc: string;
+  services: WizService[];
 }
 
 // ============================================================================
@@ -749,6 +788,13 @@ const SERVICE_GROUPS: SvcGroup[] = [
   },
 ];
 
+// Flat lookup: service key → SvcItem (used by Phase 4 wizard sync + result rendering)
+const SVC_LOOKUP: Record<string, SvcItem> = (() => {
+  const map: Record<string, SvcItem> = {};
+  SERVICE_GROUPS.forEach(g => g.items.forEach(it => { map[it.id] = it; }));
+  return map;
+})();
+
 const PACKAGES: PkgCard[] = [
   {
     id: 'basic',
@@ -823,6 +869,247 @@ const ADDONS: AddOn[] = [
     name: '월간 점검 관리',
     desc: '백업 + 월 1회 보고',
     price: '+10만원/월',
+  },
+];
+
+// ============================================================================
+// Mobile data (Phase 1 — 모바일 JS 전용)
+// ============================================================================
+
+const EDU_SECTIONS: EduSection[] = [
+  {
+    id: 'edu-pre',
+    label: '사전준비',
+    icon: '🔍',
+    highlight: false,
+    cards: [
+      {
+        code: '001',
+        codeType: 'pre',
+        cat: 'Pre-launch',
+        name: 'SEO 검색노출전략 점검',
+        price: '20만원',
+        tags: ['#업종분석', '#키워드전략', '#경쟁군분석'],
+        desc: '홈페이지 제작 전 업종·키워드·경쟁군을 분석해 검색 전략을 먼저 잡습니다.',
+      },
+      {
+        code: '002',
+        codeType: 'pre',
+        cat: 'Pre-launch',
+        name: '홈페이지 및 콘텐츠 기획·내용 설계',
+        price: '20만원',
+        tags: ['#메뉴구조', '#CTA작성', '#콘텐츠기획'],
+        desc: '홈페이지에 담을 내용의 구조와 문장을 설계합니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-core1',
+    label: 'CORE 1',
+    icon: '⭐',
+    highlight: true,
+    cards: [
+      {
+        code: 'CORE 1',
+        codeType: 'core',
+        cat: 'Deployment',
+        name: 'AI 홈페이지 즉시 배포 + 기술적 SEO 셋팅',
+        price: '10만원',
+        tags: ['#즉시배포', '#서치콘솔', '#GA4연동'],
+        desc: 'AI 홈페이지를 배포하고 Search Console·GA4·네이버까지 한 번에 세팅합니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-core2',
+    label: 'CORE 2',
+    icon: '⭐',
+    highlight: true,
+    cards: [
+      {
+        code: 'CORE 2',
+        codeType: 'core',
+        cat: 'Paid Ads',
+        name: '구글·메타 광고 고급 세팅 교육',
+        price: '50만원',
+        tags: ['#픽셀', '#GA4', '#캠페인'],
+        desc: '픽셀·전환 추적 설정부터 캠페인 구조 설계까지 실전 교육입니다.',
+      },
+      {
+        code: '201',
+        codeType: 'ads',
+        cat: 'Ads Package',
+        name: '광고 실행 준비 패키지',
+        price: '100만원',
+        tags: ['#AI소재', '#5회'],
+        desc: 'AI 도구로 소재 5종 제작, 5회 진행 후 바로 광고 집행 가능합니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-core3',
+    label: 'CORE 3',
+    icon: '⭐',
+    highlight: true,
+    cards: [
+      {
+        code: 'CORE 3',
+        codeType: 'core',
+        cat: 'Automation',
+        name: '인스타·네이버 자동화 교육',
+        price: '30만원',
+        tags: ['#노코드', '#자동화'],
+        desc: '노코드 툴로 SNS 게시·알림·운영을 자동화하는 구조를 만듭니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-mnt',
+    label: 'MNT',
+    icon: '🔧',
+    highlight: false,
+    cards: [
+      {
+        code: 'MNT 1',
+        codeType: 'mnt',
+        cat: 'Maintenance',
+        name: '독립 도메인 직접 연결 교육',
+        price: '10만원',
+        tags: ['#Route53', '#DNS'],
+        desc: '브랜드 도메인을 직접 연결하는 방법을 익힙니다.',
+      },
+      {
+        code: 'MNT 2',
+        codeType: 'mnt',
+        cat: 'Maintenance',
+        name: '독립 도메인 연결 지원',
+        price: '10만원',
+        tags: ['#1회대행'],
+        desc: '직접 진행하기 어려울 경우 1회 대행 지원합니다.',
+      },
+      {
+        code: 'MNT 3',
+        codeType: 'mnt',
+        cat: 'Maintenance',
+        name: '후속 기술 지원',
+        price: '10만원',
+        tags: ['#오픈후관리'],
+        desc: '오픈 후 문제 발생 시 빠른 기술 지원을 제공합니다.',
+      },
+      {
+        code: 'MNT 4',
+        codeType: 'mnt',
+        cat: 'Maintenance',
+        name: '월간 점검 관리',
+        price: '월 10만원',
+        tags: ['#월정기관리', '#백업'],
+        desc: '월 1회 백업 및 상태 점검 보고서를 제공합니다.',
+      },
+    ],
+  },
+  {
+    id: 'edu-str',
+    label: '전략 · 컨설팅',
+    icon: '💡',
+    highlight: false,
+    cards: [
+      {
+        code: '101',
+        codeType: 'str',
+        cat: 'Consulting',
+        name: '1:1 성장 로드맵 컨설팅',
+        price: '20만원',
+        tags: ['#맞춤전략', '#로드맵'],
+        desc: '현재 상태와 예산을 기반으로 단계별 실행 로드맵을 설계합니다.',
+      },
+      {
+        code: '102',
+        codeType: 'str',
+        cat: 'Strategy',
+        name: 'SEO 전략 정리·마케팅 방향 수립',
+        price: '10만원',
+        tags: ['#검색유입', '#키워드'],
+        desc: '페이지 구조와 키워드 전략을 SEO 관점에서 재정비합니다.',
+      },
+    ],
+  },
+];
+
+const WIZ_STEPS: WizStep[] = [
+  {
+    cat: '사전준비',
+    icon: '🔍',
+    isCore: false,
+    optionType: 'pre',
+    desc: '홈페이지 제작 전, 검색 전략과 콘텐츠 구조를 먼저 잡는 단계입니다.',
+    services: [
+      { key: 'sp1', code: '001', codeType: 'pre', label: 'SEO 검색노출전략 점검', price: 200000, priceStr: '20만원' },
+      { key: 'sp2', code: '002', codeType: 'pre', label: '홈페이지 및 콘텐츠 기획·내용 설계', price: 200000, priceStr: '20만원' },
+    ],
+  },
+  {
+    cat: 'CORE 1',
+    icon: '⭐',
+    isCore: true,
+    optionType: 'core1',
+    desc: 'AI 홈페이지를 실제 웹에 올리고 기술적 SEO까지 한 번에 완성하는 핵심 교육입니다.',
+    services: [
+      { key: 's1', code: 'CORE 1', codeType: 'core', label: 'AI 홈페이지 즉시 배포 + 기술적 SEO 셋팅', price: 100000, priceStr: '10만원' },
+    ],
+  },
+  {
+    cat: 'MNT — 도메인·유지관리',
+    icon: '🔧',
+    isCore: false,
+    optionType: 'general',
+    desc: '독립 도메인 연결부터 월간 점검까지, 사이트 운영을 이어가는 서비스입니다.',
+    services: [
+      { key: 's2', code: 'MNT 1', codeType: 'mnt', label: '독립 도메인 직접 연결 교육', price: 100000, priceStr: '10만원' },
+      { key: 's3', code: 'MNT 2', codeType: 'mnt', label: '독립 도메인 연결 지원', price: 100000, priceStr: '10만원' },
+      { key: 's4', code: 'MNT 3', codeType: 'mnt', label: '후속 기술 지원', price: 100000, priceStr: '10만원' },
+      { key: 's5', code: 'MNT 4', codeType: 'mnt', label: '월간 점검 관리', price: 100000, priceStr: '월 10만원', monthly: true },
+    ],
+  },
+  {
+    cat: '전략 · 컨설팅',
+    icon: '💡',
+    isCore: false,
+    optionType: 'general',
+    desc: '검색 유입 구조와 마케팅 로드맵을 설계하는 단계입니다.',
+    services: [
+      { key: 's6', code: '101', codeType: 'str', label: '1:1 성장 로드맵 컨설팅', price: 200000, priceStr: '20만원' },
+      { key: 's7', code: '102', codeType: 'str', label: 'SEO · 마케팅 전략 정리', price: 100000, priceStr: '10만원' },
+    ],
+  },
+  {
+    cat: 'CORE 2',
+    icon: '⭐',
+    isCore: true,
+    optionType: 'general',
+    desc: '구글·메타 광고 구조를 직접 세팅하고 데이터를 읽는 핵심 실습 교육입니다.',
+    services: [
+      { key: 's8', code: 'CORE 2', codeType: 'core', label: '구글 · 메타 광고 고급 세팅 교육', price: 500000, priceStr: '50만원' },
+    ],
+  },
+  {
+    cat: '광고 실행 준비',
+    icon: '🎯',
+    isCore: false,
+    optionType: 'general',
+    desc: 'AI 도구로 소재를 제작하고 광고를 바로 집행할 수 있는 상태로 만드는 패키지입니다.',
+    services: [
+      { key: 's9', code: '201', codeType: 'ads', label: '광고 실행 준비 패키지', price: 1000000, priceStr: '100만원' },
+    ],
+  },
+  {
+    cat: 'CORE 3',
+    icon: '⭐',
+    isCore: true,
+    optionType: 'general',
+    desc: '콘텐츠를 한 번 만들면 여러 채널에 자동으로 올라가는 구조를 만드는 핵심 교육입니다.',
+    services: [
+      { key: 's10', code: 'CORE 3', codeType: 'core', label: '인스타 · 네이버 자동화 교육', price: 300000, priceStr: '30만원' },
+    ],
   },
 ];
 
@@ -1854,7 +2141,762 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
   .aiv5-modal { padding: 28px 22px; border-radius: 24px; }
   .aiv5-section { margin-bottom: 72px; }
 }
+
+/* ═══════════════════════════════════════════
+   MOBILE JS — Phase 2: Step 1 diag accordion
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .aiv5-mob-diag-placeholder {
+    text-align: center;
+    padding: 32px 20px;
+    background: var(--bg-soft);
+    border: 1px dashed var(--line);
+    border-radius: var(--r-lg);
+  }
+  .aiv5-mob-diag-ph-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+  .aiv5-mob-diag-ph-text {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .aiv5-mob-diag-accordion {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .42s cubic-bezier(.4,0,.2,1);
+    margin-bottom: 12px;
+  }
+  .aiv5-mob-diag-accordion.open {
+    max-height: 1600px;
+  }
+  .aiv5-mob-diag-acc-inner {
+    background: white;
+    border: 1px solid var(--accent-line);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    box-shadow: var(--sh-sm);
+  }
+
+  .aiv5-mob-result-inline .aiv5-result-body {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    padding: 0;
+  }
+  .aiv5-mob-result-inline .aiv5-result-top { padding: 16px 16px 0; }
+  .aiv5-mob-result-inline .aiv5-result-meta { margin: 10px 16px 0; }
+  .aiv5-mob-result-inline .aiv5-route-steps {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .aiv5-mob-result-inline .aiv5-result-estimate { margin: 0 16px 14px; }
+  .aiv5-mob-result-inline .aiv5-result-cta {
+    margin: 0 16px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .aiv5-mob-result-inline .aiv5-result-cta .aiv5-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 13px;
+    padding: 11px;
+  }
+  .aiv5-mob-result-inline .aiv5-result-h { font-size: 16px; }
+  .aiv5-mob-result-inline .aiv5-result-desc { font-size: 13px; }
+  .aiv5-mob-result-inline .aiv5-route-step-card::after { display: none; }
+  .aiv5-mob-result-inline .aiv5-route-step-card strong { font-size: 12px; }
+  .aiv5-mob-result-inline .aiv5-route-step-card p { font-size: 11px; }
+
+  /* Mobile result choice soft buttons */
+  .aiv5-mob-result-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .aiv5-wiz-soft-btn {
+    padding: 12px 14px;
+    border-radius: var(--r-md);
+    font-family: var(--font-ko);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+    border: 1.5px solid var(--line);
+    background: white;
+    color: var(--text-2);
+  }
+  .aiv5-wiz-soft-btn:active { transform: scale(.98); }
+  .aiv5-wiz-soft-consult {
+    background: linear-gradient(135deg, rgba(139,111,212,.1), rgba(109,40,217,.05));
+    border-color: var(--accent-line);
+    color: var(--accent-deep);
+  }
+  .aiv5-wiz-soft-skip {
+    background: var(--bg-soft);
+    color: var(--text-3);
+  }
+
+  /* Hide placeholder styling's result-panel on mobile since it's not rendered */
+  .aiv5-state-panel { padding: 12px; }
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE JS — Phase 3: Step 2 edu swipe + cat collapse
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Horizontal swipe edu cards container */
+  .aiv5-mob-edu-swipe {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 28px;
+  }
+  .aiv5-mob-edu-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .aiv5-mob-edu-section.is-highlight .aiv5-mob-edu-section-head {
+    color: var(--accent-dark);
+  }
+  .aiv5-mob-edu-section-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 2px;
+  }
+  .aiv5-mob-edu-section-icon { font-size: 18px; }
+  .aiv5-mob-edu-section-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-2);
+    letter-spacing: -.2px;
+  }
+  .aiv5-mob-edu-section.is-highlight .aiv5-mob-edu-section-label {
+    color: var(--accent-dark);
+  }
+
+  .aiv5-mob-edu-swipe-inner {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0 4px;
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .aiv5-mob-edu-swipe-inner::-webkit-scrollbar { display: none; }
+  .aiv5-mob-edu-swipe-inner {
+    scrollbar-width: none;
+  }
+  .aiv5-mob-edu-swipe-inner .aiv5-mob-edu-card {
+    flex: 0 0 82vw;
+    max-width: 320px;
+    scroll-snap-align: center;
+  }
+  .aiv5-mob-edu-swipe-inner:has(.aiv5-mob-edu-card:only-child) .aiv5-mob-edu-card {
+    flex: 1 1 auto;
+    max-width: none;
+    width: 100%;
+  }
+
+  .aiv5-mob-edu-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-sm);
+  }
+  .aiv5-mob-edu-card.is-core {
+    border-color: var(--accent-line);
+    background: linear-gradient(135deg, rgba(196,168,245,.06), white);
+  }
+  .aiv5-mob-edu-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .aiv5-mob-edu-code {
+    font-family: var(--font-en);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .aiv5-mob-edu-code.core {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent-deep));
+    color: white;
+  }
+  .aiv5-mob-edu-code.mnt {
+    background: rgba(100,116,139,.12);
+    color: #475569;
+    border: 1px solid rgba(100,116,139,.2);
+  }
+  .aiv5-mob-edu-code.pre {
+    background: rgba(16,185,129,.1);
+    color: #059669;
+    border: 1px solid rgba(16,185,129,.2);
+  }
+  .aiv5-mob-edu-code.str {
+    background: rgba(245,158,11,.1);
+    color: #B45309;
+    border: 1px solid rgba(245,158,11,.2);
+  }
+  .aiv5-mob-edu-code.ads {
+    background: rgba(239,68,68,.1);
+    color: #DC2626;
+    border: 1px solid rgba(239,68,68,.2);
+  }
+  .aiv5-mob-edu-price {
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-3);
+  }
+  .aiv5-mob-edu-cat {
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-4);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .aiv5-mob-edu-name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -.3px;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .aiv5-mob-edu-desc {
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.65;
+    flex: 1;
+  }
+  .aiv5-mob-edu-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .aiv5-mob-edu-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    background: var(--bg-soft);
+    border-radius: 999px;
+    color: var(--text-3);
+  }
+
+  .aiv5-mob-edu-swipe-dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 6px;
+  }
+  .aiv5-mob-edu-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--line);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .aiv5-mob-edu-dot.active {
+    background: var(--accent-dark);
+    width: 16px;
+    border-radius: 999px;
+  }
+
+  /* Category header — clickable on mobile */
+  .aiv5-acc-category-header {
+    position: relative;
+    user-select: none;
+  }
+  .aiv5-acc-category-header::after {
+    content: '›';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 18px;
+    color: var(--text-4);
+    transition: transform .25s;
+  }
+  .aiv5-acc-category-header.mob-cat-collapsed::after {
+    transform: translateY(-50%) rotate(0deg);
+  }
+
+  /* Category group collapse container */
+  .aiv5-mob-cat-group {
+    overflow: hidden;
+    max-height: 20000px;
+    transition: max-height .4s cubic-bezier(.4,0,.2,1);
+  }
+  .aiv5-mob-cat-group.collapsed {
+    max-height: 0 !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE JS — Phase 4: Step 3 wizard
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .aiv5-mob-wizard {
+    display: block;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--r-xl);
+    padding: 24px 20px;
+    box-shadow: var(--sh-sm);
+  }
+
+  .aiv5-wiz-progress {
+    width: 100%;
+    height: 3px;
+    background: var(--line);
+    border-radius: 999px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .aiv5-wiz-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-dark), var(--accent-deep));
+    border-radius: 999px;
+    transition: width .35s cubic-bezier(.4,0,.2,1);
+  }
+  .aiv5-wiz-step-counter {
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-4);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .aiv5-wiz-steps {
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+  }
+  .aiv5-wiz-step {
+    animation: aiv5WizFadeIn .28s ease;
+  }
+  @keyframes aiv5WizFadeIn {
+    from { opacity: 0; transform: translateX(18px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .aiv5-wiz-cat-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border-radius: var(--r-lg);
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    margin-bottom: 14px;
+  }
+  .aiv5-wiz-cat-icon { font-size: 24px; flex-shrink: 0; }
+  .aiv5-wiz-cat-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .aiv5-wiz-cat-desc {
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.5;
+  }
+  .aiv5-wiz-cat-head.is-core {
+    background: linear-gradient(135deg, rgba(139,111,212,.1), rgba(109,40,217,.05));
+    border-color: var(--accent-line);
+  }
+
+  .aiv5-wiz-svc-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: white;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-lg);
+    cursor: pointer;
+    transition: all .16s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .aiv5-wiz-svc-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 3px rgba(196,168,245,.12);
+  }
+  .aiv5-wiz-svc-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--line);
+    background: white;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    color: transparent;
+    font-weight: 800;
+    transition: all .14s;
+  }
+  .aiv5-wiz-svc-card.selected .aiv5-wiz-svc-check {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+    color: white;
+  }
+  .aiv5-wiz-svc-info { flex: 1; min-width: 0; }
+  .aiv5-wiz-svc-code {
+    font-family: var(--font-en);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-bottom: 4px;
+    display: inline-block;
+  }
+  .aiv5-wiz-svc-code.core {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent-deep));
+    color: white;
+  }
+  .aiv5-wiz-svc-code.mnt {
+    background: rgba(100,116,139,.12);
+    color: #475569;
+    border: 1px solid rgba(100,116,139,.2);
+  }
+  .aiv5-wiz-svc-code.pre {
+    background: rgba(16,185,129,.1);
+    color: #059669;
+    border: 1px solid rgba(16,185,129,.2);
+  }
+  .aiv5-wiz-svc-code.str {
+    background: rgba(245,158,11,.1);
+    color: #B45309;
+    border: 1px solid rgba(245,158,11,.2);
+  }
+  .aiv5-wiz-svc-code.ads {
+    background: rgba(239,68,68,.1);
+    color: #DC2626;
+    border: 1px solid rgba(239,68,68,.2);
+  }
+  .aiv5-wiz-svc-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 2px;
+  }
+  .aiv5-wiz-svc-price {
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-3);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .aiv5-wiz-svc-card.selected .aiv5-wiz-svc-price { color: var(--accent-dark); }
+
+  .aiv5-wiz-soft-opts {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .aiv5-wiz-result-head {
+    text-align: center;
+    padding: 20px 0 16px;
+  }
+  .aiv5-wiz-result-icon { font-size: 40px; margin-bottom: 10px; }
+  .aiv5-wiz-result-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    margin-bottom: 6px;
+  }
+  .aiv5-wiz-result-sub {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.7;
+    margin: 0;
+  }
+  .aiv5-wiz-result-empty {
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    color: var(--text-3);
+    background: var(--bg-soft);
+    border: 1px dashed var(--line);
+    border-radius: var(--r-lg);
+    margin: 16px 0;
+    line-height: 1.7;
+  }
+  .aiv5-wiz-result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .aiv5-wiz-result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-md);
+  }
+  .aiv5-wiz-result-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+  .aiv5-wiz-result-item-price {
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--accent-dark);
+  }
+  .aiv5-wiz-result-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 16px;
+    margin-top: 4px;
+    background: linear-gradient(135deg, rgba(139,111,212,.08), rgba(109,40,217,.04));
+    border: 1.5px solid var(--accent-line);
+    border-radius: var(--r-lg);
+  }
+  .aiv5-wiz-result-total-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+  .aiv5-wiz-result-total-price {
+    font-family: var(--font-en);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent-dark);
+  }
+  .aiv5-wiz-result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .aiv5-wiz-result-restart {
+    background: none;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 12px;
+    font-family: var(--font-ko);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-3);
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .aiv5-wiz-nav {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .aiv5-wiz-btn-skip {
+    flex: 1;
+    padding: 13px 12px;
+    background: var(--bg-soft);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-md);
+    font-family: var(--font-ko);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-3);
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+  }
+  .aiv5-wiz-btn-skip:active { background: var(--line-soft); }
+  .aiv5-wiz-btn-next {
+    flex: 2;
+    padding: 13px 16px;
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent-deep));
+    border: none;
+    border-radius: var(--r-md);
+    font-family: var(--font-ko);
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(109,40,217,.28);
+    transition: all .15s;
+  }
+  .aiv5-wiz-btn-next:active { transform: scale(.98); }
+  .aiv5-wiz-btn-next.is-last {
+    background: linear-gradient(135deg, #059669, #047857);
+    box-shadow: 0 6px 20px rgba(5,150,105,.28);
+  }
+
+  /* Hide PC notice on mobile */
+  .aiv5-pc-notice { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE JS — Phase 5: Step 4 pkg swipe carousel
+═══════════════════════════════════════════ */
+.aiv5-pkg-swipe-dots {
+  display: none;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+.aiv5-pkg-dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--line);
+  transition: all .2s;
+  cursor: pointer;
+}
+.aiv5-pkg-dot.active {
+  background: var(--accent-dark);
+  width: 18px;
+  border-radius: 999px;
+}
+@media (max-width: 768px) {
+  .aiv5-pkg-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding: 4px 0 12px;
+    margin-top: 20px;
+    scroll-padding-left: 0;
+  }
+  .aiv5-pkg-grid::-webkit-scrollbar { display: none; }
+  .aiv5-pkg-card {
+    flex: 0 0 85vw;
+    scroll-snap-align: center;
+    border-radius: var(--r-xl);
+    padding: 22px 20px;
+  }
+  .aiv5-pkg-swipe-dots { display: flex; }
+  .aiv5-pkg-price { font-size: 28px; }
+  .aiv5-pkg-name { font-size: 17px; }
+  .aiv5-pkg-list li { font-size: 12px; }
+  .aiv5-pkg-note-row p { font-size: 11px; }
+  .aiv5-pkg-addon-block { padding: 16px; }
+  .aiv5-pkg-addon-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .aiv5-pkg-addon-item { padding: 11px; }
+  .aiv5-pkg-addon-name { font-size: 12px; }
+  .aiv5-pkg-addon-desc { font-size: 11px; }
+  .aiv5-pkg-addon-price { font-size: 12px; }
+}
 `;
+
+// ============================================================================
+// Mobile swipe carousel helper (Phase 3)
+// ============================================================================
+
+function EduSwipe({ section }: { section: EduSection }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const hasDots = section.cards.length > 1;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !hasDots) return;
+    const onScroll = () => {
+      const cardEl = el.querySelector<HTMLDivElement>('.aiv5-mob-edu-card');
+      const w = cardEl?.offsetWidth || 1;
+      const idx = Math.round(el.scrollLeft / (w + 12));
+      setActiveIdx(idx);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [hasDots]);
+
+  const goTo = (idx: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardEl = el.querySelector<HTMLDivElement>('.aiv5-mob-edu-card');
+    const w = cardEl?.offsetWidth || 0;
+    el.scrollTo({ left: idx * (w + 12), behavior: 'smooth' });
+  };
+
+  return (
+    <div className={`aiv5-mob-edu-section${section.highlight ? ' is-highlight' : ''}`}>
+      <div className="aiv5-mob-edu-section-head">
+        <span className="aiv5-mob-edu-section-icon">{section.icon}</span>
+        <span className="aiv5-mob-edu-section-label">{section.label}</span>
+      </div>
+      <div className="aiv5-mob-edu-swipe-inner" ref={scrollRef}>
+        {section.cards.map((card, i) => (
+          <div
+            key={i}
+            className={`aiv5-mob-edu-card${card.codeType === 'core' ? ' is-core' : ''}`}
+          >
+            <div className="aiv5-mob-edu-card-top">
+              <span className={`aiv5-mob-edu-code ${card.codeType}`}>{card.code}</span>
+              <span className="aiv5-mob-edu-price">{card.price}</span>
+            </div>
+            <div className="aiv5-mob-edu-cat">{card.cat}</div>
+            <div className="aiv5-mob-edu-name">{card.name}</div>
+            <div className="aiv5-mob-edu-desc">{card.desc}</div>
+            <div className="aiv5-mob-edu-tags">
+              {card.tags.map((t, j) => (
+                <span key={j} className="aiv5-mob-edu-tag">{t}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      {hasDots && (
+        <div className="aiv5-mob-edu-swipe-dots">
+          {section.cards.map((_, i) => (
+            <span
+              key={i}
+              className={`aiv5-mob-edu-dot${i === activeIdx ? ' active' : ''}`}
+              onClick={() => goTo(i)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ============================================================================
 // Component
@@ -1870,6 +2912,19 @@ export function CoursePage() {
   const [formEmail, setFormEmail] = useState('');
   const [formMemo, setFormMemo] = useState('');
 
+  // ── Mobile state (Phase 1) ──
+  const [isMobile, setIsMobile] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.innerWidth <= 768,
+  );
+  const [diagCurrentKey, setDiagCurrentKey] = useState<string | null>(null);
+  const [diagMobOpen, setDiagMobOpen] = useState<boolean>(false);
+  const [catCollapsedMap, setCatCollapsedMap] = useState<Record<string, boolean>>({});
+  const [wizCurrent, setWizCurrent] = useState<number>(0);
+  const [wizSelectedSet, setWizSelectedSet] = useState<Set<string>>(new Set());
+  const [pkgActiveIdx, setPkgActiveIdx] = useState<number>(0);
+  const pkgGridRef = useRef<HTMLDivElement>(null);
+  const pkgUserInteractedRef = useRef<boolean>(false);
+
   useEffect(() => {
     const styleId = 'aiv5-course-styles';
     if (document.getElementById(styleId)) return;
@@ -1878,6 +2933,74 @@ export function CoursePage() {
     style.textContent = COURSE_CSS;
     document.head.appendChild(style);
   }, []);
+
+  // ── Resize listener: breakpoint detection ──
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // ── Reset mobile-only state when crossing breakpoint back to desktop ──
+  useEffect(() => {
+    if (!isMobile) {
+      setDiagMobOpen(false);
+      setDiagCurrentKey(null);
+      setWizCurrent(0);
+      setWizSelectedSet(new Set());
+      setCatCollapsedMap({});
+      setPkgActiveIdx(0);
+      pkgUserInteractedRef.current = false;
+    }
+  }, [isMobile]);
+
+  // ── Step 4 pkg auto-slide carousel (mobile only) ──
+  useEffect(() => {
+    if (!isMobile) return;
+    const grid = pkgGridRef.current;
+    if (!grid) return;
+
+    pkgUserInteractedRef.current = false;
+    const total = PACKAGES.length;
+    let idx = 0;
+
+    const timer = window.setInterval(() => {
+      if (pkgUserInteractedRef.current) return;
+      idx = (idx + 1) % total;
+      const card = grid.querySelector<HTMLElement>('.aiv5-pkg-card');
+      const cardW = card?.offsetWidth ?? 0;
+      grid.scrollTo({ left: idx * (cardW + 12), behavior: 'smooth' });
+    }, 3200);
+
+    const onTouchStart = () => {
+      pkgUserInteractedRef.current = true;
+    };
+    grid.addEventListener('touchstart', onTouchStart, { passive: true });
+
+    const onScroll = () => {
+      const card = grid.querySelector<HTMLElement>('.aiv5-pkg-card');
+      const cardW = card?.offsetWidth ?? 1;
+      const activeIdx = Math.round(grid.scrollLeft / (cardW + 12));
+      idx = activeIdx;
+      setPkgActiveIdx(activeIdx);
+    };
+    grid.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      window.clearInterval(timer);
+      grid.removeEventListener('touchstart', onTouchStart);
+      grid.removeEventListener('scroll', onScroll);
+    };
+  }, [isMobile]);
+
+  const onPkgDotClick = (idx: number) => {
+    pkgUserInteractedRef.current = true;
+    const grid = pkgGridRef.current;
+    if (!grid) return;
+    const card = grid.querySelector<HTMLElement>('.aiv5-pkg-card');
+    const cardW = card?.offsetWidth ?? 0;
+    grid.scrollTo({ left: idx * (cardW + 12), behavior: 'smooth' });
+  };
 
   // ── Handlers ──
   const scrollToId = (id: string) => {
@@ -1943,10 +3066,179 @@ export function CoursePage() {
   const totalLabel = totalSelected.toLocaleString('ko-KR') + '원';
   const hasMonthly = [...selectedSvcs.values()].some(s => s.priceLabel.includes('월'));
 
-  // Suppress unused warnings until Phase 8 wires them up
-  void ReactDOM;
+  // ── Phase 3: Step 2 mobile category collapse handler ──
+  const toggleCatCollapsed = (catKey: string) => {
+    setCatCollapsedMap(prev => ({ ...prev, [catKey]: !prev[catKey] }));
+  };
+
+  // ── Phase 4: Step 3 mobile wizard handlers ──
+  const wizToggle = (key: string) => {
+    setWizSelectedSet(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const wizSyncToMain = (setOverride?: Set<string>) => {
+    const src = setOverride ?? wizSelectedSet;
+    setSelectedSvcs(prev => {
+      const next = new Map(prev);
+      WIZ_STEPS.forEach(step =>
+        step.services.forEach(s => {
+          if (src.has(s.key)) {
+            const item = SVC_LOOKUP[s.key];
+            if (item) next.set(s.key, item);
+          } else {
+            next.delete(s.key);
+          }
+        }),
+      );
+      return next;
+    });
+  };
+
+  const wizNext = () => {
+    wizSyncToMain();
+    setWizCurrent(c => c + 1);
+  };
+
+  const wizBack = () => {
+    setWizCurrent(c => Math.max(0, c - 1));
+  };
+
+  const wizSoftChoice = (type: 'consult' | 'skip') => {
+    setWizSelectedSet(prev => {
+      const next = new Set(prev);
+      if (type === 'consult') next.add('__consult__' + wizCurrent);
+      WIZ_STEPS[wizCurrent]?.services.forEach(s => next.delete(s.key));
+      wizSyncToMain(next);
+      return next;
+    });
+    setWizCurrent(c => c + 1);
+  };
+
+  const wizRestart = () => {
+    setWizCurrent(0);
+    setWizSelectedSet(new Set());
+    clearServices();
+  };
+
+  const wizInquire = () => {
+    wizSyncToMain();
+    // Defer modal open so the state update flushes first
+    setTimeout(() => {
+      if ([...wizSelectedSet].some(k => !k.startsWith('__consult__'))) {
+        setModalOpen(true);
+        document.body.style.overflow = 'hidden';
+      } else {
+        alert('서비스를 하나 이상 선택해주세요.');
+      }
+    }, 0);
+  };
+
+  // ── Phase 2: Step 1 mobile handlers ──
+  const applyPreset = (key: string) => {
+    setSelectedState(key);
+    if (isMobile) {
+      if (diagCurrentKey && diagCurrentKey !== key) {
+        setDiagMobOpen(false);
+      }
+      setDiagCurrentKey(key);
+    }
+  };
+
+  const onStateCardClick = (key: string) => {
+    if (isMobile) {
+      setSelectedState(key);
+      if (diagCurrentKey === key && diagMobOpen) {
+        setDiagMobOpen(false);
+      } else {
+        setDiagCurrentKey(key);
+        setDiagMobOpen(true);
+      }
+    } else {
+      setSelectedState(key);
+    }
+  };
 
   const route = selectedState ? ROUTES[selectedState] : null;
+
+  // Phase 2: Reusable result body JSX (used by desktop right panel + mobile inline accordion)
+  const resultBody = route && (
+    <div className="aiv5-result-body">
+      <div className="aiv5-result-top">
+        <div className="aiv5-result-kicker">
+          {route.pills.map((p, i) => (
+            <span key={i} className="aiv5-kicker-pill">{p}</span>
+          ))}
+        </div>
+        <h3 className="aiv5-result-h">{route.title}</h3>
+        <p className="aiv5-result-desc">{route.desc}</p>
+      </div>
+
+      <div className="aiv5-result-meta">
+        {route.meta.map((m, i) => (
+          <span key={i} className="aiv5-meta-chip">{m}</span>
+        ))}
+      </div>
+
+      <div className="aiv5-route-steps">
+        {route.steps.map((s, i) => (
+          <div key={i} className="aiv5-route-step-card">
+            <div className="aiv5-step-n">{s.n}</div>
+            <strong>{s.title}</strong>
+            <p>{s.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="aiv5-result-estimate">
+        <div className="aiv5-estimate-header">
+          <span className="aiv5-estimate-label">Estimate</span>
+          <span className="aiv5-estimate-total">{route.totalEst}</span>
+        </div>
+        <div className="aiv5-estimate-rows">
+          {route.estimate.map((r, i) => (
+            <div key={i} className="aiv5-estimate-row">
+              <span>{r.label}</span>
+              <span>{r.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="aiv5-result-cta">
+        {route.note && <p className="aiv5-result-cta-note">{route.note}</p>}
+        <button
+          type="button"
+          className="aiv5-btn aiv5-btn-primary"
+          onClick={() => scrollToId('services')}
+        >
+          이 경로로 상담 문의하기
+        </button>
+        {isMobile && (
+          <div className="aiv5-mob-result-choices">
+            <button
+              type="button"
+              className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
+              onClick={() => scrollToId('services')}
+            >
+              💬 상담이 필요해요
+            </button>
+            <button
+              type="button"
+              className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
+              onClick={() => scrollToId('modules')}
+            >
+              ✓ 준비됐어요 · 교육 보기
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="aiv5-page">
@@ -2021,7 +3313,7 @@ export function CoursePage() {
               key={p.id}
               type="button"
               className={`aiv5-preset-btn${selectedState === p.id ? ' active' : ''}`}
-              onClick={() => setSelectedState(p.id)}
+              onClick={() => applyPreset(p.id)}
             >
               <span className="aiv5-preset-icon">{p.icon}</span> {p.label}
             </button>
@@ -2031,89 +3323,63 @@ export function CoursePage() {
         <div className="aiv5-diagnosis-layout">
           {/* Left: State Cards */}
           <div className="aiv5-state-panel">
-            {STATES.map(s => (
-              <button
-                key={s.id}
-                type="button"
-                className={`aiv5-state-card${selectedState === s.id ? ' active' : ''}`}
-                onClick={() => setSelectedState(s.id)}
-              >
-                <div className={`aiv5-state-icon ${s.iconClass}`}>{s.icon}</div>
-                <div className="aiv5-state-text">
-                  <strong>{s.title}</strong>
-                  <span>{s.sub}</span>
-                </div>
-                <div className="aiv5-state-arrow">›</div>
-              </button>
-            ))}
-          </div>
-
-          {/* Right: Result Panel */}
-          <div className="aiv5-result-panel">
-            {!route ? (
-              <div className="aiv5-result-empty">
-                <div className="aiv5-result-empty-inner">
-                  <div className="aiv5-result-empty-icon">🗂️</div>
-                  <strong>현재 상태를 선택해 주세요</strong>
-                  <p>선택 즉시 추천 경로, 단계별 교육 내용, 예상 비용이 표시됩니다.</p>
-                </div>
+            {/* Mobile: placeholder shown before any preset selected */}
+            {isMobile && !diagCurrentKey && (
+              <div className="aiv5-mob-diag-placeholder">
+                <div className="aiv5-mob-diag-ph-icon">🔍</div>
+                <p className="aiv5-mob-diag-ph-text">
+                  위 버튼으로 현재 상황을 선택하면<br />
+                  딱 맞는 추천 경로가 나타납니다
+                </p>
               </div>
-            ) : (
-              <div className="aiv5-result-body">
-                <div className="aiv5-result-top">
-                  <div className="aiv5-result-kicker">
-                    {route.pills.map((p, i) => (
-                      <span key={i} className="aiv5-kicker-pill">{p}</span>
-                    ))}
-                  </div>
-                  <h3 className="aiv5-result-h">{route.title}</h3>
-                  <p className="aiv5-result-desc">{route.desc}</p>
-                </div>
+            )}
 
-                <div className="aiv5-result-meta">
-                  {route.meta.map((m, i) => (
-                    <span key={i} className="aiv5-meta-chip">{m}</span>
-                  ))}
-                </div>
-
-                <div className="aiv5-route-steps">
-                  {route.steps.map((s, i) => (
-                    <div key={i} className="aiv5-route-step-card">
-                      <div className="aiv5-step-n">{s.n}</div>
-                      <strong>{s.title}</strong>
-                      <p>{s.desc}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="aiv5-result-estimate">
-                  <div className="aiv5-estimate-header">
-                    <span className="aiv5-estimate-label">Estimate</span>
-                    <span className="aiv5-estimate-total">{route.totalEst}</span>
-                  </div>
-                  <div className="aiv5-estimate-rows">
-                    {route.estimate.map((r, i) => (
-                      <div key={i} className="aiv5-estimate-row">
-                        <span>{r.label}</span>
-                        <span>{r.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="aiv5-result-cta">
-                  {route.note && <p className="aiv5-result-cta-note">{route.note}</p>}
-                  <button
-                    type="button"
-                    className="aiv5-btn aiv5-btn-primary"
-                    onClick={() => scrollToId('services')}
-                  >
-                    이 경로로 상담 문의하기
-                  </button>
+            {/* Mobile: inline accordion with route result (opens below state card) */}
+            {isMobile && diagCurrentKey && (
+              <div className={`aiv5-mob-diag-accordion${diagMobOpen ? ' open' : ''}`}>
+                <div className="aiv5-mob-diag-acc-inner">
+                  {diagMobOpen && resultBody && (
+                    <div className="aiv5-mob-result-inline">{resultBody}</div>
+                  )}
                 </div>
               </div>
             )}
+
+            {STATES
+              .filter(s => !isMobile || s.id === diagCurrentKey)
+              .map(s => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`aiv5-state-card${selectedState === s.id ? ' active' : ''}`}
+                  onClick={() => onStateCardClick(s.id)}
+                >
+                  <div className={`aiv5-state-icon ${s.iconClass}`}>{s.icon}</div>
+                  <div className="aiv5-state-text">
+                    <strong>{s.title}</strong>
+                    <span>{s.sub}</span>
+                  </div>
+                  <div className="aiv5-state-arrow">›</div>
+                </button>
+              ))}
           </div>
+
+          {/* Right: Result Panel (desktop only) */}
+          {!isMobile && (
+            <div className="aiv5-result-panel">
+              {!route ? (
+                <div className="aiv5-result-empty">
+                  <div className="aiv5-result-empty-inner">
+                    <div className="aiv5-result-empty-icon">🗂️</div>
+                    <strong>현재 상태를 선택해 주세요</strong>
+                    <p>선택 즉시 추천 경로, 단계별 교육 내용, 예상 비용이 표시됩니다.</p>
+                  </div>
+                </div>
+              ) : (
+                resultBody
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -2127,10 +3393,26 @@ export function CoursePage() {
           </p>
         </div>
 
+        {/* Mobile: horizontal swipe edu cards by section */}
+        {isMobile && (
+          <div className="aiv5-mob-edu-swipe">
+            {EDU_SECTIONS.map(sec => (
+              <EduSwipe key={sec.id} section={sec} />
+            ))}
+          </div>
+        )}
+
         <div className="aiv5-accordion">
-          {MODULES.map((cat, ci) => (
+          {MODULES.map((cat, ci) => {
+            const catKey = `cat-${ci}`;
+            const collapsed = isMobile && !!catCollapsedMap[catKey];
+            return (
             <div key={ci}>
-              <div className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}`}>
+              <div
+                className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}${collapsed ? ' mob-cat-collapsed' : ''}`}
+                onClick={() => isMobile && toggleCatCollapsed(catKey)}
+                style={isMobile ? { cursor: 'pointer' } : undefined}
+              >
                 <span className="aiv5-acc-category-icon">{cat.icon}</span>
                 <div>
                   <strong>{cat.title}</strong>
@@ -2138,6 +3420,7 @@ export function CoursePage() {
                 </div>
               </div>
 
+              <div className={`aiv5-mob-cat-group${collapsed ? ' collapsed' : ''}`}>
               {cat.items.map(item => {
                 const isOpen = openAccId === item.id;
                 return (
@@ -2217,8 +3500,10 @@ export function CoursePage() {
                   </div>
                 );
               })}
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -2238,7 +3523,185 @@ export function CoursePage() {
           </div>
         </div>
 
-        <div className="aiv5-services-layout">
+        {/* ── Mobile: Wizard ── */}
+        {isMobile && (() => {
+          const total = WIZ_STEPS.length;
+          const isResult = wizCurrent >= total;
+          const pct = isResult ? 100 : Math.round((wizCurrent / total) * 100);
+          const step = WIZ_STEPS[wizCurrent];
+
+          // Result screen computations
+          const resultItems = [...wizSelectedSet]
+            .filter(k => !k.startsWith('__consult__'))
+            .map(k => SVC_LOOKUP[k])
+            .filter((x): x is SvcItem => !!x);
+          const resultTotal = resultItems.reduce((sum, it) => sum + it.price, 0);
+          const resultHasMonthly = resultItems.some(it => it.priceLabel.includes('월'));
+          const consultCount = [...wizSelectedSet].filter(k => k.startsWith('__consult__')).length;
+
+          return (
+            <div className="aiv5-mob-wizard">
+              <div className="aiv5-wiz-progress">
+                <div className="aiv5-wiz-progress-bar" style={{ width: pct + '%' }} />
+              </div>
+              <div className="aiv5-wiz-step-counter">
+                {isResult ? '✓ 선택 완료' : `${wizCurrent + 1} / ${total}`}
+              </div>
+
+              <div className="aiv5-wiz-steps">
+                {isResult ? (
+                  <div className="aiv5-wiz-step">
+                    <div className="aiv5-wiz-result-head">
+                      <div className="aiv5-wiz-result-icon">✨</div>
+                      <div className="aiv5-wiz-result-title">선택하신 구성</div>
+                      <p className="aiv5-wiz-result-sub">
+                        아래 내용으로 문의를 보내시면 전문 컨설턴트가 1영업일 내 연락드립니다.
+                      </p>
+                    </div>
+
+                    {resultItems.length === 0 ? (
+                      <div className="aiv5-wiz-result-empty">
+                        선택한 서비스가 없습니다.
+                        {consultCount > 0 && <><br />상담 요청 {consultCount}건이 기록됐습니다.</>}
+                      </div>
+                    ) : (
+                      <>
+                        <div className="aiv5-wiz-result-list">
+                          {resultItems.map(it => (
+                            <div key={it.id} className="aiv5-wiz-result-item">
+                              <span className="aiv5-wiz-result-item-name">{it.code} {it.name}</span>
+                              <span className="aiv5-wiz-result-item-price">{it.priceLabel}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="aiv5-wiz-result-total">
+                          <span className="aiv5-wiz-result-total-label">
+                            예상 총액 {resultHasMonthly && '(월정액 포함)'}
+                          </span>
+                          <span className="aiv5-wiz-result-total-price">
+                            {resultTotal.toLocaleString('ko-KR')}원
+                          </span>
+                        </div>
+                      </>
+                    )}
+
+                    <div className="aiv5-wiz-result-actions">
+                      <button
+                        type="button"
+                        className="aiv5-wiz-btn-next"
+                        onClick={wizInquire}
+                      >
+                        이 구성으로 문의하기 →
+                      </button>
+                      <button
+                        type="button"
+                        className="aiv5-wiz-result-restart"
+                        onClick={wizRestart}
+                      >
+                        처음부터 다시하기
+                      </button>
+                    </div>
+                  </div>
+                ) : step ? (
+                  <div className="aiv5-wiz-step">
+                    <div className={`aiv5-wiz-cat-head${step.isCore ? ' is-core' : ''}`}>
+                      <span className="aiv5-wiz-cat-icon">{step.icon}</span>
+                      <div>
+                        <div className="aiv5-wiz-cat-title">{step.cat}</div>
+                        <div className="aiv5-wiz-cat-desc">{step.desc}</div>
+                      </div>
+                    </div>
+
+                    {step.services.map(s => {
+                      const sel = wizSelectedSet.has(s.key);
+                      return (
+                        <div
+                          key={s.key}
+                          className={`aiv5-wiz-svc-card${sel ? ' selected' : ''}`}
+                          onClick={() => wizToggle(s.key)}
+                        >
+                          <div className="aiv5-wiz-svc-check">✓</div>
+                          <div className="aiv5-wiz-svc-info">
+                            <span className={`aiv5-wiz-svc-code ${s.codeType}`}>{s.code}</span>
+                            <div className="aiv5-wiz-svc-name">{s.label}</div>
+                          </div>
+                          <div className="aiv5-wiz-svc-price">{s.priceStr}</div>
+                        </div>
+                      );
+                    })}
+
+                    {step.optionType === 'pre' && (
+                      <div className="aiv5-wiz-soft-opts">
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
+                          onClick={() => wizSoftChoice('consult')}
+                        >
+                          💬 잘 모르겠어요, 상담이 필요해요
+                        </button>
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
+                          onClick={() => wizSoftChoice('skip')}
+                        >
+                          ✓ 이미 준비됐어요 · 해당없음
+                        </button>
+                      </div>
+                    )}
+                    {step.optionType === 'core1' && (
+                      <div className="aiv5-wiz-soft-opts">
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
+                          onClick={() => wizSoftChoice('skip')}
+                        >
+                          ✓ 이 단계 준비완료 · 해당없음
+                        </button>
+                      </div>
+                    )}
+                    {step.optionType === 'general' && (
+                      <div className="aiv5-wiz-soft-opts">
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
+                          onClick={() => wizSoftChoice('consult')}
+                        >
+                          💬 상담이 필요해요
+                        </button>
+                        <button
+                          type="button"
+                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
+                          onClick={() => wizSoftChoice('skip')}
+                        >
+                          ✓ 필요없음
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+
+              {!isResult && (
+                <div className="aiv5-wiz-nav">
+                  {wizCurrent > 0 && (
+                    <button type="button" className="aiv5-wiz-btn-skip" onClick={wizBack}>
+                      ← 이전 단계로
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={`aiv5-wiz-btn-next${wizCurrent === total - 1 ? ' is-last' : ''}`}
+                    onClick={wizNext}
+                  >
+                    {wizCurrent === total - 1 ? '결과 보기 ✓' : '다음 →'}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {!isMobile && <div className="aiv5-services-layout">
           <div className="aiv5-service-groups">
             {SERVICE_GROUPS.map((group, gi) => (
               <div
@@ -2315,7 +3778,7 @@ export function CoursePage() {
               실제 제안 시에는 업종, 현재 사이트 상태, 예산 규모에 따라 묶음 구성과 순서를 다시 조정할 수 있습니다.
             </div>
           </aside>
-        </div>
+        </div>}
       </section>
 
       {/* ══ STEP 4: PACKAGES ══ */}
@@ -2330,7 +3793,7 @@ export function CoursePage() {
           </p>
         </div>
 
-        <div className="aiv5-pkg-grid">
+        <div className="aiv5-pkg-grid" ref={pkgGridRef}>
           {PACKAGES.map(pkg => (
             <div key={pkg.id} className={`aiv5-pkg-card${pkg.featured ? ' featured' : ''}`}>
               {pkg.featured && <div className="aiv5-pkg-rec-badge">⭐ 가장 많이 선택</div>}
@@ -2348,6 +3811,22 @@ export function CoursePage() {
             </div>
           ))}
         </div>
+
+        {isMobile && (
+          <div className="aiv5-pkg-swipe-dots" role="tablist" aria-label="패키지 선택">
+            {PACKAGES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={`aiv5-pkg-dot${pkgActiveIdx === i ? ' active' : ''}`}
+                aria-label={`패키지 ${i + 1}`}
+                aria-selected={pkgActiveIdx === i}
+                role="tab"
+                onClick={() => onPkgDotClick(i)}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="aiv5-pkg-addon-block">
           <div className="aiv5-pkg-addon-header">
