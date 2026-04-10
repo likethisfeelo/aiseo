@@ -3402,109 +3402,111 @@ export function CoursePage() {
           </div>
         )}
 
-        <div className="aiv5-accordion">
-          {MODULES.map((cat, ci) => {
-            const catKey = `cat-${ci}`;
-            const collapsed = isMobile && !!catCollapsedMap[catKey];
-            return (
-            <div key={ci}>
-              <div
-                className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}${collapsed ? ' mob-cat-collapsed' : ''}`}
-                onClick={() => isMobile && toggleCatCollapsed(catKey)}
-                style={isMobile ? { cursor: 'pointer' } : undefined}
-              >
-                <span className="aiv5-acc-category-icon">{cat.icon}</span>
-                <div>
-                  <strong>{cat.title}</strong>
-                  <span>{cat.sub}</span>
+        {!isMobile && (
+          <div className="aiv5-accordion">
+            {MODULES.map((cat, ci) => {
+              const catKey = `cat-${ci}`;
+              const collapsed = isMobile && !!catCollapsedMap[catKey];
+              return (
+              <div key={ci}>
+                <div
+                  className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}${collapsed ? ' mob-cat-collapsed' : ''}`}
+                  onClick={() => isMobile && toggleCatCollapsed(catKey)}
+                  style={isMobile ? { cursor: 'pointer' } : undefined}
+                >
+                  <span className="aiv5-acc-category-icon">{cat.icon}</span>
+                  <div>
+                    <strong>{cat.title}</strong>
+                    <span>{cat.sub}</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className={`aiv5-mob-cat-group${collapsed ? ' collapsed' : ''}`}>
-              {cat.items.map(item => {
-                const isOpen = openAccId === item.id;
-                return (
-                  <div
-                    key={item.id}
-                    className={`aiv5-acc-item${isOpen ? ' open' : ''}`}
-                    id={item.id}
-                  >
-                    <button
-                      type="button"
-                      className="aiv5-acc-trigger"
-                      aria-expanded={isOpen}
-                      onClick={() => setOpenAccId(isOpen ? null : item.id)}
+                <div className={`aiv5-mob-cat-group${collapsed ? ' collapsed' : ''}`}>
+                {cat.items.map(item => {
+                  const isOpen = openAccId === item.id;
+                  return (
+                    <div
+                      key={item.id}
+                      className={`aiv5-acc-item${isOpen ? ' open' : ''}`}
+                      id={item.id}
                     >
-                      <div className={`aiv5-acc-num${item.numClass ? ' ' + item.numClass : ''}`}>
-                        {item.num}
-                      </div>
-                      <div className="aiv5-acc-meta">
-                        <span className={`aiv5-acc-code-chip ${item.chipClass}`}>{item.chip}</span>
-                        <span className="aiv5-acc-name">{item.name}</span>
-                        <div className="aiv5-acc-tagrow">
-                          {item.tags.map((t, i) => (
-                            <span key={i} className="aiv5-acc-tag">{t}</span>
-                          ))}
+                      <button
+                        type="button"
+                        className="aiv5-acc-trigger"
+                        aria-expanded={isOpen}
+                        onClick={() => setOpenAccId(isOpen ? null : item.id)}
+                      >
+                        <div className={`aiv5-acc-num${item.numClass ? ' ' + item.numClass : ''}`}>
+                          {item.num}
                         </div>
-                      </div>
-                      <div className="aiv5-acc-right">
-                        <span className="aiv5-acc-price-chip">{item.price}</span>
-                        <div className="aiv5-acc-chevron">▾</div>
-                      </div>
-                    </button>
-
-                    <div className="aiv5-acc-body" role="region">
-                      <div className="aiv5-acc-body-inner">
-                        <div className="aiv5-acc-body-content">
-                          <div>
-                            <p className="aiv5-acc-desc">
-                              {item.desc.split('\n').map((line, i, arr) => (
-                                <span key={i}>
-                                  {line}
-                                  {i < arr.length - 1 && <><br /><br /></>}
-                                </span>
-                              ))}
-                            </p>
-                            <span className="aiv5-acc-who-label">{item.whoTitle}</span>
-                            <div className="aiv5-acc-who-list">
-                              {item.who.map((w, i) => (
-                                <div key={i} className="aiv5-acc-who-item">
-                                  <div className="aiv5-acc-who-dot"></div>
-                                  {w}
-                                </div>
-                              ))}
-                            </div>
+                        <div className="aiv5-acc-meta">
+                          <span className={`aiv5-acc-code-chip ${item.chipClass}`}>{item.chip}</span>
+                          <span className="aiv5-acc-name">{item.name}</span>
+                          <div className="aiv5-acc-tagrow">
+                            {item.tags.map((t, i) => (
+                              <span key={i} className="aiv5-acc-tag">{t}</span>
+                            ))}
                           </div>
-                          <div className="aiv5-acc-outcomes">
-                            <div className="aiv5-acc-outcome-group">
-                              <h5>{item.learnTitle}</h5>
-                              <div className="aiv5-acc-learn-list">
-                                {item.learn.map((l, i) => (
-                                  <div key={i} className="aiv5-acc-learn-item">{l}</div>
+                        </div>
+                        <div className="aiv5-acc-right">
+                          <span className="aiv5-acc-price-chip">{item.price}</span>
+                          <div className="aiv5-acc-chevron">▾</div>
+                        </div>
+                      </button>
+
+                      <div className="aiv5-acc-body" role="region">
+                        <div className="aiv5-acc-body-inner">
+                          <div className="aiv5-acc-body-content">
+                            <div>
+                              <p className="aiv5-acc-desc">
+                                {item.desc.split('\n').map((line, i, arr) => (
+                                  <span key={i}>
+                                    {line}
+                                    {i < arr.length - 1 && <><br /><br /></>}
+                                  </span>
+                                ))}
+                              </p>
+                              <span className="aiv5-acc-who-label">{item.whoTitle}</span>
+                              <div className="aiv5-acc-who-list">
+                                {item.who.map((w, i) => (
+                                  <div key={i} className="aiv5-acc-who-item">
+                                    <div className="aiv5-acc-who-dot"></div>
+                                    {w}
+                                  </div>
                                 ))}
                               </div>
                             </div>
-                            <div className="aiv5-acc-divider-h"></div>
-                            <div className="aiv5-acc-outcome-group">
-                              <h5>진행 방식</h5>
-                              <div className="aiv5-acc-info-row">
-                                {item.metaChips.map((m, i) => (
-                                  <span key={i} className="aiv5-acc-info-chip">{m}</span>
-                                ))}
+                            <div className="aiv5-acc-outcomes">
+                              <div className="aiv5-acc-outcome-group">
+                                <h5>{item.learnTitle}</h5>
+                                <div className="aiv5-acc-learn-list">
+                                  {item.learn.map((l, i) => (
+                                    <div key={i} className="aiv5-acc-learn-item">{l}</div>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="aiv5-acc-divider-h"></div>
+                              <div className="aiv5-acc-outcome-group">
+                                <h5>진행 방식</h5>
+                                <div className="aiv5-acc-info-row">
+                                  {item.metaChips.map((m, i) => (
+                                    <span key={i} className="aiv5-acc-info-chip">{m}</span>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+                </div>
               </div>
-            </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* ══ STEP 3: INDIVIDUAL SERVICES ══ */}
