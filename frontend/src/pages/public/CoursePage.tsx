@@ -922,13 +922,6 @@ export function CoursePage() {
   const hasMonthly = [...selectedSvcs.values()].some(s => s.priceLabel.includes('월'));
 
   // Suppress unused warnings until Phase 8 wires them up
-  void PACKAGES; void ADDONS;
-  void modalOpen;
-  void formEmail; void setFormEmail;
-  void formMemo; void setFormMemo;
-  void handlePhoneChange;
-  void closeModal; void submitForm;
-  void hasMonthly;
   void ReactDOM;
 
   const route = selectedState ? ROUTES[selectedState] : null;
@@ -1303,7 +1296,224 @@ export function CoursePage() {
         </div>
       </section>
 
-      {/* Step 4/CTA/modal rendered in Phase 8 */}
+      {/* ══ STEP 4: PACKAGES ══ */}
+      <section className="aiv5-section" id="packages">
+        <div className="aiv5-section-head">
+          <div className="aiv5-step-badge"><span className="aiv5-step-dot"></span> Step 4</div>
+          <h2 className="aiv5-section-title">
+            누구보다 빠르게, 남들과는 다르게<br />실행하고 싶다면 — 1:1 PKG
+          </h2>
+          <p className="aiv5-section-sub">
+            AISEO.TIPS는 많은 강의를 듣게 하는 것이 목표가 아닙니다. 이 PKG는 빠르게, 집중적으로 진행하고 싶은 분들을 위해 1:1로 진행되는 서비스입니다. 여러 개를 들었다고 할인해드리는 PKG가 아닙니다. 상담을 통한 맞춤형 계약 후 진행됩니다.
+          </p>
+        </div>
+
+        <div className="aiv5-pkg-grid">
+          {PACKAGES.map(pkg => (
+            <div key={pkg.id} className={`aiv5-pkg-card${pkg.featured ? ' featured' : ''}`}>
+              {pkg.featured && <div className="aiv5-pkg-rec-badge">⭐ 가장 많이 선택</div>}
+              <div className="aiv5-pkg-tier">{pkg.tier}</div>
+              <div className="aiv5-pkg-name">{pkg.name}</div>
+              <div className="aiv5-pkg-price">{pkg.price}</div>
+              <div className="aiv5-pkg-duration">{pkg.duration}</div>
+              <div className="aiv5-pkg-rule"></div>
+              <ul className="aiv5-pkg-list">
+                {pkg.includes.map((it, i) => <li key={i}>{it}</li>)}
+              </ul>
+              {pkg.tags && pkg.tags.map((t, i) => (
+                <div key={i} className="aiv5-pkg-tag">{t}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="aiv5-pkg-addon-block">
+          <div className="aiv5-pkg-addon-header">
+            <span className="aiv5-pkg-addon-label">Add-on · 추가 선택 가능 항목</span>
+            <span className="aiv5-pkg-addon-sub">패키지에 개별 항목을 더해 맞춤 구성할 수 있습니다</span>
+          </div>
+          <div className="aiv5-pkg-addon-grid">
+            {ADDONS.map((a, i) => (
+              <div key={i} className="aiv5-pkg-addon-item">
+                <span className={`aiv5-pkg-addon-code ${a.codeClass}`}>{a.code}</span>
+                <span className="aiv5-pkg-addon-name">{a.name}</span>
+                <span className="aiv5-pkg-addon-desc">{a.desc}</span>
+                <span className="aiv5-pkg-addon-price">{a.price}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="aiv5-pkg-note-row">
+          <p>모든 서비스는 현재 상태와 콘텐츠 준비도에 따라 범위가 조정될 수 있습니다 · 콘텐츠 기획부터 필요한 경우 별도 견적이 추가됩니다 · 실제 광고비, 외부 툴 사용료, 도메인 구입비는 별도입니다.</p>
+        </div>
+      </section>
+
+      {/* ══ FINAL CTA ══ */}
+      <section className="aiv5-cta-section">
+        <div className="aiv5-cta-inner">
+          <div className="aiv5-cta-left">
+            <span className="aiv5-cta-eyebrow">AI로 쉽게 만들고, 제대로 된 SEO로 — 구독료 없이</span>
+            <h2 className="aiv5-cta-title">
+              고객이 먼저 찾아오는 구조,<br />지금 시작할 수 있습니다
+            </h2>
+            <p className="aiv5-cta-desc">
+              월구독 없이. 에이전시 없이.<br />
+              한 번 제대로 만들면 계속 일하는<br />
+              AI 시대에 맞는 온라인 마케팅을 직접 할 수 있게 도와드립니다.
+            </p>
+            <div className="aiv5-cta-btns">
+              <button
+                type="button"
+                className="aiv5-cta-btn-primary"
+                onClick={() => {
+                  if (selectedSvcs.size === 0) {
+                    scrollToId('services');
+                  } else {
+                    openModal();
+                  }
+                }}
+              >
+                <span className="aiv5-cta-btn-icon">✉</span>
+                지금 문의하기
+              </button>
+              <button
+                type="button"
+                className="aiv5-cta-btn-ghost"
+                onClick={() => scrollToId('diagnosis')}
+              >
+                처음부터 다시 보기
+              </button>
+            </div>
+          </div>
+          <div className="aiv5-cta-right">
+            <div className="aiv5-cta-card">
+              <div className="aiv5-cta-card-row">
+                <div className="aiv5-cta-card-dot dot-green"></div>
+                <span>평균 응답</span>
+                <strong>1영업일 이내</strong>
+              </div>
+              <div className="aiv5-cta-card-rule"></div>
+              <div className="aiv5-cta-card-row">
+                <div className="aiv5-cta-card-dot dot-purple"></div>
+                <span>진행 방식</span>
+                <strong>화상 미팅 기준</strong>
+              </div>
+              <div className="aiv5-cta-card-rule"></div>
+              <div className="aiv5-cta-card-row">
+                <div className="aiv5-cta-card-dot dot-blue"></div>
+                <span>첫 상담</span>
+                <strong>무료 · 부담 없음</strong>
+              </div>
+              <div className="aiv5-cta-card-rule"></div>
+              <div className="aiv5-cta-card-row">
+                <div className="aiv5-cta-card-dot dot-green"></div>
+                <span>개별 구성</span>
+                <strong>필요한 것만 선택 가능</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ STICKY INQUIRY BAR ══ */}
+      {selectedSvcs.size > 0 && (
+        <div className="aiv5-inq-bar">
+          <div className="aiv5-inq-bar-inner">
+            <div className="aiv5-inq-info">
+              <div className="aiv5-inq-tags">
+                {[...selectedSvcs.values()].map(s => (
+                  <span key={s.id} className="aiv5-inq-tag">{s.code} {s.name}</span>
+                ))}
+              </div>
+              <div className="aiv5-inq-total-row">
+                <span className="aiv5-inq-label">선택 합계</span>
+                <span className="aiv5-inq-amount">{totalLabel}</span>
+                {hasMonthly && <span className="aiv5-inq-note">(월정액 포함)</span>}
+              </div>
+            </div>
+            <button type="button" className="aiv5-inq-btn" onClick={openModal}>
+              상담 문의하기 →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ══ MODAL (portal) ══ */}
+      {modalOpen && ReactDOM.createPortal(
+        <div className="aiv5-modal-ov open" onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}>
+          <div className="aiv5-modal">
+            <button type="button" className="aiv5-modal-x" onClick={closeModal}>×</button>
+            <span className="aiv5-modal-logo">AISEO</span>
+            <div className="aiv5-modal-title">상담 문의</div>
+            <div className="aiv5-modal-sub">
+              선택하신 서비스를 확인하고, 연락처를 남겨주시면 1영업일 내 연락드립니다.
+            </div>
+
+            <div className="aiv5-modal-summary">
+              <div className="aiv5-modal-sum-label">선택 서비스</div>
+              <div>
+                {[...selectedSvcs.values()].map(s => (
+                  <div key={s.id} className="aiv5-modal-sum-item">
+                    <span>{s.code} {s.name}</span>
+                    <span>{s.priceLabel}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="aiv5-modal-sum-total">
+                <span>합계</span>
+                <span>{totalLabel}{hasMonthly ? ' +월정액' : ''}</span>
+              </div>
+            </div>
+
+            <form onSubmit={submitForm}>
+              <div className="aiv5-form-row">
+                <label className="aiv5-form-label">이름 <em>*</em></label>
+                <input
+                  className="aiv5-form-ctrl"
+                  type="text"
+                  placeholder="홍길동"
+                  value={formName}
+                  onChange={e => setFormName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="aiv5-form-row">
+                <label className="aiv5-form-label">연락처 <em>*</em></label>
+                <input
+                  className="aiv5-form-ctrl"
+                  type="tel"
+                  placeholder="010-0000-0000"
+                  value={formPhone}
+                  onChange={e => handlePhoneChange(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="aiv5-form-row">
+                <label className="aiv5-form-label">카카오톡 ID (선택)</label>
+                <input
+                  className="aiv5-form-ctrl"
+                  type="text"
+                  placeholder="kakao_id"
+                  value={formEmail}
+                  onChange={e => setFormEmail(e.target.value)}
+                />
+              </div>
+              <div className="aiv5-form-row">
+                <label className="aiv5-form-label">현재 상태 / 문의 내용</label>
+                <textarea
+                  className="aiv5-form-ctrl"
+                  placeholder="현재 운영 중인 사이트 주소나 상황을 간략히 적어주세요"
+                  value={formMemo}
+                  onChange={e => setFormMemo(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="aiv5-form-submit">상담 신청하기</button>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
