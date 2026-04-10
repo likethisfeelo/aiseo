@@ -2625,7 +2625,32 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
     margin-top: 10px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .aiv5-wiz-soft-btn.selected {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent-deep));
+    border-color: var(--accent-deep);
+    color: white;
+    box-shadow: 0 6px 18px rgba(109,40,217,.25);
+  }
+  .aiv5-wiz-multi-hint {
+    font-size: 11px;
+    color: var(--text-4);
+    text-align: center;
+    line-height: 1.5;
+    padding: 2px 8px 0;
+  }
+
+  /* Skip-as-card: same shape as svc cards but no code chip/price */
+  .aiv5-wiz-svc-card.aiv5-wiz-svc-skip .aiv5-wiz-svc-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-3);
+    margin-bottom: 0;
+  }
+  .aiv5-wiz-svc-card.aiv5-wiz-svc-skip.selected .aiv5-wiz-svc-name {
+    color: var(--accent-deep);
   }
 
   .aiv5-wiz-result-head {
@@ -3075,8 +3100,39 @@ export function CoursePage() {
   const wizToggle = (key: string) => {
     setWizSelectedSet(prev => {
       const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+        // Mutex: selecting a real service clears the "skip" sentinel for this step
+        next.delete('__skip__' + wizCurrent);
+      }
+      return next;
+    });
+  };
+
+  const wizToggleSkip = () => {
+    const skipKey = '__skip__' + wizCurrent;
+    setWizSelectedSet(prev => {
+      const next = new Set(prev);
+      if (next.has(skipKey)) {
+        next.delete(skipKey);
+      } else {
+        next.add(skipKey);
+        // Mutex: selecting skip clears all real services for this step
+        WIZ_STEPS[wizCurrent]?.services.forEach(s => next.delete(s.key));
+      }
+      return next;
+    });
+  };
+
+  const wizToggleConsult = () => {
+    const consultKey = '__consult__' + wizCurrent;
+    setWizSelectedSet(prev => {
+      const next = new Set(prev);
+      if (next.has(consultKey)) next.delete(consultKey);
+      else next.add(consultKey);
+      // Non-mutex: consult can coexist with real services and skip
       return next;
     });
   };
@@ -3108,17 +3164,6 @@ export function CoursePage() {
     setWizCurrent(c => Math.max(0, c - 1));
   };
 
-  const wizSoftChoice = (type: 'consult' | 'skip') => {
-    setWizSelectedSet(prev => {
-      const next = new Set(prev);
-      if (type === 'consult') next.add('__consult__' + wizCurrent);
-      WIZ_STEPS[wizCurrent]?.services.forEach(s => next.delete(s.key));
-      wizSyncToMain(next);
-      return next;
-    });
-    setWizCurrent(c => c + 1);
-  };
-
   const wizRestart = () => {
     setWizCurrent(0);
     setWizSelectedSet(new Set());
@@ -3129,7 +3174,11 @@ export function CoursePage() {
     wizSyncToMain();
     // Defer modal open so the state update flushes first
     setTimeout(() => {
-      if ([...wizSelectedSet].some(k => !k.startsWith('__consult__'))) {
+      if (
+        [...wizSelectedSet].some(
+          k => !k.startsWith('__consult__') && !k.startsWith('__skip__'),
+        )
+      ) {
         setModalOpen(true);
         document.body.style.overflow = 'hidden';
       } else {
@@ -3402,109 +3451,111 @@ export function CoursePage() {
           </div>
         )}
 
-        <div className="aiv5-accordion">
-          {MODULES.map((cat, ci) => {
-            const catKey = `cat-${ci}`;
-            const collapsed = isMobile && !!catCollapsedMap[catKey];
-            return (
-            <div key={ci}>
-              <div
-                className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}${collapsed ? ' mob-cat-collapsed' : ''}`}
-                onClick={() => isMobile && toggleCatCollapsed(catKey)}
-                style={isMobile ? { cursor: 'pointer' } : undefined}
-              >
-                <span className="aiv5-acc-category-icon">{cat.icon}</span>
-                <div>
-                  <strong>{cat.title}</strong>
-                  <span>{cat.sub}</span>
+        {!isMobile && (
+          <div className="aiv5-accordion">
+            {MODULES.map((cat, ci) => {
+              const catKey = `cat-${ci}`;
+              const collapsed = isMobile && !!catCollapsedMap[catKey];
+              return (
+              <div key={ci}>
+                <div
+                  className={`aiv5-acc-category-header${cat.core ? ' is-core' : ''}${collapsed ? ' mob-cat-collapsed' : ''}`}
+                  onClick={() => isMobile && toggleCatCollapsed(catKey)}
+                  style={isMobile ? { cursor: 'pointer' } : undefined}
+                >
+                  <span className="aiv5-acc-category-icon">{cat.icon}</span>
+                  <div>
+                    <strong>{cat.title}</strong>
+                    <span>{cat.sub}</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className={`aiv5-mob-cat-group${collapsed ? ' collapsed' : ''}`}>
-              {cat.items.map(item => {
-                const isOpen = openAccId === item.id;
-                return (
-                  <div
-                    key={item.id}
-                    className={`aiv5-acc-item${isOpen ? ' open' : ''}`}
-                    id={item.id}
-                  >
-                    <button
-                      type="button"
-                      className="aiv5-acc-trigger"
-                      aria-expanded={isOpen}
-                      onClick={() => setOpenAccId(isOpen ? null : item.id)}
+                <div className={`aiv5-mob-cat-group${collapsed ? ' collapsed' : ''}`}>
+                {cat.items.map(item => {
+                  const isOpen = openAccId === item.id;
+                  return (
+                    <div
+                      key={item.id}
+                      className={`aiv5-acc-item${isOpen ? ' open' : ''}`}
+                      id={item.id}
                     >
-                      <div className={`aiv5-acc-num${item.numClass ? ' ' + item.numClass : ''}`}>
-                        {item.num}
-                      </div>
-                      <div className="aiv5-acc-meta">
-                        <span className={`aiv5-acc-code-chip ${item.chipClass}`}>{item.chip}</span>
-                        <span className="aiv5-acc-name">{item.name}</span>
-                        <div className="aiv5-acc-tagrow">
-                          {item.tags.map((t, i) => (
-                            <span key={i} className="aiv5-acc-tag">{t}</span>
-                          ))}
+                      <button
+                        type="button"
+                        className="aiv5-acc-trigger"
+                        aria-expanded={isOpen}
+                        onClick={() => setOpenAccId(isOpen ? null : item.id)}
+                      >
+                        <div className={`aiv5-acc-num${item.numClass ? ' ' + item.numClass : ''}`}>
+                          {item.num}
                         </div>
-                      </div>
-                      <div className="aiv5-acc-right">
-                        <span className="aiv5-acc-price-chip">{item.price}</span>
-                        <div className="aiv5-acc-chevron">▾</div>
-                      </div>
-                    </button>
-
-                    <div className="aiv5-acc-body" role="region">
-                      <div className="aiv5-acc-body-inner">
-                        <div className="aiv5-acc-body-content">
-                          <div>
-                            <p className="aiv5-acc-desc">
-                              {item.desc.split('\n').map((line, i, arr) => (
-                                <span key={i}>
-                                  {line}
-                                  {i < arr.length - 1 && <><br /><br /></>}
-                                </span>
-                              ))}
-                            </p>
-                            <span className="aiv5-acc-who-label">{item.whoTitle}</span>
-                            <div className="aiv5-acc-who-list">
-                              {item.who.map((w, i) => (
-                                <div key={i} className="aiv5-acc-who-item">
-                                  <div className="aiv5-acc-who-dot"></div>
-                                  {w}
-                                </div>
-                              ))}
-                            </div>
+                        <div className="aiv5-acc-meta">
+                          <span className={`aiv5-acc-code-chip ${item.chipClass}`}>{item.chip}</span>
+                          <span className="aiv5-acc-name">{item.name}</span>
+                          <div className="aiv5-acc-tagrow">
+                            {item.tags.map((t, i) => (
+                              <span key={i} className="aiv5-acc-tag">{t}</span>
+                            ))}
                           </div>
-                          <div className="aiv5-acc-outcomes">
-                            <div className="aiv5-acc-outcome-group">
-                              <h5>{item.learnTitle}</h5>
-                              <div className="aiv5-acc-learn-list">
-                                {item.learn.map((l, i) => (
-                                  <div key={i} className="aiv5-acc-learn-item">{l}</div>
+                        </div>
+                        <div className="aiv5-acc-right">
+                          <span className="aiv5-acc-price-chip">{item.price}</span>
+                          <div className="aiv5-acc-chevron">▾</div>
+                        </div>
+                      </button>
+
+                      <div className="aiv5-acc-body" role="region">
+                        <div className="aiv5-acc-body-inner">
+                          <div className="aiv5-acc-body-content">
+                            <div>
+                              <p className="aiv5-acc-desc">
+                                {item.desc.split('\n').map((line, i, arr) => (
+                                  <span key={i}>
+                                    {line}
+                                    {i < arr.length - 1 && <><br /><br /></>}
+                                  </span>
+                                ))}
+                              </p>
+                              <span className="aiv5-acc-who-label">{item.whoTitle}</span>
+                              <div className="aiv5-acc-who-list">
+                                {item.who.map((w, i) => (
+                                  <div key={i} className="aiv5-acc-who-item">
+                                    <div className="aiv5-acc-who-dot"></div>
+                                    {w}
+                                  </div>
                                 ))}
                               </div>
                             </div>
-                            <div className="aiv5-acc-divider-h"></div>
-                            <div className="aiv5-acc-outcome-group">
-                              <h5>진행 방식</h5>
-                              <div className="aiv5-acc-info-row">
-                                {item.metaChips.map((m, i) => (
-                                  <span key={i} className="aiv5-acc-info-chip">{m}</span>
-                                ))}
+                            <div className="aiv5-acc-outcomes">
+                              <div className="aiv5-acc-outcome-group">
+                                <h5>{item.learnTitle}</h5>
+                                <div className="aiv5-acc-learn-list">
+                                  {item.learn.map((l, i) => (
+                                    <div key={i} className="aiv5-acc-learn-item">{l}</div>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="aiv5-acc-divider-h"></div>
+                              <div className="aiv5-acc-outcome-group">
+                                <h5>진행 방식</h5>
+                                <div className="aiv5-acc-info-row">
+                                  {item.metaChips.map((m, i) => (
+                                    <span key={i} className="aiv5-acc-info-chip">{m}</span>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+                </div>
               </div>
-            </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* ══ STEP 3: INDIVIDUAL SERVICES ══ */}
@@ -3532,7 +3583,7 @@ export function CoursePage() {
 
           // Result screen computations
           const resultItems = [...wizSelectedSet]
-            .filter(k => !k.startsWith('__consult__'))
+            .filter(k => !k.startsWith('__consult__') && !k.startsWith('__skip__'))
             .map(k => SVC_LOOKUP[k])
             .filter((x): x is SvcItem => !!x);
           const resultTotal = resultItems.reduce((sum, it) => sum + it.price, 0);
@@ -3630,53 +3681,52 @@ export function CoursePage() {
                       );
                     })}
 
-                    {step.optionType === 'pre' && (
-                      <div className="aiv5-wiz-soft-opts">
-                        <button
-                          type="button"
-                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
-                          onClick={() => wizSoftChoice('consult')}
-                        >
-                          💬 잘 모르겠어요, 상담이 필요해요
-                        </button>
-                        <button
-                          type="button"
-                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
-                          onClick={() => wizSoftChoice('skip')}
-                        >
-                          ✓ 이미 준비됐어요 · 해당없음
-                        </button>
-                      </div>
-                    )}
-                    {step.optionType === 'core1' && (
-                      <div className="aiv5-wiz-soft-opts">
-                        <button
-                          type="button"
-                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
-                          onClick={() => wizSoftChoice('skip')}
-                        >
-                          ✓ 이 단계 준비완료 · 해당없음
-                        </button>
-                      </div>
-                    )}
-                    {step.optionType === 'general' && (
-                      <div className="aiv5-wiz-soft-opts">
-                        <button
-                          type="button"
-                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
-                          onClick={() => wizSoftChoice('consult')}
-                        >
-                          💬 상담이 필요해요
-                        </button>
-                        <button
-                          type="button"
-                          className="aiv5-wiz-soft-btn aiv5-wiz-soft-skip"
-                          onClick={() => wizSoftChoice('skip')}
-                        >
-                          ✓ 필요없음
-                        </button>
-                      </div>
-                    )}
+                    {(() => {
+                      const consultKey = '__consult__' + wizCurrent;
+                      const consultSel = wizSelectedSet.has(consultKey);
+                      const skipKey = '__skip__' + wizCurrent;
+                      const skipSel = wizSelectedSet.has(skipKey);
+                      const consultLabel =
+                        step.optionType === 'pre'
+                          ? '잘 모르겠어요, 상담이 필요해요'
+                          : '상담이 필요해요';
+                      const skipLabel =
+                        step.optionType === 'pre'
+                          ? '이미 준비됐어요 · 해당없음'
+                          : step.optionType === 'core1'
+                          ? '이 단계 준비완료 · 해당없음'
+                          : '필요없음';
+                      return (
+                        <>
+                          {step.optionType !== 'core1' && (
+                            <div className="aiv5-wiz-soft-opts">
+                              <button
+                                type="button"
+                                className={`aiv5-wiz-soft-btn aiv5-wiz-soft-consult${consultSel ? ' selected' : ''}`}
+                                onClick={wizToggleConsult}
+                                aria-pressed={consultSel}
+                              >
+                                {consultSel ? '✓ ' : '💬 '}{consultLabel}
+                              </button>
+                              <div className="aiv5-wiz-multi-hint">
+                                💡 다른 항목과 함께 선택할 수 있어요
+                              </div>
+                            </div>
+                          )}
+                          <div
+                            className={`aiv5-wiz-svc-card aiv5-wiz-svc-skip${skipSel ? ' selected' : ''}`}
+                            onClick={wizToggleSkip}
+                            role="button"
+                            aria-pressed={skipSel}
+                          >
+                            <div className="aiv5-wiz-svc-check">✓</div>
+                            <div className="aiv5-wiz-svc-info">
+                              <div className="aiv5-wiz-svc-name">{skipLabel}</div>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 ) : null}
               </div>
