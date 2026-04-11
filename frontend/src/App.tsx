@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { selectSite, getMe } from './api';
@@ -8,8 +8,10 @@ import { APP_ENV } from './config.js';
 const BASE_DOMAIN = APP_ENV === 'prod' ? 'aiseo.tips' : 'dev.${BASE_DOMAIN}';
 import { ForgotPasswordPage, LoginPage, SignupPage } from './auth-pages';
 import { LandingPage } from './pages/LandingPage';
+import type { UserProfile } from './types';
 import { PublicSubPage } from './pages/public/PublicSubPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
+import { AdminLayout } from './components/layout/AdminLayout';
 import { EducationDrawer } from './components/education/EducationDrawer';
 import { BrandPage } from './pages/BrandPage';
 import { ProductPage } from './pages/ProductPage';
@@ -57,6 +59,17 @@ function PageTitleProvider({ children, setPageTitle }: { children: React.ReactNo
     setPageTitle(PAGE_TITLES[location.pathname] || '대시보드');
   }, [location.pathname, setPageTitle]);
   return <>{children}</>;
+}
+
+/**
+ * True when the current path belongs to the admin section. Admin routes
+ * render under a standalone AdminLayout (no Sidebar/TopBar) so they look
+ * visually distinct from the user dashboard.
+ */
+function isAdminPath(pathname: string): boolean {
+  return pathname === '/admin'
+    || pathname.startsWith('/admin/')
+    || pathname === '/mktadmin';
 }
 
 /* LandingPage is now imported from ./pages/LandingPage */
@@ -294,6 +307,63 @@ export default function App() {
   // Authenticated dashboard
   return (
     <PageTitleProvider setPageTitle={setPageTitle}>
+      <AuthenticatedShell
+        user={user}
+        siteId={siteId}
+        pageTitle={pageTitle}
+        logout={logout}
+        educationOpen={educationOpen}
+        setEducationOpen={setEducationOpen}
+      />
+    </PageTitleProvider>
+  );
+}
+
+/**
+ * Routes-aware shell that picks between two top-level layouts:
+ *   - AdminLayout for /admin/* and /mktadmin (standalone, no sidebar)
+ *   - DashboardLayout for everything else (sidebar + topbar)
+ *
+ * Must live inside Router context to use useLocation, and inside
+ * PageTitleProvider so pageTitle updates on navigation.
+ */
+function AuthenticatedShell({
+  user,
+  siteId,
+  pageTitle,
+  logout,
+  educationOpen,
+  setEducationOpen,
+}: {
+  user: UserProfile;
+  siteId: string;
+  pageTitle: string;
+  logout: () => void;
+  educationOpen: boolean;
+  setEducationOpen: Dispatch<SetStateAction<boolean>>;
+}) {
+  const location = useLocation();
+
+  if (isAdminPath(location.pathname)) {
+    return (
+      <AdminLayout user={user} onLogout={logout}>
+        <Routes>
+          <Route path="/admin" element={<AdminSiteListPage />} />
+          <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
+          <Route path="/mktadmin" element={<MktAdminPage />} />
+          <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
+          <Route path="/admin/blog/posts" element={<BlogPostsAdminPage />} />
+          <Route path="/admin/blog/posts/new" element={<BlogPostEditPage />} />
+          <Route path="/admin/blog/posts/:slug/edit" element={<BlogPostEditPage />} />
+          <Route path="/admin/blog/categories" element={<BlogCategoriesAdminPage />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
+        </Routes>
+      </AdminLayout>
+    );
+  }
+
+  return (
+    <>
       <DashboardLayout
         user={user}
         siteId={siteId}
@@ -319,18 +389,10 @@ export default function App() {
           <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
           <Route path="/content" element={<ContentAutomationPage />} />
           <Route path="/domain" element={<DomainSettingsPage siteId={siteId} />} />
-          <Route path="/admin" element={<AdminSiteListPage />} />
-          <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
-          <Route path="/mktadmin" element={<MktAdminPage />} />
-          <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
-          <Route path="/admin/blog/posts" element={<BlogPostsAdminPage />} />
-          <Route path="/admin/blog/posts/new" element={<BlogPostEditPage />} />
-          <Route path="/admin/blog/posts/:slug/edit" element={<BlogPostEditPage />} />
-          <Route path="/admin/blog/categories" element={<BlogCategoriesAdminPage />} />
           <Route path="*" element={<Navigate to="/site/upload" replace />} />
         </Routes>
       </DashboardLayout>
       <EducationDrawer open={educationOpen} onClose={() => setEducationOpen(false)} />
-    </PageTitleProvider>
+    </>
   );
 }

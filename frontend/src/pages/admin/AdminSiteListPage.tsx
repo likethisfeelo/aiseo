@@ -1,7 +1,97 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { adminGetSites } from '../../api';
 import { getJson, postJson } from '../../api-client.js';
+
+interface MenuCard {
+  to: string;
+  icon: string;
+  title: string;
+  description: string;
+  color: string;
+}
+
+const ADMIN_MENU: MenuCard[] = [
+  {
+    to: '/admin/blog/posts',
+    icon: '📝',
+    title: '블로그 글 관리',
+    description: '발행·초안·삭제된 글 목록, 새 글 작성 및 편집',
+    color: '#2563eb',
+  },
+  {
+    to: '/admin/blog/categories',
+    icon: '🗂',
+    title: '블로그 카테고리',
+    description: '블로그 분류 체계 생성 및 관리',
+    color: '#0891b2',
+  },
+  {
+    to: '/admin/course-inquiries',
+    icon: '📞',
+    title: '수강 문의',
+    description: '코스 상담 요청 내역 확인',
+    color: '#f59e0b',
+  },
+  {
+    to: '/mktadmin',
+    icon: '📊',
+    title: '마케팅 어드민',
+    description: '마케팅 지표 및 운영 도구',
+    color: '#7c3aed',
+  },
+];
+
+function AdminMenuGrid() {
+  return (
+    <div style={{ marginBottom: 32 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 700, color: '#475569', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        관리 메뉴
+      </h3>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+          gap: 12,
+        }}
+      >
+        {ADMIN_MENU.map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
+            style={{
+              display: 'block',
+              padding: 16,
+              borderRadius: 12,
+              background: '#fff',
+              border: '1px solid #e2e8f0',
+              textDecoration: 'none',
+              transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,23,42,0.08)';
+              e.currentTarget.style.borderColor = item.color;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.borderColor = '#e2e8f0';
+            }}
+          >
+            <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+              {item.title}
+            </div>
+            <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>
+              {item.description}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface SiteSummary {
   siteId: string;
@@ -132,15 +222,21 @@ export function AdminSiteListPage() {
   if (error) return <div style={{ padding: 40, textAlign: 'center', color: '#dc2626' }}>오류: {error}</div>;
 
   return (
-    <div style={{ padding: 24, maxWidth: 900, margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', margin: 0 }}>🔧 관리자 — 사이트 목록</h2>
-          <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>전체 {sites.length}개 사이트</p>
-        </div>
+    <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e293b', margin: 0 }}>관리자 대시보드</h2>
+        <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
+          전체 {sites.length}개 사이트 · 관리 메뉴에서 세부 기능으로 이동할 수 있습니다.
+        </p>
       </div>
 
+      <AdminMenuGrid />
+
       <DomainChangeRequests />
+
+      <h3 style={{ fontSize: 14, fontWeight: 700, color: '#475569', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        사이트 목록
+      </h3>
 
       <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
         {/* Table Header */}
