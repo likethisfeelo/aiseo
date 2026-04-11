@@ -25,6 +25,7 @@ import { DomainSettingsPage } from './pages/DomainSettingsPage';
 import { AdminSiteListPage } from './pages/admin/AdminSiteListPage';
 import { AdminSiteDetailPage } from './pages/admin/AdminSiteDetailPage';
 import { MktAdminPage } from './pages/admin/MktAdminPage';
+import { CourseInquiryAdminPage } from './pages/admin/CourseInquiryAdminPage';
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -306,6 +307,7 @@ export default function App() {
             <Route path="/admin" element={<AdminSiteListPage />} />
             <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
             <Route path="/mktadmin" element={<MktAdminPage />} />
+            <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
             <Route path="*" element={<Navigate to="/site/upload" replace />} />
           </Routes>
         </DashboardLayout>
