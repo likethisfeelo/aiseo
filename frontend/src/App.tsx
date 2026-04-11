@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { selectSite, getMe } from './api';
 import { tokenStore } from './auth.js';
@@ -26,6 +26,11 @@ import { AdminSiteListPage } from './pages/admin/AdminSiteListPage';
 import { AdminSiteDetailPage } from './pages/admin/AdminSiteDetailPage';
 import { MktAdminPage } from './pages/admin/MktAdminPage';
 import { CourseInquiryAdminPage } from './pages/admin/CourseInquiryAdminPage';
+import { BlogCategoriesAdminPage } from './pages/admin/BlogCategoriesAdminPage';
+import { BlogPostsAdminPage } from './pages/admin/BlogPostsAdminPage';
+import { BlogPostEditPage } from './pages/admin/BlogPostEditPage';
+import { BlogListPage } from './pages/public/BlogListPage';
+import { BlogPostPage } from './pages/public/BlogPostPage';
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -42,6 +47,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/roadmap': '성장 로드맵',
   '/domain': '도메인 설정',
   '/admin': '관리자',
+  '/admin/blog/posts': '블로그 글 관리',
+  '/admin/blog/categories': '블로그 카테고리',
 };
 
 function PageTitleProvider({ children, setPageTitle }: { children: React.ReactNode; setPageTitle: (t: string) => void }) {
@@ -225,21 +232,30 @@ export default function App() {
     );
   }
 
-  // Not logged in — hash-based routing for public sub-pages
+  // Not logged in — /blog uses real router; everything else falls through
+  // to legacy hash-based dispatch for public sub-pages.
   if (!user) {
     const subPages: Record<string, string> = {
       'course': '수강안내',
       'support': '지원서비스',
       'events': '이벤트',
-      'blog': '블로그',
     };
     const pageKey = currentHash && subPages[currentHash] ? currentHash : 'landing';
     return (
-      <div className="page-transition" key={pageKey}>
-        {pageKey !== 'landing'
-          ? <PublicSubPage pageKey={pageKey} title={subPages[pageKey]} />
-          : <LandingPage authError={authError} />}
-      </div>
+      <Routes>
+        <Route path="/blog" element={<BlogListPage />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route
+          path="*"
+          element={
+            <div className="page-transition" key={pageKey}>
+              {pageKey !== 'landing'
+                ? <PublicSubPage pageKey={pageKey} title={subPages[pageKey]} />
+                : <LandingPage authError={authError} />}
+            </div>
+          }
+        />
+      </Routes>
     );
   }
 
@@ -277,42 +293,44 @@ export default function App() {
 
   // Authenticated dashboard
   return (
-    <BrowserRouter>
-      <PageTitleProvider setPageTitle={setPageTitle}>
-        <DashboardLayout
-          user={user}
-          siteId={siteId}
-          siteOnline={true}
-          brandCompleteness={30}
-          stageProgress={20}
-          pageTitle={pageTitle}
-          onLogout={logout}
-          onToggleEducation={() => setEducationOpen((o) => !o)}
-        >
-          <Routes>
-            <Route path="/brand" element={<BrandPage siteId={siteId} />} />
-            <Route path="/products" element={<ProductPage siteId={siteId} />} />
-            <Route path="/services" element={<ServicePage siteId={siteId} />} />
-            <Route path="/store" element={<StorePage siteId={siteId} />} />
-            <Route path="/site/upload" element={<SiteManagementPage siteId={siteId} initialFocus="left" />} />
-            <Route path="/site/seo" element={<SiteManagementPage siteId={siteId} initialFocus="center" />} />
-            <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} initialFocus="right" />} />
-            <Route path="/site" element={<Navigate to="/site/upload" replace />} />
-            <Route path="/roadmap" element={<RoadmapPage />} />
-            <Route path="/seo-status" element={<SeoStatusPage siteId={siteId} />} />
-            <Route path="/analytics" element={<AnalyticsPage siteId={siteId} />} />
-            <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
-            <Route path="/content" element={<ContentAutomationPage />} />
-            <Route path="/domain" element={<DomainSettingsPage siteId={siteId} />} />
-            <Route path="/admin" element={<AdminSiteListPage />} />
-            <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
-            <Route path="/mktadmin" element={<MktAdminPage />} />
-            <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
-            <Route path="*" element={<Navigate to="/site/upload" replace />} />
-          </Routes>
-        </DashboardLayout>
-        <EducationDrawer open={educationOpen} onClose={() => setEducationOpen(false)} />
-      </PageTitleProvider>
-    </BrowserRouter>
+    <PageTitleProvider setPageTitle={setPageTitle}>
+      <DashboardLayout
+        user={user}
+        siteId={siteId}
+        siteOnline={true}
+        brandCompleteness={30}
+        stageProgress={20}
+        pageTitle={pageTitle}
+        onLogout={logout}
+        onToggleEducation={() => setEducationOpen((o) => !o)}
+      >
+        <Routes>
+          <Route path="/brand" element={<BrandPage siteId={siteId} />} />
+          <Route path="/products" element={<ProductPage siteId={siteId} />} />
+          <Route path="/services" element={<ServicePage siteId={siteId} />} />
+          <Route path="/store" element={<StorePage siteId={siteId} />} />
+          <Route path="/site/upload" element={<SiteManagementPage siteId={siteId} initialFocus="left" />} />
+          <Route path="/site/seo" element={<SiteManagementPage siteId={siteId} initialFocus="center" />} />
+          <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} initialFocus="right" />} />
+          <Route path="/site" element={<Navigate to="/site/upload" replace />} />
+          <Route path="/roadmap" element={<RoadmapPage />} />
+          <Route path="/seo-status" element={<SeoStatusPage siteId={siteId} />} />
+          <Route path="/analytics" element={<AnalyticsPage siteId={siteId} />} />
+          <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
+          <Route path="/content" element={<ContentAutomationPage />} />
+          <Route path="/domain" element={<DomainSettingsPage siteId={siteId} />} />
+          <Route path="/admin" element={<AdminSiteListPage />} />
+          <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
+          <Route path="/mktadmin" element={<MktAdminPage />} />
+          <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
+          <Route path="/admin/blog/posts" element={<BlogPostsAdminPage />} />
+          <Route path="/admin/blog/posts/new" element={<BlogPostEditPage />} />
+          <Route path="/admin/blog/posts/:slug/edit" element={<BlogPostEditPage />} />
+          <Route path="/admin/blog/categories" element={<BlogCategoriesAdminPage />} />
+          <Route path="*" element={<Navigate to="/site/upload" replace />} />
+        </Routes>
+      </DashboardLayout>
+      <EducationDrawer open={educationOpen} onClose={() => setEducationOpen(false)} />
+    </PageTitleProvider>
   );
 }

@@ -119,7 +119,7 @@ export class CdkStack extends Stack {
       deploy: false,
       defaultCorsPreflightOptions: {
         allowOrigins: [devOrigin, prodOrigin, siteDevOrigin, siteProdOrigin, b2bDevOrigin, b2bProdOrigin],
-        allowMethods: ['GET', 'POST', 'OPTIONS'],
+        allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowHeaders: ['Content-Type', 'Authorization'],
       },
     });
@@ -234,6 +234,26 @@ export class CdkStack extends Stack {
       resource.addMethod('GET', integration, {
         authorizationType: authorizer ? apigateway.AuthorizationType.COGNITO : apigateway.AuthorizationType.NONE,
         authorizer,
+      });
+    };
+
+    const addPut = (resource: apigateway.Resource, integration: apigateway.LambdaIntegration) => {
+      resource.addMethod('PUT', integration, {
+        authorizationType: authorizer ? apigateway.AuthorizationType.COGNITO : apigateway.AuthorizationType.NONE,
+        authorizer,
+      });
+    };
+
+    const addDelete = (resource: apigateway.Resource, integration: apigateway.LambdaIntegration) => {
+      resource.addMethod('DELETE', integration, {
+        authorizationType: authorizer ? apigateway.AuthorizationType.COGNITO : apigateway.AuthorizationType.NONE,
+        authorizer,
+      });
+    };
+
+    const addPublicGet = (resource: apigateway.Resource, integration: apigateway.LambdaIntegration) => {
+      resource.addMethod('GET', integration, {
+        authorizationType: apigateway.AuthorizationType.NONE,
       });
     };
 
@@ -370,6 +390,34 @@ export class CdkStack extends Stack {
     });
     courseInquiriesTable.grantReadWriteData(courseInquiryHandler);
 
+    // ── Blog tables + Lambda ──
+    const blogPostsTableName = 'aiseo-blog-posts';
+    const blogPostsTable = new dynamodb.Table(this, 'BlogPostsTable', {
+      tableName: blogPostsTableName,
+      partitionKey: { name: 'slug', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const blogCategoriesTableName = 'aiseo-blog-categories';
+    const blogCategoriesTable = new dynamodb.Table(this, 'BlogCategoriesTable', {
+      tableName: blogCategoriesTableName,
+      partitionKey: { name: 'slug', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const blogHandler = new lambda.Function(this, 'BlogFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'blog/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        BLOG_POSTS_TABLE: blogPostsTableName,
+        BLOG_CATEGORIES_TABLE: blogCategoriesTableName,
+      },
+    });
+    blogPostsTable.grantReadWriteData(blogHandler);
+    blogCategoriesTable.grantReadWriteData(blogHandler);
+
     // ── Comments table + Lambda handlers ──
     const commentsTableName = this.node.tryGetContext('commentsTableName') ?? 'aiseo-comments';
     const commentsTable = new dynamodb.Table(this, 'CommentsTable', {
@@ -453,12 +501,46 @@ export class CdkStack extends Stack {
     const adminCourseInquiriesResource = adminResource.addResource('course-inquiries');
     addGet(adminCourseInquiriesResource, courseInquiryIntegration);
 
+    // ── Blog routes ──
+    const blogIntegration = new apigateway.LambdaIntegration(blogHandler);
+
+    // Public blog routes (auth NONE) — /blog/*
+    const blogResource = api.root.addResource('blog');
+    const blogPostsResource = blogResource.addResource('posts');
+    addPublicGet(blogPostsResource, blogIntegration);
+    const blogPostSlugResource = blogPostsResource.addResource('{slug}');
+    addPublicGet(blogPostSlugResource, blogIntegration);
+    const blogFeaturedResource = blogResource.addResource('featured');
+    addPublicGet(blogFeaturedResource, blogIntegration);
+    const blogPopularResource = blogResource.addResource('popular');
+    addPublicGet(blogPopularResource, blogIntegration);
+    const blogCategoriesResource = blogResource.addResource('categories');
+    addPublicGet(blogCategoriesResource, blogIntegration);
+
+    // Admin blog routes (Cognito admin) — /admin/blog/*
+    const adminBlogResource = adminResource.addResource('blog');
+
+    const adminBlogPostsResource = adminBlogResource.addResource('posts');
+    addGet(adminBlogPostsResource, blogIntegration);
+    addPost(adminBlogPostsResource, blogIntegration);
+    const adminBlogPostSlugResource = adminBlogPostsResource.addResource('{slug}');
+    addGet(adminBlogPostSlugResource, blogIntegration);
+    addPut(adminBlogPostSlugResource, blogIntegration);
+    addDelete(adminBlogPostSlugResource, blogIntegration);
+
+    const adminBlogCategoriesResource = adminBlogResource.addResource('categories');
+    addGet(adminBlogCategoriesResource, blogIntegration);
+    addPost(adminBlogCategoriesResource, blogIntegration);
+    const adminBlogCategorySlugResource = adminBlogCategoriesResource.addResource('{slug}');
+    addPut(adminBlogCategorySlugResource, blogIntegration);
+    addDelete(adminBlogCategorySlugResource, blogIntegration);
+
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,
       responseHeaders: {
         'Access-Control-Allow-Origin': "'*'",
         'Access-Control-Allow-Headers': "'Content-Type,Authorization'",
-        'Access-Control-Allow-Methods': "'GET,POST,OPTIONS'",
+        'Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'",
       },
     });
 
@@ -467,7 +549,7 @@ export class CdkStack extends Stack {
       responseHeaders: {
         'Access-Control-Allow-Origin': "'*'",
         'Access-Control-Allow-Headers': "'Content-Type,Authorization'",
-        'Access-Control-Allow-Methods': "'GET,POST,OPTIONS'",
+        'Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'",
       },
     });
 

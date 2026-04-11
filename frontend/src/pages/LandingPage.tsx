@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './landing.css';
 import { ConsultationWidget } from '../components/ConsultationWidget';
+import { LandingBlogSection } from './landing/LandingBlogSection';
 
 interface Props {
   authError: string;
@@ -436,7 +437,7 @@ export function LandingPage({ authError }: Props) {
             <a href="/#course">수강안내</a>
             <a href="/#support">지원서비스</a>
             <a href="/#events">이벤트</a>
-            <a href="/#blog">블로그</a>
+            <a href="/blog">블로그</a>
           </div>
           <div className="nav-cta">
             <a href="/?auth=login" className="btn-ghost">로그인</a>
@@ -454,7 +455,7 @@ export function LandingPage({ authError }: Props) {
           <a href="/#course" className="nmm-link">수강안내</a>
           <a href="/#support" className="nmm-link">지원서비스</a>
           <a href="/#events" className="nmm-link">이벤트</a>
-          <a href="/#blog" className="nmm-link">블로그</a>
+          <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
           <a href="/?auth=login" className="nmm-btn-ghost">로그인</a>
@@ -1148,66 +1149,8 @@ export function LandingPage({ authError }: Props) {
         </div>
       </div>
 
-      {/* BLOG/NEWS */}
-      <section className="blog-section" id="blog">
-        <div className="blog-head">
-          <span className="blog-head-title">SEO 인사이트 &amp; 가이드</span>
-          <a href="#" className="blog-all-btn">모든 아티클 보기 →</a>
-        </div>
-        <div className="blog-grid">
-          <a href="#" className="blog-card" style={{textDecoration:'none'}}>
-            <div className="blog-thumb">
-              <div className="blog-thumb-inner blog-thumb-1">
-                <div className="blog-thumb-tag">PLAYBOOK</div>
-                <div className="blog-thumb-headline">THE AI SEO<br/>PLAYBOOK<br/>2026</div>
-              </div>
-            </div>
-            <p className="blog-card-title">AI로 완성하는 2026 SEO 전략 플레이북: 웹사이트 제작부터 상위 노출까지</p>
-          </a>
-          <a href="#" className="blog-card" style={{textDecoration:'none'}}>
-            <div className="blog-thumb">
-              <div className="blog-thumb-inner blog-thumb-2" style={{justifyContent:'flex-start',padding:14}}>
-                <div className="blog-thumb-tag">GUIDE</div>
-                <div style={{marginTop:24,width:'100%'}}>
-                  <div style={{fontSize:13,fontWeight:600,color:'var(--text-primary)',marginBottom:8,lineHeight:1.4}}>ChatGPT로 키워드 리서치하는<br/>5가지 프롬프트</div>
-                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
-                    <div style={{width:24,height:24,borderRadius:'50%',background:'var(--accent-light)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10}}>K</div>
-                    <div style={{fontSize:10,color:'var(--text-muted)'}}>AISEO 콘텐츠팀</div>
-                  </div>
-                  <div className="blog-mock-rows">
-                    <div className="blog-mock-row" style={{width:'100%'}}></div>
-                    <div className="blog-mock-row accent"></div>
-                    <div className="blog-mock-row" style={{width:'80%'}}></div>
-                    <div className="blog-mock-row" style={{width:'50%',background:'var(--accent)',opacity:0.3}}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <p className="blog-card-title">ChatGPT와 AISEO를 활용한 키워드 리서치 자동화 5가지 방법 (2026)</p>
-          </a>
-          <a href="#" className="blog-card" style={{textDecoration:'none'}}>
-            <div className="blog-thumb">
-              <div className="blog-thumb-inner blog-thumb-3" style={{justifyContent:'center',alignItems:'center'}}>
-                <div className="blog-thumb-tag">TECHNICAL</div>
-                <div className="blog-thumb-headline" style={{textAlign:'center'}}>기술적 SEO란<br/>무엇인가?</div>
-              </div>
-            </div>
-            <p className="blog-card-title">기술적 SEO 완전 정복: AI가 자동화하는 핵심 요소와 체크리스트</p>
-          </a>
-          <a href="#" className="blog-card" style={{textDecoration:'none'}}>
-            <div className="blog-thumb">
-              <div className="blog-thumb-inner blog-thumb-4">
-                <div className="blog-thumb-tag" style={{background:'rgba(0,0,0,0.1)',color:'#1C1917'}}>PRICING</div>
-                <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',textAlign:'center',width:'90%'}}>
-                  <div style={{fontFamily:'var(--font-en)',fontSize:13,color:'rgba(0,0,0,0.45)',marginBottom:4}}>진짜</div>
-                  <div style={{fontFamily:'var(--font-ko)',fontSize:22,fontWeight:800,color:'#1C1917',lineHeight:1.2,letterSpacing:-1}}>SEO 비용은<br/>얼마일까?</div>
-                </div>
-              </div>
-            </div>
-            <p className="blog-card-title">SEO 에이전시 vs AI 자동화: 2026년 비용 완전 비교 가이드</p>
-          </a>
-        </div>
-      </section>
+      {/* BLOG/NEWS — real featured posts from backend (Phase 7) */}
+      <LandingBlogSection />
 
       {/* FOOTER */}
       <footer>

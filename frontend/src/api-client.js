@@ -59,3 +59,51 @@ export const getJson = async (path) => {
 
   return payload.data;
 };
+
+export const putJson = async (path, body) => {
+  const url = `${API_BASE_URL}${path}`;
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...createAuthHeaders(),
+    },
+    body: JSON.stringify(body),
+  });
+
+  const payload = await toJson(response);
+
+  if (!response.ok) {
+    const errorMessage = payload?.error || `Request failed: ${response.status}`;
+    throw new Error(errorMessage);
+  }
+
+  if (!payload.success) {
+    throw new Error(payload.error || 'API returned success=false');
+  }
+
+  return payload.data;
+};
+
+export const deleteJson = async (path) => {
+  const url = `${API_BASE_URL}${path}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      ...createAuthHeaders(),
+    },
+  });
+
+  const payload = await toJson(response);
+
+  if (!response.ok) {
+    const errorMessage = payload?.error || `Request failed: ${response.status}`;
+    throw new Error(errorMessage);
+  }
+
+  if (!payload.success) {
+    throw new Error(payload.error || 'API returned success=false');
+  }
+
+  return payload.data;
+};
