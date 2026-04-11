@@ -74,26 +74,26 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
       style={{
         width: 220,
         minHeight: '100vh',
-        background: '#fff',
-        borderRight: '1px solid #e2e8f0',
+        background: 'var(--bg-card)',
+        borderRight: '1px solid var(--border)',
         display: 'flex',
         flexDirection: 'column',
         flexShrink: 0,
-        fontFamily: "'Noto Sans KR', system-ui, sans-serif",
+        fontFamily: 'var(--font-ko)',
       }}
     >
       {/* Logo */}
-      <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid #f1f5f9' }}>
+      <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid var(--border-soft)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1e293b', fontFamily: "'DM Serif Display', serif" }}>
+          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'DM Serif Display', serif", letterSpacing: '-0.01em' }}>
             AISEO
           </span>
-          <span style={{ fontSize: 10, fontWeight: 700, color: '#2563eb', background: '#eff6ff', padding: '2px 6px', borderRadius: 4 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--primary)', background: 'var(--primary-soft)', padding: '2px 6px', borderRadius: 4 }}>
             BETA
           </span>
         </div>
         {siteId && (
-          <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, fontFamily: 'var(--font-en)' }}>
             {siteId}.aiseo.tips
           </div>
         )}
@@ -123,14 +123,14 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
               expanded={true}
               onClick={() => {}}
             />
-            <div style={{ background: '#fafbfc', overflowY: 'auto', flex: 1 }}>
+            <div style={{ background: 'var(--bg-soft)', overflowY: 'auto', flex: 1 }}>
               {MENU[expandedIdx].children.map((child) => {
                 const active = location.pathname === child.path;
                 const disabled = child.locked;
                 return (
                   <div key={child.path}>
                     {child.section && (
-                      <div style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', padding: '10px 16px 3px 40px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', padding: '10px 16px 3px 40px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                         {child.section}
                       </div>
                     )}
@@ -144,20 +144,20 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
                         textAlign: 'left',
                         padding: '8px 16px 8px 40px',
                         border: 'none',
-                        background: active ? '#eff6ff' : 'transparent',
-                        color: disabled ? '#b0b8c4' : active ? '#2563eb' : '#475569',
+                        background: active ? 'var(--primary-soft)' : 'transparent',
+                        color: disabled ? 'var(--text-muted)' : active ? 'var(--primary)' : 'var(--text-secondary)',
                         fontSize: 13,
                         fontWeight: active ? 600 : 400,
                         cursor: disabled ? 'default' : 'pointer',
-                        borderLeft: active ? '3px solid #2563eb' : '3px solid transparent',
+                        borderLeft: active ? '3px solid var(--primary)' : '3px solid transparent',
                         transition: 'background 0.15s, color 0.15s',
                         fontFamily: 'inherit',
                       }}
-                      onMouseEnter={(e) => { if (!active && !disabled) e.currentTarget.style.background = '#f1f5f9'; }}
+                      onMouseEnter={(e) => { if (!active && !disabled) e.currentTarget.style.background = 'var(--border-soft)'; }}
                       onMouseLeave={(e) => { if (!active && !disabled) e.currentTarget.style.background = 'transparent'; }}
                     >
                       <span>{child.label}</span>
-                      {disabled && <span style={{ fontSize: 10, color: '#94a3b8', background: '#f1f5f9', padding: '1px 6px', borderRadius: 4 }}>준비 중</span>}
+                      {disabled && <span style={{ fontSize: 10, color: 'var(--text-muted)', background: 'var(--border-soft)', padding: '1px 6px', borderRadius: 4 }}>준비 중</span>}
                     </button>
                   </div>
                 );
@@ -192,9 +192,9 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
             width: '100%',
             padding: '12px 16px',
             border: 'none',
-            borderTop: '1px solid #f1f5f9',
+            borderTop: '1px solid var(--border-soft)',
             background: 'transparent',
-            color: '#475569',
+            color: 'var(--text-secondary)',
             fontSize: 14,
             fontWeight: 600,
             cursor: 'pointer',
@@ -202,12 +202,12 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
             fontFamily: 'inherit',
             transition: 'background 0.15s',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-soft)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
         >
           <span style={{ fontSize: 16 }}>📚</span>
           <span>교육 안내</span>
-          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>›</span>
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>›</span>
         </button>
 
         {/* Domain Settings */}
@@ -220,9 +220,9 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
             width: '100%',
             padding: '12px 16px',
             border: 'none',
-            borderTop: '1px solid #f1f5f9',
+            borderTop: '1px solid var(--border-soft)',
             background: 'transparent',
-            color: '#475569',
+            color: 'var(--text-secondary)',
             fontSize: 14,
             fontWeight: 600,
             cursor: 'pointer',
@@ -230,12 +230,12 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
             fontFamily: 'inherit',
             transition: 'background 0.15s',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-soft)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
         >
           <span style={{ fontSize: 16 }}>🌐</span>
           <span>도메인 수정 신청</span>
-          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>›</span>
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>›</span>
         </button>
 
         {/* Consulting */}
@@ -248,9 +248,9 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
             width: '100%',
             padding: '12px 16px',
             border: 'none',
-            borderTop: '1px solid #f1f5f9',
+            borderTop: '1px solid var(--border-soft)',
             background: 'transparent',
-            color: '#2563eb',
+            color: 'var(--primary)',
             fontSize: 14,
             fontWeight: 600,
             cursor: 'pointer',
@@ -258,19 +258,19 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
             fontFamily: 'inherit',
             transition: 'background 0.15s',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#eff6ff'; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--primary-soft)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
         >
           <span style={{ fontSize: 16 }}>💬</span>
           <span>상담 신청</span>
-          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>›</span>
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>›</span>
         </button>
       </div>
 
       {/* Bottom: Completeness */}
       <div
         style={{
-          borderTop: '1px solid #e2e8f0',
+          borderTop: '1px solid var(--border)',
           padding: 16,
           display: 'flex',
           flexDirection: 'column',
@@ -279,18 +279,18 @@ export function Sidebar({ siteId, brandCompleteness, stageProgress, onToggleEduc
         }}
       >
         <ProgressRing value={brandCompleteness} size={52} strokeWidth={4} label="브랜드 완성도" />
-        <div style={{ width: '100%', background: '#f1f5f9', borderRadius: 4, height: 6, overflow: 'hidden' }}>
+        <div style={{ width: '100%', background: 'var(--border-soft)', borderRadius: 4, height: 6, overflow: 'hidden' }}>
           <div
             style={{
               height: '100%',
               width: `${stageProgress}%`,
-              background: 'linear-gradient(90deg, #2563eb, #7c3aed)',
+              background: 'linear-gradient(90deg, var(--primary), var(--accent))',
               borderRadius: 4,
               transition: 'width 0.4s ease',
             }}
           />
         </div>
-        <span style={{ fontSize: 11, color: '#64748b' }}>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
           전체 여정 {stageProgress}%
         </span>
       </div>
@@ -310,22 +310,22 @@ function SectionHeader({ menu, expanded, onClick }: { menu: MenuItem; expanded: 
         width: '100%',
         padding: '12px 16px',
         border: 'none',
-        background: expanded ? '#f1f5f9' : 'transparent',
-        color: expanded ? '#1e293b' : '#475569',
+        background: expanded ? 'var(--bg-soft)' : 'transparent',
+        color: expanded ? 'var(--text-primary)' : 'var(--text-secondary)',
         fontSize: 14,
         fontWeight: 600,
         cursor: expanded ? 'default' : 'pointer',
         textAlign: 'left',
         fontFamily: 'inherit',
-        borderBottom: expanded ? '1px solid #e2e8f0' : 'none',
+        borderBottom: expanded ? '1px solid var(--border)' : 'none',
         transition: 'background 0.2s, color 0.2s',
       }}
-      onMouseEnter={(e) => { if (!expanded) e.currentTarget.style.background = '#f8fafc'; }}
+      onMouseEnter={(e) => { if (!expanded) e.currentTarget.style.background = 'var(--bg-soft)'; }}
       onMouseLeave={(e) => { if (!expanded) e.currentTarget.style.background = 'transparent'; }}
     >
       <span style={{ fontSize: 16 }}>{menu.icon}</span>
       <span>{menu.label}</span>
-      <span style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8', transition: 'transform 0.2s', transform: expanded ? 'rotate(90deg)' : 'none' }}>
+      <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)', transition: 'transform 0.2s', transform: expanded ? 'rotate(90deg)' : 'none' }}>
         ›
       </span>
     </button>

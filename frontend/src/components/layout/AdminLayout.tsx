@@ -20,8 +20,9 @@ export function AdminLayout({ user, onLogout, children }: Props) {
     <div
       style={{
         minHeight: '100vh',
-        fontFamily: "'Noto Sans KR', system-ui, sans-serif",
-        background: '#f8fafc',
+        fontFamily: 'var(--font-ko)',
+        background: 'var(--bg-app)',
+        color: 'var(--text-primary)',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -32,21 +33,23 @@ export function AdminLayout({ user, onLogout, children }: Props) {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '12px 24px',
-          background: '#0f172a',
+          background: 'var(--text-primary)',
           color: '#fff',
-          borderBottom: '1px solid #1e293b',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
         }}
       >
         <Link
           to="/admin"
           style={{
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: 700,
             color: '#fff',
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
+            gap: 10,
+            fontFamily: "'DM Serif Display', serif",
+            letterSpacing: '-0.01em',
           }}
         >
           <span>🔧</span>
@@ -57,26 +60,28 @@ export function AdminLayout({ user, onLogout, children }: Props) {
             to="/site/upload"
             style={{
               fontSize: 12,
-              color: '#cbd5e1',
+              color: 'rgba(255,255,255,0.78)',
               textDecoration: 'none',
               padding: '6px 12px',
-              borderRadius: 6,
-              border: '1px solid #334155',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid rgba(255,255,255,0.16)',
+              fontFamily: 'var(--font-ko)',
             }}
           >
             ← 사용자 대시보드
           </Link>
-          <span style={{ fontSize: 12, color: '#94a3b8' }}>{user.email}</span>
+          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-en)' }}>{user.email}</span>
           <button
             onClick={onLogout}
             style={{
               fontSize: 12,
               background: 'transparent',
-              border: '1px solid #334155',
-              color: '#cbd5e1',
+              border: '1px solid rgba(255,255,255,0.16)',
+              color: 'rgba(255,255,255,0.78)',
               padding: '6px 12px',
-              borderRadius: 6,
+              borderRadius: 'var(--radius-sm)',
               cursor: 'pointer',
+              fontFamily: 'var(--font-ko)',
             }}
           >
             로그아웃
