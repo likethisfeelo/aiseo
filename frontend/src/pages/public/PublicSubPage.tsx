@@ -46,7 +46,7 @@ export function PublicSubPage({ pageKey, title }: Props) {
             <a href="/#course" className={pageKey === 'course' ? 'active' : ''}>수강안내</a>
             <a href="/#support" className={pageKey === 'support' ? 'active' : ''}>지원서비스</a>
             <a href="/#events" className={pageKey === 'events' ? 'active' : ''}>이벤트</a>
-            <a href="/#blog" className={pageKey === 'blog' ? 'active' : ''}>블로그</a>
+            <a href="/blog">블로그</a>
           </div>
           <div className="nav-cta">
             <a href="/?auth=login" className="btn-ghost">로그인</a>
@@ -64,7 +64,7 @@ export function PublicSubPage({ pageKey, title }: Props) {
           <a href="/#course" className="nmm-link">수강안내</a>
           <a href="/#support" className="nmm-link">지원서비스</a>
           <a href="/#events" className="nmm-link">이벤트</a>
-          <a href="/#blog" className="nmm-link">블로그</a>
+          <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
           <a href="/?auth=login" className="nmm-btn-ghost">로그인</a>

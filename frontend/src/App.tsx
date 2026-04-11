@@ -29,6 +29,7 @@ import { CourseInquiryAdminPage } from './pages/admin/CourseInquiryAdminPage';
 import { BlogCategoriesAdminPage } from './pages/admin/BlogCategoriesAdminPage';
 import { BlogPostsAdminPage } from './pages/admin/BlogPostsAdminPage';
 import { BlogPostEditPage } from './pages/admin/BlogPostEditPage';
+import { BlogListPage } from './pages/public/BlogListPage';
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -230,21 +231,29 @@ export default function App() {
     );
   }
 
-  // Not logged in — hash-based routing for public sub-pages
+  // Not logged in — /blog uses real router; everything else falls through
+  // to legacy hash-based dispatch for public sub-pages.
   if (!user) {
     const subPages: Record<string, string> = {
       'course': '수강안내',
       'support': '지원서비스',
       'events': '이벤트',
-      'blog': '블로그',
     };
     const pageKey = currentHash && subPages[currentHash] ? currentHash : 'landing';
     return (
-      <div className="page-transition" key={pageKey}>
-        {pageKey !== 'landing'
-          ? <PublicSubPage pageKey={pageKey} title={subPages[pageKey]} />
-          : <LandingPage authError={authError} />}
-      </div>
+      <Routes>
+        <Route path="/blog" element={<BlogListPage />} />
+        <Route
+          path="*"
+          element={
+            <div className="page-transition" key={pageKey}>
+              {pageKey !== 'landing'
+                ? <PublicSubPage pageKey={pageKey} title={subPages[pageKey]} />
+                : <LandingPage authError={authError} />}
+            </div>
+          }
+        />
+      </Routes>
     );
   }
 
