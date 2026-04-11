@@ -61,7 +61,7 @@ export function CourseInquiryAdminPage() {
       <p style={styles.subtitle}>총 {items.length}건의 문의</p>
 
       {loading && <p style={styles.msg}>로딩 중...</p>}
-      {error && <p style={{ ...styles.msg, color: '#c0392b' }}>오류: {error}</p>}
+      {error && <p style={{ ...styles.msg, color: 'var(--danger)' }}>오류: {error}</p>}
 
       {!loading && !error && items.length === 0 && (
         <p style={styles.msg}>아직 접수된 문의가 없습니다.</p>
@@ -112,12 +112,12 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 1200,
     margin: '0 auto',
     padding: '40px 24px',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif",
+    fontFamily: 'var(--font-ko)',
   },
   title: {
     fontSize: 22,
     fontWeight: 600,
-    color: '#1a1a18',
+    color: 'var(--text-primary)',
     marginBottom: 4,
   },
   subtitle: {
@@ -133,7 +133,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   tableWrap: {
     overflowX: 'auto',
-    border: '1px solid #e0dfd8',
+    border: '1px solid var(--border)',
     borderRadius: 10,
   },
   table: {
@@ -144,14 +144,14 @@ const styles: Record<string, React.CSSProperties> = {
   th: {
     textAlign: 'left' as const,
     padding: '12px 14px',
-    background: '#f8f7f4',
+    background: 'var(--bg-soft)',
     fontWeight: 600,
     color: '#555',
-    borderBottom: '1px solid #e0dfd8',
+    borderBottom: '1px solid var(--border)',
     whiteSpace: 'nowrap' as const,
   },
   tr: {
-    borderBottom: '1px solid #f0efec',
+    borderBottom: '1px solid var(--border-soft)',
   },
   td: {
     padding: '11px 14px',

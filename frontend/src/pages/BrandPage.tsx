@@ -27,8 +27,8 @@ function calcCompleteness(b: Brand): number {
   return Math.round(((filled + hasColors + hasTone + hasKeywords) / 12) * 100);
 }
 
-const inputStyle = { width: '100%', padding: 8, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 12 };
-const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 } as const;
+const inputStyle = { width: '100%', padding: 8, border: '1px solid var(--border-strong)', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 12 };
+const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 } as const;
 
 export function BrandPage({ siteId }: { siteId: string }) {
   const [brand, setBrand] = useState<Brand>(EMPTY_BRAND);
@@ -77,17 +77,17 @@ export function BrandPage({ siteId }: { siteId: string }) {
 
   const completeness = calcCompleteness(brand);
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>불러오는 중...</div>;
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>불러오는 중...</div>;
 
   return (
     <div style={{ display: 'flex', gap: 0, height: '100%' }}>
       {/* Left: Edit Form */}
-      <div style={{ width: 400, borderRight: '1px solid #e2e8f0', overflowY: 'auto', padding: 24, background: '#fff' }}>
+      <div style={{ width: 400, borderRight: '1px solid var(--border)', overflowY: 'auto', padding: 24, background: '#fff' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>브랜드 관리</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <AutoSaveIndicator saving={saving} lastSaved={lastSaved} error={saveError} />
-            <button onClick={manualSave} disabled={saving} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', fontSize: 12, cursor: 'pointer', color: '#475569' }}>
+            <button onClick={manualSave} disabled={saving} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid var(--border-strong)', background: '#fff', fontSize: 12, cursor: 'pointer', color: 'var(--text-secondary)' }}>
               {saving ? '저장 중...' : '저장'}
             </button>
           </div>
@@ -121,7 +121,7 @@ export function BrandPage({ siteId }: { siteId: string }) {
         <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
           {brand.colors.map((c, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 6, background: c, border: '1px solid #d1d5db' }} />
+              <div style={{ width: 28, height: 28, borderRadius: 6, background: c, border: '1px solid var(--border-strong)' }} />
               <input
                 value={c}
                 onChange={(e) => {
@@ -129,13 +129,13 @@ export function BrandPage({ siteId }: { siteId: string }) {
                   next[i] = e.target.value;
                   update('colors', next);
                 }}
-                style={{ width: 72, padding: 4, fontSize: 11, border: '1px solid #d1d5db', borderRadius: 4 }}
+                style={{ width: 72, padding: 4, fontSize: 11, border: '1px solid var(--border-strong)', borderRadius: 4 }}
               />
-              <button onClick={() => update('colors', brand.colors.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>×</button>
+              <button onClick={() => update('colors', brand.colors.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
             </div>
           ))}
           {brand.colors.length < 3 && (
-            <button onClick={() => update('colors', [...brand.colors, '#2563eb'])} style={{ width: 28, height: 28, borderRadius: 6, border: '1px dashed #cbd5e1', background: '#f8fafc', cursor: 'pointer', fontSize: 16, color: '#94a3b8' }}>+</button>
+            <button onClick={() => update('colors', [...brand.colors, 'var(--primary)'])} style={{ width: 28, height: 28, borderRadius: 6, border: '1px dashed var(--text-muted)', background: 'var(--bg-soft)', cursor: 'pointer', fontSize: 16, color: 'var(--text-muted)' }}>+</button>
           )}
         </div>
 
@@ -148,8 +148,8 @@ export function BrandPage({ siteId }: { siteId: string }) {
               onClick={() => brand.tone.includes(t) ? removeTag('tone', t) : addTag('tone', t)}
               style={{
                 padding: '4px 10px', borderRadius: 12, fontSize: 12, cursor: 'pointer',
-                background: brand.tone.includes(t) ? '#2563eb' : '#f1f5f9',
-                color: brand.tone.includes(t) ? '#fff' : '#475569',
+                background: brand.tone.includes(t) ? 'var(--primary)' : 'var(--border-soft)',
+                color: brand.tone.includes(t) ? '#fff' : 'var(--text-secondary)',
                 border: 'none',
               }}
             >
@@ -168,7 +168,7 @@ export function BrandPage({ siteId }: { siteId: string }) {
             <input value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder="직접 입력" style={{ ...inputStyle, marginBottom: 0, flex: 1 }}
               onKeyDown={(e) => { if (e.key === 'Enter') { addTag('tone', tagInput); setTagInput(''); setTagField(null); } }}
             />
-            <button onClick={() => { addTag('tone', tagInput); setTagInput(''); setTagField(null); }} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #2563eb', background: '#2563eb', color: '#fff', fontSize: 12, cursor: 'pointer' }}>추가</button>
+            <button onClick={() => { addTag('tone', tagInput); setTagInput(''); setTagField(null); }} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid var(--primary)', background: 'var(--primary)', color: '#fff', fontSize: 12, cursor: 'pointer' }}>추가</button>
           </div>
         )}
 
@@ -195,7 +195,7 @@ export function BrandPage({ siteId }: { siteId: string }) {
         <label style={labelStyle}>SEO 키워드</label>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
           {brand.target.keywords.map((k) => (
-            <TagChip key={k} label={k} onRemove={() => removeTag('keywords', k)} color="#7c3aed" />
+            <TagChip key={k} label={k} onRemove={() => removeTag('keywords', k)} color="var(--accent-dark)" />
           ))}
           <AddTagButton onClick={() => setTagField('keywords')} />
         </div>
@@ -204,36 +204,36 @@ export function BrandPage({ siteId }: { siteId: string }) {
             <input value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder="키워드 입력" style={{ ...inputStyle, marginBottom: 0, flex: 1 }}
               onKeyDown={(e) => { if (e.key === 'Enter') { addTag('keywords', tagInput); setTagInput(''); setTagField(null); } }}
             />
-            <button onClick={() => { addTag('keywords', tagInput); setTagInput(''); setTagField(null); }} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #7c3aed', background: '#7c3aed', color: '#fff', fontSize: 12, cursor: 'pointer' }}>추가</button>
+            <button onClick={() => { addTag('keywords', tagInput); setTagInput(''); setTagField(null); }} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid var(--accent-dark)', background: 'var(--accent-dark)', color: '#fff', fontSize: 12, cursor: 'pointer' }}>추가</button>
           </div>
         )}
       </div>
 
       {/* Right: Preview */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: 24, background: '#f8fafc' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 24, background: 'var(--bg-soft)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: '#64748b', margin: 0 }}>미리보기</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0 }}>미리보기</h3>
           <ProgressRing value={completeness} size={44} strokeWidth={4} />
         </div>
 
         {/* Preview Card */}
-        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0', overflow: 'hidden', maxWidth: 380 }}>
+        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden', maxWidth: 380 }}>
           {brand.logo && (
-            <div style={{ padding: 20, display: 'flex', justifyContent: 'center', background: '#f8fafc' }}>
+            <div style={{ padding: 20, display: 'flex', justifyContent: 'center', background: 'var(--bg-soft)' }}>
               <img src={brand.logo} alt="logo" style={{ maxHeight: 64, objectFit: 'contain' }} />
             </div>
           )}
           <div style={{ padding: 20 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 4px', color: '#1e293b', fontFamily: "'Noto Serif KR', serif" }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 4px', color: 'var(--text-primary)', fontFamily: "'Noto Serif KR', serif" }}>
               {brand.name || '브랜드 이름'}
             </h3>
-            {brand.nameEn && <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>{brand.nameEn}</div>}
-            <p style={{ fontSize: 14, color: '#475569', marginBottom: 12 }}>{brand.tagline || '한 줄 소개가 여기에 표시됩니다'}</p>
+            {brand.nameEn && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>{brand.nameEn}</div>}
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 12 }}>{brand.tagline || '한 줄 소개가 여기에 표시됩니다'}</p>
 
             {brand.colors.length > 0 && (
               <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
                 {brand.colors.map((c, i) => (
-                  <div key={i} style={{ width: 24, height: 24, borderRadius: '50%', background: c, border: '1px solid #e2e8f0' }} />
+                  <div key={i} style={{ width: 24, height: 24, borderRadius: '50%', background: c, border: '1px solid var(--border)' }} />
                 ))}
               </div>
             )}
@@ -241,29 +241,29 @@ export function BrandPage({ siteId }: { siteId: string }) {
             {brand.tone.length > 0 && (
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 12 }}>
                 {brand.tone.map((t) => (
-                  <span key={t} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: '#f1f5f9', color: '#475569' }}>{t}</span>
+                  <span key={t} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'var(--border-soft)', color: 'var(--text-secondary)' }}>{t}</span>
                 ))}
               </div>
             )}
 
             {brand.industry && (
-              <div style={{ fontSize: 12, color: '#64748b' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                 {brand.industry} · {brand.businessType}
               </div>
             )}
 
             {brand.story.origin && (
-              <div style={{ marginTop: 12, padding: 12, background: '#fffbeb', borderRadius: 6, fontSize: 13, color: '#78350f', lineHeight: 1.6 }}>
+              <div style={{ marginTop: 12, padding: 12, background: 'var(--warning-soft)', borderRadius: 6, fontSize: 13, color: 'var(--warning-dark)', lineHeight: 1.6 }}>
                 {brand.story.origin}
               </div>
             )}
 
             {brand.target.keywords.length > 0 && (
               <div style={{ marginTop: 12 }}>
-                <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 4 }}>SEO 키워드</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>SEO 키워드</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                   {brand.target.keywords.map((k) => (
-                    <span key={k} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: '#f3e8ff', color: '#7c3aed' }}>{k}</span>
+                    <span key={k} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'var(--primary-soft)', color: 'var(--accent-dark)' }}>{k}</span>
                   ))}
                 </div>
               </div>

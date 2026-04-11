@@ -7,13 +7,13 @@ import type { HeadSnippets, SeoSnapshot, SnapshotEntry, SnapshotChannel } from '
 /* ── Shared Styles ── */
 const tabBtnStyle = (active: boolean) => ({
   padding: '10px 20px', fontSize: 13, fontWeight: active ? 700 : 500,
-  border: 'none', borderBottom: active ? '3px solid #2563eb' : '3px solid transparent',
-  background: 'none', color: active ? '#2563eb' : '#64748b', cursor: 'pointer',
+  border: 'none', borderBottom: active ? '3px solid var(--primary)' : '3px solid transparent',
+  background: 'none', color: active ? 'var(--primary)' : 'var(--text-secondary)', cursor: 'pointer',
 } as const);
-const cardStyle = { padding: 14, borderRadius: 8, background: '#fff', border: '1px solid #e2e8f0', marginBottom: 12 } as const;
-const inputStyle = { width: '100%', padding: 8, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 8 };
-const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 } as const;
-const statusDot = (on: boolean) => ({ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: on ? '#22c55e' : '#d1d5db', marginRight: 6 } as const);
+const cardStyle = { padding: 14, borderRadius: 8, background: '#fff', border: '1px solid var(--border)', marginBottom: 12 } as const;
+const inputStyle = { width: '100%', padding: 8, border: '1px solid var(--border-strong)', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 8 };
+const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 } as const;
+const statusDot = (on: boolean) => ({ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: on ? 'var(--success)' : 'var(--border-strong)', marginRight: 6 } as const);
 
 type Tab = 'snapshot' | 'health' | 'tools';
 
@@ -122,8 +122,8 @@ function AddSnapshotForm({ siteId, onSaved }: { siteId: string; onSaved: () => v
   if (!open) {
     return (
       <button onClick={() => setOpen(true)} style={{
-        width: '100%', padding: 12, borderRadius: 8, border: '2px dashed #cbd5e1',
-        background: '#f8fafc', color: '#475569', fontSize: 13, cursor: 'pointer', marginBottom: 16,
+        width: '100%', padding: 12, borderRadius: 8, border: '2px dashed var(--text-muted)',
+        background: 'var(--bg-soft)', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', marginBottom: 16,
       }}>
         + 새 스냅샷 기록
       </button>
@@ -131,10 +131,10 @@ function AddSnapshotForm({ siteId, onSaved }: { siteId: string; onSaved: () => v
   }
 
   return (
-    <div style={{ ...cardStyle, background: '#fafbfc' }} onPaste={handlePaste} ref={pasteRef}>
+    <div style={{ ...cardStyle, background: 'var(--bg-soft)' }} onPaste={handlePaste} ref={pasteRef}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>새 스냅샷 기록</span>
-        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 16 }}>✕</button>
+        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>새 스냅샷 기록</span>
+        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 16 }}>✕</button>
       </div>
 
       <label style={labelStyle}>날짜</label>
@@ -142,15 +142,15 @@ function AddSnapshotForm({ siteId, onSaved }: { siteId: string; onSaved: () => v
 
       {CHANNEL_GROUPS.map((group) => (
         <div key={group.label} style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', marginBottom: 6, textTransform: 'uppercase' }}>{group.label}</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>{group.label}</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {group.channels.map((ch) => {
               const selected = selectedChannels.has(ch.value);
               return (
                 <button key={ch.value} onClick={() => toggleChannel(ch.value)} style={{
                   padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 500, cursor: 'pointer',
-                  background: selected ? '#eff6ff' : '#f8fafc', color: selected ? '#2563eb' : '#64748b',
-                  border: `1px solid ${selected ? '#bfdbfe' : '#e2e8f0'}`,
+                  background: selected ? 'var(--primary-soft)' : 'var(--bg-soft)', color: selected ? 'var(--primary)' : 'var(--text-secondary)',
+                  border: `1px solid ${selected ? 'var(--accent-mid)' : 'var(--border)'}`,
                 }}>{ch.label}</button>
               );
             })}
@@ -164,8 +164,8 @@ function AddSnapshotForm({ siteId, onSaved }: { siteId: string; onSaved: () => v
         const isSns = ch === 'instagram-hashtag' || ch === 'naver-blog';
         const isMap = ch === 'google-map' || ch === 'naver-place';
         return (
-          <div key={ch} style={{ padding: 10, borderRadius: 6, background: '#fff', border: '1px solid #e2e8f0', marginBottom: 8 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b', marginBottom: 6 }}>{CHANNEL_LABEL[ch]}</div>
+          <div key={ch} style={{ padding: 10, borderRadius: 6, background: '#fff', border: '1px solid var(--border)', marginBottom: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>{CHANNEL_LABEL[ch]}</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <label style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}>
                 <input type="checkbox" checked={entries[ch]?.isExposed ?? true} onChange={(e) => updateEntry(ch, 'isExposed', e.target.checked)} /> 노출됨
@@ -201,10 +201,10 @@ function AddSnapshotForm({ siteId, onSaved }: { siteId: string; onSaved: () => v
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
         {images.map((url, i) => (
           <div key={i} style={{ position: 'relative' }}>
-            <img src={url} alt="" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6, border: '1px solid #e2e8f0' }} />
+            <img src={url} alt="" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--border)' }} />
             <button onClick={() => setImages((prev) => prev.filter((_, j) => j !== i))} style={{
               position: 'absolute', top: -4, right: -4, width: 18, height: 18, borderRadius: '50%',
-              background: '#ef4444', color: '#fff', border: 'none', fontSize: 10, cursor: 'pointer', lineHeight: '18px', padding: 0,
+              background: 'var(--danger)', color: '#fff', border: 'none', fontSize: 10, cursor: 'pointer', lineHeight: '18px', padding: 0,
             }}>✕</button>
           </div>
         ))}
@@ -212,20 +212,20 @@ function AddSnapshotForm({ siteId, onSaved }: { siteId: string; onSaved: () => v
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <input type="file" accept="image/*" onChange={handleFileSelect} style={{ display: 'none' }} id="snapshot-file" />
         <label htmlFor="snapshot-file" style={{
-          padding: '5px 12px', borderRadius: 6, border: '1px dashed #cbd5e1', background: '#f8fafc',
-          color: '#475569', fontSize: 11, cursor: 'pointer',
+          padding: '5px 12px', borderRadius: 6, border: '1px dashed var(--text-muted)', background: 'var(--bg-soft)',
+          color: 'var(--text-secondary)', fontSize: 11, cursor: 'pointer',
         }}>파일 선택</label>
-        <span style={{ fontSize: 11, color: '#94a3b8' }}>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
           {uploading ? '업로드 중...' : 'Ctrl+V로 캡처 붙여넣기 가능'}
         </span>
       </div>
 
       <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
         <button onClick={handleSave} disabled={saving || selectedChannels.size === 0} style={{
-          padding: '8px 20px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+          padding: '8px 20px', borderRadius: 6, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer',
         }}>{saving ? '저장 중...' : '저장'}</button>
         <button onClick={() => setOpen(false)} style={{
-          padding: '8px 16px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#475569', fontSize: 13, cursor: 'pointer',
+          padding: '8px 16px', borderRadius: 6, border: '1px solid var(--border-strong)', background: '#fff', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer',
         }}>취소</button>
       </div>
     </div>
@@ -247,14 +247,14 @@ function SnapshotCard({ snapshot, onDelete }: { snapshot: SeoSnapshot; onDelete:
       });
       return Object.entries(byKeyword).map(([kw, entries]) => (
         <div key={kw} style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#1e293b', marginBottom: 4, paddingLeft: 4 }}>"{kw}"</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4, paddingLeft: 4 }}>"{kw}"</div>
           {entries.map((e, i) => (
             <div key={i} style={{ fontSize: 12, padding: '2px 0', paddingLeft: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ color: e.isExposed ? '#166534' : '#991b1b' }}>
+              <span style={{ color: e.isExposed ? 'var(--success-dark)' : 'var(--danger-dark)' }}>
                 {e.isExposed ? '●' : '○'}
               </span>
-              <strong style={{ color: '#475569' }}>{CHANNEL_LABEL[e.channel]}:</strong>
-              <span style={{ color: e.isExposed ? '#166534' : '#991b1b' }}>
+              <strong style={{ color: 'var(--text-secondary)' }}>{CHANNEL_LABEL[e.channel]}:</strong>
+              <span style={{ color: e.isExposed ? 'var(--success-dark)' : 'var(--danger-dark)' }}>
                 {e.isExposed === false ? '노출 없음' : (e.rank ? `${e.rank}위${e.pageNumber ? ` (${e.pageNumber}페이지)` : ''}` : '노출됨')}
               </span>
             </div>
@@ -272,9 +272,9 @@ function SnapshotCard({ snapshot, onDelete }: { snapshot: SeoSnapshot; onDelete:
     });
     return Object.entries(grouped).map(([group, entries]) => (
       <div key={group} style={{ marginBottom: 8 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', marginBottom: 4 }}>{group}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4 }}>{group}</div>
         {entries.map((e, i) => (
-          <div key={i} style={{ fontSize: 12, color: '#475569', padding: '3px 0', paddingLeft: 8 }}>
+          <div key={i} style={{ fontSize: 12, color: 'var(--text-secondary)', padding: '3px 0', paddingLeft: 8 }}>
             <strong>{CHANNEL_LABEL[e.channel]}:</strong> {formatEntry(e)}
           </div>
         ))}
@@ -283,27 +283,27 @@ function SnapshotCard({ snapshot, onDelete }: { snapshot: SeoSnapshot; onDelete:
   };
 
   return (
-    <div style={{ ...cardStyle, borderLeft: isAuto ? '3px solid #2563eb' : undefined }}>
+    <div style={{ ...cardStyle, borderLeft: isAuto ? '3px solid var(--primary)' : undefined }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>{snapshot.date}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{snapshot.date}</span>
           {isAuto && (
-            <span style={{ fontSize: 10, fontWeight: 600, color: '#2563eb', background: '#eff6ff', padding: '2px 8px', borderRadius: 10 }}>자동 확인</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--primary)', background: 'var(--primary-soft)', padding: '2px 8px', borderRadius: 10 }}>자동 확인</span>
           )}
         </div>
-        <button onClick={onDelete} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 13 }}>🗑️</button>
+        <button onClick={onDelete} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 13 }}>🗑️</button>
       </div>
       {renderEntries()}
       {snapshot.images && snapshot.images.length > 0 && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
           {snapshot.images.map((url, i) => (
             <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-              <img src={url} alt="" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6, border: '1px solid #e2e8f0' }} />
+              <img src={url} alt="" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--border)' }} />
             </a>
           ))}
         </div>
       )}
-      {snapshot.memo && <div style={{ fontSize: 12, color: '#64748b', marginTop: 6, fontStyle: 'italic' }}>{snapshot.memo}</div>}
+      {snapshot.memo && <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6, fontStyle: 'italic' }}>{snapshot.memo}</div>}
     </div>
   );
 }
@@ -331,11 +331,11 @@ function KeywordSettings({ siteId, keywords, onSaved }: { siteId: string; keywor
   };
 
   return (
-    <div style={{ ...cardStyle, background: '#fafbfc' }}>
+    <div style={{ ...cardStyle, background: 'var(--bg-soft)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>추적 키워드</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>추적 키워드</span>
         {!editing && (
-          <button onClick={startEdit} style={{ fontSize: 11, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button onClick={startEdit} style={{ fontSize: 11, color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer' }}>
             {keywords.length > 0 ? '수정' : '+ 키워드 추가'}
           </button>
         )}
@@ -351,10 +351,10 @@ function KeywordSettings({ siteId, keywords, onSaved }: { siteId: string; keywor
           />
           <div style={{ display: 'flex', gap: 6 }}>
             <button onClick={handleSave} disabled={saving} style={{
-              padding: '5px 14px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 12, cursor: 'pointer',
+              padding: '5px 14px', borderRadius: 6, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 12, cursor: 'pointer',
             }}>{saving ? '저장 중...' : '저장'}</button>
             <button onClick={() => setEditing(false)} style={{
-              padding: '5px 14px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#475569', fontSize: 12, cursor: 'pointer',
+              padding: '5px 14px', borderRadius: 6, border: '1px solid var(--border-strong)', background: '#fff', color: 'var(--text-secondary)', fontSize: 12, cursor: 'pointer',
             }}>취소</button>
           </div>
         </div>
@@ -363,12 +363,12 @@ function KeywordSettings({ siteId, keywords, onSaved }: { siteId: string; keywor
           {keywords.map((kw, i) => (
             <span key={i} style={{
               padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 500,
-              background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe',
+              background: 'var(--primary-soft)', color: 'var(--primary)', border: '1px solid var(--accent-mid)',
             }}>{kw}</span>
           ))}
         </div>
       ) : (
-        <div style={{ fontSize: 12, color: '#94a3b8' }}>자동 확인을 위해 추적할 키워드를 설정하세요</div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>자동 확인을 위해 추적할 키워드를 설정하세요</div>
       )}
     </div>
   );
@@ -398,20 +398,20 @@ function AutoCheckButton({ siteId, hasKeywords, onDone }: { siteId: string; hasK
     <div style={{ marginBottom: 16 }}>
       <button onClick={handleCheck} disabled={checking || !hasKeywords} style={{
         width: '100%', padding: 14, borderRadius: 8, border: 'none',
-        background: hasKeywords ? (checking ? '#93c5fd' : '#2563eb') : '#e2e8f0',
-        color: hasKeywords ? '#fff' : '#94a3b8',
+        background: hasKeywords ? (checking ? 'var(--accent-mid)' : 'var(--primary)') : 'var(--border)',
+        color: hasKeywords ? '#fff' : 'var(--text-muted)',
         fontSize: 14, fontWeight: 700, cursor: hasKeywords ? 'pointer' : 'default',
         transition: 'background 0.2s',
       }}>
         {checking ? '확인 중... (약 10초 소요)' : '검색 결과 자동 확인'}
       </button>
       {result && (
-        <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: '#f0fdf4', border: '1px solid #bbf7d0', fontSize: 12, color: '#166534' }}>
+        <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: 'var(--success-soft)', border: '1px solid var(--success-soft)', fontSize: 12, color: 'var(--success-dark)' }}>
           {result.totalChecks}건 검색 완료 — {result.foundCount}건 노출 확인
         </div>
       )}
       {error && (
-        <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: '#fef2f2', border: '1px solid #fecaca', fontSize: 12, color: '#991b1b' }}>
+        <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: 'var(--danger-soft)', border: '1px solid var(--danger-soft)', fontSize: 12, color: 'var(--danger-dark)' }}>
           {error}
         </div>
       )}
@@ -435,7 +435,7 @@ function SnapshotTimeline({ siteId, snapshots, keywords, onRefresh, onKeywordsCh
       <AutoCheckButton siteId={siteId} hasKeywords={keywords.length > 0} onDone={onRefresh} />
       <AddSnapshotForm siteId={siteId} onSaved={onRefresh} />
       {snapshots.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8', fontSize: 13 }}>
+        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)', fontSize: 13 }}>
           아직 기록된 스냅샷이 없습니다.
         </div>
       ) : (
@@ -483,28 +483,28 @@ function SeoHealthCheck({ snippets }: { snippets: HeadSnippets }) {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-        <ProgressRing value={doneCount} max={total} size={64} strokeWidth={5} color={doneCount === total ? '#22c55e' : '#2563eb'} />
+        <ProgressRing value={doneCount} max={total} size={64} strokeWidth={5} color={doneCount === total ? 'var(--success)' : 'var(--primary)'} />
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#1e293b' }}>{total}개 중 {doneCount}개 완료</div>
-          <div style={{ fontSize: 12, color: '#64748b' }}>SEO 최적화 진행률 {Math.round((doneCount / total) * 100)}%</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{total}개 중 {doneCount}개 완료</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>SEO 최적화 진행률 {Math.round((doneCount / total) * 100)}%</div>
         </div>
       </div>
 
       {checks.map((section) => (
         <div key={section.label} style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>{section.label}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>{section.label}</div>
           {section.label === '기본 SEO' && (
-            <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 8, fontStyle: 'italic' }}>{basicSeoNote}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontStyle: 'italic' }}>{basicSeoNote}</div>
           )}
           {section.items.map((item) => (
-            <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}>
+            <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-soft)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={statusDot(item.done)} />
-                <span style={{ fontSize: 13, color: item.done ? '#166534' : '#475569' }}>{item.name}</span>
+                <span style={{ fontSize: 13, color: item.done ? 'var(--success-dark)' : 'var(--text-secondary)' }}>{item.name}</span>
               </div>
               {!item.done && item.link && (
                 <button onClick={() => navigate(item.link!)} style={{
-                  fontSize: 11, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: 11, color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer',
                 }}>설정하기 →</button>
               )}
             </div>
@@ -524,7 +524,7 @@ const EXTERNAL_TOOLS = [
   { name: 'Naver Search Advisor', url: 'https://searchadvisor.naver.com/', desc: '네이버 검색 등록/분석', bg: '#03cf5d' },
   { name: 'Naver Webmaster Tools', url: 'https://webmastertool.naver.com/', desc: '네이버 웹마스터 도구', bg: '#03cf5d' },
   { name: 'Bing Webmaster', url: 'https://www.bing.com/webmasters/', desc: 'Bing 검색엔진 등록', bg: '#008373' },
-  { name: 'Schema Validator', url: 'https://validator.schema.org/', desc: 'Schema.org 마크업 검증', bg: '#475569' },
+  { name: 'Schema Validator', url: 'https://validator.schema.org/', desc: 'Schema.org 마크업 검증', bg: 'var(--text-secondary)' },
   { name: 'W3C HTML Validator', url: 'https://validator.w3.org/', desc: 'HTML 표준 준수 확인', bg: '#005a9c' },
 ];
 
@@ -537,10 +537,10 @@ function ExternalTools() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: tool.bg, flexShrink: 0 }} />
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1e293b' }}>{tool.name}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{tool.name}</div>
           </div>
-          <div style={{ fontSize: 11, color: '#64748b' }}>{tool.desc}</div>
-          <div style={{ fontSize: 11, color: '#2563eb', marginTop: 6 }}>바로가기 ↗</div>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{tool.desc}</div>
+          <div style={{ fontSize: 11, color: 'var(--primary)', marginTop: 6 }}>바로가기 ↗</div>
         </a>
       ))}
     </div>
@@ -569,11 +569,11 @@ export function SeoStatusPage({ siteId }: { siteId: string }) {
 
   useEffect(() => { loadData(); }, [siteId]);
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>불러오는 중...</div>;
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>불러오는 중...</div>;
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
-      <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', marginBottom: 24 }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: 24 }}>
         <button style={tabBtnStyle(tab === 'snapshot')} onClick={() => setTab('snapshot')}>검색 결과 스냅샷</button>
         <button style={tabBtnStyle(tab === 'health')} onClick={() => setTab('health')}>SEO 건강 체크</button>
         <button style={tabBtnStyle(tab === 'tools')} onClick={() => setTab('tools')}>외부 도구</button>

@@ -27,9 +27,9 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
-  draft: { bg: '#fef3c7', fg: '#92400e' },
-  published: { bg: '#d1fae5', fg: '#065f46' },
-  deleted: { bg: '#fee2e2', fg: '#991b1b' },
+  draft: { bg: 'var(--warning-soft)', fg: 'var(--warning-dark)' },
+  published: { bg: 'var(--success-soft)', fg: 'var(--success-dark)' },
+  deleted: { bg: 'var(--danger-soft)', fg: 'var(--danger-dark)' },
 };
 
 export function BlogPostsAdminPage() {
@@ -130,7 +130,7 @@ export function BlogPostsAdminPage() {
       </div>
 
       {loading && <p style={styles.msg}>로딩 중...</p>}
-      {error && <p style={{ ...styles.msg, color: '#c0392b' }}>오류: {error}</p>}
+      {error && <p style={{ ...styles.msg, color: 'var(--danger)' }}>오류: {error}</p>}
 
       {!loading && !error && filtered.length === 0 && (
         <p style={styles.msg}>{filter === 'all' ? '아직 작성된 글이 없습니다.' : `${STATUS_LABELS[filter] || filter} 글이 없습니다.`}</p>
@@ -157,8 +157,8 @@ export function BlogPostsAdminPage() {
                 return (
                   <tr key={p.slug} style={styles.tr}>
                     <td style={{ ...styles.td, maxWidth: 360 }}>
-                      <div style={{ fontWeight: 500, color: '#1a1a18' }}>{p.title || '(제목 없음)'}</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8', fontFamily: 'monospace', marginTop: 2 }}>
+                      <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{p.title || '(제목 없음)'}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 2 }}>
                         /{p.slug}
                       </div>
                     </td>
@@ -180,9 +180,9 @@ export function BlogPostsAdminPage() {
                     </td>
                     <td style={styles.td}>
                       {p.featured ? (
-                        <span style={{ color: '#f59e0b', fontWeight: 600 }}>★ {p.featuredOrder ?? '-'}</span>
+                        <span style={{ color: 'var(--warning)', fontWeight: 600 }}>★ {p.featuredOrder ?? '-'}</span>
                       ) : (
-                        <span style={{ color: '#cbd5e1' }}>—</span>
+                        <span style={{ color: 'var(--text-muted)' }}>—</span>
                       )}
                     </td>
                     <td style={styles.td}>{p.viewCount ?? 0}</td>
@@ -198,7 +198,7 @@ export function BlogPostsAdminPage() {
                       {p.status !== 'deleted' && (
                         <button
                           onClick={() => handleDelete(p.slug, p.title || p.slug)}
-                          style={{ ...styles.smallBtn, color: '#dc2626', borderColor: '#fecaca' }}
+                          style={{ ...styles.smallBtn, color: 'var(--danger)', borderColor: 'var(--danger-soft)' }}
                         >
                           삭제
                         </button>
@@ -220,28 +220,28 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 1200,
     margin: '0 auto',
     padding: '40px 24px',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif",
+    fontFamily: 'var(--font-ko)',
   },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, gap: 16 },
-  title: { fontSize: 22, fontWeight: 600, color: '#1a1a18', marginBottom: 4 },
+  title: { fontSize: 22, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 },
   subtitle: { fontSize: 13, color: '#888' },
   tabs: { display: 'flex', gap: 6, marginBottom: 16 },
   tab: {
     padding: '8px 14px',
-    border: '1px solid #e2e8f0',
+    border: '1px solid var(--border)',
     background: '#fff',
     borderRadius: 8,
     fontSize: 12,
     cursor: 'pointer',
-    color: '#64748b',
+    color: 'var(--text-secondary)',
     fontWeight: 500,
   },
-  tabActive: { background: '#1f2937', color: '#fff', borderColor: '#1f2937' },
+  tabActive: { background: 'var(--text-primary)', color: '#fff', borderColor: 'var(--text-primary)' },
   primaryBtn: {
     padding: '9px 18px',
     border: 'none',
     borderRadius: 6,
-    background: '#2563eb',
+    background: 'var(--primary)',
     color: '#fff',
     fontSize: 13,
     fontWeight: 600,
@@ -249,17 +249,17 @@ const styles: Record<string, React.CSSProperties> = {
   },
   secondaryBtn: {
     padding: '9px 18px',
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--border-strong)',
     background: '#fff',
     borderRadius: 6,
     fontSize: 13,
     fontWeight: 500,
-    color: '#475569',
+    color: 'var(--text-secondary)',
     cursor: 'pointer',
   },
   smallBtn: {
     padding: '6px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--border-strong)',
     background: '#fff',
     borderRadius: 6,
     fontSize: 12,
@@ -267,17 +267,17 @@ const styles: Record<string, React.CSSProperties> = {
     marginLeft: 6,
   },
   msg: { fontSize: 14, color: '#666', padding: '40px 0', textAlign: 'center' },
-  tableWrap: { border: '1px solid #e0dfd8', borderRadius: 10, overflowX: 'auto' },
+  tableWrap: { border: '1px solid var(--border)', borderRadius: 10, overflowX: 'auto' },
   table: { width: '100%', borderCollapse: 'collapse' as const, fontSize: 13 },
   th: {
     textAlign: 'left' as const,
     padding: '12px 14px',
-    background: '#f8f7f4',
+    background: 'var(--bg-soft)',
     fontWeight: 600,
     color: '#555',
-    borderBottom: '1px solid #e0dfd8',
+    borderBottom: '1px solid var(--border)',
     whiteSpace: 'nowrap' as const,
   },
-  tr: { borderBottom: '1px solid #f0efec' },
+  tr: { borderBottom: '1px solid var(--border-soft)' },
   td: { padding: '11px 14px', color: '#333', verticalAlign: 'middle' as const, whiteSpace: 'nowrap' as const },
 };

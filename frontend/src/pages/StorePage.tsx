@@ -17,8 +17,8 @@ const DAYS = [
   { key: 'holiday', label: '공휴일' },
 ];
 
-const inputStyle = { width: '100%', padding: 8, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 12 };
-const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 } as const;
+const inputStyle = { width: '100%', padding: 8, border: '1px solid var(--border-strong)', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 12 };
+const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 } as const;
 
 export function StorePage({ siteId }: { siteId: string }) {
   const [store, setStore] = useState<Store>(EMPTY_STORE);
@@ -38,17 +38,17 @@ export function StorePage({ siteId }: { siteId: string }) {
 
   const { saving, lastSaved, error: saveError, save: manualSave } = useAutoSave({ data: store, saveFn: doSave, enabled: !loading && !!siteId });
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>불러오는 중...</div>;
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>불러오는 중...</div>;
 
   return (
     <div style={{ display: 'flex', gap: 0, height: '100%' }}>
       {/* Left: Form */}
-      <div style={{ width: 400, borderRight: '1px solid #e2e8f0', overflowY: 'auto', padding: 24, background: '#fff' }}>
+      <div style={{ width: 400, borderRight: '1px solid var(--border)', overflowY: 'auto', padding: 24, background: '#fff' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>매장 관리</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <AutoSaveIndicator saving={saving} lastSaved={lastSaved} error={saveError} />
-            <button onClick={manualSave} disabled={saving} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', fontSize: 12, cursor: 'pointer', color: '#475569' }}>
+            <button onClick={manualSave} disabled={saving} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid var(--border-strong)', background: '#fff', fontSize: 12, cursor: 'pointer', color: 'var(--text-secondary)' }}>
               {saving ? '저장 중...' : '저장'}
             </button>
           </div>
@@ -65,7 +65,7 @@ export function StorePage({ siteId }: { siteId: string }) {
         <label style={{ ...labelStyle, marginBottom: 8 }}>운영 시간</label>
         {DAYS.map((d) => (
           <div key={d.key} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <span style={{ fontSize: 12, color: '#64748b', width: 40 }}>{d.label}</span>
+            <span style={{ fontSize: 12, color: 'var(--text-secondary)', width: 40 }}>{d.label}</span>
             <input
               value={store.hours[d.key] || ''}
               onChange={(e) => setStore({ ...store, hours: { ...store.hours, [d.key]: e.target.value } })}
@@ -79,54 +79,54 @@ export function StorePage({ siteId }: { siteId: string }) {
         {/* SNS */}
         <label style={{ ...labelStyle, marginBottom: 8 }}>SNS 채널</label>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <span style={{ fontSize: 12, color: '#64748b', width: 70 }}>Instagram</span>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)', width: 70 }}>Instagram</span>
           <input value={store.sns.instagram} onChange={(e) => setStore({ ...store, sns: { ...store.sns, instagram: e.target.value } })} placeholder="@username" style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <span style={{ fontSize: 12, color: '#64748b', width: 70 }}>Naver Blog</span>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)', width: 70 }}>Naver Blog</span>
           <input value={store.sns.blog} onChange={(e) => setStore({ ...store, sns: { ...store.sns, blog: e.target.value } })} placeholder="블로그 URL" style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <span style={{ fontSize: 12, color: '#64748b', width: 70 }}>카카오 오픈챗</span>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)', width: 70 }}>카카오 오픈챗</span>
           <input value={store.sns.kakao} onChange={(e) => setStore({ ...store, sns: { ...store.sns, kakao: e.target.value } })} placeholder="오픈챗 링크" style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
         </div>
 
         {/* Platforms */}
         <label style={{ ...labelStyle, marginBottom: 8 }}>플랫폼 등록</label>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <span style={{ fontSize: 12, color: '#64748b', width: 100 }}>Naver Place</span>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)', width: 100 }}>Naver Place</span>
           <input value={store.platforms.naverPlace} onChange={(e) => setStore({ ...store, platforms: { ...store.platforms, naverPlace: e.target.value } })} placeholder="URL" style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <span style={{ fontSize: 12, color: '#64748b', width: 100 }}>Google Business</span>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)', width: 100 }}>Google Business</span>
           <input value={store.platforms.googleBusiness} onChange={(e) => setStore({ ...store, platforms: { ...store.platforms, googleBusiness: e.target.value } })} placeholder="URL" style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <span style={{ fontSize: 12, color: '#64748b', width: 100 }}>스마트스토어</span>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)', width: 100 }}>스마트스토어</span>
           <input value={store.platforms.smartStore} onChange={(e) => setStore({ ...store, platforms: { ...store.platforms, smartStore: e.target.value } })} placeholder="URL" style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
         </div>
       </div>
 
       {/* Right: Preview */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: 24, background: '#f8fafc' }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#64748b', marginBottom: 16 }}>매장 정보 미리보기</h3>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 24, background: 'var(--bg-soft)' }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 16 }}>매장 정보 미리보기</h3>
 
-        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0', padding: 20, maxWidth: 380 }}>
+        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', padding: 20, maxWidth: 380 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 4 }}>주소</div>
-              <div style={{ fontSize: 13, color: '#1e293b' }}>{store.address || '-'}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>주소</div>
+              <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>{store.address || '-'}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 4 }}>전화</div>
-              <div style={{ fontSize: 13, color: '#1e293b' }}>{store.phone || '-'}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>전화</div>
+              <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>{store.phone || '-'}</div>
             </div>
           </div>
 
-          <div style={{ marginTop: 16, borderTop: '1px solid #f1f5f9', paddingTop: 16 }}>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 8 }}>운영 시간</div>
+          <div style={{ marginTop: 16, borderTop: '1px solid var(--border-soft)', paddingTop: 16 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>운영 시간</div>
             {DAYS.map((d) => (
-              <div key={d.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#475569', marginBottom: 4 }}>
+              <div key={d.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 4 }}>
                 <span>{d.label}</span>
                 <span>{store.hours[d.key] || '-'}</span>
               </div>
@@ -134,21 +134,21 @@ export function StorePage({ siteId }: { siteId: string }) {
           </div>
 
           {(store.sns.instagram || store.sns.blog || store.sns.kakao) && (
-            <div style={{ marginTop: 16, borderTop: '1px solid #f1f5f9', paddingTop: 16 }}>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 8 }}>SNS</div>
-              {store.sns.instagram && <div style={{ fontSize: 12, color: '#2563eb', marginBottom: 4 }}>Instagram: {store.sns.instagram}</div>}
-              {store.sns.blog && <div style={{ fontSize: 12, color: '#2563eb', marginBottom: 4 }}>Blog: {store.sns.blog}</div>}
-              {store.sns.kakao && <div style={{ fontSize: 12, color: '#2563eb' }}>카카오: {store.sns.kakao}</div>}
+            <div style={{ marginTop: 16, borderTop: '1px solid var(--border-soft)', paddingTop: 16 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>SNS</div>
+              {store.sns.instagram && <div style={{ fontSize: 12, color: 'var(--primary)', marginBottom: 4 }}>Instagram: {store.sns.instagram}</div>}
+              {store.sns.blog && <div style={{ fontSize: 12, color: 'var(--primary)', marginBottom: 4 }}>Blog: {store.sns.blog}</div>}
+              {store.sns.kakao && <div style={{ fontSize: 12, color: 'var(--primary)' }}>카카오: {store.sns.kakao}</div>}
             </div>
           )}
 
-          <div style={{ marginTop: 16, borderTop: '1px solid #f1f5f9', paddingTop: 16 }}>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 8 }}>플랫폼 등록 현황</div>
+          <div style={{ marginTop: 16, borderTop: '1px solid var(--border-soft)', paddingTop: 16 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>플랫폼 등록 현황</div>
             {(['naverPlace', 'googleBusiness', 'smartStore'] as const).map((key) => {
               const labels = { naverPlace: 'Naver Place', googleBusiness: 'Google Business', smartStore: '스마트스토어' };
               const registered = !!store.platforms[key];
               return (
-                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: registered ? '#059669' : '#94a3b8', marginBottom: 4 }}>
+                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: registered ? 'var(--success)' : 'var(--text-muted)', marginBottom: 4 }}>
                   <span>{registered ? '✓' : '○'}</span>
                   <span>{labels[key]}</span>
                 </div>

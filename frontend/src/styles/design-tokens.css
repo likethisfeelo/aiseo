@@ -42,13 +42,17 @@
   --border-soft: #F3F4F6;
   --border-strong: #D1D5DB;
 
-  /* ── Status ── */
+  /* ── Status ──
+     *-dark 는 soft 배경 위에 가독성 좋은 텍스트 색으로 사용 */
   --success: #10B981;
   --success-soft: rgba(16, 185, 129, 0.10);
+  --success-dark: #047857;
   --warning: #F59E0B;
   --warning-soft: rgba(245, 158, 11, 0.12);
+  --warning-dark: #92400E;
   --danger: #EF4444;
   --danger-soft: rgba(239, 68, 68, 0.10);
+  --danger-dark: #991B1B;
 
   /* ── Radius ── */
   --radius-sm: 8px;

@@ -17,35 +17,35 @@ const ADMIN_MENU: MenuCard[] = [
     icon: '📝',
     title: '블로그 글 관리',
     description: '발행·초안·삭제된 글 목록, 새 글 작성 및 편집',
-    color: '#2563eb',
+    color: 'var(--primary)',
   },
   {
     to: '/admin/blog/categories',
     icon: '🗂',
     title: '블로그 카테고리',
     description: '블로그 분류 체계 생성 및 관리',
-    color: '#0891b2',
+    color: 'var(--success)',
   },
   {
     to: '/admin/course-inquiries',
     icon: '📞',
     title: '수강 문의',
     description: '코스 상담 요청 내역 확인',
-    color: '#f59e0b',
+    color: 'var(--warning)',
   },
   {
     to: '/mktadmin',
     icon: '📊',
     title: '마케팅 어드민',
     description: '마케팅 지표 및 운영 도구',
-    color: '#7c3aed',
+    color: 'var(--accent-dark)',
   },
 ];
 
 function AdminMenuGrid() {
   return (
     <div style={{ marginBottom: 32 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 700, color: '#475569', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         관리 메뉴
       </h3>
       <div
@@ -64,7 +64,7 @@ function AdminMenuGrid() {
               padding: 16,
               borderRadius: 12,
               background: '#fff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid var(--border)',
               textDecoration: 'none',
               transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s',
             }}
@@ -76,14 +76,14 @@ function AdminMenuGrid() {
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = 'none';
-              e.currentTarget.style.borderColor = '#e2e8f0';
+              e.currentTarget.style.borderColor = 'var(--border)';
             }}
           >
             <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
               {item.title}
             </div>
-            <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               {item.description}
             </div>
           </Link>
@@ -162,40 +162,40 @@ function DomainChangeRequests() {
 
   return (
     <div style={{ marginBottom: 24 }}>
-      <h3 style={{ fontSize: 16, fontWeight: 700, color: '#92400e', marginBottom: 12 }}>
+      <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--warning-dark)', marginBottom: 12 }}>
         도메인 변경 요청 ({requests.length}건)
       </h3>
       {actionMsg && (
-        <div style={{ padding: 10, borderRadius: 6, background: '#f0fdf4', border: '1px solid #bbf7d0', fontSize: 12, color: '#166534', marginBottom: 12 }}>
+        <div style={{ padding: 10, borderRadius: 6, background: 'var(--success-soft)', border: '1px solid var(--success-soft)', fontSize: 12, color: 'var(--success-dark)', marginBottom: 12 }}>
           {actionMsg}
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {requests.map((req) => (
           <div key={req.siteId || req.currentSiteId} style={{
-            padding: 16, borderRadius: 10, background: '#fffbeb', border: '1px solid #fde68a',
+            padding: 16, borderRadius: 10, background: 'var(--warning-soft)', border: '1px solid var(--warning-soft)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#92400e' }}>
-                  {req.currentSiteId}.aiseo.tips → <span style={{ color: '#2563eb' }}>{req.requestedSiteId}.aiseo.tips</span>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--warning-dark)' }}>
+                  {req.currentSiteId}.aiseo.tips → <span style={{ color: 'var(--primary)' }}>{req.requestedSiteId}.aiseo.tips</span>
                 </div>
-                <div style={{ fontSize: 12, color: '#78350f', marginTop: 4 }}>{req.ownerEmail}</div>
-                {req.reason && <div style={{ fontSize: 12, color: '#a16207', marginTop: 4 }}>사유: {req.reason}</div>}
-                <div style={{ fontSize: 11, color: '#a16207', marginTop: 4 }}>
+                <div style={{ fontSize: 12, color: 'var(--warning-dark)', marginTop: 4 }}>{req.ownerEmail}</div>
+                {req.reason && <div style={{ fontSize: 12, color: 'var(--warning-dark)', marginTop: 4 }}>사유: {req.reason}</div>}
+                <div style={{ fontSize: 11, color: 'var(--warning-dark)', marginTop: 4 }}>
                   {new Date(req.createdAt).toLocaleDateString('ko-KR')} 요청
                 </div>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => handleApprove(req.currentSiteId)} style={{
-                padding: '6px 16px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                padding: '6px 16px', borderRadius: 6, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer',
               }}>승인</button>
               <button onClick={() => handleReject(req.currentSiteId)} style={{
-                padding: '6px 16px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#475569', fontSize: 12, cursor: 'pointer',
+                padding: '6px 16px', borderRadius: 6, border: '1px solid var(--border-strong)', background: '#fff', color: 'var(--text-secondary)', fontSize: 12, cursor: 'pointer',
               }}>거절</button>
               <button onClick={() => handleDeactivate(req.currentSiteId)} style={{
-                padding: '6px 16px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff', color: '#dc2626', fontSize: 12, cursor: 'pointer',
+                padding: '6px 16px', borderRadius: 6, border: '1px solid var(--danger-soft)', background: '#fff', color: 'var(--danger)', fontSize: 12, cursor: 'pointer',
               }}>기존 주소 비활성화</button>
             </div>
           </div>
@@ -218,14 +218,14 @@ export function AdminSiteListPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>불러오는 중...</div>;
-  if (error) return <div style={{ padding: 40, textAlign: 'center', color: '#dc2626' }}>오류: {error}</div>;
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>불러오는 중...</div>;
+  if (error) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--danger)' }}>오류: {error}</div>;
 
   return (
     <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e293b', margin: 0 }}>관리자 대시보드</h2>
-        <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>관리자 대시보드</h2>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
           전체 {sites.length}개 사이트 · 관리 메뉴에서 세부 기능으로 이동할 수 있습니다.
         </p>
       </div>
@@ -234,13 +234,13 @@ export function AdminSiteListPage() {
 
       <DomainChangeRequests />
 
-      <h3 style={{ fontSize: 14, fontWeight: 700, color: '#475569', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         사이트 목록
       </h3>
 
-      <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden' }}>
         {/* Table Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr 100px 120px', padding: '10px 16px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr 100px 120px', padding: '10px 16px', background: 'var(--bg-soft)', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
           <span>사이트 ID</span>
           <span>소유자</span>
           <span>완성도</span>
@@ -254,23 +254,23 @@ export function AdminSiteListPage() {
             onClick={() => navigate(`/admin/site/${site.siteId}`)}
             style={{
               display: 'grid', gridTemplateColumns: '1fr 1.5fr 100px 120px', padding: '12px 16px',
-              width: '100%', border: 'none', borderBottom: '1px solid #f1f5f9', background: '#fff',
+              width: '100%', border: 'none', borderBottom: '1px solid var(--border-soft)', background: '#fff',
               cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', transition: 'background 0.15s',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-soft)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; }}
           >
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#2563eb' }}>{site.siteId}</span>
-            <span style={{ fontSize: 12, color: '#475569' }}>{site.ownerEmail}</span>
-            <span style={{ fontSize: 12, color: '#475569' }}>{site.brandCompleteness || 0}%</span>
-            <span style={{ fontSize: 11, color: '#94a3b8' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--primary)' }}>{site.siteId}</span>
+            <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{site.ownerEmail}</span>
+            <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{site.brandCompleteness || 0}%</span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
               {site.updatedAt ? new Date(site.updatedAt).toLocaleDateString('ko') : '-'}
             </span>
           </button>
         ))}
 
         {sites.length === 0 && (
-          <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>등록된 사이트가 없습니다.</div>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>등록된 사이트가 없습니다.</div>
         )}
       </div>
     </div>

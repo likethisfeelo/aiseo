@@ -195,7 +195,7 @@ export function BlogPostEditPage() {
   );
 
   if (loading) {
-    return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>불러오는 중...</div>;
+    return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>불러오는 중...</div>;
   }
 
   return (
@@ -269,7 +269,7 @@ export function BlogPostEditPage() {
             <TagChip key={t} label={t} onRemove={() => removeTag(t)} />
           ))}
           {tags.length === 0 && (
-            <span style={{ fontSize: 12, color: '#94a3b8' }}>아직 태그가 없습니다.</span>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>아직 태그가 없습니다.</span>
           )}
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
@@ -377,7 +377,7 @@ export function BlogPostEditPage() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginTop: 8 }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-primary)' }}>
             <input
               type="checkbox"
               checked={featured}
@@ -387,7 +387,7 @@ export function BlogPostEditPage() {
           </label>
           {featured && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 12, color: '#64748b' }}>순서</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>순서</span>
               <input
                 type="number"
                 value={featuredOrder}
@@ -416,7 +416,7 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 1200,
     margin: '0 auto',
     padding: '40px 24px',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif",
+    fontFamily: 'var(--font-ko)',
   },
   header: {
     display: 'flex',
@@ -425,12 +425,12 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 16,
     gap: 16,
   },
-  title: { fontSize: 22, fontWeight: 600, color: '#1a1a18', marginBottom: 4 },
+  title: { fontSize: 22, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 },
   subtitle: { fontSize: 13, color: '#888' },
   errorBox: {
-    background: '#fef2f2',
-    border: '1px solid #fecaca',
-    color: '#b91c1c',
+    background: 'var(--danger-soft)',
+    border: '1px solid var(--danger-soft)',
+    color: 'var(--danger)',
     fontSize: 13,
     padding: '10px 14px',
     borderRadius: 8,
@@ -438,7 +438,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   section: {
     background: '#fff',
-    border: '1px solid #e0dfd8',
+    border: '1px solid var(--border)',
     borderRadius: 10,
     padding: 20,
     marginBottom: 16,
@@ -446,20 +446,20 @@ const styles: Record<string, React.CSSProperties> = {
   sectionTitle: {
     fontSize: 14,
     fontWeight: 600,
-    color: '#334155',
+    color: 'var(--text-primary)',
     marginBottom: 12,
   },
   label: {
     display: 'block',
     fontSize: 12,
     fontWeight: 600,
-    color: '#374151',
+    color: 'var(--text-primary)',
     marginBottom: 4,
   },
   input: {
     width: '100%',
     padding: 8,
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--border-strong)',
     borderRadius: 6,
     fontSize: 13,
     boxSizing: 'border-box' as const,
@@ -470,7 +470,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '9px 18px',
     border: 'none',
     borderRadius: 6,
-    background: '#2563eb',
+    background: 'var(--primary)',
     color: '#fff',
     fontSize: 13,
     fontWeight: 600,
@@ -478,21 +478,21 @@ const styles: Record<string, React.CSSProperties> = {
   },
   secondaryBtn: {
     padding: '9px 18px',
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--border-strong)',
     background: '#fff',
     borderRadius: 6,
     fontSize: 13,
     fontWeight: 500,
-    color: '#475569',
+    color: 'var(--text-secondary)',
     cursor: 'pointer',
   },
   smallBtn: {
     padding: '6px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--border-strong)',
     background: '#fff',
     borderRadius: 6,
     fontSize: 12,
     cursor: 'pointer',
-    color: '#475569',
+    color: 'var(--text-secondary)',
   },
 };
