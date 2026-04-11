@@ -36,10 +36,17 @@ echo "[3/5] Uploading B2B page..."
 aws s3 cp frontend/dist/b2b.html s3://$BUCKET/b2b.html --content-type "text/html; charset=utf-8" --profile $PROFILE
 aws s3 cp frontend/dist/b2b.html s3://$BUCKET/b2b/index.html --content-type "text/html; charset=utf-8" --profile $PROFILE
 
-# 4. SPA 대시보드를 /site/에 업로드 (site.dev.aiseo.tips)
-echo "[4/5] Uploading SPA dashboard to /site/..."
-aws s3 sync frontend/dist/assets/ s3://$BUCKET/site/assets/ --profile $PROFILE
-aws s3 cp frontend/dist/index.html s3://$BUCKET/site/index.html --content-type "text/html; charset=utf-8" --profile $PROFILE
+# 4. SPA 대시보드 + 프리렌더 HTML을 /site/에 업로드 (site.dev.aiseo.tips)
+#    - index.html (SPA shell) + assets/ + 프리렌더 서브디렉토리
+#      (course2026/, support2026/, events2026/, blog/)
+#    - `--delete` 는 쓰지 않는다. 블로그 Lambda 가 런타임에 생성하는
+#      `site/blog/<slug>/index.html` 이 같이 삭제되기 때문.
+#      대신 landing 전용 파일(philo-main/b2b)만 제외하고 sync.
+echo "[4/5] Uploading SPA + prerendered HTML to /site/..."
+aws s3 sync frontend/dist/ s3://$BUCKET/site/ \
+  --exclude "philo-main.html" \
+  --exclude "b2b.html" \
+  --profile $PROFILE
 
 # 5. CloudFront 캐시 무효화
 echo "[5/5] Invalidating CloudFront cache..."
