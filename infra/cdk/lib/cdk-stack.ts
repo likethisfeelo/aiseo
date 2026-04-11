@@ -349,6 +349,27 @@ export class CdkStack extends Stack {
     });
     consultationsTable.grantReadWriteData(consultationHandler);
 
+    // ── Course inquiries table + Lambda ──
+    const courseInquiriesTableName = 'aiseo-course-inquiries';
+    const courseInquiriesTable = new dynamodb.Table(this, 'CourseInquiriesTable', {
+      tableName: courseInquiriesTableName,
+      partitionKey: { name: 'inquiryId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const courseInquiryHandler = new lambda.Function(this, 'CourseInquiryFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'course-inquiry/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        COURSE_INQUIRIES_TABLE: courseInquiriesTableName,
+        SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL ?? '',
+      },
+    });
+    courseInquiriesTable.grantReadWriteData(courseInquiryHandler);
+
     // ── Comments table + Lambda handlers ──
     const commentsTableName = this.node.tryGetContext('commentsTableName') ?? 'aiseo-comments';
     const commentsTable = new dynamodb.Table(this, 'CommentsTable', {
@@ -416,6 +437,21 @@ export class CdkStack extends Stack {
     });
     const adminConsultationsResource = adminResource.addResource('consultations');
     addGet(adminConsultationsResource, consultationIntegration);
+
+    // Course inquiry routes
+    const courseInquiryIntegration = new apigateway.LambdaIntegration(courseInquiryHandler);
+    const courseInquiryResource = api.root.addResource('course-inquiry', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: [devOrigin, prodOrigin, siteDevOrigin, siteProdOrigin, b2bDevOrigin, b2bProdOrigin],
+        allowMethods: ['GET', 'POST', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+      },
+    });
+    courseInquiryResource.addMethod('POST', courseInquiryIntegration, {
+      authorizationType: apigateway.AuthorizationType.NONE,
+    });
+    const adminCourseInquiriesResource = adminResource.addResource('course-inquiries');
+    addGet(adminCourseInquiriesResource, courseInquiryIntegration);
 
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,

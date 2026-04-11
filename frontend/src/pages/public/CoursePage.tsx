@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import ReactDOM from 'react-dom';
+import { submitCourseInquiry } from '../../api';
 
 // ============================================================================
 // Types
@@ -2011,6 +2012,32 @@ textarea.aiv5-form-ctrl { min-height: 82px; resize: vertical; }
   box-shadow: 0 12px 32px rgba(139,111,212,.22);
 }
 .aiv5-form-submit:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(109,40,217,.28); }
+.aiv5-form-submit:disabled {
+  opacity: .6; cursor: not-allowed; transform: none; box-shadow: 0 6px 18px rgba(109,40,217,.12);
+}
+.aiv5-form-submit:disabled:hover { transform: none; box-shadow: 0 6px 18px rgba(109,40,217,.12); }
+.aiv5-form-ctrl:disabled { background: #F9FAFB; color: #6B7280; cursor: not-allowed; }
+.aiv5-form-consent {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 12px; color: #374151; margin: 4px 0 12px;
+  cursor: pointer; user-select: none;
+}
+.aiv5-form-consent input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; accent-color: #8B6FD4; }
+.aiv5-form-consent em { color: #8B6FD4; font-style: normal; }
+.aiv5-modal-err {
+  color: #B91C1C; background: #FEE2E2; border: 1px solid #FCA5A5;
+  border-radius: 12px; padding: 10px 14px; margin: 8px 0 12px; font-size: 13px;
+}
+.aiv5-modal-success { text-align: center; padding: 24px 8px 8px; }
+.aiv5-modal-success-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, #8B6FD4, #6D28D9); color: white;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 32px; font-weight: 800; margin-bottom: 16px;
+  box-shadow: 0 12px 32px rgba(139,111,212,.28);
+}
+.aiv5-modal-success-title { font-size: 16px; font-weight: 800; color: #0A0614; margin-bottom: 6px; }
+.aiv5-modal-success-sub { font-size: 13px; color: #6B7280; margin-bottom: 22px; }
 
 /* ═══════════════════════════════════════════
    RESPONSIVE
@@ -2852,6 +2879,11 @@ export function CoursePage() {
   const [formPhone, setFormPhone] = useState('');
   const [formEmail, setFormEmail] = useState('');
   const [formMemo, setFormMemo] = useState('');
+  const [formKakaoConsent, setFormKakaoConsent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   // ── Mobile state (Phase 1) ──
   const [isMobile, setIsMobile] = useState<boolean>(
@@ -2880,6 +2912,29 @@ export function CoursePage() {
     const onResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // ── Modal ESC key + autofocus + body scroll cleanup on unmount ──
+  useEffect(() => {
+    if (!modalOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setModalOpen(false);
+        setSubmitError(null);
+        setSubmitSuccess(false);
+        document.body.style.overflow = '';
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    const t = window.setTimeout(() => nameInputRef.current?.focus(), 80);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.clearTimeout(t);
+    };
+  }, [modalOpen]);
+
+  useEffect(() => () => {
+    document.body.style.overflow = '';
   }, []);
 
   // ── Reset mobile-only state when crossing breakpoint back to desktop ──
@@ -2982,25 +3037,65 @@ export function CoursePage() {
     document.body.style.overflow = 'hidden';
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
-    document.body.style.overflow = '';
-  };
-
-  const submitForm = (e: FormEvent) => {
-    e.preventDefault();
-    if (!formName.trim() || !formPhone.trim()) {
-      alert('이름과 연락처를 입력해주세요.');
-      return;
-    }
-    const name = formName;
-    closeModal();
-    clearServices();
+  const resetForm = () => {
     setFormName('');
     setFormPhone('');
     setFormEmail('');
     setFormMemo('');
-    alert(`${name}님, 상담 신청이 완료되었습니다.\n1영업일 내 연락드리겠습니다.`);
+    setFormKakaoConsent(false);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSubmitError(null);
+    setSubmitSuccess(false);
+    document.body.style.overflow = '';
+  };
+
+  const closeAfterSuccess = () => {
+    closeModal();
+    clearServices();
+    resetForm();
+  };
+
+  const submitForm = async (e: FormEvent) => {
+    e.preventDefault();
+    if (submitting) return;
+    if (!formName.trim() || !formPhone.trim()) {
+      setSubmitError('이름과 연락처를 입력해주세요.');
+      return;
+    }
+    if (!formKakaoConsent) {
+      setSubmitError('카카오톡 연락 동의는 필수입니다.');
+      return;
+    }
+    const snapshot = [...selectedSvcs.values()].map(s => ({
+      id: s.id,
+      code: s.code,
+      name: s.name,
+      price: s.price,
+      priceLabel: s.priceLabel,
+    }));
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      await submitCourseInquiry({
+        name: formName.trim(),
+        phone: formPhone.trim(),
+        email: formEmail.trim() || undefined,
+        memo: formMemo.trim() || undefined,
+        kakaoConsent: true,
+        selectedServices: snapshot.map(s => s.id),
+        servicesSnapshot: snapshot,
+        totalPrice: totalSelected,
+        source: 'course',
+      });
+      setSubmitSuccess(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : '제출에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const totalSelected = [...selectedSvcs.values()].reduce((sum, s) => sum + s.price, 0);
@@ -3916,50 +4011,84 @@ export function CoursePage() {
               </div>
             </div>
 
-            <form onSubmit={submitForm}>
-              <div className="aiv5-form-row">
-                <label className="aiv5-form-label">이름 <em>*</em></label>
-                <input
-                  className="aiv5-form-ctrl"
-                  type="text"
-                  placeholder="홍길동"
-                  value={formName}
-                  onChange={e => setFormName(e.target.value)}
-                  required
-                />
+            {submitSuccess ? (
+              <div className="aiv5-modal-success">
+                <div className="aiv5-modal-success-icon">✓</div>
+                <div className="aiv5-modal-success-title">상담 신청이 완료되었습니다</div>
+                <div className="aiv5-modal-success-sub">1영업일 내 카카오톡으로 연락드리겠습니다.</div>
+                <button type="button" className="aiv5-form-submit" onClick={closeAfterSuccess}>
+                  닫기
+                </button>
               </div>
-              <div className="aiv5-form-row">
-                <label className="aiv5-form-label">연락처 <em>*</em></label>
-                <input
-                  className="aiv5-form-ctrl"
-                  type="tel"
-                  placeholder="010-0000-0000"
-                  value={formPhone}
-                  onChange={e => handlePhoneChange(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="aiv5-form-row">
-                <label className="aiv5-form-label">카카오톡 ID (선택)</label>
-                <input
-                  className="aiv5-form-ctrl"
-                  type="text"
-                  placeholder="kakao_id"
-                  value={formEmail}
-                  onChange={e => setFormEmail(e.target.value)}
-                />
-              </div>
-              <div className="aiv5-form-row">
-                <label className="aiv5-form-label">현재 상태 / 문의 내용</label>
-                <textarea
-                  className="aiv5-form-ctrl"
-                  placeholder="현재 운영 중인 사이트 주소나 상황을 간략히 적어주세요"
-                  value={formMemo}
-                  onChange={e => setFormMemo(e.target.value)}
-                />
-              </div>
-              <button type="submit" className="aiv5-form-submit">상담 신청하기</button>
-            </form>
+            ) : (
+              <form onSubmit={submitForm}>
+                <div className="aiv5-form-row">
+                  <label className="aiv5-form-label">이름 <em>*</em></label>
+                  <input
+                    ref={nameInputRef}
+                    className="aiv5-form-ctrl"
+                    type="text"
+                    placeholder="홍길동"
+                    value={formName}
+                    onChange={e => setFormName(e.target.value)}
+                    required
+                    disabled={submitting}
+                  />
+                </div>
+                <div className="aiv5-form-row">
+                  <label className="aiv5-form-label">연락처 <em>*</em></label>
+                  <input
+                    className="aiv5-form-ctrl"
+                    type="tel"
+                    placeholder="010-0000-0000"
+                    value={formPhone}
+                    onChange={e => handlePhoneChange(e.target.value)}
+                    required
+                    disabled={submitting}
+                  />
+                </div>
+                <div className="aiv5-form-row">
+                  <label className="aiv5-form-label">카카오톡 ID (선택)</label>
+                  <input
+                    className="aiv5-form-ctrl"
+                    type="text"
+                    placeholder="kakao_id"
+                    value={formEmail}
+                    onChange={e => setFormEmail(e.target.value)}
+                    disabled={submitting}
+                  />
+                </div>
+                <div className="aiv5-form-row">
+                  <label className="aiv5-form-label">현재 상태 / 문의 내용</label>
+                  <textarea
+                    className="aiv5-form-ctrl"
+                    placeholder="현재 운영 중인 사이트 주소나 상황을 간략히 적어주세요"
+                    value={formMemo}
+                    onChange={e => setFormMemo(e.target.value)}
+                    disabled={submitting}
+                  />
+                </div>
+                <label className="aiv5-form-consent">
+                  <input
+                    type="checkbox"
+                    checked={formKakaoConsent}
+                    onChange={e => setFormKakaoConsent(e.target.checked)}
+                    disabled={submitting}
+                  />
+                  <span>카카오톡으로 연락받는 것에 동의합니다. <em>*</em></span>
+                </label>
+                {submitError && (
+                  <div className="aiv5-modal-err" role="alert">{submitError}</div>
+                )}
+                <button
+                  type="submit"
+                  className="aiv5-form-submit"
+                  disabled={submitting || !formKakaoConsent}
+                >
+                  {submitting ? '제출 중…' : '상담 신청하기'}
+                </button>
+              </form>
+            )}
           </div>
         </div>,
         document.body

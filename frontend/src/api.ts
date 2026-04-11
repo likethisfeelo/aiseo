@@ -107,6 +107,31 @@ export const submitConsultation = async (input: {
 
 export const adminGetConsultations = () => getJson('/admin/consultations');
 
+// ── Course inquiry APIs ──
+export const submitCourseInquiry = async (input: {
+  name: string;
+  phone: string;
+  email?: string;
+  memo?: string;
+  kakaoConsent: boolean;
+  selectedServices: string[];
+  servicesSnapshot?: Array<{ id: string; code: string; name: string; price: number; priceLabel: string }>;
+  totalPrice?: number;
+  source?: string;
+}) => {
+  const { API_BASE_URL } = await import('./config.js');
+  const res = await fetch(`${API_BASE_URL}/course-inquiry`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  const payload = await res.json();
+  if (!res.ok || !payload.success) throw new Error(payload.error || 'Submission failed');
+  return payload.data;
+};
+
+export const adminGetCourseInquiries = () => getJson('/admin/course-inquiries');
+
 // ── Admin APIs ──
 export const adminGetSites = () => getJson('/admin/sites');
 
