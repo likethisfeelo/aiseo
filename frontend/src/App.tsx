@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { selectSite, getMe } from './api';
 import { tokenStore } from './auth.js';
@@ -277,42 +277,40 @@ export default function App() {
 
   // Authenticated dashboard
   return (
-    <BrowserRouter>
-      <PageTitleProvider setPageTitle={setPageTitle}>
-        <DashboardLayout
-          user={user}
-          siteId={siteId}
-          siteOnline={true}
-          brandCompleteness={30}
-          stageProgress={20}
-          pageTitle={pageTitle}
-          onLogout={logout}
-          onToggleEducation={() => setEducationOpen((o) => !o)}
-        >
-          <Routes>
-            <Route path="/brand" element={<BrandPage siteId={siteId} />} />
-            <Route path="/products" element={<ProductPage siteId={siteId} />} />
-            <Route path="/services" element={<ServicePage siteId={siteId} />} />
-            <Route path="/store" element={<StorePage siteId={siteId} />} />
-            <Route path="/site/upload" element={<SiteManagementPage siteId={siteId} initialFocus="left" />} />
-            <Route path="/site/seo" element={<SiteManagementPage siteId={siteId} initialFocus="center" />} />
-            <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} initialFocus="right" />} />
-            <Route path="/site" element={<Navigate to="/site/upload" replace />} />
-            <Route path="/roadmap" element={<RoadmapPage />} />
-            <Route path="/seo-status" element={<SeoStatusPage siteId={siteId} />} />
-            <Route path="/analytics" element={<AnalyticsPage siteId={siteId} />} />
-            <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
-            <Route path="/content" element={<ContentAutomationPage />} />
-            <Route path="/domain" element={<DomainSettingsPage siteId={siteId} />} />
-            <Route path="/admin" element={<AdminSiteListPage />} />
-            <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
-            <Route path="/mktadmin" element={<MktAdminPage />} />
-            <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
-            <Route path="*" element={<Navigate to="/site/upload" replace />} />
-          </Routes>
-        </DashboardLayout>
-        <EducationDrawer open={educationOpen} onClose={() => setEducationOpen(false)} />
-      </PageTitleProvider>
-    </BrowserRouter>
+    <PageTitleProvider setPageTitle={setPageTitle}>
+      <DashboardLayout
+        user={user}
+        siteId={siteId}
+        siteOnline={true}
+        brandCompleteness={30}
+        stageProgress={20}
+        pageTitle={pageTitle}
+        onLogout={logout}
+        onToggleEducation={() => setEducationOpen((o) => !o)}
+      >
+        <Routes>
+          <Route path="/brand" element={<BrandPage siteId={siteId} />} />
+          <Route path="/products" element={<ProductPage siteId={siteId} />} />
+          <Route path="/services" element={<ServicePage siteId={siteId} />} />
+          <Route path="/store" element={<StorePage siteId={siteId} />} />
+          <Route path="/site/upload" element={<SiteManagementPage siteId={siteId} initialFocus="left" />} />
+          <Route path="/site/seo" element={<SiteManagementPage siteId={siteId} initialFocus="center" />} />
+          <Route path="/site/deployed" element={<SiteManagementPage siteId={siteId} initialFocus="right" />} />
+          <Route path="/site" element={<Navigate to="/site/upload" replace />} />
+          <Route path="/roadmap" element={<RoadmapPage />} />
+          <Route path="/seo-status" element={<SeoStatusPage siteId={siteId} />} />
+          <Route path="/analytics" element={<AnalyticsPage siteId={siteId} />} />
+          <Route path="/ads" element={<ComingSoonPage title="광고 관리" description="Google Ads, Naver 검색 광고 등 광고 캠페인을 통합 관리하고 ROI를 추적합니다." icon="📢" />} />
+          <Route path="/content" element={<ContentAutomationPage />} />
+          <Route path="/domain" element={<DomainSettingsPage siteId={siteId} />} />
+          <Route path="/admin" element={<AdminSiteListPage />} />
+          <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
+          <Route path="/mktadmin" element={<MktAdminPage />} />
+          <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
+          <Route path="*" element={<Navigate to="/site/upload" replace />} />
+        </Routes>
+      </DashboardLayout>
+      <EducationDrawer open={educationOpen} onClose={() => setEducationOpen(false)} />
+    </PageTitleProvider>
   );
 }

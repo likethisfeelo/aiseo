@@ -1,4 +1,4 @@
-import { getJson, postJson } from './api-client.js';
+import { getJson, postJson, putJson, deleteJson } from './api-client.js';
 import type { Brand, HeadSnippets, Product, Service, Store } from './types';
 
 // ── Existing MVP APIs ──
@@ -147,3 +147,48 @@ export const adminCreateComment = (input: {
   content: string;
   suggestedValue?: string;
 }) => postJson('/admin/comment', input);
+
+// ── Blog APIs (public) ──
+export const getBlogPosts = (params: { category?: string; tag?: string; page?: number } = {}) => {
+  const qs = new URLSearchParams();
+  if (params.category) qs.set('category', params.category);
+  if (params.tag) qs.set('tag', params.tag);
+  if (params.page) qs.set('page', String(params.page));
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  return getJson(`/blog/posts${suffix}`);
+};
+
+export const getBlogPost = (slug: string) =>
+  getJson(`/blog/posts/${encodeURIComponent(slug)}`);
+
+export const getBlogFeatured = () => getJson('/blog/featured');
+
+export const getBlogPopular = () => getJson('/blog/popular');
+
+export const getBlogCategories = () => getJson('/blog/categories');
+
+// ── Blog APIs (admin) ──
+export const adminListBlogPosts = () => getJson('/admin/blog/posts');
+
+export const adminGetBlogPost = (slug: string) =>
+  getJson(`/admin/blog/posts/${encodeURIComponent(slug)}`);
+
+export const adminCreateBlogPost = (post: Record<string, unknown>) =>
+  postJson('/admin/blog/posts', post);
+
+export const adminUpdateBlogPost = (slug: string, post: Record<string, unknown>) =>
+  putJson(`/admin/blog/posts/${encodeURIComponent(slug)}`, post);
+
+export const adminDeleteBlogPost = (slug: string) =>
+  deleteJson(`/admin/blog/posts/${encodeURIComponent(slug)}`);
+
+export const adminListBlogCategories = () => getJson('/admin/blog/categories');
+
+export const adminCreateBlogCategory = (cat: { slug: string; name: string; order?: number }) =>
+  postJson('/admin/blog/categories', cat);
+
+export const adminUpdateBlogCategory = (slug: string, cat: { name: string; order?: number }) =>
+  putJson(`/admin/blog/categories/${encodeURIComponent(slug)}`, cat);
+
+export const adminDeleteBlogCategory = (slug: string) =>
+  deleteJson(`/admin/blog/categories/${encodeURIComponent(slug)}`);
