@@ -1,7 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import '../landing.css';
 import { getBlogPost, getBlogPosts, getBlogCategories } from '../../api';
 
@@ -243,50 +241,12 @@ export function BlogPostPage() {
             </div>
           )}
 
-          {/* Body */}
-          <div style={styles.bodyWrap}>
-            <Markdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                h1: ({ children }) => <h1 style={mdStyles.h1}>{children}</h1>,
-                h2: ({ children }) => <h2 style={mdStyles.h2}>{children}</h2>,
-                h3: ({ children }) => <h3 style={mdStyles.h3}>{children}</h3>,
-                h4: ({ children }) => <h4 style={mdStyles.h4}>{children}</h4>,
-                p: ({ children }) => <p style={mdStyles.p}>{children}</p>,
-                a: ({ href, children }) => (
-                  <a href={href} style={mdStyles.a} target="_blank" rel="noopener noreferrer">
-                    {children}
-                  </a>
-                ),
-                ul: ({ children }) => <ul style={mdStyles.ul}>{children}</ul>,
-                ol: ({ children }) => <ol style={mdStyles.ol}>{children}</ol>,
-                li: ({ children }) => <li style={mdStyles.li}>{children}</li>,
-                blockquote: ({ children }) => (
-                  <blockquote style={mdStyles.blockquote}>{children}</blockquote>
-                ),
-                code: ({ className, children }) => {
-                  const isBlock = !!className;
-                  return isBlock ? (
-                    <code style={mdStyles.codeBlock}>{children}</code>
-                  ) : (
-                    <code style={mdStyles.codeInline}>{children}</code>
-                  );
-                },
-                pre: ({ children }) => <pre style={mdStyles.pre}>{children}</pre>,
-                img: ({ src, alt }) => <img src={src} alt={alt || ''} style={mdStyles.img} />,
-                hr: () => <hr style={mdStyles.hr} />,
-                table: ({ children }) => (
-                  <div style={mdStyles.tableWrap}>
-                    <table style={mdStyles.table}>{children}</table>
-                  </div>
-                ),
-                th: ({ children }) => <th style={mdStyles.th}>{children}</th>,
-                td: ({ children }) => <td style={mdStyles.td}>{children}</td>,
-              }}
-            >
-              {post.body || ''}
-            </Markdown>
-          </div>
+          {/* Body — server-sanitized HTML, shared .blog-content CSS */}
+          <div
+            className="blog-content"
+            dangerouslySetInnerHTML={{ __html: post.body || '' }}
+          />
+
 
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
@@ -464,12 +424,6 @@ const styles: Record<string, React.CSSProperties> = {
     height: 'auto',
     display: 'block',
   },
-  bodyWrap: {
-    fontSize: 16,
-    lineHeight: 1.8,
-    color: '#1a1a18',
-    fontFamily: "'Noto Sans KR', -apple-system, sans-serif",
-  },
   tagsWrap: {
     display: 'flex',
     flexWrap: 'wrap' as const,
@@ -574,123 +528,3 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-const mdStyles: Record<string, React.CSSProperties> = {
-  h1: {
-    fontSize: 28,
-    fontWeight: 700,
-    marginTop: 48,
-    marginBottom: 16,
-    color: '#1a1a18',
-    letterSpacing: -0.5,
-    fontFamily: 'var(--font-ko)',
-  },
-  h2: {
-    fontSize: 23,
-    fontWeight: 700,
-    marginTop: 40,
-    marginBottom: 14,
-    color: '#1a1a18',
-    letterSpacing: -0.5,
-    fontFamily: 'var(--font-ko)',
-  },
-  h3: {
-    fontSize: 19,
-    fontWeight: 700,
-    marginTop: 32,
-    marginBottom: 12,
-    color: '#1a1a18',
-    fontFamily: 'var(--font-ko)',
-  },
-  h4: {
-    fontSize: 16,
-    fontWeight: 700,
-    marginTop: 24,
-    marginBottom: 10,
-    color: '#1a1a18',
-  },
-  p: {
-    marginTop: 0,
-    marginBottom: 18,
-  },
-  a: {
-    color: '#2563eb',
-    textDecoration: 'underline',
-    textUnderlineOffset: 2,
-  },
-  ul: {
-    marginTop: 0,
-    marginBottom: 18,
-    paddingLeft: 24,
-  },
-  ol: {
-    marginTop: 0,
-    marginBottom: 18,
-    paddingLeft: 24,
-  },
-  li: {
-    marginBottom: 6,
-  },
-  blockquote: {
-    margin: '24px 0',
-    padding: '12px 20px',
-    borderLeft: '4px solid #2563eb',
-    background: '#f8fafc',
-    color: '#475569',
-    borderRadius: '0 8px 8px 0',
-  },
-  codeInline: {
-    background: '#f1f5f9',
-    color: '#dc2626',
-    padding: '2px 6px',
-    borderRadius: 4,
-    fontSize: '0.9em',
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-  },
-  codeBlock: {
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-    fontSize: 13,
-    color: '#1a1a18',
-  },
-  pre: {
-    background: '#0f172a',
-    color: '#e2e8f0',
-    padding: 20,
-    borderRadius: 10,
-    overflowX: 'auto' as const,
-    margin: '24px 0',
-    fontSize: 13,
-    lineHeight: 1.6,
-  },
-  img: {
-    maxWidth: '100%',
-    height: 'auto',
-    borderRadius: 10,
-    margin: '24px 0',
-    display: 'block',
-  },
-  hr: {
-    border: 'none',
-    borderTop: '1px solid #ececea',
-    margin: '32px 0',
-  },
-  tableWrap: {
-    overflowX: 'auto' as const,
-    margin: '24px 0',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse' as const,
-    fontSize: 14,
-  },
-  th: {
-    textAlign: 'left' as const,
-    padding: '10px 14px',
-    background: '#f8f7f4',
-    borderBottom: '2px solid #e0dfd8',
-    fontWeight: 600,
-  },
-  td: {
-    padding: '10px 14px',
-    borderBottom: '1px solid #ececea',
-  },
-};
