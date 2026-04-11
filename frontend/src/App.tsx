@@ -30,6 +30,7 @@ import { BlogCategoriesAdminPage } from './pages/admin/BlogCategoriesAdminPage';
 import { BlogPostsAdminPage } from './pages/admin/BlogPostsAdminPage';
 import { BlogPostEditPage } from './pages/admin/BlogPostEditPage';
 import { BlogListPage } from './pages/public/BlogListPage';
+import { BlogPostPage } from './pages/public/BlogPostPage';
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -243,6 +244,7 @@ export default function App() {
     return (
       <Routes>
         <Route path="/blog" element={<BlogListPage />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route
           path="*"
           element={
