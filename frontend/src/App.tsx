@@ -26,6 +26,9 @@ import { AdminSiteListPage } from './pages/admin/AdminSiteListPage';
 import { AdminSiteDetailPage } from './pages/admin/AdminSiteDetailPage';
 import { MktAdminPage } from './pages/admin/MktAdminPage';
 import { CourseInquiryAdminPage } from './pages/admin/CourseInquiryAdminPage';
+import { BlogCategoriesAdminPage } from './pages/admin/BlogCategoriesAdminPage';
+import { BlogPostsAdminPage } from './pages/admin/BlogPostsAdminPage';
+import { BlogPostEditPage } from './pages/admin/BlogPostEditPage';
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -42,6 +45,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/roadmap': '성장 로드맵',
   '/domain': '도메인 설정',
   '/admin': '관리자',
+  '/admin/blog/posts': '블로그 글 관리',
+  '/admin/blog/categories': '블로그 카테고리',
 };
 
 function PageTitleProvider({ children, setPageTitle }: { children: React.ReactNode; setPageTitle: (t: string) => void }) {
@@ -307,6 +312,10 @@ export default function App() {
           <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
           <Route path="/mktadmin" element={<MktAdminPage />} />
           <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
+          <Route path="/admin/blog/posts" element={<BlogPostsAdminPage />} />
+          <Route path="/admin/blog/posts/new" element={<BlogPostEditPage />} />
+          <Route path="/admin/blog/posts/:slug/edit" element={<BlogPostEditPage />} />
+          <Route path="/admin/blog/categories" element={<BlogCategoriesAdminPage />} />
           <Route path="*" element={<Navigate to="/site/upload" replace />} />
         </Routes>
       </DashboardLayout>
