@@ -30,8 +30,9 @@ export function DashboardLayout({
       style={{
         display: 'flex',
         minHeight: '100vh',
-        fontFamily: "'Noto Sans KR', system-ui, sans-serif",
-        background: '#f8fafc',
+        fontFamily: 'var(--font-ko)',
+        background: 'var(--bg-app)',
+        color: 'var(--text-primary)',
       }}
     >
       <Sidebar

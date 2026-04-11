@@ -29,15 +29,15 @@ function ProgressTracker({ currentStep }: { currentStep: number }) {
                 borderRadius: 12,
                 fontSize: 11,
                 fontWeight: done || active ? 600 : 400,
-                background: active ? '#2563eb' : done ? '#dcfce7' : '#f1f5f9',
-                color: active ? '#fff' : done ? '#166534' : '#94a3b8',
+                background: active ? 'var(--primary)' : done ? 'var(--success-soft)' : 'var(--border-soft)',
+                color: active ? 'var(--primary-contrast)' : done ? 'var(--success)' : 'var(--text-muted)',
               }}
             >
               {done ? '✓' : i + 1}
               <span>{label}</span>
             </div>
             {i < STEPS.length - 1 && (
-              <div style={{ width: 16, height: 1, background: done ? '#86efac' : '#e2e8f0' }} />
+              <div style={{ width: 16, height: 1, background: done ? 'var(--success)' : 'var(--border)' }} />
             )}
           </div>
         );
@@ -52,27 +52,27 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
     <header
       style={{
         height: 56,
-        background: '#fff',
-        borderBottom: '1px solid #e2e8f0',
+        background: 'var(--bg-card)',
+        borderBottom: '1px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
         padding: '0 16px',
         flexShrink: 0,
-        fontFamily: "'Noto Sans KR', system-ui, sans-serif",
+        fontFamily: 'var(--font-ko)',
         gap: 0,
         overflow: 'hidden',
         minWidth: 0,
       }}
     >
       {/* 1. Profile (로그인 정보) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 12, borderRight: '1px solid #e2e8f0', marginRight: 12, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 12, borderRight: '1px solid var(--border)', marginRight: 12, flexShrink: 0 }}>
         <div
           style={{
             width: 28,
             height: 28,
             borderRadius: '50%',
-            background: '#2563eb',
-            color: '#fff',
+            background: 'var(--primary)',
+            color: 'var(--primary-contrast)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -84,12 +84,12 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
           {(user.email || '?')[0].toUpperCase()}
         </div>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#1e293b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 90 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 90 }}>
             {user.name || user.email}
           </div>
           <button
             onClick={onLogout}
-            style={{ fontSize: 10, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{ fontSize: 10, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
             로그아웃
           </button>
@@ -98,7 +98,7 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
 
       {/* 2. Deployed Site Status (좌측 정렬) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexShrink: 1 }}>
-        <h1 style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pageTitle}</h1>
+        <h1 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pageTitle}</h1>
         {siteId && (
           <div
             onClick={() => navigate('/domain')}
@@ -108,23 +108,24 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
               gap: 6,
               padding: '4px 10px',
               borderRadius: 14,
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              background: 'var(--bg-soft)',
+              border: '1px solid var(--border)',
               fontSize: 12,
-              color: '#475569',
+              color: 'var(--text-secondary)',
               whiteSpace: 'nowrap',
               cursor: 'pointer',
-              transition: 'background 0.2s',
+              transition: 'background 0.2s, border-color 0.2s',
+              fontFamily: 'var(--font-en)',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = '#bfdbfe'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--primary-soft)'; e.currentTarget.style.borderColor = 'var(--accent-mid)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg-soft)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
           >
             <span
               style={{
                 width: 7,
                 height: 7,
                 borderRadius: '50%',
-                background: siteOnline ? '#22c55e' : '#94a3b8',
+                background: siteOnline ? 'var(--success)' : 'var(--text-muted)',
               }}
             />
             {siteId}.aiseo.tips
@@ -142,7 +143,7 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
       <div style={{ flex: 1 }} />
 
       {/* 4. Version tag */}
-      <span style={{ fontSize: 10, color: '#94a3b8', marginRight: 12, flexShrink: 0 }}>v.0402-1</span>
+      <span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 12, flexShrink: 0, fontFamily: 'var(--font-en)' }}>v.0402-1</span>
 
       {/* 5. Education Button (우측 정렬, 크게) */}
       {onToggleEducation && (
@@ -150,13 +151,13 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
           onClick={onToggleEducation}
           style={{
             padding: '8px 16px',
-            borderRadius: 8,
-            border: '1.5px solid #2563eb',
-            background: '#eff6ff',
+            borderRadius: 'var(--radius-sm)',
+            border: '1.5px solid var(--primary)',
+            background: 'var(--primary-soft)',
             fontSize: 12,
             fontWeight: 700,
             cursor: 'pointer',
-            color: '#2563eb',
+            color: 'var(--primary)',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
@@ -164,8 +165,8 @@ export function TopBar({ pageTitle, siteId, siteOnline, user, onLogout, onToggle
             transition: 'all 0.2s',
             fontFamily: 'inherit',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#dbeafe'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = '#eff6ff'; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--primary-soft-strong)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--primary-soft)'; }}
         >
           <span style={{ fontSize: 18 }}>📚</span>
           교육 자료
