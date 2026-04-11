@@ -9,7 +9,9 @@ const BASE_DOMAIN = APP_ENV === 'prod' ? 'aiseo.tips' : 'dev.${BASE_DOMAIN}';
 import { ForgotPasswordPage, LoginPage, SignupPage } from './auth-pages';
 import { LandingPage } from './pages/LandingPage';
 import type { UserProfile } from './types';
-import { PublicSubPage } from './pages/public/PublicSubPage';
+import { Course2026Page } from './pages/public/Course2026Page';
+import { Support2026Page } from './pages/public/Support2026Page';
+import { Events2026Page } from './pages/public/Events2026Page';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { AdminLayout } from './components/layout/AdminLayout';
 import { EducationDrawer } from './components/education/EducationDrawer';
@@ -190,16 +192,6 @@ export default function App() {
   const [pageTitle, setPageTitle] = useState('대시보드');
   const [educationOpen, setEducationOpen] = useState(false);
 
-  // Reactive hash state for public sub-page routing
-  const [currentHash, setCurrentHash] = useState(
-    typeof window !== 'undefined' ? window.location.hash.replace('#', '') : ''
-  );
-  useEffect(() => {
-    const onHashChange = () => setCurrentHash(window.location.hash.replace('#', ''));
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
-
   // Get siteId: server first, then localStorage fallback
   useEffect(() => {
     if (!user) { setSiteIdLoading(false); return; }
@@ -245,29 +237,20 @@ export default function App() {
     );
   }
 
-  // Not logged in — /blog uses real router; everything else falls through
-  // to legacy hash-based dispatch for public sub-pages.
+  // Not logged in — public marketing site via path-based routing.
+  // Every public sub-page gets its own URL so we can ship per-page
+  // OG tags / meta titles and be crawled individually by search engines.
+  // Legacy `#course`, `#support`, `#events` hash routes are no longer
+  // supported; users land on the homepage instead.
   if (!user) {
-    const subPages: Record<string, string> = {
-      'course': '수강안내',
-      'support': '지원서비스',
-      'events': '이벤트',
-    };
-    const pageKey = currentHash && subPages[currentHash] ? currentHash : 'landing';
     return (
       <Routes>
+        <Route path="/course2026" element={<Course2026Page />} />
+        <Route path="/support2026" element={<Support2026Page />} />
+        <Route path="/events2026" element={<Events2026Page />} />
         <Route path="/blog" element={<BlogListPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
-        <Route
-          path="*"
-          element={
-            <div className="page-transition" key={pageKey}>
-              {pageKey !== 'landing'
-                ? <PublicSubPage pageKey={pageKey} title={subPages[pageKey]} />
-                : <LandingPage authError={authError} />}
-            </div>
-          }
-        />
+        <Route path="*" element={<LandingPage authError={authError} />} />
       </Routes>
     );
   }

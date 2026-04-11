@@ -434,9 +434,9 @@ export function LandingPage({ authError }: Props) {
         <div className="nav-inner">
           <a href="/" className="nav-logo">AISEO</a>
           <div className="nav-links">
-            <a href="/#course">수강안내</a>
-            <a href="/#support">지원서비스</a>
-            <a href="/#events">이벤트</a>
+            <a href="/course2026">수강안내</a>
+            <a href="/support2026">지원서비스</a>
+            <a href="/events2026">이벤트</a>
             <a href="/blog">블로그</a>
           </div>
           <div className="nav-cta">
@@ -452,9 +452,9 @@ export function LandingPage({ authError }: Props) {
       {/* Mobile dropdown menu */}
       <div className="nav-mobile-menu" id="navMobileMenu">
         <nav className="nmm-links">
-          <a href="/#course" className="nmm-link">수강안내</a>
-          <a href="/#support" className="nmm-link">지원서비스</a>
-          <a href="/#events" className="nmm-link">이벤트</a>
+          <a href="/course2026" className="nmm-link">수강안내</a>
+          <a href="/support2026" className="nmm-link">지원서비스</a>
+          <a href="/events2026" className="nmm-link">이벤트</a>
           <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
