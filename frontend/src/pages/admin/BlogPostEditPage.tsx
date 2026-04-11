@@ -1,7 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import {
   adminGetBlogPost,
   adminCreateBlogPost,
@@ -10,6 +8,7 @@ import {
 } from '../../api';
 import { ImageUploader } from '../../components/common/ImageUploader';
 import { TagChip } from '../../components/common/TagChip';
+import { BlogEditor } from '../../components/common/BlogEditor';
 
 interface BlogPostFull {
   slug: string;
@@ -77,7 +76,6 @@ export function BlogPostEditPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
 
   // Initial load: categories + (edit mode) post
   useEffect(() => {
@@ -288,38 +286,10 @@ export function BlogPostEditPage() {
         </div>
       </div>
 
-      {/* Section: Body + Preview */}
+      {/* Section: Body */}
       <div style={styles.section}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <div style={styles.sectionTitle}>본문 (Markdown)</div>
-          <button
-            onClick={() => setShowPreview(!showPreview)}
-            style={styles.smallBtn}
-          >
-            {showPreview ? '미리보기 숨김' : '미리보기 표시'}
-          </button>
-        </div>
-        <div style={{ display: 'flex', gap: 12 }}>
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="# 제목&#10;&#10;Markdown 으로 본문을 작성합니다..."
-            style={{
-              ...styles.input,
-              flex: 1,
-              minHeight: 480,
-              fontFamily: 'monospace',
-              fontSize: 13,
-              resize: 'vertical',
-              marginBottom: 0,
-            }}
-          />
-          {showPreview && (
-            <div style={styles.previewPanel}>
-              <Markdown remarkPlugins={[remarkGfm]}>{body || '_(미리보기)_'}</Markdown>
-            </div>
-          )}
-        </div>
+        <div style={styles.sectionTitle}>본문</div>
+        <BlogEditor value={body} onChange={setBody} />
       </div>
 
       {/* Section: Images */}
@@ -495,18 +465,6 @@ const styles: Record<string, React.CSSProperties> = {
     boxSizing: 'border-box' as const,
     marginBottom: 12,
     fontFamily: 'inherit',
-  },
-  previewPanel: {
-    flex: 1,
-    minHeight: 480,
-    border: '1px solid #e2e8f0',
-    borderRadius: 6,
-    padding: 16,
-    background: '#fafafa',
-    overflowY: 'auto' as const,
-    fontSize: 14,
-    lineHeight: 1.6,
-    color: '#1a1a18',
   },
   primaryBtn: {
     padding: '9px 18px',

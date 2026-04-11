@@ -9,6 +9,7 @@ const {
 } = require('@aws-sdk/lib-dynamodb');
 const { ok, badRequest, serverError, conflict } = require('../shared/response');
 const { requireAdmin } = require('../shared/auth');
+const { sanitizeBlogHtml } = require('./sanitize');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -200,7 +201,12 @@ const buildPostItem = (body, base = {}) => {
   const nowIso = new Date().toISOString();
   const title = str(body.title, 300);
   const excerpt = str(body.excerpt, 500);
-  const markdown = typeof body.body === 'string' ? body.body.slice(0, 300000) : '';
+  // `body.body` arrives from the TipTap editor as HTML. We sanitize
+  // against a narrow allow-list (see sanitize.js) and then cap at
+  // 300KB. The cap is applied after sanitization so the stored value
+  // is never half-truncated tags.
+  const rawHtml = typeof body.body === 'string' ? body.body : '';
+  const html = sanitizeBlogHtml(rawHtml).slice(0, 300000);
   const category = str(body.category, 100);
   const tags = sanitizeTags(body.tags);
   const thumbnailUrl = str(body.thumbnailUrl, 1000);
@@ -217,7 +223,7 @@ const buildPostItem = (body, base = {}) => {
     ...base,
     title,
     excerpt,
-    body: markdown,
+    body: html,
     category,
     tags,
     thumbnailUrl,
