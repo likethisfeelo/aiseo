@@ -59,9 +59,9 @@ const EXAMPLE_ROADMAPS = [
 ];
 
 function StageCard({ stage }: { stage: Stage }) {
-  const statusColor = { done: '#22c55e', current: '#2563eb', next: '#cbd5e1' };
+  const statusColor = { done: 'var(--success)', current: 'var(--primary)', next: 'var(--text-muted)' };
   const statusIcon = { done: '✓', current: '◎', next: '○' };
-  const statusBg = { done: '#f0fdf4', current: '#eff6ff', next: '#f8fafc' };
+  const statusBg = { done: 'var(--success-soft)', current: 'var(--primary-soft)', next: 'var(--bg-soft)' };
 
   return (
     <div style={{ display: 'flex', gap: 16, marginBottom: 4 }}>
@@ -71,39 +71,39 @@ function StageCard({ stage }: { stage: Stage }) {
           background: statusBg[stage.status], border: `2px solid ${statusColor[stage.status]}`,
           color: statusColor[stage.status], fontSize: 11, fontWeight: 700,
         }}>{statusIcon[stage.status]}</div>
-        <div style={{ width: 2, flex: 1, background: stage.status === 'done' ? '#86efac' : '#e2e8f0', minHeight: 12 }} />
+        <div style={{ width: 2, flex: 1, background: stage.status === 'done' ? 'var(--success)' : 'var(--border)', minHeight: 12 }} />
       </div>
 
       <div style={{ flex: 1, paddingBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <span style={{ fontSize: 11, fontWeight: 600, color: statusColor[stage.status] }}>Stage {stage.stage}</span>
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>{stage.title}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{stage.title}</span>
         </div>
 
         {stage.metrics && (
           <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
             {stage.metrics.map((m) => (
-              <div key={m.label} style={{ padding: '4px 10px', borderRadius: 6, background: '#eff6ff', fontSize: 11 }}>
-                <span style={{ color: '#64748b' }}>{m.label}: </span>
-                <span style={{ fontWeight: 600, color: '#2563eb' }}>{m.value}</span>
+              <div key={m.label} style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--primary-soft)', fontSize: 11 }}>
+                <span style={{ color: 'var(--text-secondary)' }}>{m.label}: </span>
+                <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{m.value}</span>
               </div>
             ))}
           </div>
         )}
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <div style={{ flex: 1, padding: 10, borderRadius: 8, background: '#fff', border: '1px solid #e2e8f0' }}>
-            <div style={{ fontSize: 10, fontWeight: 600, color: '#7c3aed', marginBottom: 4 }}>비즈니스</div>
+          <div style={{ flex: 1, padding: 10, borderRadius: 8, background: '#fff', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--accent-dark)', marginBottom: 4 }}>비즈니스</div>
             {stage.businessTrack.map((item) => (
-              <div key={item.text} style={{ fontSize: 12, color: item.done ? '#16a34a' : '#475569', marginBottom: 2 }}>
+              <div key={item.text} style={{ fontSize: 12, color: item.done ? 'var(--success)' : 'var(--text-secondary)', marginBottom: 2 }}>
                 {item.done ? '✓ ' : '· '}{item.text}
               </div>
             ))}
           </div>
-          <div style={{ flex: 1, padding: 10, borderRadius: 8, background: '#fff', border: '1px solid #e2e8f0' }}>
-            <div style={{ fontSize: 10, fontWeight: 600, color: '#2563eb', marginBottom: 4 }}>디지털 마케팅</div>
+          <div style={{ flex: 1, padding: 10, borderRadius: 8, background: '#fff', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--primary)', marginBottom: 4 }}>디지털 마케팅</div>
             {stage.marketingTrack.map((item) => (
-              <div key={item.text} style={{ fontSize: 12, color: item.done ? '#16a34a' : '#475569', marginBottom: 2 }}>
+              <div key={item.text} style={{ fontSize: 12, color: item.done ? 'var(--success)' : 'var(--text-secondary)', marginBottom: 2 }}>
                 {item.done ? '✓ ' : '· '}{item.text}
               </div>
             ))}
@@ -124,17 +124,17 @@ export function RoadmapPage() {
   return (
     <div style={{ padding: 24, maxWidth: 860, margin: '0 auto' }}>
       {/* Tab Bar */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid #e2e8f0', marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid var(--border)', marginBottom: 24 }}>
         <button onClick={() => setTab('my')} style={{
           padding: '10px 20px', border: 'none', background: 'transparent', fontSize: 14,
-          fontWeight: tab === 'my' ? 700 : 400, color: tab === 'my' ? '#2563eb' : '#64748b',
-          cursor: 'pointer', borderBottom: tab === 'my' ? '2px solid #2563eb' : '2px solid transparent',
+          fontWeight: tab === 'my' ? 700 : 400, color: tab === 'my' ? 'var(--primary)' : 'var(--text-secondary)',
+          cursor: 'pointer', borderBottom: tab === 'my' ? '2px solid var(--primary)' : '2px solid transparent',
           marginBottom: -2, fontFamily: 'inherit',
         }}>🗺 내 로드맵</button>
         <button onClick={() => setTab('examples')} style={{
           padding: '10px 20px', border: 'none', background: 'transparent', fontSize: 14,
-          fontWeight: tab === 'examples' ? 700 : 400, color: tab === 'examples' ? '#2563eb' : '#64748b',
-          cursor: 'pointer', borderBottom: tab === 'examples' ? '2px solid #2563eb' : '2px solid transparent',
+          fontWeight: tab === 'examples' ? 700 : 400, color: tab === 'examples' ? 'var(--primary)' : 'var(--text-secondary)',
+          cursor: 'pointer', borderBottom: tab === 'examples' ? '2px solid var(--primary)' : '2px solid transparent',
           marginBottom: -2, fontFamily: 'inherit',
         }}>📋 업종별 예시</button>
       </div>
@@ -150,17 +150,17 @@ export function RoadmapPage() {
           /* No roadmap yet (컨설팅 전) */
           <div style={{ textAlign: 'center', padding: '40px 20px' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🗺</div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e293b', marginBottom: 8, fontFamily: "'Noto Serif KR', serif" }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8, fontFamily: "'Noto Serif KR', serif" }}>
               아직 로드맵이 생성되지 않았어요
             </h2>
-            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.7, marginBottom: 32, maxWidth: 400, margin: '0 auto 32px' }}>
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 32, maxWidth: 400, margin: '0 auto 32px' }}>
               1:1 컨설팅을 통해 업종과 현재 상황에 맞는<br />
               맞춤 성장 로드맵을 만들어 드립니다.
             </p>
 
             {/* What you get */}
-            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0', padding: 24, maxWidth: 480, margin: '0 auto 24px', textAlign: 'left' }}>
-              <h4 style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 12 }}>컨설팅에서 받으실 수 있는 것</h4>
+            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid var(--border)', padding: 24, maxWidth: 480, margin: '0 auto 24px', textAlign: 'left' }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>컨설팅에서 받으실 수 있는 것</h4>
               {[
                 '현재 비즈니스 단계 진단',
                 '업종 맞춤 5단계 성장 플랜',
@@ -169,21 +169,21 @@ export function RoadmapPage() {
                 '컨설턴트의 맞춤 메모와 조언',
               ].map((item) => (
                 <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ color: '#22c55e', fontSize: 14 }}>✓</span>
-                  <span style={{ fontSize: 13, color: '#475569' }}>{item}</span>
+                  <span style={{ color: 'var(--success)', fontSize: 14 }}>✓</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{item}</span>
                 </div>
               ))}
             </div>
 
             <button style={{
-              padding: '14px 32px', borderRadius: 10, border: 'none', background: '#2563eb',
+              padding: '14px 32px', borderRadius: 10, border: 'none', background: 'var(--primary)',
               color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               transition: 'all 0.2s',
             }}>
               1:1 컨설팅 신청하기 →
             </button>
 
-            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 16 }}>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 16 }}>
               아래 "업종별 예시" 탭에서 참고 로드맵을 미리 확인할 수 있어요
             </p>
           </div>
@@ -196,19 +196,19 @@ export function RoadmapPage() {
             {EXAMPLE_ROADMAPS.map((r, i) => (
               <button key={r.id} onClick={() => setExampleIdx(i)} style={{
                 padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: exampleIdx === i ? 600 : 400,
-                background: exampleIdx === i ? '#2563eb' : '#f1f5f9',
-                color: exampleIdx === i ? '#fff' : '#475569',
+                background: exampleIdx === i ? 'var(--primary)' : 'var(--border-soft)',
+                color: exampleIdx === i ? '#fff' : 'var(--text-secondary)',
                 border: 'none', cursor: 'pointer', fontFamily: 'inherit',
               }}>{r.title}</button>
             ))}
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e293b', margin: 0 }}>{EXAMPLE_ROADMAPS[exampleIdx].title}</h3>
-            <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>{EXAMPLE_ROADMAPS[exampleIdx].subtitle}</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{EXAMPLE_ROADMAPS[exampleIdx].title}</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '4px 0 0' }}>{EXAMPLE_ROADMAPS[exampleIdx].subtitle}</p>
           </div>
 
-          <div style={{ background: '#fffbeb', borderRadius: 8, padding: 12, fontSize: 12, color: '#92400e', marginBottom: 20 }}>
+          <div style={{ background: 'var(--warning-soft)', borderRadius: 8, padding: 12, fontSize: 12, color: 'var(--warning-dark)', marginBottom: 20 }}>
             💡 이 로드맵은 참고용 예시입니다. 실제 로드맵은 1:1 컨설팅을 통해 맞춤 제작됩니다.
           </div>
 

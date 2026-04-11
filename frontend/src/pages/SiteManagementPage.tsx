@@ -30,26 +30,26 @@ const SEO_FIX_GUIDES: Record<string, { guide: string; tooltip: string }> = {
   },
 };
 
-const inputStyle = { width: '100%', padding: 8, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 8 };
-const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 } as const;
+const inputStyle = { width: '100%', padding: 8, border: '1px solid var(--border-strong)', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' as const, marginBottom: 8 };
+const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 } as const;
 
 /* ── Collapsed column: shows only title + expand button ── */
 function CollapsedColumn({ title, icon, onClick }: { title: string; icon: string; onClick: () => void }) {
   return (
     <div style={{
       width: 48, minWidth: 48, display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'center', gap: 8, borderRight: '1px solid #e2e8f0', background: '#f8fafc',
+      justifyContent: 'center', gap: 8, borderRight: '1px solid var(--border)', background: 'var(--bg-soft)',
       cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0,
     }}
       onClick={onClick}
-      onMouseEnter={(e) => { e.currentTarget.style.background = '#eff6ff'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--primary-soft)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg-soft)'; }}
     >
       <span style={{ fontSize: 16 }}>{icon}</span>
-      <span style={{ writingMode: 'vertical-rl', fontSize: 12, fontWeight: 600, color: '#475569', letterSpacing: '0.05em' }}>
+      <span style={{ writingMode: 'vertical-rl', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
         {title}
       </span>
-      <span style={{ fontSize: 14, color: '#2563eb', marginTop: 4 }}>▸</span>
+      <span style={{ fontSize: 14, color: 'var(--primary)', marginTop: 4 }}>▸</span>
     </div>
   );
 }
@@ -166,37 +166,37 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
       ) : (
         <div style={{
           width: colWidth('left', '270px'), flex: isExpanded('left') ? 1 : undefined,
-          borderRight: '1px solid #e2e8f0', padding: 20, background: '#fff', overflowY: 'auto',
+          borderRight: '1px solid var(--border)', padding: 20, background: '#fff', overflowY: 'auto',
           position: 'relative', transition: 'flex 0.3s ease', minWidth: 0,
         }}>
           {isExpanded('left') && (
             <button onClick={() => setFocused(null)} style={{
-              position: 'absolute', top: 8, right: 8, background: '#f1f5f9', border: 'none',
-              borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: '#64748b',
+              position: 'absolute', top: 8, right: 8, background: 'var(--border-soft)', border: 'none',
+              borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: 'var(--text-secondary)',
             }}>✕ 축소</button>
           )}
 
-          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#1e293b' }}>사이트 파일</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: 'var(--text-primary)' }}>사이트 파일</h3>
 
           <input ref={fileRef} type="file" accept=".zip" style={{ display: 'none' }} onChange={handleFileChange} />
 
           {uploadedFileName ? (
             <>
-              <div style={{ borderRadius: 8, padding: 16, background: '#f0fdf4', border: '1px solid #bbf7d0', marginBottom: 12 }}>
+              <div style={{ borderRadius: 8, padding: 16, background: 'var(--success-soft)', border: '1px solid var(--success-soft)', marginBottom: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <span style={{ fontSize: 18 }}>✅</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#166534' }}>업로드 완료</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--success-dark)' }}>업로드 완료</span>
                 </div>
-                <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>{uploadedFileName}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}>{uploadedFileName}</div>
                 {validateResult && (
-                  <div style={{ fontSize: 11, color: '#64748b' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
                     검증: {validateResult.summary.passed}/{validateResult.summary.total} 항목 통과
                   </div>
                 )}
               </div>
               <button onClick={handleReupload} style={{
-                width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #d1d5db',
-                background: '#fff', color: '#475569', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 16,
+                width: '100%', padding: '10px', borderRadius: 6, border: '1px solid var(--border-strong)',
+                background: '#fff', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 16,
               }}>
                 재업로드
               </button>
@@ -205,9 +205,9 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             <>
               <div
                 style={{
-                  border: `2px dashed ${selectedFile ? '#2563eb' : '#cbd5e1'}`,
+                  border: `2px dashed ${selectedFile ? 'var(--primary)' : 'var(--text-muted)'}`,
                   borderRadius: 8, padding: 20, textAlign: 'center',
-                  background: selectedFile ? '#eff6ff' : '#f8fafc',
+                  background: selectedFile ? 'var(--primary-soft)' : 'var(--bg-soft)',
                   marginBottom: 16, cursor: 'pointer', transition: 'all 0.2s',
                 }}
                 onClick={() => fileRef.current?.click()}
@@ -215,35 +215,35 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
                 {selectedFile ? (
                   <>
                     <div style={{ fontSize: 24, marginBottom: 4 }}>📦</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', wordBreak: 'break-all' }}>{selectedFile.name}</div>
-                    <div style={{ fontSize: 11, color: '#2563eb', marginTop: 4 }}>{formatFileSize(selectedFile.size)}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', wordBreak: 'break-all' }}>{selectedFile.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--primary)', marginTop: 4 }}>{formatFileSize(selectedFile.size)}</div>
                   </>
                 ) : (
                   <>
                     <div style={{ fontSize: 24, marginBottom: 4 }}>📁</div>
-                    <div style={{ fontSize: 12, color: '#64748b' }}>ZIP 파일을 선택하세요</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>최대 50MB</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>ZIP 파일을 선택하세요</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>최대 50MB</div>
                   </>
                 )}
               </div>
 
               <button onClick={handleUpload} disabled={loading} style={{
                 width: '100%', padding: '10px', borderRadius: 6, border: 'none',
-                background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 16,
+                background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 16,
               }}>
                 {loading ? '처리 중...' : '업로드 & 검증'}
               </button>
             </>
           )}
 
-          {error && <div style={{ fontSize: 12, color: '#dc2626', marginBottom: 12, padding: 8, background: '#fef2f2', borderRadius: 6 }}>{error}</div>}
+          {error && <div style={{ fontSize: 12, color: 'var(--danger)', marginBottom: 12, padding: 8, background: 'var(--danger-soft)', borderRadius: 6 }}>{error}</div>}
 
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 8 }}>레퍼런스 사이트 & 메모</h4>
-          <div style={{ padding: 12, borderRadius: 6, background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: 12, color: '#64748b', marginBottom: 12 }}>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>레퍼런스 사이트 & 메모</h4>
+          <div style={{ padding: 12, borderRadius: 6, background: 'var(--bg-soft)', border: '1px solid var(--border)', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 12 }}>
             레퍼런스 사이트와 메모를 추가하여 컨설턴트에게 전달할 수 있습니다.
           </div>
 
-          <div style={{ padding: 12, borderRadius: 6, background: '#fefce8', border: '1px solid #fde68a', fontSize: 12, color: '#78350f' }}>
+          <div style={{ padding: 12, borderRadius: 6, background: 'var(--warning-soft)', border: '1px solid var(--warning-soft)', fontSize: 12, color: 'var(--warning-dark)' }}>
             <div style={{ fontWeight: 600, marginBottom: 4 }}>컨설턴트 메모</div>
             아직 등록된 메모가 없습니다.
           </div>
@@ -260,16 +260,16 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
         }}>
           {isExpanded('center') && (
             <button onClick={() => setFocused(null)} style={{
-              position: 'absolute', top: 8, right: 8, background: '#f1f5f9', border: 'none',
-              borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: '#64748b',
+              position: 'absolute', top: 8, right: 8, background: 'var(--border-soft)', border: 'none',
+              borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: 'var(--text-secondary)',
             }}>✕ 축소</button>
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-            <ProgressRing value={passed} max={total} size={56} strokeWidth={5} color={passed === total ? '#22c55e' : '#2563eb'} />
+            <ProgressRing value={passed} max={total} size={56} strokeWidth={5} color={passed === total ? 'var(--success)' : 'var(--primary)'} />
             <div>
-              <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: '#1e293b' }}>SEO 검증 결과</h3>
-              <div style={{ fontSize: 12, color: '#64748b' }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>SEO 검증 결과</h3>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                 {validateResult ? `${passed}/${total} 항목 통과` : '파일을 업로드하면 자동으로 검증됩니다'}
               </div>
             </div>
@@ -278,13 +278,13 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
           {validateResult && (
             <div style={{ marginBottom: 24 }}>
               {validateResult.checks.map((check, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 0', borderBottom: '1px solid var(--border-soft)' }}>
                   <span style={{ fontSize: 16 }}>{check.passed ? '✅' : '⚠️'}</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: check.passed ? '#166534' : '#92400e' }}>{check.reason}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: check.passed ? 'var(--success-dark)' : 'var(--warning-dark)' }}>{check.reason}</div>
                     {!check.passed && check.key && SEO_FIX_GUIDES[check.key] && (
                       <>
-                        <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{SEO_FIX_GUIDES[check.key].guide}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{SEO_FIX_GUIDES[check.key].guide}</div>
                         <div style={{ position: 'relative', display: 'inline-block', marginTop: 6 }}>
                           <button
                             className="seo-guide-btn"
@@ -299,7 +299,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
                             }}
                             style={{
                               padding: '3px 10px', fontSize: 11, borderRadius: 4,
-                              border: '1px solid #fbbf24', background: '#fffbeb', color: '#92400e',
+                              border: '1px solid var(--warning)', background: 'var(--warning-soft)', color: 'var(--warning-dark)',
                               cursor: 'pointer', fontWeight: 500,
                             }}
                           >
@@ -308,8 +308,8 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
                           <div style={{
                             display: 'none', position: 'absolute', bottom: '100%', left: 0,
                             marginBottom: 6, padding: '10px 12px', borderRadius: 6,
-                            background: '#fef9c3', border: '1px solid #fde68a',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 11, color: '#78350f',
+                            background: 'var(--warning-soft)', border: '1px solid var(--warning-soft)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 11, color: 'var(--warning-dark)',
                             whiteSpace: 'pre-line', minWidth: 220, zIndex: 10, lineHeight: 1.5,
                           }}>
                             {SEO_FIX_GUIDES[check.key].tooltip}
@@ -326,10 +326,10 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
           <OgTagEditor snippets={snippets} siteId={siteId} onChange={setSnippets} />
           <OgPreviewCards snippets={snippets} siteId={siteId} />
 
-          <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, color: '#1e293b' }}>마케팅 코드 설정</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, color: 'var(--text-primary)' }}>마케팅 코드 설정</h3>
 
           <label style={labelStyle}>GA4 측정 ID</label>
-          <input value={snippets.ga4Id || ''} onChange={(e) => setSnippets({ ...snippets, ga4Id: e.target.value })} placeholder="G-XXXXXXXXXX" style={{ ...inputStyle, borderColor: snippets.ga4Id ? '#22c55e' : '#d1d5db' }} />
+          <input value={snippets.ga4Id || ''} onChange={(e) => setSnippets({ ...snippets, ga4Id: e.target.value })} placeholder="G-XXXXXXXXXX" style={{ ...inputStyle, borderColor: snippets.ga4Id ? 'var(--success)' : 'var(--border-strong)' }} />
 
           <label style={labelStyle}>Google Ads 전환 ID</label>
           <input value={snippets.googleAdsId || ''} onChange={(e) => setSnippets({ ...snippets, googleAdsId: e.target.value })} placeholder="AW-XXXXXXXXX (선택)" style={inputStyle} />
@@ -343,16 +343,16 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
           <label style={labelStyle}>커스텀 {'<head>'} 코드</label>
           <textarea value={snippets.customHead || ''} onChange={(e) => setSnippets({ ...snippets, customHead: e.target.value })} style={{ ...inputStyle, minHeight: 60, resize: 'vertical' }} placeholder="기타 삽입할 HTML 코드" />
 
-          {snippetMsg && <div style={{ fontSize: 12, color: snippetMsg.includes('실패') ? '#dc2626' : '#059669', marginBottom: 8 }}>{snippetMsg}</div>}
+          {snippetMsg && <div style={{ fontSize: 12, color: snippetMsg.includes('실패') ? 'var(--danger)' : 'var(--success)', marginBottom: 8 }}>{snippetMsg}</div>}
 
           <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-            <button onClick={handleSaveSnippets} disabled={savingSnippets} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 13, cursor: 'pointer' }}>
+            <button onClick={handleSaveSnippets} disabled={savingSnippets} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 13, cursor: 'pointer' }}>
               {savingSnippets ? '저장 중...' : '설정 저장'}
             </button>
-            <button onClick={() => handleDeploy('dev')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', fontSize: 13, cursor: 'pointer', color: '#475569' }}>
+            <button onClick={() => handleDeploy('dev')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid var(--border-strong)', background: '#fff', fontSize: 13, cursor: 'pointer', color: 'var(--text-secondary)' }}>
               Dev 배포
             </button>
-            <button onClick={() => handleDeploy('prod')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+            <button onClick={() => handleDeploy('prod')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--success)', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
               🚀 Prod 배포
             </button>
           </div>
@@ -365,46 +365,46 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
       ) : (
         <div style={{
           width: colWidth('right', '290px'), flex: isExpanded('right') ? 1 : undefined,
-          borderLeft: '1px solid #e2e8f0', padding: 20, background: '#f8fafc', overflowY: 'auto',
+          borderLeft: '1px solid var(--border)', padding: 20, background: 'var(--bg-soft)', overflowY: 'auto',
           position: 'relative', transition: 'flex 0.3s ease', minWidth: 0,
         }}>
           {isExpanded('right') && (
             <button onClick={() => setFocused(null)} style={{
-              position: 'absolute', top: 8, right: 8, background: '#e2e8f0', border: 'none',
-              borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: '#64748b',
+              position: 'absolute', top: 8, right: 8, background: 'var(--border)', border: 'none',
+              borderRadius: 6, padding: '4px 8px', fontSize: 11, cursor: 'pointer', color: 'var(--text-secondary)',
             }}>✕ 축소</button>
           )}
 
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>배포된 사이트</h4>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12 }}>배포된 사이트</h4>
           {deployResult ? (
-            <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden', marginBottom: 16 }}>
+            <div style={{ background: '#fff', borderRadius: 8, border: '1px solid var(--border)', overflow: 'hidden', marginBottom: 16 }}>
               {snippets.ogImage ? (
                 <div style={{ height: 160, overflow: 'hidden' }}>
                   <img src={snippets.ogImage} alt="사이트 대표 이미지" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ) : (
-                <div style={{ height: 160, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#94a3b8' }}>
+                <div style={{ height: 160, background: 'var(--border-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
                   사이트 미리보기
                 </div>
               )}
               <div style={{ padding: 12 }}>
-                <a href={deployResult.deployedUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#2563eb', wordBreak: 'break-all' }}>
+                <a href={deployResult.deployedUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'var(--primary)', wordBreak: 'break-all' }}>
                   {deployResult.deployedUrl}
                 </a>
-                <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>
                   {deployResult.uploadedCount}개 파일 배포됨
                 </div>
               </div>
             </div>
           ) : (
-            <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', padding: 20, textAlign: 'center', color: '#94a3b8', fontSize: 12, marginBottom: 16 }}>
+            <div style={{ background: '#fff', borderRadius: 8, border: '1px solid var(--border)', padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, marginBottom: 16 }}>
               배포 후 미리보기가 표시됩니다
             </div>
           )}
 
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>검색 결과 미리보기</h4>
-          <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', padding: 12, marginBottom: 16 }}>
-            <div style={{ fontSize: 11, color: '#059669', marginBottom: 2 }}>{siteId}.aiseo.tips</div>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12 }}>검색 결과 미리보기</h4>
+          <div style={{ background: '#fff', borderRadius: 8, border: '1px solid var(--border)', padding: 12, marginBottom: 16 }}>
+            <div style={{ fontSize: 11, color: 'var(--success)', marginBottom: 2 }}>{siteId}.aiseo.tips</div>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#1a0dab', marginBottom: 2 }}>{snippets.ogTitle || '사이트 제목'}</div>
             <div style={{ fontSize: 12, color: '#545454' }}>{snippets.ogDescription || '사이트 설명이 여기에 표시됩니다...'}</div>
           </div>
@@ -419,7 +419,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
                   window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.trim())}`, '_blank');
                 }
               }}
-              style={{ flex: 1, padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 12 }}
+              style={{ flex: 1, padding: '6px 10px', border: '1px solid var(--border-strong)', borderRadius: 6, fontSize: 12 }}
             />
           </div>
           <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -437,29 +437,29 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             </button>
             <button
               onClick={() => { if (searchQuery.trim()) window.open(`https://search.daum.net/search?q=${encodeURIComponent(searchQuery.trim())}`, '_blank'); }}
-              style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#FEE500', color: '#3C1E1E', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#FEE500', color: 'var(--text-primary)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}
             >
               Kakao
             </button>
           </div>
 
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>💡 인사이트 & 다음 단계</h4>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12 }}>💡 인사이트 & 다음 단계</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ padding: 10, borderRadius: 6, background: '#fff', border: '1px solid #e2e8f0', fontSize: 12, color: '#475569' }}>
+            <div style={{ padding: 10, borderRadius: 6, background: '#fff', border: '1px solid var(--border)', fontSize: 12, color: 'var(--text-secondary)' }}>
               <strong>Search Console 등록</strong> — 사이트를 Google에 등록하고 검색 노출을 시작하세요
             </div>
-            <div style={{ padding: 10, borderRadius: 6, background: '#fff', border: '1px solid #e2e8f0', fontSize: 12, color: '#475569' }}>
+            <div style={{ padding: 10, borderRadius: 6, background: '#fff', border: '1px solid var(--border)', fontSize: 12, color: 'var(--text-secondary)' }}>
               <strong>GA4 데이터 확인</strong> — 측정 ID 연결 후 실시간 데이터를 확인하세요
             </div>
-            <div style={{ padding: 10, borderRadius: 6, background: '#fff', border: '1px solid #e2e8f0', fontSize: 12, color: '#475569' }}>
+            <div style={{ padding: 10, borderRadius: 6, background: '#fff', border: '1px solid var(--border)', fontSize: 12, color: 'var(--text-secondary)' }}>
               <strong>Naver 웹마스터 등록</strong> — 네이버 검색 노출을 위해 등록하세요
             </div>
           </div>
 
-          <div style={{ marginTop: 16, padding: 16, borderRadius: 8, background: 'linear-gradient(135deg, #eff6ff, #f0fdf4)', textAlign: 'center' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>Search Console 설정이 어려우신가요?</div>
-            <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>15분 가이드 영상을 시청해 보세요</div>
-            <button style={{ padding: '6px 14px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontSize: 12, cursor: 'pointer' }}>
+          <div style={{ marginTop: 16, padding: 16, borderRadius: 8, background: 'linear-gradient(135deg, var(--primary-soft), var(--success-soft))', textAlign: 'center' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Search Console 설정이 어려우신가요?</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8 }}>15분 가이드 영상을 시청해 보세요</div>
+            <button style={{ padding: '6px 14px', borderRadius: 6, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 12, cursor: 'pointer' }}>
               교육 신청
             </button>
           </div>

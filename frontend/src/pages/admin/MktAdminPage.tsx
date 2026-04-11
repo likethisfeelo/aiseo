@@ -59,7 +59,7 @@ export function MktAdminPage() {
       <p style={styles.subtitle}>총 {items.length}건의 상담신청</p>
 
       {loading && <p style={styles.msg}>로딩 중...</p>}
-      {error && <p style={{ ...styles.msg, color: '#c0392b' }}>오류: {error}</p>}
+      {error && <p style={{ ...styles.msg, color: 'var(--danger)' }}>오류: {error}</p>}
 
       {!loading && !error && items.length === 0 && (
         <p style={styles.msg}>아직 접수된 상담신청이 없습니다.</p>
@@ -102,10 +102,10 @@ export function MktAdminPage() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     maxWidth: 1100, margin: '0 auto', padding: '40px 24px',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif",
+    fontFamily: 'var(--font-ko)',
   },
   title: {
-    fontSize: 22, fontWeight: 600, color: '#1a1a18', marginBottom: 4,
+    fontSize: 22, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4,
   },
   subtitle: {
     fontSize: 13, color: '#888', marginBottom: 24,
@@ -114,18 +114,18 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 14, color: '#666', padding: '40px 0', textAlign: 'center',
   },
   tableWrap: {
-    overflowX: 'auto', border: '1px solid #e0dfd8', borderRadius: 10,
+    overflowX: 'auto', border: '1px solid var(--border)', borderRadius: 10,
   },
   table: {
     width: '100%', borderCollapse: 'collapse' as const, fontSize: 13,
   },
   th: {
-    textAlign: 'left' as const, padding: '12px 14px', background: '#f8f7f4',
-    fontWeight: 600, color: '#555', borderBottom: '1px solid #e0dfd8',
+    textAlign: 'left' as const, padding: '12px 14px', background: 'var(--bg-soft)',
+    fontWeight: 600, color: '#555', borderBottom: '1px solid var(--border)',
     whiteSpace: 'nowrap' as const,
   },
   tr: {
-    borderBottom: '1px solid #f0efec',
+    borderBottom: '1px solid var(--border-soft)',
   },
   td: {
     padding: '11px 14px', color: '#333', whiteSpace: 'nowrap' as const,

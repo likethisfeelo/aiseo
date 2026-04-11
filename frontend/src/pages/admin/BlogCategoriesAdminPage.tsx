@@ -162,7 +162,7 @@ export function BlogCategoriesAdminPage() {
       </div>
 
       {loading && <p style={styles.msg}>로딩 중...</p>}
-      {error && <p style={{ ...styles.msg, color: '#c0392b' }}>오류: {error}</p>}
+      {error && <p style={{ ...styles.msg, color: 'var(--danger)' }}>오류: {error}</p>}
 
       {!loading && !error && items.length === 0 && (
         <p style={styles.msg}>아직 등록된 카테고리가 없습니다.</p>
@@ -184,7 +184,7 @@ export function BlogCategoriesAdminPage() {
                 const isEditing = editingSlug === cat.slug;
                 return (
                   <tr key={cat.slug} style={styles.tr}>
-                    <td style={{ ...styles.td, fontFamily: 'monospace', color: '#475569' }}>
+                    <td style={{ ...styles.td, fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
                       {cat.slug}
                     </td>
                     <td style={styles.td}>
@@ -216,7 +216,7 @@ export function BlogCategoriesAdminPage() {
                           <button
                             onClick={() => handleSaveEdit(cat.slug)}
                             disabled={editSaving}
-                            style={{ ...styles.smallBtn, background: '#2563eb', color: '#fff', borderColor: '#2563eb' }}
+                            style={{ ...styles.smallBtn, background: 'var(--primary)', color: '#fff', borderColor: 'var(--primary)' }}
                           >
                             {editSaving ? '저장 중...' : '저장'}
                           </button>
@@ -231,7 +231,7 @@ export function BlogCategoriesAdminPage() {
                           </button>
                           <button
                             onClick={() => handleDelete(cat.slug)}
-                            style={{ ...styles.smallBtn, color: '#dc2626', borderColor: '#fecaca' }}
+                            style={{ ...styles.smallBtn, color: 'var(--danger)', borderColor: 'var(--danger-soft)' }}
                           >
                             삭제
                           </button>
@@ -255,22 +255,22 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 1100,
     margin: '0 auto',
     padding: '40px 24px',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif",
+    fontFamily: 'var(--font-ko)',
   },
-  title: { fontSize: 22, fontWeight: 600, color: '#1a1a18', marginBottom: 4 },
+  title: { fontSize: 22, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 },
   subtitle: { fontSize: 13, color: '#888', marginBottom: 24 },
   createBox: {
-    background: '#f8fafc',
-    border: '1px solid #e2e8f0',
+    background: 'var(--bg-soft)',
+    border: '1px solid var(--border)',
     borderRadius: 10,
     padding: 16,
     marginBottom: 24,
   },
-  createTitle: { fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 10 },
+  createTitle: { fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 10 },
   createRow: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' },
   input: {
     padding: 8,
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--border-strong)',
     borderRadius: 6,
     fontSize: 13,
     boxSizing: 'border-box' as const,
@@ -280,7 +280,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '9px 18px',
     border: 'none',
     borderRadius: 6,
-    background: '#2563eb',
+    background: 'var(--primary)',
     color: '#fff',
     fontSize: 13,
     fontWeight: 600,
@@ -288,7 +288,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   smallBtn: {
     padding: '6px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--border-strong)',
     background: '#fff',
     borderRadius: 6,
     fontSize: 12,
@@ -296,18 +296,18 @@ const styles: Record<string, React.CSSProperties> = {
     marginLeft: 6,
   },
   msg: { fontSize: 14, color: '#666', padding: '24px 0', textAlign: 'center' },
-  errMsg: { fontSize: 12, color: '#dc2626', marginTop: 8, marginBottom: 0 },
-  tableWrap: { border: '1px solid #e0dfd8', borderRadius: 10, overflowX: 'auto' },
+  errMsg: { fontSize: 12, color: 'var(--danger)', marginTop: 8, marginBottom: 0 },
+  tableWrap: { border: '1px solid var(--border)', borderRadius: 10, overflowX: 'auto' },
   table: { width: '100%', borderCollapse: 'collapse' as const, fontSize: 13 },
   th: {
     textAlign: 'left' as const,
     padding: '12px 14px',
-    background: '#f8f7f4',
+    background: 'var(--bg-soft)',
     fontWeight: 600,
     color: '#555',
-    borderBottom: '1px solid #e0dfd8',
+    borderBottom: '1px solid var(--border)',
     whiteSpace: 'nowrap' as const,
   },
-  tr: { borderBottom: '1px solid #f0efec' },
+  tr: { borderBottom: '1px solid var(--border-soft)' },
   td: { padding: '11px 14px', color: '#333', verticalAlign: 'middle' as const },
 };

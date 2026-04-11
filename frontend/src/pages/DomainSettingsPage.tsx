@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getSiteSettings } from '../api';
 import { getJson, postJson } from '../api-client.js';
 
-const cardStyle = { padding: 20, borderRadius: 10, background: '#fff', border: '1px solid #e2e8f0', marginBottom: 16 } as const;
-const inputStyle = { width: '100%', padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 14, boxSizing: 'border-box' as const, marginBottom: 8 };
+const cardStyle = { padding: 20, borderRadius: 10, background: '#fff', border: '1px solid var(--border)', marginBottom: 16 } as const;
+const inputStyle = { width: '100%', padding: 10, border: '1px solid var(--border-strong)', borderRadius: 6, fontSize: 14, boxSizing: 'border-box' as const, marginBottom: 8 };
 
 interface DomainChangeRequest {
   id: string;
@@ -68,42 +68,42 @@ export function DomainSettingsPage({ siteId }: { siteId: string }) {
     setSending(false);
   };
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>불러오는 중...</div>;
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>불러오는 중...</div>;
 
   return (
     <div style={{ maxWidth: 560, margin: '0 auto', padding: 20 }}>
       <button onClick={() => navigate(-1)} style={{
-        background: 'none', border: 'none', color: '#64748b', fontSize: 13, cursor: 'pointer', marginBottom: 16, padding: 0,
+        background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', marginBottom: 16, padding: 0,
       }}>← 뒤로</button>
 
-      <h2 style={{ fontSize: 20, fontWeight: 800, color: '#1e293b', marginBottom: 8 }}>도메인 설정</h2>
-      <p style={{ fontSize: 13, color: '#64748b', marginBottom: 24 }}>현재 사이트 주소를 확인하고 변경을 요청할 수 있습니다.</p>
+      <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>도메인 설정</h2>
+      <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 24 }}>현재 사이트 주소를 확인하고 변경을 요청할 수 있습니다.</p>
 
       {/* Current Domain */}
       <div style={cardStyle}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8', marginBottom: 8 }}>현재 도메인</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>현재 도메인</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#1e293b' }}>{siteId}.aiseo.tips</span>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
+          <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{siteId}.aiseo.tips</span>
         </div>
-        <div style={{ fontSize: 12, color: '#64748b', marginTop: 8 }}>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
           이 주소는 처음 설정 시 확정되었으며, 변경은 관리자 승인이 필요합니다.
         </div>
       </div>
 
       {/* Pending Request */}
       {pendingRequest && (
-        <div style={{ ...cardStyle, background: '#fffbeb', borderColor: '#fde68a' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#92400e', marginBottom: 8 }}>변경 요청 대기 중</div>
-          <div style={{ fontSize: 13, color: '#78350f' }}>
+        <div style={{ ...cardStyle, background: 'var(--warning-soft)', borderColor: 'var(--warning-soft)' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--warning-dark)', marginBottom: 8 }}>변경 요청 대기 중</div>
+          <div style={{ fontSize: 13, color: 'var(--warning-dark)' }}>
             <strong>요청 주소:</strong> {pendingRequest.requestedSiteId}.aiseo.tips
           </div>
           {pendingRequest.reason && (
-            <div style={{ fontSize: 12, color: '#78350f', marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: 'var(--warning-dark)', marginTop: 4 }}>
               <strong>사유:</strong> {pendingRequest.reason}
             </div>
           )}
-          <div style={{ fontSize: 11, color: '#a16207', marginTop: 8 }}>
+          <div style={{ fontSize: 11, color: 'var(--warning-dark)', marginTop: 8 }}>
             {new Date(pendingRequest.createdAt).toLocaleDateString('ko-KR')} 요청 · 관리자 승인 대기 중
           </div>
         </div>
@@ -112,9 +112,9 @@ export function DomainSettingsPage({ siteId }: { siteId: string }) {
       {/* Change Request Form */}
       {!pendingRequest && (
         <div style={cardStyle}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 12 }}>도메인 변경 요청</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>도메인 변경 요청</div>
 
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>새 도메인 주소</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>새 도메인 주소</label>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
             <input
               value={newSiteId}
@@ -122,15 +122,15 @@ export function DomainSettingsPage({ siteId }: { siteId: string }) {
               placeholder="new-site-id"
               style={{ ...inputStyle, marginBottom: 0, flex: 1 }}
             />
-            <span style={{ fontSize: 13, color: '#64748b', flexShrink: 0 }}>.aiseo.tips</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)', flexShrink: 0 }}>.aiseo.tips</span>
           </div>
           {newSiteId.trim() && (
-            <div style={{ fontSize: 11, color: !siteIdValid ? '#dc2626' : isReserved ? '#dc2626' : '#059669', marginBottom: 8 }}>
+            <div style={{ fontSize: 11, color: !siteIdValid ? 'var(--danger)' : isReserved ? 'var(--danger)' : 'var(--success)', marginBottom: 8 }}>
               {!siteIdValid ? '영문 소문자, 숫자, 하이픈(-) 3~63자만 가능합니다.' : isReserved ? '예약된 주소입니다.' : `https://${newSiteId.trim()}.aiseo.tips`}
             </div>
           )}
 
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4, marginTop: 8 }}>변경 사유 (선택)</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4, marginTop: 8 }}>변경 사유 (선택)</label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
@@ -143,8 +143,8 @@ export function DomainSettingsPage({ siteId }: { siteId: string }) {
             disabled={sending || !siteIdValid || isReserved || newSiteId.trim() === siteId}
             style={{
               width: '100%', padding: 12, borderRadius: 8, border: 'none',
-              background: siteIdValid && !isReserved ? '#2563eb' : '#e2e8f0',
-              color: siteIdValid && !isReserved ? '#fff' : '#94a3b8',
+              background: siteIdValid && !isReserved ? 'var(--primary)' : 'var(--border)',
+              color: siteIdValid && !isReserved ? '#fff' : 'var(--text-muted)',
               fontSize: 14, fontWeight: 700, cursor: siteIdValid ? 'pointer' : 'default', marginTop: 8,
             }}
           >
@@ -156,13 +156,13 @@ export function DomainSettingsPage({ siteId }: { siteId: string }) {
       {msg && (
         <div style={{
           padding: 12, borderRadius: 8, fontSize: 13, marginTop: 8,
-          background: msgType === 'success' ? '#f0fdf4' : '#fef2f2',
-          color: msgType === 'success' ? '#166534' : '#991b1b',
-          border: `1px solid ${msgType === 'success' ? '#bbf7d0' : '#fecaca'}`,
+          background: msgType === 'success' ? 'var(--success-soft)' : 'var(--danger-soft)',
+          color: msgType === 'success' ? 'var(--success-dark)' : 'var(--danger-dark)',
+          border: `1px solid ${msgType === 'success' ? 'var(--success-soft)' : 'var(--danger-soft)'}`,
         }}>{msg}</div>
       )}
 
-      <div style={{ marginTop: 24, padding: 16, borderRadius: 8, background: '#f8fafc', fontSize: 12, color: '#64748b', lineHeight: 1.7 }}>
+      <div style={{ marginTop: 24, padding: 16, borderRadius: 8, background: 'var(--bg-soft)', fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
         <strong>안내사항</strong><br />
         · 도메인 변경은 관리자 승인 후 반영됩니다<br />
         · 변경 전 주소로의 접속은 차단됩니다<br />
