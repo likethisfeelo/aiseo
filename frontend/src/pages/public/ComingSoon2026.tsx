@@ -11,8 +11,10 @@ import '../landing.css';
  * individual files can later diverge when real content is filled in.
  *
  * `activeMenu` drives the nav link underline on the matching
- * menu item. `docTitle` is pushed into `document.title` so that
- * per-page browser tab titles work without react-helmet.
+ * menu item. SEO/OG meta tags are rendered as React 19 native
+ * head metadata (tags rendered here are auto-hoisted into
+ * `<head>`), matching the pattern used in BlogPostPage. No
+ * react-helmet needed.
  */
 
 export type Nav2026Key = 'course' | 'support' | 'events';
@@ -21,7 +23,15 @@ interface Props {
   activeMenu: Nav2026Key;
   eyebrow: string;
   title: string;
+  /** `<title>` tag value. Shown in the browser tab and SERP. */
   docTitle: string;
+  /** `<meta name="description">` + og:description + twitter:description. */
+  metaDescription: string;
+  /** Path portion of the canonical URL, e.g. "/course2026". */
+  canonicalPath: string;
+  /** Absolute og:image URL. Optional — summary card falls back to `summary` when absent. */
+  ogImage?: string;
+  /** Body paragraph under the "준비중" card. Defaults to a generic message. */
   description?: string;
 }
 
@@ -30,13 +40,12 @@ export function ComingSoon2026({
   eyebrow,
   title,
   docTitle,
+  metaDescription,
+  canonicalPath,
+  ogImage,
   description,
 }: Props) {
   useEffect(() => {
-    // Per-page browser tab title for marketing clarity.
-    const prev = document.title;
-    document.title = docTitle;
-
     // Nav starts scrolled on sub-pages (landing.css `.scrolled`).
     const nav = document.getElementById('mainNav');
     nav?.classList.add('scrolled');
@@ -61,14 +70,41 @@ export function ComingSoon2026({
     );
 
     return () => {
-      document.title = prev;
       if (btn) btn.removeEventListener('click', hamburgerHandler);
       document.body.style.overflow = '';
     };
-  }, [docTitle]);
+  }, []);
+
+  // CSR-only app, so `window` is always defined at render time.
+  // Canonical / og:url must be absolute so social crawlers resolve them.
+  const origin =
+    typeof window !== 'undefined' ? window.location.origin : '';
+  const canonicalUrl = `${origin}${canonicalPath}`;
 
   return (
     <>
+      {/*
+        React 19 native head metadata — rendering <title> / <meta> /
+        <link> inside a component auto-hoists them into <head>. Same
+        pattern used by BlogPostPage; no react-helmet required.
+      */}
+      <title>{docTitle}</title>
+      <meta name="description" content={metaDescription} />
+      <link rel="canonical" href={canonicalUrl} />
+      <meta property="og:type" content="website" />
+      <meta property="og:site_name" content="AISEO" />
+      <meta property="og:title" content={docTitle} />
+      <meta property="og:description" content={metaDescription} />
+      <meta property="og:url" content={canonicalUrl} />
+      {ogImage && <meta property="og:image" content={ogImage} />}
+      <meta
+        name="twitter:card"
+        content={ogImage ? 'summary_large_image' : 'summary'}
+      />
+      <meta name="twitter:title" content={docTitle} />
+      <meta name="twitter:description" content={metaDescription} />
+      {ogImage && <meta name="twitter:image" content={ogImage} />}
+
       {/* NAV */}
       <nav id="mainNav" className="scrolled">
         <div className="nav-inner">
