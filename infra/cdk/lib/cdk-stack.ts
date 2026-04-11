@@ -409,14 +409,43 @@ export class CdkStack extends Stack {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset(functionsRoot),
       handler: 'blog/handler.handler',
-      timeout: Duration.seconds(10),
+      // Bumped from 10s because admin create/update now runs a
+      // prerender cycle (S3 GET template + S3 PUT snapshot + CF
+      // invalidation) against both dev and prod targets.
+      timeout: Duration.seconds(30),
       environment: {
         BLOG_POSTS_TABLE: blogPostsTableName,
         BLOG_CATEGORIES_TABLE: blogCategoriesTableName,
+        // Prerender targets — the blog Lambda writes per-post
+        // HTML snapshots to these buckets whenever an admin
+        // creates/updates/deletes a post, so Kakao/FB/X/Naver
+        // crawlers see per-post OG tags. See
+        // backend/functions/blog/prerender.js.
+        SITES_BUCKET: sitesBucketName,
+        SITES_BUCKET_DEV: sitesBucketDevName,
+        DISTRIBUTION_ID: process.env.DISTRIBUTION_ID ?? '',
+        DISTRIBUTION_ID_DEV: process.env.DISTRIBUTION_ID_DEV ?? '',
+        BLOG_BASE_URL: process.env.BLOG_BASE_URL ?? 'https://site.dev.aiseo.tips',
       },
     });
     blogPostsTable.grantReadWriteData(blogHandler);
     blogCategoriesTable.grantReadWriteData(blogHandler);
+
+    // The blog Lambda needs to read the SPA template
+    // (`site/index.html`) and write prerendered blog snapshots
+    // (`site/blog/<slug>/index.html`) to both environments.
+    // Scope grants to the `site/*` prefix so we don't leak
+    // write access to user site buckets.
+    sitesBucket.grantReadWrite(blogHandler, 'site/*');
+    sitesBucketDev.grantReadWrite(blogHandler, 'site/*');
+
+    blogHandler.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['cloudfront:CreateInvalidation'],
+      resources: [
+        `arn:aws:cloudfront::${this.account}:distribution/${process.env.DISTRIBUTION_ID ?? ''}`,
+        `arn:aws:cloudfront::${this.account}:distribution/${process.env.DISTRIBUTION_ID_DEV ?? ''}`,
+      ],
+    }));
 
     // ── Comments table + Lambda handlers ──
     const commentsTableName = this.node.tryGetContext('commentsTableName') ?? 'aiseo-comments';

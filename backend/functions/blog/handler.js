@@ -10,6 +10,7 @@ const {
 const { ok, badRequest, serverError, conflict } = require('../shared/response');
 const { requireAdmin } = require('../shared/auth');
 const { sanitizeBlogHtml } = require('./sanitize');
+const { prerenderPost, deletePrerenderedPost } = require('./prerender');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -256,6 +257,12 @@ const adminCreatePost = async (event, postsTable) => {
   });
 
   await ddb.send(new PutCommand({ TableName: postsTable, Item: item }));
+
+  // Fire-and-await prerender so the OG/meta HTML snapshot
+  // exists before we respond. Any failure is logged inside
+  // prerenderPost and does not fail the API call.
+  await prerenderPost(item);
+
   return ok({ post: item });
 };
 
@@ -285,9 +292,17 @@ const adminUpdatePost = async (event, postsTable) => {
 
     await ddb.send(new PutCommand({ TableName: postsTable, Item: item }));
     await ddb.send(new DeleteCommand({ TableName: postsTable, Key: { slug: oldSlug } }));
+    // Slug rename — drop the OLD prerendered file so stale
+    // links stop resolving, then regenerate under the new slug.
+    await deletePrerenderedPost(oldSlug);
   } else {
     await ddb.send(new PutCommand({ TableName: postsTable, Item: item }));
   }
+
+  // Always refresh the prerender on update. When status !=
+  // published, prerenderPost delegates to deletePrerenderedPost
+  // so unpublishing cleans up automatically.
+  await prerenderPost(item);
 
   return ok({ post: item });
 };
@@ -304,6 +319,10 @@ const adminDeletePost = async (event, postsTable) => {
     ExpressionAttributeNames: { '#s': 'status' },
     ExpressionAttributeValues: { ':deleted': 'deleted', ':now': nowIso },
   }));
+
+  // Soft delete — still need to drop the prerendered HTML so
+  // the post stops surfacing in social previews.
+  await deletePrerenderedPost(slug);
 
   return ok({ slug, status: 'deleted' });
 };
