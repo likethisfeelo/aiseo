@@ -94,7 +94,7 @@ const publicListPosts = async (event, postsTable) => {
   const start = (page - 1) * PAGE_SIZE;
   const pagePosts = visible.slice(start, start + PAGE_SIZE).map(stripBodyForCard);
 
-  return ok({ posts: pagePosts, page, pageSize: PAGE_SIZE, total, totalPages });
+  return ok({ posts: pagePosts, page, pageSize: PAGE_SIZE, total, totalPages }, event);
 };
 
 const stripBodyForCard = (p) => {
@@ -105,12 +105,12 @@ const stripBodyForCard = (p) => {
 
 const publicGetPost = async (event, postsTable) => {
   const slug = str(event.pathParameters?.slug, 100);
-  if (!validateSlug(slug)) return badRequest('Invalid slug');
+  if (!validateSlug(slug)) return badRequest('Invalid slug', event);
 
   const result = await ddb.send(new GetCommand({ TableName: postsTable, Key: { slug } }));
   const post = result.Item;
   const nowIso = new Date().toISOString();
-  if (!isPubliclyVisible(post, nowIso)) return badRequest('Post not found');
+  if (!isPubliclyVisible(post, nowIso)) return badRequest('Post not found', event);
 
   // Atomic view count increment. Fire and await; fast enough.
   try {
@@ -128,10 +128,10 @@ const publicGetPost = async (event, postsTable) => {
     console.error('viewCount update failed', err);
   }
 
-  return ok({ post });
+  return ok({ post }, event);
 };
 
-const publicFeatured = async (_event, postsTable) => {
+const publicFeatured = async (event, postsTable) => {
   const nowIso = new Date().toISOString();
   const all = await scanAll(postsTable);
   const featured = all
@@ -145,10 +145,10 @@ const publicFeatured = async (_event, postsTable) => {
     .slice(0, 4)
     .map(stripBodyForCard);
 
-  return ok({ posts: featured });
+  return ok({ posts: featured }, event);
 };
 
-const publicPopular = async (_event, postsTable) => {
+const publicPopular = async (event, postsTable) => {
   const nowIso = new Date().toISOString();
   const all = await scanAll(postsTable);
   const popular = all
@@ -162,10 +162,10 @@ const publicPopular = async (_event, postsTable) => {
     .slice(0, 3)
     .map(stripBodyForCard);
 
-  return ok({ posts: popular });
+  return ok({ posts: popular }, event);
 };
 
-const publicCategories = async (_event, categoriesTable) => {
+const publicCategories = async (event, categoriesTable) => {
   const all = await scanAll(categoriesTable);
   const categories = all.sort((a, b) => {
     const ao = Number.isFinite(a.order) ? a.order : 9999;
@@ -173,12 +173,12 @@ const publicCategories = async (_event, categoriesTable) => {
     if (ao !== bo) return ao - bo;
     return (a.name || '').localeCompare(b.name || '');
   });
-  return ok({ categories });
+  return ok({ categories }, event);
 };
 
 // ── Admin handlers: posts ───────────────────────────────────────────────────
 
-const adminListPosts = async (_event, postsTable) => {
+const adminListPosts = async (event, postsTable) => {
   const all = await scanAll(postsTable);
   // Admin sees everything — sort newest updated first for the management list.
   const posts = all
@@ -186,16 +186,16 @@ const adminListPosts = async (_event, postsTable) => {
     .sort((a, b) =>
       (b.updatedAt || b.createdAt || '').localeCompare(a.updatedAt || a.createdAt || '')
     );
-  return ok({ posts, count: posts.length });
+  return ok({ posts, count: posts.length }, event);
 };
 
 const adminGetPost = async (event, postsTable) => {
   const slug = str(event.pathParameters?.slug, 100);
-  if (!validateSlug(slug)) return badRequest('Invalid slug');
+  if (!validateSlug(slug)) return badRequest('Invalid slug', event);
 
   const result = await ddb.send(new GetCommand({ TableName: postsTable, Key: { slug } }));
-  if (!result.Item) return badRequest('Post not found');
-  return ok({ post: result.Item });
+  if (!result.Item) return badRequest('Post not found', event);
+  return ok({ post: result.Item }, event);
 };
 
 const buildPostItem = (body, base = {}) => {
@@ -243,11 +243,11 @@ const buildPostItem = (body, base = {}) => {
 const adminCreatePost = async (event, postsTable) => {
   const body = parseBody(event);
   const slug = str(body.slug, 100);
-  if (!validateSlug(slug)) return badRequest('Invalid slug (영문 소문자·숫자·하이픈)');
-  if (!str(body.title, 300)) return badRequest('제목은 필수입니다.');
+  if (!validateSlug(slug)) return badRequest('Invalid slug (영문 소문자·숫자·하이픈)', event);
+  if (!str(body.title, 300)) return badRequest('제목은 필수입니다.', event);
 
   const existing = await ddb.send(new GetCommand({ TableName: postsTable, Key: { slug } }));
-  if (existing.Item) return conflict('이미 존재하는 slug 입니다.');
+  if (existing.Item) return conflict('이미 존재하는 slug 입니다.', event);
 
   const nowIso = new Date().toISOString();
   const item = buildPostItem(body, {
@@ -263,20 +263,20 @@ const adminCreatePost = async (event, postsTable) => {
   // prerenderPost and does not fail the API call.
   await prerenderPost(item);
 
-  return ok({ post: item });
+  return ok({ post: item }, event);
 };
 
 const adminUpdatePost = async (event, postsTable) => {
   const oldSlug = str(event.pathParameters?.slug, 100);
-  if (!validateSlug(oldSlug)) return badRequest('Invalid slug');
+  if (!validateSlug(oldSlug)) return badRequest('Invalid slug', event);
 
   const body = parseBody(event);
   const newSlug = str(body.slug, 100) || oldSlug;
-  if (!validateSlug(newSlug)) return badRequest('Invalid new slug');
-  if (!str(body.title, 300)) return badRequest('제목은 필수입니다.');
+  if (!validateSlug(newSlug)) return badRequest('Invalid new slug', event);
+  if (!str(body.title, 300)) return badRequest('제목은 필수입니다.', event);
 
   const current = await ddb.send(new GetCommand({ TableName: postsTable, Key: { slug: oldSlug } }));
-  if (!current.Item) return badRequest('Post not found');
+  if (!current.Item) return badRequest('Post not found', event);
 
   const base = {
     slug: newSlug,
@@ -288,7 +288,7 @@ const adminUpdatePost = async (event, postsTable) => {
   if (newSlug !== oldSlug) {
     // Make sure the new slug isn't already taken by a different post.
     const collision = await ddb.send(new GetCommand({ TableName: postsTable, Key: { slug: newSlug } }));
-    if (collision.Item) return conflict('이미 존재하는 slug 입니다.');
+    if (collision.Item) return conflict('이미 존재하는 slug 입니다.', event);
 
     await ddb.send(new PutCommand({ TableName: postsTable, Item: item }));
     await ddb.send(new DeleteCommand({ TableName: postsTable, Key: { slug: oldSlug } }));
@@ -304,12 +304,12 @@ const adminUpdatePost = async (event, postsTable) => {
   // so unpublishing cleans up automatically.
   await prerenderPost(item);
 
-  return ok({ post: item });
+  return ok({ post: item }, event);
 };
 
 const adminDeletePost = async (event, postsTable) => {
   const slug = str(event.pathParameters?.slug, 100);
-  if (!validateSlug(slug)) return badRequest('Invalid slug');
+  if (!validateSlug(slug)) return badRequest('Invalid slug', event);
 
   const nowIso = new Date().toISOString();
   await ddb.send(new UpdateCommand({
@@ -324,12 +324,12 @@ const adminDeletePost = async (event, postsTable) => {
   // the post stops surfacing in social previews.
   await deletePrerenderedPost(slug);
 
-  return ok({ slug, status: 'deleted' });
+  return ok({ slug, status: 'deleted' }, event);
 };
 
 // ── Admin handlers: categories ──────────────────────────────────────────────
 
-const adminListCategories = async (_event, categoriesTable) => {
+const adminListCategories = async (event, categoriesTable) => {
   const all = await scanAll(categoriesTable);
   const categories = all.sort((a, b) => {
     const ao = Number.isFinite(a.order) ? a.order : 9999;
@@ -337,7 +337,7 @@ const adminListCategories = async (_event, categoriesTable) => {
     if (ao !== bo) return ao - bo;
     return (a.name || '').localeCompare(b.name || '');
   });
-  return ok({ categories, count: categories.length });
+  return ok({ categories, count: categories.length }, event);
 };
 
 const adminCreateCategory = async (event, categoriesTable) => {
@@ -346,42 +346,42 @@ const adminCreateCategory = async (event, categoriesTable) => {
   const name = str(body.name, 200);
   const order = Number.isFinite(body.order) ? Math.floor(body.order) : 9999;
 
-  if (!validateSlug(slug)) return badRequest('Invalid slug');
-  if (!name) return badRequest('이름은 필수입니다.');
+  if (!validateSlug(slug)) return badRequest('Invalid slug', event);
+  if (!name) return badRequest('이름은 필수입니다.', event);
 
   const existing = await ddb.send(new GetCommand({ TableName: categoriesTable, Key: { slug } }));
-  if (existing.Item) return conflict('이미 존재하는 카테고리 slug 입니다.');
+  if (existing.Item) return conflict('이미 존재하는 카테고리 slug 입니다.', event);
 
   const nowIso = new Date().toISOString();
   const item = { slug, name, order, createdAt: nowIso };
   await ddb.send(new PutCommand({ TableName: categoriesTable, Item: item }));
-  return ok({ category: item });
+  return ok({ category: item }, event);
 };
 
 const adminUpdateCategory = async (event, categoriesTable) => {
   const slug = str(event.pathParameters?.slug, 100);
-  if (!validateSlug(slug)) return badRequest('Invalid slug');
+  if (!validateSlug(slug)) return badRequest('Invalid slug', event);
 
   const body = parseBody(event);
   const name = str(body.name, 200);
   const order = Number.isFinite(body.order) ? Math.floor(body.order) : 9999;
 
-  if (!name) return badRequest('이름은 필수입니다.');
+  if (!name) return badRequest('이름은 필수입니다.', event);
 
   const current = await ddb.send(new GetCommand({ TableName: categoriesTable, Key: { slug } }));
-  if (!current.Item) return badRequest('Category not found');
+  if (!current.Item) return badRequest('Category not found', event);
 
   const item = { ...current.Item, slug, name, order };
   await ddb.send(new PutCommand({ TableName: categoriesTable, Item: item }));
-  return ok({ category: item });
+  return ok({ category: item }, event);
 };
 
 const adminDeleteCategory = async (event, categoriesTable) => {
   const slug = str(event.pathParameters?.slug, 100);
-  if (!validateSlug(slug)) return badRequest('Invalid slug');
+  if (!validateSlug(slug)) return badRequest('Invalid slug', event);
 
   await ddb.send(new DeleteCommand({ TableName: categoriesTable, Key: { slug } }));
-  return ok({ slug, deleted: true });
+  return ok({ slug, deleted: true }, event);
 };
 
 // ── Dispatcher ──────────────────────────────────────────────────────────────
@@ -393,7 +393,7 @@ exports.handler = async (event) => {
     const postsTable = process.env.BLOG_POSTS_TABLE;
     const categoriesTable = process.env.BLOG_CATEGORIES_TABLE;
     if (!postsTable || !categoriesTable) {
-      return serverError('Blog tables not configured');
+      return serverError('Blog tables not configured', event);
     }
 
     const method = event.httpMethod || event.requestContext?.http?.method || 'GET';
@@ -446,9 +446,9 @@ exports.handler = async (event) => {
       }
     }
 
-    return badRequest(`Unsupported route: ${key}`);
+    return badRequest(`Unsupported route: ${key}`, event);
   } catch (error) {
     console.error('blog handler error', error);
-    return serverError('Failed to process blog request');
+    return serverError('Failed to process blog request', event);
   }
 };

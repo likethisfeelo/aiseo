@@ -21,13 +21,13 @@ const handleGetRequest = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const siteId = event.queryStringParameters?.siteId;
-  if (!siteId) return badRequest('siteId is required');
+  if (!siteId) return badRequest('siteId is required', event);
 
   const site = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!site.Item) return badRequest('Site not found');
-  if (site.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!site.Item) return badRequest('Site not found', event);
+  if (site.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
-  return ok({ request: site.Item.domainChangeRequest || null });
+  return ok({ request: site.Item.domainChangeRequest || null }, event);
 };
 
 /* ── User: Submit change request ── */
@@ -36,18 +36,18 @@ const handleSubmitRequest = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId, requestedSiteId, reason } = parseBody(event);
-  if (!siteId || !requestedSiteId) return badRequest('siteId and requestedSiteId are required');
-  if (!SITE_ID_REGEX.test(requestedSiteId)) return badRequest('Invalid siteId format');
-  if (RESERVED_IDS.includes(requestedSiteId)) return badRequest('Reserved siteId');
-  if (requestedSiteId === siteId) return badRequest('Same as current siteId');
+  if (!siteId || !requestedSiteId) return badRequest('siteId and requestedSiteId are required', event);
+  if (!SITE_ID_REGEX.test(requestedSiteId)) return badRequest('Invalid siteId format', event);
+  if (RESERVED_IDS.includes(requestedSiteId)) return badRequest('Reserved siteId', event);
+  if (requestedSiteId === siteId) return badRequest('Same as current siteId', event);
 
   const site = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!site.Item) return badRequest('Site not found');
-  if (site.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!site.Item) return badRequest('Site not found', event);
+  if (site.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
   // Check if requested siteId is already taken
   const target = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId: requestedSiteId } }));
-  if (target.Item) return conflict('이미 사용 중인 주소입니다');
+  if (target.Item) return conflict('이미 사용 중인 주소입니다', event);
 
   const request = {
     id: crypto.randomUUID(),
@@ -69,7 +69,7 @@ const handleSubmitRequest = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ request });
+  return ok({ request }, event);
 };
 
 /* ── Admin: List all pending requests ── */
@@ -92,7 +92,7 @@ const handleAdminList = async (event, sitesTable) => {
     }))
     .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
 
-  return ok({ requests });
+  return ok({ requests }, event);
 };
 
 /* ── Admin: Approve request ── */
@@ -101,20 +101,20 @@ const handleAdminApprove = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId, reviewNote } = parseBody(event);
-  if (!siteId) return badRequest('siteId is required');
+  if (!siteId) return badRequest('siteId is required', event);
 
   const site = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!site.Item) return badRequest('Site not found');
-  if (!site.Item.domainChangeRequest) return badRequest('No pending request');
+  if (!site.Item) return badRequest('Site not found', event);
+  if (!site.Item.domainChangeRequest) return badRequest('No pending request', event);
 
   const req = site.Item.domainChangeRequest;
-  if (req.status !== 'pending') return badRequest('Request is not pending');
+  if (req.status !== 'pending') return badRequest('Request is not pending', event);
 
   const newSiteId = req.requestedSiteId;
 
   // Check if new siteId is still available
   const target = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId: newSiteId } }));
-  if (target.Item) return conflict('요청된 주소가 이미 사용 중입니다');
+  if (target.Item) return conflict('요청된 주소가 이미 사용 중입니다', event);
 
   // Create new site record with all existing data
   const newItem = { ...site.Item };
@@ -150,7 +150,7 @@ const handleAdminApprove = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ approved: true, oldSiteId: siteId, newSiteId, message: `도메인이 ${siteId} → ${newSiteId}로 변경되었습니다` });
+  return ok({ approved: true, oldSiteId: siteId, newSiteId, message: `도메인이 ${siteId} → ${newSiteId}로 변경되었습니다` }, event);
 };
 
 /* ── Admin: Reject request ── */
@@ -159,7 +159,7 @@ const handleAdminReject = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId, reviewNote } = parseBody(event);
-  if (!siteId) return badRequest('siteId is required');
+  if (!siteId) return badRequest('siteId is required', event);
 
   await ddb.send(new UpdateCommand({
     TableName: sitesTable,
@@ -173,7 +173,7 @@ const handleAdminReject = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ rejected: true, siteId });
+  return ok({ rejected: true, siteId }, event);
 };
 
 /* ── Admin: Deactivate old subdomain ── */
@@ -182,10 +182,10 @@ const handleAdminDeactivate = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId } = parseBody(event);
-  if (!siteId) return badRequest('siteId is required');
+  if (!siteId) return badRequest('siteId is required', event);
 
   const site = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!site.Item) return badRequest('Site not found');
+  if (!site.Item) return badRequest('Site not found', event);
 
   await ddb.send(new UpdateCommand({
     TableName: sitesTable,
@@ -197,13 +197,13 @@ const handleAdminDeactivate = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ deactivated: true, siteId });
+  return ok({ deactivated: true, siteId }, event);
 };
 
 exports.handler = async (event) => {
   try {
     const sitesTable = process.env.SITES_TABLE;
-    if (!sitesTable) return serverError('SITES_TABLE is not configured');
+    if (!sitesTable) return serverError('SITES_TABLE is not configured', event);
 
     const method = event.httpMethod || event.requestContext?.http?.method;
     const path = event.path || event.rawPath || '';
@@ -218,9 +218,9 @@ exports.handler = async (event) => {
     if (method === 'POST' && path.endsWith('/reject')) return handleAdminReject(event, sitesTable);
     if (method === 'POST' && path.endsWith('/deactivate')) return handleAdminDeactivate(event, sitesTable);
 
-    return badRequest('Unsupported method');
+    return badRequest('Unsupported method', event);
   } catch (error) {
     console.error('domain-change error', error);
-    return serverError('Failed to process domain change request');
+    return serverError('Failed to process domain change request', event);
   }
 };

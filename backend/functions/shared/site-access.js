@@ -4,9 +4,9 @@ const { forbidden, serverError } = require('./response');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-const ensureSiteOwnership = async ({ siteId, userSub, tableName }) => {
+const ensureSiteOwnership = async ({ siteId, userSub, tableName, event }) => {
   if (!tableName) {
-    return { ok: false, response: serverError('SITES_TABLE is not configured') };
+    return { ok: false, response: serverError('SITES_TABLE is not configured', event) };
   }
 
   const record = await ddb.send(
@@ -18,11 +18,11 @@ const ensureSiteOwnership = async ({ siteId, userSub, tableName }) => {
 
   const item = record.Item;
   if (!item) {
-    return { ok: false, response: forbidden('Site is not locked for this user') };
+    return { ok: false, response: forbidden('Site is not locked for this user', event) };
   }
 
   if (item.ownerSub !== userSub) {
-    return { ok: false, response: forbidden('You do not have access to this siteId') };
+    return { ok: false, response: forbidden('You do not have access to this siteId', event) };
   }
 
   return { ok: true, item };

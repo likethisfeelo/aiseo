@@ -224,25 +224,26 @@ exports.handler = async (event) => {
     const { siteId, objectKey, env = 'dev' } = body;
     const sitesTable = process.env.SITES_TABLE;
 
-    if (!siteId) return badRequest('siteId is required');
-    if (!objectKey) return badRequest('objectKey is required');
+    if (!siteId) return badRequest('siteId is required', event);
+    if (!objectKey) return badRequest('objectKey is required', event);
     if (!objectKey.startsWith(`uploads/${siteId}/`)) {
-      return badRequest('objectKey does not match siteId');
+      return badRequest('objectKey does not match siteId', event);
     }
-    if (!process.env.UPLOAD_BUCKET) return serverError('UPLOAD_BUCKET is not configured');
+    if (!process.env.UPLOAD_BUCKET) return serverError('UPLOAD_BUCKET is not configured', event);
 
     const access = await ensureSiteOwnership({
       siteId,
       userSub: user.sub,
       tableName: sitesTable,
+      event,
     });
     if (!access.ok) return access.response;
 
     const resolvedEnv = resolveEnv(env);
     const target = resolveTarget(resolvedEnv);
 
-    if (!target.targetBucket) return serverError('Target sites bucket is not configured');
-    if (!target.baseDomain) return serverError('Target domain is not configured');
+    if (!target.targetBucket) return serverError('Target sites bucket is not configured', event);
+    if (!target.baseDomain) return serverError('Target domain is not configured', event);
 
     const headInjection = await loadHeadSnippets(siteId, sitesTable);
 
@@ -255,7 +256,7 @@ exports.handler = async (event) => {
     });
 
     if (!uploadedKeys.length) {
-      return badRequest('No deployable files found in ZIP');
+      return badRequest('No deployable files found in ZIP', event);
     }
 
     const invalidationId = await invalidateSite({
@@ -287,9 +288,9 @@ exports.handler = async (event) => {
       targetBucket: target.targetBucket,
       invalidationId,
       deployedUrl,
-    });
+    }, event);
   } catch (error) {
     console.error('deploy-site error', error);
-    return serverError('Failed to deploy site');
+    return serverError('Failed to deploy site', event);
   }
 };

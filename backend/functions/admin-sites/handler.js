@@ -18,7 +18,7 @@ const handleList = async (event, sitesTable) => {
     (b.updatedAt || b.createdAt || '').localeCompare(a.updatedAt || a.createdAt || '')
   );
 
-  return ok({ sites, count: sites.length });
+  return ok({ sites, count: sites.length }, event);
 };
 
 const handleGet = async (event, sitesTable) => {
@@ -26,18 +26,18 @@ const handleGet = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const siteId = event.queryStringParameters?.siteId;
-  if (!siteId) return badRequest('siteId query parameter is required');
+  if (!siteId) return badRequest('siteId query parameter is required', event);
 
   const result = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!result.Item) return badRequest('Site not found');
+  if (!result.Item) return badRequest('Site not found', event);
 
-  return ok({ site: result.Item });
+  return ok({ site: result.Item }, event);
 };
 
 exports.handler = async (event) => {
   try {
     const sitesTable = process.env.SITES_TABLE;
-    if (!sitesTable) return serverError('SITES_TABLE is not configured');
+    if (!sitesTable) return serverError('SITES_TABLE is not configured', event);
 
     const method = event.httpMethod || event.requestContext?.http?.method;
     const path = event.path || event.rawPath || '';
@@ -45,9 +45,9 @@ exports.handler = async (event) => {
     if (method === 'GET' && event.queryStringParameters?.siteId) return handleGet(event, sitesTable);
     if (method === 'GET') return handleList(event, sitesTable);
 
-    return badRequest('Unsupported method');
+    return badRequest('Unsupported method', event);
   } catch (error) {
     console.error('admin-sites error', error);
-    return serverError('Failed to process admin sites request');
+    return serverError('Failed to process admin sites request', event);
   }
 };

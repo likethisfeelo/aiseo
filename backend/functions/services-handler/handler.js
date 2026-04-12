@@ -30,13 +30,13 @@ const handleGet = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const siteId = event.queryStringParameters?.siteId;
-  if (!siteId) return badRequest('siteId query parameter is required');
+  if (!siteId) return badRequest('siteId query parameter is required', event);
 
   const result = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!result.Item) return badRequest('Site not found');
-  if (result.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!result.Item) return badRequest('Site not found', event);
+  if (result.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
-  return ok({ services: result.Item.services || [] });
+  return ok({ services: result.Item.services || [] }, event);
 };
 
 const handlePost = async (event, sitesTable) => {
@@ -44,12 +44,12 @@ const handlePost = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId, service } = parseBody(event);
-  if (!siteId) return badRequest('siteId is required');
-  if (!service || !service.name) return badRequest('Service name is required');
+  if (!siteId) return badRequest('siteId is required', event);
+  if (!service || !service.name) return badRequest('Service name is required', event);
 
   const existing = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!existing.Item) return badRequest('Site not found');
-  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!existing.Item) return badRequest('Site not found', event);
+  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
   const sanitized = sanitizeService(service);
   const services = existing.Item.services || [];
@@ -71,7 +71,7 @@ const handlePost = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ service: sanitized, services });
+  return ok({ service: sanitized, services }, event);
 };
 
 const handleDelete = async (event, sitesTable) => {
@@ -79,11 +79,11 @@ const handleDelete = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId, serviceId } = parseBody(event);
-  if (!siteId || !serviceId) return badRequest('siteId and serviceId are required');
+  if (!siteId || !serviceId) return badRequest('siteId and serviceId are required', event);
 
   const existing = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!existing.Item) return badRequest('Site not found');
-  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!existing.Item) return badRequest('Site not found', event);
+  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
   const services = (existing.Item.services || []).filter((s) => s.id !== serviceId);
 
@@ -97,13 +97,13 @@ const handleDelete = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ services });
+  return ok({ services }, event);
 };
 
 exports.handler = async (event) => {
   try {
     const sitesTable = process.env.SITES_TABLE;
-    if (!sitesTable) return serverError('SITES_TABLE is not configured');
+    if (!sitesTable) return serverError('SITES_TABLE is not configured', event);
 
     const method = event.httpMethod || event.requestContext?.http?.method;
     const path = event.path || event.rawPath || '';
@@ -112,9 +112,9 @@ exports.handler = async (event) => {
     if (method === 'POST' && path.endsWith('/delete')) return handleDelete(event, sitesTable);
     if (method === 'POST') return handlePost(event, sitesTable);
 
-    return badRequest('Unsupported method');
+    return badRequest('Unsupported method', event);
   } catch (error) {
     console.error('services-handler error', error);
-    return serverError('Failed to process service data');
+    return serverError('Failed to process service data', event);
   }
 };

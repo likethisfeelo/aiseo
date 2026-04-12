@@ -81,25 +81,26 @@ exports.handler = async (event) => {
     const sitesTable = process.env.SITES_TABLE;
 
     if (!reportsTable) {
-      return serverError('REPORTS_TABLE is not configured');
+      return serverError('REPORTS_TABLE is not configured', event);
     }
 
     if (!uploadBucket) {
-      return serverError('UPLOAD_BUCKET is not configured');
+      return serverError('UPLOAD_BUCKET is not configured', event);
     }
 
     const { siteId, objectKey } = parseBody(event);
 
-    if (!siteId) return badRequest('siteId is required');
-    if (!objectKey) return badRequest('objectKey is required');
+    if (!siteId) return badRequest('siteId is required', event);
+    if (!objectKey) return badRequest('objectKey is required', event);
     if (!objectKey.startsWith(`uploads/${siteId}/`)) {
-      return badRequest('objectKey does not match siteId');
+      return badRequest('objectKey does not match siteId', event);
     }
 
     const access = await ensureSiteOwnership({
       siteId,
       userSub: user.sub,
       tableName: sitesTable,
+      event,
     });
     if (!access.ok) return access.response;
 
@@ -111,7 +112,7 @@ exports.handler = async (event) => {
     );
 
     if (!zipObject.Body) {
-      return serverError('Could not load zip object body');
+      return serverError('Could not load zip object body', event);
     }
 
     const zipBuffer = await streamToBuffer(zipObject.Body);
@@ -158,9 +159,9 @@ exports.handler = async (event) => {
       }),
     );
 
-    return ok(report);
+    return ok(report, event);
   } catch (error) {
     console.error('validate-site error', error);
-    return serverError('Failed to validate site');
+    return serverError('Failed to validate site', event);
   }
 };
