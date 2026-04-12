@@ -249,6 +249,32 @@ export function Course2026Page() {
         .cp2026-course-wrap .aiv5-inq-bar {
           display: none !important;
         }
+
+        /*
+          Solid backgrounds for aiv5-hero and #diagnosis so the mouse
+          blob effect stays behind them instead of bleeding through the
+          translucent .aiv5-hero-left / .aiv5-hero-right and the bare
+          diagnosis section. Matches the opaque card treatment the
+          sf-cards above already have.
+        */
+        .cp2026-course-wrap { position: relative; z-index: 1; }
+        .cp2026-course-wrap .aiv5-hero-left,
+        .cp2026-course-wrap .aiv5-hero-right {
+          background: #ffffff;
+        }
+        .cp2026-course-wrap .aiv5-section#diagnosis {
+          background: #ffffff;
+          border: 1px solid #E5E7EB;
+          border-radius: 28px;
+          padding: 40px 36px;
+          box-shadow: 0 8px 24px rgba(10,6,20,0.07), 0 2px 6px rgba(10,6,20,0.04);
+        }
+        @media (max-width: 900px) {
+          .cp2026-course-wrap .aiv5-section#diagnosis {
+            padding: 28px 20px;
+            border-radius: 22px;
+          }
+        }
       `}</style>
 
       {/* NAV */}
