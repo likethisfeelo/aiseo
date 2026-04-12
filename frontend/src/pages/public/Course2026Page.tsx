@@ -222,9 +222,9 @@ export function Course2026Page() {
 
         /* Hero: fit exactly in 100vh on 1920×1080, image top-aligned */
         .hero {
-          height: 100vh;
+          height: 90vh;
           min-height: unset;
-          padding-bottom: 80px;
+          padding-bottom: 40px;
           overflow: hidden;
         }
         .hero-bg {
