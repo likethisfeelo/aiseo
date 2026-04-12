@@ -171,16 +171,31 @@ curl -s  https://site.dev.aiseo.tips/blog/<slug> | grep -oE '<meta property="og:
 
 ## 5. 배포 흐름 — prod 환경
 
-**현재 prod 전용 스크립트는 존재하지 않습니다.** 아래 명령을 수동으로
-실행하거나, dev 스크립트를 복사해 버킷/distribution 값만 바꾼 prod 버전을
-만들어 쓰세요. (권장: 익숙해지면 `scripts/deploy-prod.sh` 추가.)
+```bash
+# Bash
+bash scripts/deploy-prod.sh
 
-### 수동 배포 (명령 순서)
+# PowerShell
+.\scripts\deploy-prod.ps1
+```
+
+스크립트가 자동으로 수행하는 작업:
+
+1. `VITE_APP_ENV=prod PRERENDER_BASE_URL=https://site.aiseo.tips` 로
+   프론트엔드 빌드 (API 엔드포인트 + canonical URL 을 prod 으로 설정)
+2. 랜딩/B2B/SPA+프리렌더 HTML 을 `s3://aiseo-sites-bucket` 에 업로드
+3. CloudFront 캐시 무효화 (distribution `EZSNEM80TUP6K`)
+
+> 실수 방지를 위해 실행 시 `deploy-prod` 를 입력해야 진행됩니다.
+
+### 수동 배포 (참고용)
+
+스크립트 대신 수동으로 실행해야 할 경우:
 
 ```bash
 # 0. 빌드 (PRERENDER_BASE_URL 을 prod 로 오버라이드)
 cd frontend
-PRERENDER_BASE_URL=https://site.aiseo.tips npm run build
+VITE_APP_ENV=prod PRERENDER_BASE_URL=https://site.aiseo.tips npm run build
 cd ..
 
 # 1. 랜딩
@@ -216,8 +231,9 @@ aws cloudfront create-invalidation \
 소셜 크롤러가 올바른 prod URL 을 파싱합니다.
 
 > dev 배포 스크립트는 이 값을 별도로 주지 않으므로 기본값이 그대로
-> 쓰입니다. prod 스크립트를 만들 때는 `export PRERENDER_BASE_URL=…`
-> 을 `npm run build` 앞에 넣어주세요.
+> 쓰입니다. `scripts/deploy-prod.sh` 는 빌드 커맨드 앞에
+> `VITE_APP_ENV=prod PRERENDER_BASE_URL=https://site.aiseo.tips` 를
+> 인라인으로 주입합니다.
 
 ### 블로그 Lambda 의 prod 환경변수
 
