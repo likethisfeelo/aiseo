@@ -28,19 +28,19 @@ import { useEffect } from 'react';
 export function useSubPageNav() {
   useEffect(() => {
     const nav = document.getElementById('mainNav');
+    // Tag the nav so CSS can apply faster transitions on sub-pages.
+    nav?.classList.add('subpage');
 
     // ── Nav scroll transition ──
-    // Threshold: half a viewport. On a typical 1080p desktop that's
-    // ~540px, which takes 3–5 mouse-wheel ticks to reach — matches the
-    // "세번 스크롤 다운" feel the user described. Recomputed on resize
-    // so rotating a phone (or opening DevTools) stays in sync.
-    let threshold = window.innerHeight * 0.5;
+    // Threshold: quarter viewport. Sub-page heroes are shorter than
+    // landing, so the nav should compact sooner (~1–2 wheel ticks).
+    let threshold = window.innerHeight * 0.25;
     const scrollHandler = () => {
       if (window.scrollY >= threshold) nav?.classList.add('scrolled');
       else nav?.classList.remove('scrolled');
     };
     const resizeHandler = () => {
-      threshold = window.innerHeight * 0.5;
+      threshold = window.innerHeight * 0.25;
       scrollHandler();
     };
     window.addEventListener('scroll', scrollHandler, { passive: true });
@@ -71,8 +71,9 @@ export function useSubPageNav() {
       if (btn) btn.removeEventListener('click', hamburgerHandler);
       mobileLinks?.forEach((a) => a.removeEventListener('click', closeMenu));
       document.body.style.overflow = '';
-      // Drop any `.scrolled` we added so the next page mounts clean.
+      // Drop classes we added so the next page mounts clean.
       nav?.classList.remove('scrolled');
+      nav?.classList.remove('subpage');
     };
   }, []);
 }

@@ -220,6 +220,17 @@ export function Course2026Page() {
           .cp2026-features-stack .sf-card-img { display: none; }
         }
 
+        /* Hero: fit exactly in 100vh on 1920×1080, image top-aligned */
+        .hero {
+          height: 100vh;
+          min-height: unset;
+          padding-bottom: 80px;
+          overflow: hidden;
+        }
+        .hero-bg {
+          background-position: top center !important;
+        }
+
         /* Hide CoursePage sub-sections not needed on /course2026. */
         .cp2026-course-wrap #modules,
         .cp2026-course-wrap #services,

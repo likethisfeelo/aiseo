@@ -31,6 +31,18 @@
   .landing-nav.scrolled {
     padding: 10px clamp(24px, calc((100% - 1100px) / 2), 600px);
   }
+  /* Sub-page: faster, snappier transition */
+  .landing-nav.subpage {
+    transition: padding .24s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .landing-nav.subpage .nav-inner {
+    transition:
+      background .24s ease,
+      border-radius .24s cubic-bezier(0.22, 0.61, 0.36, 1),
+      box-shadow .24s ease,
+      height .24s cubic-bezier(0.22, 0.61, 0.36, 1),
+      border-color .24s ease;
+  }
   /* 시각적 필 컨테이너 */
   .nav-inner {
     display: flex; align-items: center;
