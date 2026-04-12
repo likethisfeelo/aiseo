@@ -59,7 +59,7 @@ const ROUTES = [
   {
     path: '/support2026',
     title: '지원서비스 2026 | AISEO',
-    description: 'AISEO 2026 지원서비스. AI 웹사이트 구축·운영 지원 서비스를 안내합니다.',
+    description: 'AISEO 2026 지원서비스. AI로 직접 만들고 검색으로 고객이 먼저 찾아오는 구조를 만드는 맞춤형 교육과 실행 패키지를 안내합니다.',
   },
   {
     path: '/events2026',
