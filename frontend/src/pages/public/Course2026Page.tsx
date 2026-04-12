@@ -11,7 +11,8 @@ import { CoursePage } from './CoursePage';
  *      재사용하되 상위 3장(AI 홈페이지 제작 · 도메인 & 호스팅 · SEO 핵심강의)
  *      만 렌더링하고, 스크롤 스냅/sticky 이펙트는 꺼서 일반 컬럼으로
  *      길게 늘어놓는다 (image 2).
- *   3. 랜딩 CTA 카드 (image 5) — "지금 바로 시작하세요" 섹션을 그대로,
+ *   3. 랜딩 "핵심 진입 서비스" 다크 섹션 (image 5) —
+ *      "AI로 만든 홈페이지, 오늘 바로 공개하세요" entry-section 그대로,
  *      랜딩 공통의 마우스 팔로우 블롭 이펙트도 함께 유지.
  *
  * 아래 본문은 CoursePage.tsx 를 그대로 임베드해서 image 3(aiv5-hero —
@@ -399,24 +400,68 @@ export function Course2026Page() {
         </div>
       </section>
 
-      {/* ══ SECTION 3 — CTA (랜딩 동일, 마우스 블롭 이펙트 유지) ══ */}
-      <div className="cta-section">
-        <div className="cta-inner">
-          <div className="section-eyebrow" style={{ textAlign: 'center' }}>GET STARTED FREE</div>
-          <h2 className="cta-h2">지금 바로 시작하세요</h2>
-          <p className="cta-sub">
-            지금 AI시대에 맞춘 온라인 마케팅을 시작하세요.<br />
-            1시간이면 첫 번째 SEO 최적화 웹사이트가 완성됩니다.
+      {/* ══ SECTION 3 — 핵심 진입 서비스 (랜딩 entry-section, 마우스 블롭 이펙트 유지) ══ */}
+      <section className="entry-section">
+        <div className="entry-inner">
+          <div className="entry-eyebrow">핵심 진입 서비스</div>
+          <h2 className="entry-h2">AI로 만든 홈페이지,<br />오늘 바로 공개하세요</h2>
+          <p className="entry-sub">
+            드래그&amp;드롭 한 번으로 배포까지. 5분이면 됩니다.<br />
+            기술 지식 없어도, 도메인이 없어도, 지금 당장 시작할 수 있습니다.
           </p>
-          <div className="cta-row">
-            <a href="/?auth=signup" className="btn-primary-lg">수강신청하기 →</a>
-            <a href="/?auth=signup" className="btn-outline-lg">1:1 상담문의</a>
+
+          <div className="entry-steps">
+            <div className="entry-step">
+              <div className="entry-step-num">① AI로 제작</div>
+              <div className="entry-step-title">어떤 도구든 OK</div>
+              <div className="entry-step-desc">Framer, Claude, Webflow, Figma 어디서 만들든 ZIP으로 내보내면 됩니다</div>
+            </div>
+            <div className="entry-arrow">→</div>
+            <div className="entry-step active">
+              <div className="entry-step-num">② AISEO에 올리고</div>
+              <div className="entry-step-title">드래그&amp;드롭</div>
+              <div className="entry-step-desc">ZIP 파일 하나면 끝. 업로드하는 순간 SEO 자동 검증까지 완료</div>
+            </div>
+            <div className="entry-arrow">→</div>
+            <div className="entry-step">
+              <div className="entry-step-num">③ 즉시 라이브</div>
+              <div className="entry-step-title">완전 공개</div>
+              <div className="entry-step-desc">서브도메인으로 바로 공개, 검색엔진 등록 · 측정코드 설정까지 당일 완성</div>
+            </div>
           </div>
-          <p style={{ marginTop: 20, fontSize: 13, color: 'var(--text-muted)' }}>
-            ✓ 사업자만 신청가능 · ✓ 12개월 사이트를 한번만 결제 · ✓ 업종별 컨설팅 포함
-          </p>
+
+          <div className="entry-features">
+            <div className="entry-feat">
+              <div className="entry-feat-icon">🔍</div>
+              <div>
+                <div className="entry-feat-title">SEO 5가지 자동 검증</div>
+                <div className="entry-feat-desc">업로드 즉시 기술적 SEO 핵심 항목을 자동으로 점검합니다</div>
+              </div>
+            </div>
+            <div className="entry-feat">
+              <div className="entry-feat-icon">📡</div>
+              <div>
+                <div className="entry-feat-title">원클릭 서비스 연결</div>
+                <div className="entry-feat-desc">GA4 · Search Console · 네이버 웹마스터를 강의와 함께 직접 세팅</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="entry-price-bar">
+            <div>
+              <div className="entry-price-amount">10만원</div>
+              <div className="entry-price-meta">1회 완결 · 당일 배포 · 실습 포함</div>
+            </div>
+            <a
+              href="/?auth=signup"
+              className="entry-price-btn"
+              style={{ textDecoration: 'none', display: 'inline-block' }}
+            >
+              배포 교육 신청하기 →
+            </a>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* ══ 아래로: CoursePage 의 aiv5-hero (image 3) + #diagnosis (image 4) ══ */}
       <div className="cp2026-course-wrap">
