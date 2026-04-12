@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import '../landing.css';
 import { CoursePage } from './CoursePage';
+import { useSubPageNav } from './useSubPageNav';
 
 /**
  * 수강안내 2026 — `/course2026`
@@ -25,29 +26,10 @@ import { CoursePage } from './CoursePage';
  * (palette fader 없이 커서 따라다니는 radial gradient 3-stack) 이다.
  */
 export function Course2026Page() {
+  // Shared landing-nav → scrolled transition + mobile hamburger.
+  useSubPageNav();
+
   useEffect(() => {
-    // Nav starts scrolled on sub-pages (landing.css `.scrolled`).
-    const nav = document.getElementById('mainNav');
-    nav?.classList.add('scrolled');
-
-    // ── Mobile hamburger ──
-    const btn = document.getElementById('navHamburger');
-    const menu = document.getElementById('navMobileMenu');
-    const hamburgerHandler = () => {
-      if (!btn || !menu) return;
-      const isOpen = menu.classList.toggle('open');
-      btn.classList.toggle('open', isOpen);
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-    };
-    if (btn) btn.addEventListener('click', hamburgerHandler);
-    const closeMenu = () => {
-      menu?.classList.remove('open');
-      btn?.classList.remove('open');
-      document.body.style.overflow = '';
-    };
-    const mobileLinks = menu?.querySelectorAll('a');
-    mobileLinks?.forEach((a) => a.addEventListener('click', closeMenu));
-
     // ── Mouse gradient blob (from LandingPage) ──
     // Three layered radial gradients that lazily follow the cursor.
     // Pure cosmetic, ignored on touch devices (no mousemove events).
@@ -140,9 +122,6 @@ export function Course2026Page() {
     blobRaf = requestAnimationFrame(tick);
 
     return () => {
-      if (btn) btn.removeEventListener('click', hamburgerHandler);
-      mobileLinks?.forEach((a) => a.removeEventListener('click', closeMenu));
-      document.body.style.overflow = '';
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseleave', mouseLeaveHandler);
       cancelAnimationFrame(blobRaf);
@@ -249,10 +228,36 @@ export function Course2026Page() {
         .cp2026-course-wrap .aiv5-inq-bar {
           display: none !important;
         }
+
+        /*
+          Solid backgrounds for aiv5-hero and #diagnosis so the mouse
+          blob effect stays behind them instead of bleeding through the
+          translucent .aiv5-hero-left / .aiv5-hero-right and the bare
+          diagnosis section. Matches the opaque card treatment the
+          sf-cards above already have.
+        */
+        .cp2026-course-wrap { position: relative; z-index: 1; }
+        .cp2026-course-wrap .aiv5-hero-left,
+        .cp2026-course-wrap .aiv5-hero-right {
+          background: #ffffff;
+        }
+        .cp2026-course-wrap .aiv5-section#diagnosis {
+          background: #ffffff;
+          border: 1px solid #E5E7EB;
+          border-radius: 28px;
+          padding: 40px 36px;
+          box-shadow: 0 8px 24px rgba(10,6,20,0.07), 0 2px 6px rgba(10,6,20,0.04);
+        }
+        @media (max-width: 900px) {
+          .cp2026-course-wrap .aiv5-section#diagnosis {
+            padding: 28px 20px;
+            border-radius: 22px;
+          }
+        }
       `}</style>
 
       {/* NAV */}
-      <nav id="mainNav" className="scrolled">
+      <nav id="mainNav" className="landing-nav">
         <div className="nav-inner">
           <a href="/" className="nav-logo">AISEO</a>
           <div className="nav-links">

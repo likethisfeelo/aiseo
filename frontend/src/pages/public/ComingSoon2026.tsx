@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import '../landing.css';
+import { useSubPageNav } from './useSubPageNav';
 
 /**
  * Shared "준비중" shell for the 2026 marketing sub-pages
@@ -45,35 +45,8 @@ export function ComingSoon2026({
   ogImage,
   description,
 }: Props) {
-  useEffect(() => {
-    // Nav starts scrolled on sub-pages (landing.css `.scrolled`).
-    const nav = document.getElementById('mainNav');
-    nav?.classList.add('scrolled');
-
-    // Mobile hamburger (mirrors LandingPage behavior).
-    const btn = document.getElementById('navHamburger');
-    const menu = document.getElementById('navMobileMenu');
-    const hamburgerHandler = () => {
-      if (!btn || !menu) return;
-      const isOpen = menu.classList.toggle('open');
-      btn.classList.toggle('open', isOpen);
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-    };
-    if (btn) btn.addEventListener('click', hamburgerHandler);
-    const closeMenu = () => {
-      menu?.classList.remove('open');
-      btn?.classList.remove('open');
-      document.body.style.overflow = '';
-    };
-    menu?.querySelectorAll('a').forEach((a) =>
-      a.addEventListener('click', closeMenu),
-    );
-
-    return () => {
-      if (btn) btn.removeEventListener('click', hamburgerHandler);
-      document.body.style.overflow = '';
-    };
-  }, []);
+  // Shared landing-nav → scrolled transition + mobile hamburger.
+  useSubPageNav();
 
   // CSR-only app, so `window` is always defined at render time.
   // Canonical / og:url must be absolute so social crawlers resolve them.
@@ -106,7 +79,7 @@ export function ComingSoon2026({
       {ogImage && <meta name="twitter:image" content={ogImage} />}
 
       {/* NAV */}
-      <nav id="mainNav" className="scrolled">
+      <nav id="mainNav" className="landing-nav">
         <div className="nav-inner">
           <a href="/" className="nav-logo">AISEO</a>
           <div className="nav-links">
