@@ -241,7 +241,11 @@ export function BlogPostPage() {
             </div>
           )}
 
-          {/* Body — server-sanitized HTML, shared .blog-content CSS */}
+          {/*
+            Body: HTML is sanitized at write-time in backend/functions/blog/sanitize.js
+            (allowlist-based via sanitize-html). Do NOT accept raw HTML from any other
+            source in the client — all other blog fields must be rendered as plain text.
+          */}
           <div
             className="blog-content"
             dangerouslySetInnerHTML={{ __html: post.body || '' }}
