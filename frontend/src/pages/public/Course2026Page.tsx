@@ -220,12 +220,14 @@ export function Course2026Page() {
           .cp2026-features-stack .sf-card-img { display: none; }
         }
 
-        /* Hero: fit exactly in 100vh on 1920×1080, image top-aligned */
-        .hero {
-          height: 90vh;
-          min-height: unset;
-          padding-bottom: 40px;
-          overflow: hidden;
+        /* Hero: fit in viewport on desktop, image top-aligned */
+        @media (min-width: 769px) {
+          .hero {
+            height: 80vh;
+            min-height: unset;
+            padding-bottom: 40px;
+            overflow: hidden;
+          }
         }
         .hero-bg {
           background-position: top center !important;
