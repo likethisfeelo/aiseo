@@ -28,23 +28,24 @@ exports.handler = async (event) => {
     const sitesTable = process.env.SITES_TABLE;
     const imagesCdnDomain = process.env.IMAGES_CDN_DOMAIN || '';
 
-    if (!bucket) return serverError('IMAGES_BUCKET is not configured');
-    if (!sitesTable) return serverError('SITES_TABLE is not configured');
+    if (!bucket) return serverError('IMAGES_BUCKET is not configured', event);
+    if (!sitesTable) return serverError('SITES_TABLE is not configured', event);
 
     const { user, errorResponse } = requireUser(event);
     if (errorResponse) return errorResponse;
 
     const { siteId, fileName, fileType } = parseBody(event);
-    if (!siteId) return badRequest('siteId is required');
-    if (!fileName) return badRequest('fileName is required');
+    if (!siteId) return badRequest('siteId is required', event);
+    if (!fileName) return badRequest('fileName is required', event);
     if (!fileType || !ALLOWED_TYPES.includes(fileType)) {
-      return badRequest('Unsupported file type. Allowed: JPEG, PNG, WebP, SVG');
+      return badRequest('Unsupported file type. Allowed: JPEG, PNG, WebP, SVG', event);
     }
 
     const { ok: isOwner, response: ownerErr } = await ensureSiteOwnership({
       siteId,
       userSub: user.sub,
       tableName: sitesTable,
+      event,
     });
     if (!isOwner) return ownerErr;
 
@@ -63,9 +64,9 @@ exports.handler = async (event) => {
       ? `https://${imagesCdnDomain}/${objectKey}`
       : `https://${bucket}.s3.amazonaws.com/${objectKey}`;
 
-    return ok({ uploadUrl, objectKey, imageUrl });
+    return ok({ uploadUrl, objectKey, imageUrl }, event);
   } catch (error) {
     console.error('image-upload-handler error', error);
-    return serverError('Failed to generate image upload URL');
+    return serverError('Failed to generate image upload URL', event);
   }
 };

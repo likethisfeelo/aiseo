@@ -18,21 +18,21 @@ const VALID_COMMENT_TYPES = ['opinion', 'suggestion', 'correction'];
 exports.handler = async (event) => {
   try {
     const commentsTable = process.env.COMMENTS_TABLE;
-    if (!commentsTable) return serverError('COMMENTS_TABLE is not configured');
+    if (!commentsTable) return serverError('COMMENTS_TABLE is not configured', event);
 
     const { user, errorResponse } = requireAdmin(event);
     if (errorResponse) return errorResponse;
 
     const method = event.httpMethod || event.requestContext?.http?.method;
-    if (method !== 'POST') return badRequest('Unsupported method');
+    if (method !== 'POST') return badRequest('Unsupported method', event);
 
     const body = parseBody(event);
     const { siteId, targetType, targetId, targetField, type, content, suggestedValue } = body;
 
-    if (!siteId) return badRequest('siteId is required');
-    if (!targetType || !VALID_TARGET_TYPES.includes(targetType)) return badRequest('Invalid targetType');
-    if (!type || !VALID_COMMENT_TYPES.includes(type)) return badRequest('Invalid comment type');
-    if (!content || typeof content !== 'string' || content.trim().length === 0) return badRequest('content is required');
+    if (!siteId) return badRequest('siteId is required', event);
+    if (!targetType || !VALID_TARGET_TYPES.includes(targetType)) return badRequest('Invalid targetType', event);
+    if (!type || !VALID_COMMENT_TYPES.includes(type)) return badRequest('Invalid comment type', event);
+    if (!content || typeof content !== 'string' || content.trim().length === 0) return badRequest('content is required', event);
 
     const now = new Date().toISOString();
     const commentId = `${now}#${crypto.randomUUID()}`;
@@ -55,9 +55,9 @@ exports.handler = async (event) => {
 
     await ddb.send(new PutCommand({ TableName: commentsTable, Item: comment }));
 
-    return ok({ comment });
+    return ok({ comment }, event);
   } catch (error) {
     console.error('admin-comment error', error);
-    return serverError('Failed to create comment');
+    return serverError('Failed to create comment', event);
   }
 };

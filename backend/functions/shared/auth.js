@@ -27,7 +27,7 @@ const getUserContext = (event) => {
 
 const requireUser = (event) => {
   const user = getUserContext(event);
-  if (!user) return { user: null, errorResponse: unauthorized('Unauthorized') };
+  if (!user) return { user: null, errorResponse: unauthorized('Unauthorized', event) };
   return { user, errorResponse: null };
 };
 
@@ -42,7 +42,7 @@ const isAdmin = (event) => {
 const requireAdmin = (event) => {
   const { user, errorResponse } = requireUser(event);
   if (errorResponse) return { user: null, errorResponse };
-  if (!isAdmin(event)) return { user: null, errorResponse: forbidden('Admin access required') };
+  if (!isAdmin(event)) return { user: null, errorResponse: forbidden('Admin access required', event) };
   return { user, errorResponse: null };
 };
 

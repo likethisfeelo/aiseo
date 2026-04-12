@@ -88,13 +88,13 @@ const handleSubmit = async (event) => {
   const kakaoConsent = !!body.kakaoConsent;
 
   if (!name || !phone) {
-    return badRequest('이름과 연락처는 필수입니다.');
+    return badRequest('이름과 연락처는 필수입니다.', event);
   }
   if (!kakaoConsent) {
-    return badRequest('카카오톡 연락 동의는 필수입니다.');
+    return badRequest('카카오톡 연락 동의는 필수입니다.', event);
   }
   if (selectedServices.length === 0) {
-    return badRequest('서비스를 하나 이상 선택해주세요.');
+    return badRequest('서비스를 하나 이상 선택해주세요.', event);
   }
 
   const inquiryId = randomUUID();
@@ -122,7 +122,7 @@ const handleSubmit = async (event) => {
 
   await sendSlackNotification(item);
 
-  return ok({ inquiryId });
+  return ok({ inquiryId }, event);
 };
 
 const handleList = async (event) => {
@@ -137,22 +137,22 @@ const handleList = async (event) => {
     (b.createdAt || '').localeCompare(a.createdAt || '')
   );
 
-  return ok({ inquiries, count: inquiries.length });
+  return ok({ inquiries, count: inquiries.length }, event);
 };
 
 exports.handler = async (event) => {
   try {
     const table = process.env.COURSE_INQUIRIES_TABLE;
-    if (!table) return serverError('COURSE_INQUIRIES_TABLE is not configured');
+    if (!table) return serverError('COURSE_INQUIRIES_TABLE is not configured', event);
 
     const method = event.httpMethod || event.requestContext?.http?.method;
 
     if (method === 'POST') return handleSubmit(event);
     if (method === 'GET') return handleList(event);
 
-    return badRequest('Unsupported method');
+    return badRequest('Unsupported method', event);
   } catch (error) {
     console.error('course-inquiry error', error);
-    return serverError('Failed to process course inquiry request');
+    return serverError('Failed to process course inquiry request', event);
   }
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import './landing.css';
 import { ConsultationWidget } from '../components/ConsultationWidget';
 import { LandingBlogSection } from './landing/LandingBlogSection';
@@ -847,7 +847,14 @@ export function LandingPage({ authError }: Props) {
               ].map((panel, i) => (
                 <div className={`ps-panel${i === 0 ? ' active' : ''}`} data-idx={String(i)} key={`panel-${i}`}>
                   <div className="ps-left">
-                    <h2 className="ps-title" dangerouslySetInnerHTML={{ __html: panel.title.replace('\n', '<br/>') }} />
+                    <h2 className="ps-title">
+                      {panel.title.split('\n').map((line, lineIdx, arr) => (
+                        <Fragment key={lineIdx}>
+                          {line}
+                          {lineIdx < arr.length - 1 && <br />}
+                        </Fragment>
+                      ))}
+                    </h2>
                     <p className="ps-desc">{panel.desc}</p>
                     <a href="/?auth=login" className="ps-cta">{panel.cta}</a>
                   </div>
@@ -879,7 +886,14 @@ export function LandingPage({ authError }: Props) {
                   <div className="mp-card" key={`mp-${i}`}>
                     <span className="mp-card-icon">{card.icon}</span>
                     <span className="mp-card-tag">{card.tag}</span>
-                    <h3 dangerouslySetInnerHTML={{ __html: card.title.replace('\n', '<br/>') }} />
+                    <h3>
+                      {card.title.split('\n').map((line, lineIdx, arr) => (
+                        <Fragment key={lineIdx}>
+                          {line}
+                          {lineIdx < arr.length - 1 && <br />}
+                        </Fragment>
+                      ))}
+                    </h3>
                     <p>{card.desc}</p>
                     <div className="mp-benefit-item"><span className="mp-benefit-icon">{card.b1i}</span><span>{card.b1}</span></div>
                     <div className="mp-benefit-item"><span className="mp-benefit-icon">{card.b2i}</span><span>{card.b2}</span></div>

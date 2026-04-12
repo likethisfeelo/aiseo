@@ -35,13 +35,13 @@ const handleGet = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const siteId = event.queryStringParameters?.siteId;
-  if (!siteId) return badRequest('siteId query parameter is required');
+  if (!siteId) return badRequest('siteId query parameter is required', event);
 
   const result = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!result.Item) return badRequest('Site not found');
-  if (result.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!result.Item) return badRequest('Site not found', event);
+  if (result.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
-  return ok({ store: result.Item.store || {} });
+  return ok({ store: result.Item.store || {} }, event);
 };
 
 const handlePost = async (event, sitesTable) => {
@@ -49,11 +49,11 @@ const handlePost = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId, store } = parseBody(event);
-  if (!siteId) return badRequest('siteId is required');
+  if (!siteId) return badRequest('siteId is required', event);
 
   const existing = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!existing.Item) return badRequest('Site not found');
-  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!existing.Item) return badRequest('Site not found', event);
+  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
   const sanitized = sanitizeStore(store);
 
@@ -67,21 +67,21 @@ const handlePost = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ store: sanitized });
+  return ok({ store: sanitized }, event);
 };
 
 exports.handler = async (event) => {
   try {
     const sitesTable = process.env.SITES_TABLE;
-    if (!sitesTable) return serverError('SITES_TABLE is not configured');
+    if (!sitesTable) return serverError('SITES_TABLE is not configured', event);
 
     const method = event.httpMethod || event.requestContext?.http?.method;
     if (method === 'GET') return handleGet(event, sitesTable);
     if (method === 'POST') return handlePost(event, sitesTable);
 
-    return badRequest('Unsupported method');
+    return badRequest('Unsupported method', event);
   } catch (error) {
     console.error('store-handler error', error);
-    return serverError('Failed to process store data');
+    return serverError('Failed to process store data', event);
   }
 };

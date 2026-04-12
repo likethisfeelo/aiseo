@@ -62,14 +62,14 @@ const handleGet = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const siteId = event.queryStringParameters?.siteId;
-  if (!siteId) return badRequest('siteId query parameter is required');
+  if (!siteId) return badRequest('siteId query parameter is required', event);
 
   const result = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!result.Item) return badRequest('Site not found');
-  if (result.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!result.Item) return badRequest('Site not found', event);
+  if (result.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
   const snapshots = (result.Item.seoSnapshots || []).sort((a, b) => b.date.localeCompare(a.date));
-  return ok({ snapshots });
+  return ok({ snapshots }, event);
 };
 
 const handlePost = async (event, sitesTable) => {
@@ -77,14 +77,14 @@ const handlePost = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId, snapshot } = parseBody(event);
-  if (!siteId) return badRequest('siteId is required');
+  if (!siteId) return badRequest('siteId is required', event);
 
   const existing = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!existing.Item) return badRequest('Site not found');
-  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!existing.Item) return badRequest('Site not found', event);
+  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
   const sanitized = sanitizeSnapshot(snapshot);
-  if (!sanitized) return badRequest('Invalid snapshot data (date required, YYYY-MM-DD)');
+  if (!sanitized) return badRequest('Invalid snapshot data (date required, YYYY-MM-DD)', event);
 
   const snapshots = existing.Item.seoSnapshots || [];
   const idx = snapshots.findIndex((s) => s.id === sanitized.id);
@@ -104,7 +104,7 @@ const handlePost = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ snapshot: sanitized, snapshots: snapshots.sort((a, b) => b.date.localeCompare(a.date)) });
+  return ok({ snapshot: sanitized, snapshots: snapshots.sort((a, b) => b.date.localeCompare(a.date)) }, event);
 };
 
 const handleDelete = async (event, sitesTable) => {
@@ -112,11 +112,11 @@ const handleDelete = async (event, sitesTable) => {
   if (errorResponse) return errorResponse;
 
   const { siteId, snapshotId } = parseBody(event);
-  if (!siteId || !snapshotId) return badRequest('siteId and snapshotId are required');
+  if (!siteId || !snapshotId) return badRequest('siteId and snapshotId are required', event);
 
   const existing = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-  if (!existing.Item) return badRequest('Site not found');
-  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site');
+  if (!existing.Item) return badRequest('Site not found', event);
+  if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
   const snapshots = (existing.Item.seoSnapshots || []).filter((s) => s.id !== snapshotId);
 
@@ -130,13 +130,13 @@ const handleDelete = async (event, sitesTable) => {
     },
   }));
 
-  return ok({ snapshots });
+  return ok({ snapshots }, event);
 };
 
 exports.handler = async (event) => {
   try {
     const sitesTable = process.env.SITES_TABLE;
-    if (!sitesTable) return serverError('SITES_TABLE is not configured');
+    if (!sitesTable) return serverError('SITES_TABLE is not configured', event);
 
     const method = event.httpMethod || event.requestContext?.http?.method;
     const path = event.path || event.rawPath || '';
@@ -145,9 +145,9 @@ exports.handler = async (event) => {
     if (method === 'POST' && path.endsWith('/delete')) return handleDelete(event, sitesTable);
     if (method === 'POST') return handlePost(event, sitesTable);
 
-    return badRequest('Unsupported method');
+    return badRequest('Unsupported method', event);
   } catch (error) {
     console.error('seo-snapshot error', error);
-    return serverError('Failed to process SEO snapshot data');
+    return serverError('Failed to process SEO snapshot data', event);
   }
 };

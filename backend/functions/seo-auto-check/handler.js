@@ -65,20 +65,20 @@ const findSiteInResults = (items, siteUrl, linkField = 'link') => {
 exports.handler = async (event) => {
   try {
     const sitesTable = process.env.SITES_TABLE;
-    if (!sitesTable) return serverError('SITES_TABLE is not configured');
+    if (!sitesTable) return serverError('SITES_TABLE is not configured', event);
 
     const { user, errorResponse } = requireUser(event);
     if (errorResponse) return errorResponse;
 
     const { siteId } = parseBody(event);
-    if (!siteId) return badRequest('siteId is required');
+    if (!siteId) return badRequest('siteId is required', event);
 
     const existing = await ddb.send(new GetCommand({ TableName: sitesTable, Key: { siteId } }));
-    if (!existing.Item) return badRequest('Site not found');
-    if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site');
+    if (!existing.Item) return badRequest('Site not found', event);
+    if (existing.Item.ownerSub !== user.sub) return forbidden('Not your site', event);
 
     const keywords = existing.Item.seoKeywords || [];
-    if (keywords.length === 0) return badRequest('추적 키워드를 먼저 설정하세요');
+    if (keywords.length === 0) return badRequest('추적 키워드를 먼저 설정하세요', event);
 
     const siteUrl = `${siteId}.aiseo.tips`;
 
@@ -92,7 +92,7 @@ exports.handler = async (event) => {
     const hasGoogle = googleApiKey && googleEngineId;
 
     if (!hasNaver && !hasGoogle) {
-      return badRequest('검색 API가 설정되지 않았습니다. 관리자에게 문의하세요.');
+      return badRequest('검색 API가 설정되지 않았습니다. 관리자에게 문의하세요.', event);
     }
 
     const entries = [];
@@ -213,9 +213,9 @@ exports.handler = async (event) => {
       results,
       errors: [...new Set(errors)],
       summary: { keywords: keywords.length, totalChecks, foundCount },
-    });
+    }, event);
   } catch (error) {
     console.error('seo-auto-check error', error);
-    return serverError('Failed to run auto check');
+    return serverError('Failed to run auto check', event);
   }
 };

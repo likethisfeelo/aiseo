@@ -25,25 +25,26 @@ exports.handler = async (event) => {
     const bucket = process.env.UPLOAD_BUCKET;
     const sitesTable = process.env.SITES_TABLE;
     if (!bucket) {
-      return serverError('UPLOAD_BUCKET is not configured');
+      return serverError('UPLOAD_BUCKET is not configured', event);
     }
 
     const { siteId, fileName, contentType = 'application/zip', fileSize } = parseBody(event);
 
-    if (!siteId) return badRequest('siteId is required');
-    if (!fileName) return badRequest('fileName is required');
+    if (!siteId) return badRequest('siteId is required', event);
+    if (!fileName) return badRequest('fileName is required', event);
     if (!fileName.toLowerCase().endsWith(ALLOWED_EXTENSION)) {
-      return badRequest('Only .zip files are allowed');
+      return badRequest('Only .zip files are allowed', event);
     }
 
     if (fileSize && Number(fileSize) > MAX_UPLOAD_BYTES) {
-      return badRequest(`File is too large. Max size: ${MAX_UPLOAD_BYTES} bytes`);
+      return badRequest(`File is too large. Max size: ${MAX_UPLOAD_BYTES} bytes`, event);
     }
 
     const access = await ensureSiteOwnership({
       siteId,
       userSub: user.sub,
       tableName: sitesTable,
+      event,
     });
     if (!access.ok) return access.response;
 
@@ -69,9 +70,9 @@ exports.handler = async (event) => {
       objectKey,
       expiresIn: 300,
       maxUploadBytes: MAX_UPLOAD_BYTES,
-    });
+    }, event);
   } catch (error) {
     console.error('upload-handler error', error);
-    return serverError('Failed to create upload URL');
+    return serverError('Failed to create upload URL', event);
   }
 };

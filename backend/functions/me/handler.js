@@ -41,5 +41,5 @@ exports.handler = async (event) => {
     // Non-fatal — return user info without siteId
   }
 
-  return ok(result);
+  return ok(result, event);
 };
