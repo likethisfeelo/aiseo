@@ -54,7 +54,7 @@ const ROUTES = [
   {
     path: '/course2026',
     title: '수강안내 2026 | AISEO',
-    description: 'AISEO 2026 수강안내. AI 웹사이트 제작과 검색 최적화 교육 과정을 안내합니다.',
+    description: 'AISEO 2026 수강안내. AI 홈페이지 제작 · 도메인 & 호스팅 · SEO 핵심강의 3가지 트랙과 맞춤형 진단을 한 페이지에서 확인하세요.',
   },
   {
     path: '/support2026',
