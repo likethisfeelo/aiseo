@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import '../landing.css';
 import { getBlogPosts, getBlogCategories } from '../../api';
+import { useSubPageNav } from './useSubPageNav';
 
 interface BlogPostCard {
   slug: string;
@@ -46,32 +47,8 @@ export function BlogListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Nav scrolled state + hamburger (mirrors PublicSubPage)
-  useEffect(() => {
-    const nav = document.getElementById('mainNav');
-    nav?.classList.add('scrolled');
-
-    const btn = document.getElementById('navHamburger');
-    const menu = document.getElementById('navMobileMenu');
-    const hamburgerHandler = () => {
-      if (!btn || !menu) return;
-      const isOpen = menu.classList.toggle('open');
-      btn.classList.toggle('open', isOpen);
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-    };
-    if (btn) btn.addEventListener('click', hamburgerHandler);
-    const closeMenu = () => {
-      menu?.classList.remove('open');
-      btn?.classList.remove('open');
-      document.body.style.overflow = '';
-    };
-    menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
-
-    return () => {
-      if (btn) btn.removeEventListener('click', hamburgerHandler);
-      document.body.style.overflow = '';
-    };
-  }, []);
+  // Shared landing-nav → scrolled transition + mobile hamburger.
+  useSubPageNav();
 
   // Load categories once
   useEffect(() => {
@@ -139,7 +116,7 @@ export function BlogListPage() {
   return (
     <>
       {/* NAV — mirrors PublicSubPage */}
-      <nav id="mainNav" className="scrolled">
+      <nav id="mainNav" className="landing-nav">
         <div className="nav-inner">
           <a href="/" className="nav-logo">AISEO</a>
           <div className="nav-links">
