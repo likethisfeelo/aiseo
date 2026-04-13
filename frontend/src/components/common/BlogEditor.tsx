@@ -6,6 +6,8 @@ import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import { createImageUploadUrl } from '../../api';
+import { useQuotaPolicy } from '../../hooks/useQuotaPolicy';
+import { resizeImageWithPolicy } from '../../utils/resizeImage';
 
 /**
  * TipTap-based WYSIWYG editor used by the blog admin.
@@ -29,6 +31,9 @@ interface Props {
 
 export function BlogEditor({ value, onChange, placeholder }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Admin-only editor, but we still fetch quota so we can apply the
+  // policy-driven resize settings before uploading blog images.
+  const { data: quota } = useQuotaPolicy();
 
   const editor = useEditor({
     extensions: [
@@ -85,22 +90,28 @@ export function BlogEditor({ value, onChange, placeholder }: Props) {
         alert('JPG, PNG, WebP, SVG 파일만 업로드 가능합니다.');
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        alert('파일 크기는 5MB 이하여야 합니다.');
+      const maxMB = quota?.policy.maxImageMB ?? 5;
+      if (file.size > maxMB * 1024 * 1024) {
+        alert(`파일 크기는 ${maxMB}MB 이하여야 합니다.`);
         return;
       }
 
       try {
+        // Apply the same policy-driven resize the main uploader uses
+        // so blog images also land in S3 at a reasonable size.
+        const resized = await resizeImageWithPolicy(file, quota?.policy.imageResize ?? null);
+
         const data = (await createImageUploadUrl({
           siteId: 'blog',
           fileName: file.name,
-          fileType: file.type,
+          fileType: resized.mimeType,
+          fileSize: resized.resultBytes,
         })) as { uploadUrl: string; imageUrl: string };
 
         await fetch(data.uploadUrl, {
           method: 'PUT',
-          headers: { 'Content-Type': file.type },
-          body: file,
+          headers: { 'Content-Type': resized.mimeType },
+          body: resized.blob,
         });
 
         editor.chain().focus().setImage({ src: data.imageUrl }).run();
@@ -108,7 +119,7 @@ export function BlogEditor({ value, onChange, placeholder }: Props) {
         alert(err instanceof Error ? err.message : '이미지 업로드 실패');
       }
     },
-    [editor],
+    [editor, quota],
   );
 
   const handleLinkButton = useCallback(() => {

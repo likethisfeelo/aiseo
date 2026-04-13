@@ -40,6 +40,13 @@ const ADMIN_MENU: MenuCard[] = [
     description: '마케팅 지표 및 운영 도구',
     color: 'var(--accent-dark)',
   },
+  {
+    to: '/admin/quota-policy',
+    icon: '📏',
+    title: '쿼터 정책 관리',
+    description: '사용자 업로드·저장 한도 및 교육 모드 설정',
+    color: 'var(--info, #0ea5e9)',
+  },
 ];
 
 function AdminMenuGrid() {

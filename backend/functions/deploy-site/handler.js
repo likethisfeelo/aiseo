@@ -6,6 +6,7 @@ const AdmZip = require('adm-zip');
 const { ok, badRequest, serverError } = require('../shared/response');
 const { requireUser } = require('../shared/auth');
 const { ensureSiteOwnership } = require('../shared/site-access');
+const { incrementUsage } = require('../shared/usage-tracker');
 
 const s3 = new S3Client({});
 const cloudFront = new CloudFrontClient({});
@@ -167,6 +168,7 @@ const uploadZipEntries = async ({ uploadBucket, objectKey, targetBucket, siteId,
 
   const entries = zip.getEntries().filter((entry) => !entry.isDirectory);
   const uploadedKeys = [];
+  let uploadedBytes = 0;
 
   for (const entry of entries) {
     const relativePath = normalizeEntryName(entry.entryName);
@@ -191,9 +193,10 @@ const uploadZipEntries = async ({ uploadBucket, objectKey, targetBucket, siteId,
     );
 
     uploadedKeys.push(targetKey);
+    uploadedBytes += body.length || 0;
   }
 
-  return uploadedKeys;
+  return { uploadedKeys, uploadedBytes };
 };
 
 const invalidateSite = async ({ distributionId, siteId }) => {
@@ -247,7 +250,7 @@ exports.handler = async (event) => {
 
     const headInjection = await loadHeadSnippets(siteId, sitesTable);
 
-    const uploadedKeys = await uploadZipEntries({
+    const { uploadedKeys, uploadedBytes } = await uploadZipEntries({
       uploadBucket: process.env.UPLOAD_BUCKET,
       objectKey,
       targetBucket: target.targetBucket,
@@ -257,6 +260,19 @@ exports.handler = async (event) => {
 
     if (!uploadedKeys.length) {
       return badRequest('No deployable files found in ZIP', event);
+    }
+
+    // Record a successful deploy against the user's monthly quota.
+    // Done after upload succeeds so failed attempts don't burn quota.
+    // siteId === 'blog' is skipped automatically by incrementUsage.
+    try {
+      await incrementUsage(user.sub, {
+        siteId,
+        storageBytes: uploadedBytes,
+        deploy: 1,
+      });
+    } catch (usageErr) {
+      console.warn('deploy-site: usage tracking failed', usageErr?.message || usageErr);
     }
 
     const invalidationId = await invalidateSite({
@@ -275,6 +291,7 @@ exports.handler = async (event) => {
         objectKey,
         targetBucket: target.targetBucket,
         uploadedCount: uploadedKeys.length,
+        uploadedBytes,
         invalidationId,
       }),
     );
@@ -284,6 +301,7 @@ exports.handler = async (event) => {
       env: resolvedEnv,
       objectKey,
       uploadedCount: uploadedKeys.length,
+      uploadedBytes,
       sampleKeys: uploadedKeys.slice(0, 10),
       targetBucket: target.targetBucket,
       invalidationId,

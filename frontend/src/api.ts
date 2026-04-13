@@ -70,8 +70,20 @@ export const triggerSeoAutoCheck = (input: { siteId: string }) =>
   postJson('/seo-snapshots/auto-check', input);
 
 // ── Image Upload API ──
-export const createImageUploadUrl = (input: { siteId: string; fileName: string; fileType: string }) =>
-  postJson('/image-upload', input);
+export const createImageUploadUrl = (input: {
+  siteId: string;
+  fileName: string;
+  fileType: string;
+  fileSize?: number;
+}) => postJson('/image-upload', input);
+
+// ── Quota Status / Admin Policy ──
+export const getQuotaStatus = () => getJson('/quota/status');
+
+export const adminGetQuotaPolicy = () => getJson('/admin/quota-policy');
+
+export const adminSaveQuotaPolicy = (config: Record<string, unknown>) =>
+  putJson('/admin/quota-policy', { config });
 
 // ── Comments APIs (User) ──
 export const getComments = (siteId: string, targetType?: string, targetId?: string) => {

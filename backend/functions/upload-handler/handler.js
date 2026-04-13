@@ -1,13 +1,16 @@
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { ok, badRequest, serverError } = require('../shared/response');
+const { ok, badRequest, serverError, payloadTooLarge, tooManyRequests } = require('../shared/response');
 const { requireUser } = require('../shared/auth');
 const { ensureSiteOwnership } = require('../shared/site-access');
+const { getAppConfig, resolveEffectivePolicy, validateUpload, MB } = require('../shared/quota-policy');
+const { getUsage } = require('../shared/usage-tracker');
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 const ALLOWED_EXTENSION = '.zip';
-const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES || 50 * 1024 * 1024);
+// Legacy env-var fallback; the effective policy takes precedence.
+const LEGACY_MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES || 50 * 1024 * 1024);
 
 const parseBody = (event) => {
   if (!event.body) return {};
@@ -36,10 +39,6 @@ exports.handler = async (event) => {
       return badRequest('Only .zip files are allowed', event);
     }
 
-    if (fileSize && Number(fileSize) > MAX_UPLOAD_BYTES) {
-      return badRequest(`File is too large. Max size: ${MAX_UPLOAD_BYTES} bytes`, event);
-    }
-
     const access = await ensureSiteOwnership({
       siteId,
       userSub: user.sub,
@@ -47,6 +46,36 @@ exports.handler = async (event) => {
       event,
     });
     if (!access.ok) return access.response;
+
+    // ── Quota policy check ──
+    // Resolve the user's effective policy (training/normal) and verify
+    // the ZIP size + monthly deploy count + projected storage.
+    const appConfig = await getAppConfig();
+    const effective = resolveEffectivePolicy(appConfig, {
+      userCreatedAt: user.claims?.iat ? new Date(Number(user.claims.iat) * 1000).toISOString() : undefined,
+    });
+    const usage = await getUsage(user.sub);
+
+    const sizeNumber = fileSize ? Number(fileSize) : 0;
+    if (sizeNumber && sizeNumber > LEGACY_MAX_UPLOAD_BYTES) {
+      // Keep legacy guard as a defence-in-depth for very old deploys.
+      return payloadTooLarge(`File is too large. Max size: ${LEGACY_MAX_UPLOAD_BYTES} bytes`, event);
+    }
+
+    const verdict = validateUpload({
+      kind: 'site-zip',
+      siteId,
+      fileSize: sizeNumber,
+      usage,
+      effective,
+    });
+    if (!verdict.ok) {
+      const body = { code: verdict.code, mode: effective.mode };
+      if (verdict.code === 'POLICY_MONTHLY_DEPLOYS') {
+        return tooManyRequests(verdict.reason, event, body);
+      }
+      return payloadTooLarge(verdict.reason, event, body);
+    }
 
     const objectKey = `uploads/${siteId}/${Date.now()}-${sanitizeFileName(fileName)}`;
 
@@ -69,7 +98,8 @@ exports.handler = async (event) => {
       uploadUrl,
       objectKey,
       expiresIn: 300,
-      maxUploadBytes: MAX_UPLOAD_BYTES,
+      maxUploadBytes: effective.policy.maxSiteZipMB * MB,
+      policyMode: effective.mode,
     }, event);
   } catch (error) {
     console.error('upload-handler error', error);
