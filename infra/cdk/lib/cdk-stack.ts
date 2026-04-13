@@ -37,6 +37,38 @@ export class CdkStack extends Stack {
 
     const functionsRoot = path.resolve(__dirname, '../../../backend/functions');
 
+    // ── Quota policy infrastructure ──
+    // Two new tables back the admin-configurable quota system:
+    //   1. aiseo-app-config  — single row holding the current policy doc
+    //   2. aiseo-user-usage  — per-user running counters (storage, month)
+    // Plus a set of HARD_CAP_* env vars that bound any admin-configurable
+    // policy so a misconfiguration can't silently bypass our budget.
+    const appConfigTableName =
+      this.node.tryGetContext('appConfigTableName') ?? 'aiseo-app-config';
+    const userUsageTableName =
+      this.node.tryGetContext('userUsageTableName') ?? 'aiseo-user-usage';
+
+    const appConfigTable = new dynamodb.Table(this, 'AppConfigTable', {
+      tableName: appConfigTableName,
+      partitionKey: { name: 'configKey', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const userUsageTable = new dynamodb.Table(this, 'UserUsageTable', {
+      tableName: userUsageTableName,
+      partitionKey: { name: 'userSub', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    // Shared env block applied to every Lambda that needs quota info.
+    const quotaEnv = {
+      APP_CONFIG_TABLE: appConfigTableName,
+      USER_USAGE_TABLE: userUsageTableName,
+      HARD_CAP_IMAGE_MB: process.env.HARD_CAP_IMAGE_MB ?? '20',
+      HARD_CAP_STORAGE_GB: process.env.HARD_CAP_STORAGE_GB ?? '8',
+      HARD_CAP_SITE_ZIP_MB: process.env.HARD_CAP_SITE_ZIP_MB ?? '600',
+    };
+
     const uploadHandler = new lambda.Function(this, 'UploadHandlerFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset(functionsRoot),
@@ -46,8 +78,11 @@ export class CdkStack extends Stack {
         UPLOAD_BUCKET: uploadBucketName,
         SITES_TABLE: this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites',
         MAX_UPLOAD_BYTES: '52428800',
+        ...quotaEnv,
       },
     });
+    appConfigTable.grantReadData(uploadHandler);
+    userUsageTable.grantReadData(uploadHandler);
 
     const validateSite = new lambda.Function(this, 'ValidateSiteFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
@@ -75,8 +110,10 @@ export class CdkStack extends Stack {
         DISTRIBUTION_ID_DEV: process.env.DISTRIBUTION_ID_DEV ?? '',
         BASE_DOMAIN: process.env.BASE_DOMAIN ?? 'aiseo.tips',
         DEV_DOMAIN: process.env.DEV_DOMAIN ?? 'dev.aiseo.tips',
+        ...quotaEnv,
       },
     });
+    userUsageTable.grantReadWriteData(deploySite);
 
     const selectSite = new lambda.Function(this, 'SelectSiteFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
@@ -218,10 +255,35 @@ export class CdkStack extends Stack {
         SITES_TABLE: sitesTableName,
         IMAGES_BUCKET: imagesBucketName,
         IMAGES_CDN_DOMAIN: imagesCdnDomain,
+        ...quotaEnv,
       },
     });
     sitesTable.grantReadData(imageUploadHandler);
     imagesBucket.grantPut(imageUploadHandler);
+    appConfigTable.grantReadData(imageUploadHandler);
+    userUsageTable.grantReadWriteData(imageUploadHandler);
+
+    // ── Admin quota policy handler (GET/PUT /admin/quota-policy) ──
+    const adminQuotaPolicyHandler = new lambda.Function(this, 'AdminQuotaPolicyFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'admin-quota-policy/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { ...quotaEnv },
+    });
+    appConfigTable.grantReadWriteData(adminQuotaPolicyHandler);
+
+    // ── Quota status handler (GET /quota/status) ──
+    // Any authenticated user can read their own effective policy + usage.
+    const quotaStatusHandler = new lambda.Function(this, 'QuotaStatusFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'quota-status/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: { ...quotaEnv },
+    });
+    appConfigTable.grantReadData(quotaStatusHandler);
+    userUsageTable.grantReadData(quotaStatusHandler);
 
     const addPost = (resource: apigateway.Resource, integration: apigateway.LambdaIntegration) => {
       resource.addMethod('POST', integration, {
@@ -347,6 +409,11 @@ export class CdkStack extends Stack {
 
     const imageUploadResource = api.root.addResource('image-upload');
     addPost(imageUploadResource, new apigateway.LambdaIntegration(imageUploadHandler));
+
+    // Quota status (authenticated user) — /quota/status
+    const quotaResource = api.root.addResource('quota');
+    const quotaStatusResource = quotaResource.addResource('status');
+    addGet(quotaStatusResource, new apigateway.LambdaIntegration(quotaStatusHandler));
 
     // ── Consultations table + Lambda ──
     const consultationsTableName = 'aiseo-consultations';
@@ -515,6 +582,12 @@ export class CdkStack extends Stack {
     const adminConsultationsResource = adminResource.addResource('consultations');
     addGet(adminConsultationsResource, consultationIntegration);
 
+    // Admin quota policy — /admin/quota-policy (GET+PUT)
+    const adminQuotaPolicyResource = adminResource.addResource('quota-policy');
+    const adminQuotaPolicyIntegration = new apigateway.LambdaIntegration(adminQuotaPolicyHandler);
+    addGet(adminQuotaPolicyResource, adminQuotaPolicyIntegration);
+    addPut(adminQuotaPolicyResource, adminQuotaPolicyIntegration);
+
     // Course inquiry routes
     const courseInquiryIntegration = new apigateway.LambdaIntegration(courseInquiryHandler);
     const courseInquiryResource = api.root.addResource('course-inquiry', {
@@ -586,14 +659,26 @@ export class CdkStack extends Stack {
     // Force redeployment when resources change
     deployment.addToLogicalId(new Date().toISOString());
 
+    // Account-level throttling applied to every route in each stage.
+    // Protects us against a runaway client burning through S3 PUT quota
+    // while still leaving comfortable headroom for 77 concurrent users.
+    const stageThrottling: apigateway.ThrottleSettings = {
+      rateLimit: 20,
+      burstLimit: 40,
+    };
+
     new apigateway.Stage(this, 'DevApiStage', {
       deployment,
       stageName: 'dev',
+      throttlingRateLimit: stageThrottling.rateLimit,
+      throttlingBurstLimit: stageThrottling.burstLimit,
     });
 
     new apigateway.Stage(this, 'ProdApiStage', {
       deployment,
       stageName: 'prod',
+      throttlingRateLimit: stageThrottling.rateLimit,
+      throttlingBurstLimit: stageThrottling.burstLimit,
     });
 
     new CfnOutput(this, 'DevApiUrl', {

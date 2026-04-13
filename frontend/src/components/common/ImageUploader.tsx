@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { createImageUploadUrl } from '../../api';
+import { useQuotaPolicy } from '../../hooks/useQuotaPolicy';
+import { resizeImageWithPolicy } from '../../utils/resizeImage';
 
 interface Props {
   siteId: string;
@@ -12,6 +14,9 @@ export function ImageUploader({ siteId, currentUrl, onUploaded, label = '이미�
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const { data: quota, reload: reloadQuota } = useQuotaPolicy();
+
+  const maxImageMB = quota?.policy.maxImageMB ?? 5;
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -22,33 +27,44 @@ export function ImageUploader({ siteId, currentUrl, onUploaded, label = '이미�
       setError('JPG, PNG, WebP, SVG 파일만 업로드 가능합니다.');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError('파일 크기는 5MB 이하여야 합니다.');
+    if (file.size > maxImageMB * 1024 * 1024) {
+      setError(`파일 크기는 ${maxImageMB}MB 이하여야 합니다.`);
       return;
     }
 
     setUploading(true);
     setError('');
     try {
+      // Resize client-side against the policy's maxWidth/quality so we
+      // send smaller files to S3 and stay inside the per-user storage
+      // quota. SVGs and already-small images pass through untouched.
+      const resized = await resizeImageWithPolicy(file, quota?.policy.imageResize ?? null);
+
       const data = await createImageUploadUrl({
         siteId,
         fileName: file.name,
-        fileType: file.type,
+        fileType: resized.mimeType,
+        fileSize: resized.resultBytes,
       });
 
       await fetch(data.uploadUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': file.type },
-        body: file,
+        headers: { 'Content-Type': resized.mimeType },
+        body: resized.blob,
       });
 
       onUploaded(data.imageUrl);
+      // Refresh quota so usage bars reflect the latest counts.
+      reloadQuota();
     } catch (e) {
       setError(e instanceof Error ? e.message : '업로드 실패');
     } finally {
       setUploading(false);
     }
   };
+
+  const remainingImages = quota?.remaining.imageCount;
+  const remainingStorageMB = quota ? Math.floor(quota.remaining.storageBytes / (1024 * 1024)) : null;
 
   return (
     <div>
@@ -83,6 +99,11 @@ export function ImageUploader({ siteId, currentUrl, onUploaded, label = '이미�
       >
         {uploading ? '업로드 중...' : label}
       </button>
+      {quota && siteId !== 'blog' && (
+        <p style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>
+          {quota.mode === 'training' ? '교육 모드' : '기본 모드'} · 남은 이미지 {remainingImages} · 남은 용량 {remainingStorageMB} MB
+        </p>
+      )}
       {error && <p style={{ fontSize: 11, color: '#dc2626', marginTop: 4 }}>{error}</p>}
     </div>
   );

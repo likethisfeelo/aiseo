@@ -38,6 +38,12 @@ const forbidden = (error, event) => json(403, { success: false, error }, event);
 
 const conflict = (error, event) => json(409, { success: false, error }, event);
 
+const payloadTooLarge = (error, event, details) =>
+  json(413, { success: false, error, ...(details ? { details } : {}) }, event);
+
+const tooManyRequests = (error, event, details) =>
+  json(429, { success: false, error, ...(details ? { details } : {}) }, event);
+
 const serverError = (error, event) => json(500, { success: false, error }, event);
 
 module.exports = {
@@ -46,5 +52,7 @@ module.exports = {
   unauthorized,
   forbidden,
   conflict,
+  payloadTooLarge,
+  tooManyRequests,
   serverError,
 };

@@ -33,6 +33,7 @@ import { CourseInquiryAdminPage } from './pages/admin/CourseInquiryAdminPage';
 import { BlogCategoriesAdminPage } from './pages/admin/BlogCategoriesAdminPage';
 import { BlogPostsAdminPage } from './pages/admin/BlogPostsAdminPage';
 import { BlogPostEditPage } from './pages/admin/BlogPostEditPage';
+import { QuotaPolicyPage } from './pages/admin/QuotaPolicyPage';
 import { BlogListPage } from './pages/public/BlogListPage';
 import { BlogPostPage } from './pages/public/BlogPostPage';
 
@@ -53,6 +54,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin': '관리자',
   '/admin/blog/posts': '블로그 글 관리',
   '/admin/blog/categories': '블로그 카테고리',
+  '/admin/quota-policy': '쿼터 정책 관리',
 };
 
 function PageTitleProvider({ children, setPageTitle }: { children: React.ReactNode; setPageTitle: (t: string) => void }) {
@@ -339,6 +341,7 @@ function AuthenticatedShell({
           <Route path="/admin/blog/posts/new" element={<BlogPostEditPage />} />
           <Route path="/admin/blog/posts/:slug/edit" element={<BlogPostEditPage />} />
           <Route path="/admin/blog/categories" element={<BlogCategoriesAdminPage />} />
+          <Route path="/admin/quota-policy" element={<QuotaPolicyPage />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
       </AdminLayout>
