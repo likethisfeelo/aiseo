@@ -2883,6 +2883,7 @@ export function CoursePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [inquiryRoute, setInquiryRoute] = useState<(RouteData & { id: string }) | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   // ── Mobile state (Phase 1) ──
@@ -3029,10 +3030,18 @@ export function CoursePage() {
   };
 
   const openModal = () => {
-    if (selectedSvcs.size === 0) {
-      alert('서비스를 하나 이상 선택해주세요.');
+    if (selectedSvcs.size === 0 && !inquiryRoute) {
+      alert('서비스를 하나 이상 선택하거나 경로를 선택해주세요.');
       return;
     }
+    setModalOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const openInquiryWithRoute = (id: string, r: RouteData) => {
+    setInquiryRoute({ ...r, id });
+    setSubmitError(null);
+    setSubmitSuccess(false);
     setModalOpen(true);
     document.body.style.overflow = 'hidden';
   };
@@ -3056,6 +3065,7 @@ export function CoursePage() {
     closeModal();
     clearServices();
     resetForm();
+    setInquiryRoute(null);
   };
 
   const submitForm = async (e: FormEvent) => {
@@ -3088,7 +3098,15 @@ export function CoursePage() {
         selectedServices: snapshot.map(s => s.id),
         servicesSnapshot: snapshot,
         totalPrice: totalSelected,
-        source: 'course',
+        source: inquiryRoute ? `course-route-${inquiryRoute.id}` : 'course',
+        route: inquiryRoute
+          ? {
+              id: inquiryRoute.id,
+              title: inquiryRoute.title,
+              totalEst: inquiryRoute.totalEst,
+              estimate: inquiryRoute.estimate.map(e => ({ label: e.label, value: e.value })),
+            }
+          : undefined,
       });
       setSubmitSuccess(true);
     } catch (err) {
@@ -3274,7 +3292,7 @@ export function CoursePage() {
         <button
           type="button"
           className="aiv5-btn aiv5-btn-primary"
-          onClick={() => scrollToId('services')}
+          onClick={() => openInquiryWithRoute(selectedState!, route)}
         >
           이 경로로 상담 문의하기
         </button>
@@ -3283,7 +3301,7 @@ export function CoursePage() {
             <button
               type="button"
               className="aiv5-wiz-soft-btn aiv5-wiz-soft-consult"
-              onClick={() => scrollToId('services')}
+              onClick={() => openInquiryWithRoute(selectedState!, route)}
             >
               💬 상담이 필요해요
             </button>
@@ -3992,24 +4010,46 @@ export function CoursePage() {
             <span className="aiv5-modal-logo">AISEO</span>
             <div className="aiv5-modal-title">상담 문의</div>
             <div className="aiv5-modal-sub">
-              선택하신 서비스를 확인하고, 연락처를 남겨주시면 1영업일 내 연락드립니다.
+              {inquiryRoute && selectedSvcs.size === 0
+                ? '선택하신 경로를 확인하고, 연락처를 남겨주시면 1영업일 내 연락드립니다.'
+                : '선택하신 서비스를 확인하고, 연락처를 남겨주시면 1영업일 내 연락드립니다.'}
             </div>
 
-            <div className="aiv5-modal-summary">
-              <div className="aiv5-modal-sum-label">선택 서비스</div>
-              <div>
-                {[...selectedSvcs.values()].map(s => (
-                  <div key={s.id} className="aiv5-modal-sum-item">
-                    <span>{s.code} {s.name}</span>
-                    <span>{s.priceLabel}</span>
-                  </div>
-                ))}
+            {inquiryRoute && (
+              <div className="aiv5-modal-summary">
+                <div className="aiv5-modal-sum-label">선택 경로</div>
+                <div className="aiv5-modal-sum-item">
+                  <span><strong>경로 {inquiryRoute.id}</strong> · {inquiryRoute.title}</span>
+                  <span>{inquiryRoute.totalEst}</span>
+                </div>
+                <div>
+                  {inquiryRoute.estimate.map((e, i) => (
+                    <div key={i} className="aiv5-modal-sum-item">
+                      <span>{e.label}</span>
+                      <span>{e.value}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="aiv5-modal-sum-total">
-                <span>합계</span>
-                <span>{totalLabel}{hasMonthly ? ' +월정액' : ''}</span>
+            )}
+
+            {selectedSvcs.size > 0 && (
+              <div className="aiv5-modal-summary">
+                <div className="aiv5-modal-sum-label">선택 서비스</div>
+                <div>
+                  {[...selectedSvcs.values()].map(s => (
+                    <div key={s.id} className="aiv5-modal-sum-item">
+                      <span>{s.code} {s.name}</span>
+                      <span>{s.priceLabel}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="aiv5-modal-sum-total">
+                  <span>합계</span>
+                  <span>{totalLabel}{hasMonthly ? ' +월정액' : ''}</span>
+                </div>
               </div>
-            </div>
+            )}
 
             {submitSuccess ? (
               <div className="aiv5-modal-success">

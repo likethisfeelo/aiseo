@@ -130,6 +130,12 @@ export const submitCourseInquiry = async (input: {
   servicesSnapshot?: Array<{ id: string; code: string; name: string; price: number; priceLabel: string }>;
   totalPrice?: number;
   source?: string;
+  route?: {
+    id: string;
+    title: string;
+    totalEst: string;
+    estimate: Array<{ label: string; value: string }>;
+  };
 }) => {
   const { API_BASE_URL } = await import('./config.js');
   const res = await fetch(`${API_BASE_URL}/course-inquiry`, {
