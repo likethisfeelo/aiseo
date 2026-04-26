@@ -1,7 +1,17 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, type FormEvent } from 'react';
+import ReactDOM from 'react-dom';
 import './landing.css';
 import { ConsultationWidget } from '../components/ConsultationWidget';
 import { LandingBlogSection } from './landing/LandingBlogSection';
+import { subscribeNewsletter, type NewsletterPersona } from '../api';
+
+const PERSONA_LABEL: Record<NewsletterPersona, string> = {
+  'small-business': '소상공인',
+  'freelancer': '프리랜서',
+  'startup': '스타트업',
+  'marketer': '마케터',
+  'creator': '크리에이터',
+};
 
 interface Props {
   authError: string;
@@ -9,6 +19,39 @@ interface Props {
 
 export function LandingPage({ authError }: Props) {
   const [consultOpen, setConsultOpen] = useState(false);
+  const [newsletterPersona, setNewsletterPersona] = useState<NewsletterPersona | null>(null);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [newsletterError, setNewsletterError] = useState<string | null>(null);
+
+  const openNewsletterModal = (key: NewsletterPersona) => {
+    setNewsletterPersona(key);
+    setNewsletterEmail('');
+    setNewsletterStatus('idle');
+    setNewsletterError(null);
+    document.body.style.overflow = 'hidden';
+  };
+  const closeNewsletterModal = () => {
+    setNewsletterPersona(null);
+    document.body.style.overflow = '';
+  };
+  const submitNewsletter = async (e: FormEvent) => {
+    e.preventDefault();
+    if (newsletterStatus === 'submitting' || !newsletterPersona) return;
+    setNewsletterStatus('submitting');
+    setNewsletterError(null);
+    try {
+      await subscribeNewsletter({
+        email: newsletterEmail.trim(),
+        persona: newsletterPersona,
+        source: 'landing-persona',
+      });
+      setNewsletterStatus('success');
+    } catch (err) {
+      setNewsletterStatus('error');
+      setNewsletterError(err instanceof Error ? err.message : '구독에 실패했습니다.');
+    }
+  };
 
   useEffect(() => {
     // ── Mobile hamburger menu ──
@@ -839,11 +882,11 @@ export function LandingPage({ authError }: Props) {
 
             <div className="ps-panels" id="psPanels">
               {[
-                { title: '동네 가게도\n검색 1위가 됩니다', desc: 'IT 전문 지식 없이도 홈페이지 만들고, 네이버·구글 검색 상위 노출까지 한 번에. 마케팅 비용은 줄이고 고객은 늘어납니다.', cta: '소상공인 솔루션 알아보기 →', b1: '고객 문의 3배 증가', b1d: 'AI SEO 자동화로 검색 상위 노출을 달성하고 네이버·구글에서 새 고객이 직접 찾아오게 만드세요.', b2: '온라인 광고 이제 직접 시작하세요', b2d: 'SNS 광고, 검색 광고를 전문가 없이도 직접 운영하세요. AI가 타겟 설정부터 카피 작성까지 도와드립니다.' },
-                { title: '포트폴리오가\n스스로 영업합니다', desc: '전문가 포트폴리오 사이트를 AI로 제작하고, SEO 최적화로 검색을 통한 클라이언트 자동 유입 채널을 만드세요.', cta: '프리랜서 솔루션 알아보기 →', b1: '클라이언트 문의 5배 증가', b1d: '검색으로 찾아오는 잠재 고객을 자동으로 끌어들이고 더 좋은 프로젝트를 선택할 수 있는 여유를 만드세요.', b2: '나를 꼭 필요로 하는 클라이언트가 찾아오도록', b2d: '검색으로 나를 발견한 클라이언트는 이미 나를 원하는 사람입니다. SEO로 질 좋은 문의만 자동으로 받으세요.' },
-                { title: '마케터 없이도\n유기 트래픽을 키웁니다', desc: '초기 팀에게 SEO 전담 인력은 사치입니다. AISEO가 콘텐츠 마케팅 전략부터 실행까지 자동화합니다.', cta: '스타트업 솔루션 알아보기 →', b1: '유기 트래픽 4배 증가', b1d: '광고비 없이 검색엔진에서 찾아오는 트래픽을 4배로 늘리고 지속 가능한 성장 채널을 구축하세요.', b2: '담당자 없이도 꼭 필요한 마케팅을 놓치지 않도록', b2d: '마케팅 자동화로 채용 없이도 핵심 채널을 빠짐없이 운영하세요. 런웨이를 지키면서 성장 채널을 확보합니다.' },
-                { title: 'SEO 보고서 작성\n자동화로 해방되세요', desc: '키워드 리서치, 경쟁사 분석, 성과 리포트까지 — 반복 업무를 AI에게 넘기고 전략에 집중하세요.', cta: '마케터 솔루션 알아보기 →', b1: '주당 12시간 업무 자동화', b1d: '키워드 분석, 콘텐츠 최적화, 리포팅까지 AI가 대신합니다. 전략 수립에만 집중하세요.', b2: '상위 노출 성공률 78%', b2d: 'AI 기반 콘텐츠 최적화와 기술적 SEO 자동화로 목표 키워드 1페이지 달성률을 극대화하세요.' },
-                { title: '콘텐츠가 검색으로\n스스로 퍼져나갑니다', desc: '유튜브, 블로그, 뉴스레터 — 모든 콘텐츠를 SEO 최적화해 검색 유입을 극대화하고 새로운 팬을 만나세요.', cta: '크리에이터 솔루션 알아보기 →', b1: '검색 노출 2.8배 증가', b1d: '기존 콘텐츠를 AI가 SEO 최적화해 검색엔진에서 더 많이 발견되고 새 구독자가 자연스럽게 유입됩니다.', b2: '한 번 만든 콘텐츠도 계속해서 찾아오도록', b2d: '제목, 설명, 태그를 SEO 최적화해 오래된 콘텐츠도 검색에서 계속 발견됩니다. 업로드 후에도 트래픽이 쌓입니다.' },
+                { key: 'small-business' as NewsletterPersona, title: '동네 가게도\n검색 1위가 됩니다', desc: 'IT 전문 지식 없이도 홈페이지 만들고, 네이버·구글 검색 상위 노출까지 한 번에. 마케팅 비용은 줄이고 고객은 늘어납니다.', cta: '소상공인 솔루션 알아보기 →', b1: '고객 문의 3배 증가', b1d: 'AI SEO 자동화로 검색 상위 노출을 달성하고 네이버·구글에서 새 고객이 직접 찾아오게 만드세요.', b2: '온라인 광고 이제 직접 시작하세요', b2d: 'SNS 광고, 검색 광고를 전문가 없이도 직접 운영하세요. AI가 타겟 설정부터 카피 작성까지 도와드립니다.' },
+                { key: 'freelancer' as NewsletterPersona, title: '포트폴리오가\n스스로 영업합니다', desc: '전문가 포트폴리오 사이트를 AI로 제작하고, SEO 최적화로 검색을 통한 클라이언트 자동 유입 채널을 만드세요.', cta: '프리랜서 솔루션 알아보기 →', b1: '클라이언트 문의 5배 증가', b1d: '검색으로 찾아오는 잠재 고객을 자동으로 끌어들이고 더 좋은 프로젝트를 선택할 수 있는 여유를 만드세요.', b2: '나를 꼭 필요로 하는 클라이언트가 찾아오도록', b2d: '검색으로 나를 발견한 클라이언트는 이미 나를 원하는 사람입니다. SEO로 질 좋은 문의만 자동으로 받으세요.' },
+                { key: 'startup' as NewsletterPersona, title: '마케터 없이도\n유기 트래픽을 키웁니다', desc: '초기 팀에게 SEO 전담 인력은 사치입니다. AISEO가 콘텐츠 마케팅 전략부터 실행까지 자동화합니다.', cta: '스타트업 솔루션 알아보기 →', b1: '유기 트래픽 4배 증가', b1d: '광고비 없이 검색엔진에서 찾아오는 트래픽을 4배로 늘리고 지속 가능한 성장 채널을 구축하세요.', b2: '담당자 없이도 꼭 필요한 마케팅을 놓치지 않도록', b2d: '마케팅 자동화로 채용 없이도 핵심 채널을 빠짐없이 운영하세요. 런웨이를 지키면서 성장 채널을 확보합니다.' },
+                { key: 'marketer' as NewsletterPersona, title: 'SEO 보고서 작성\n자동화로 해방되세요', desc: '키워드 리서치, 경쟁사 분석, 성과 리포트까지 — 반복 업무를 AI에게 넘기고 전략에 집중하세요.', cta: '마케터 솔루션 알아보기 →', b1: '주당 12시간 업무 자동화', b1d: '키워드 분석, 콘텐츠 최적화, 리포팅까지 AI가 대신합니다. 전략 수립에만 집중하세요.', b2: '상위 노출 성공률 78%', b2d: 'AI 기반 콘텐츠 최적화와 기술적 SEO 자동화로 목표 키워드 1페이지 달성률을 극대화하세요.' },
+                { key: 'creator' as NewsletterPersona, title: '콘텐츠가 검색으로\n스스로 퍼져나갑니다', desc: '유튜브, 블로그, 뉴스레터 — 모든 콘텐츠를 SEO 최적화해 검색 유입을 극대화하고 새로운 팬을 만나세요.', cta: '크리에이터 솔루션 알아보기 →', b1: '검색 노출 2.8배 증가', b1d: '기존 콘텐츠를 AI가 SEO 최적화해 검색엔진에서 더 많이 발견되고 새 구독자가 자연스럽게 유입됩니다.', b2: '한 번 만든 콘텐츠도 계속해서 찾아오도록', b2d: '제목, 설명, 태그를 SEO 최적화해 오래된 콘텐츠도 검색에서 계속 발견됩니다. 업로드 후에도 트래픽이 쌓입니다.' },
               ].map((panel, i) => (
                 <div className={`ps-panel${i === 0 ? ' active' : ''}`} data-idx={String(i)} key={`panel-${i}`}>
                   <div className="ps-left">
@@ -856,7 +899,13 @@ export function LandingPage({ authError }: Props) {
                       ))}
                     </h2>
                     <p className="ps-desc">{panel.desc}</p>
-                    <a href="/?auth=login" className="ps-cta">{panel.cta}</a>
+                    <button
+                      type="button"
+                      className="ps-cta"
+                      onClick={() => openNewsletterModal(panel.key)}
+                    >
+                      {panel.cta}
+                    </button>
                   </div>
                   <div className="ps-right">
                     <div className="ps-benefit">
@@ -879,9 +928,9 @@ export function LandingPage({ authError }: Props) {
             <div className="mp-track-wrap">
               <div className="mp-track" id="mpTrack">
                 {[
-                  { icon: '🏪', tag: '소상공인', title: '동네 가게도\n검색 1위가 됩니다', desc: 'IT 전문 지식 없이도 홈페이지 만들고, 네이버·구글 검색 상위 노출까지 한 번에. 마케팅 비용은 줄이고 고객은 늘어납니다.', b1i: '📈', b1: '고객 문의 3배 증가', b2i: '📣', b2: '온라인 광고 이제 직접 시작하세요', cta: '소상공인 솔루션 알아보기 →' },
-                  { icon: '💻', tag: '프리랜서', title: '포트폴리오가\n스스로 영업합니다', desc: '전문가 포트폴리오 사이트를 AI로 제작하고, SEO 최적화로 검색을 통한 클라이언트 자동 유입 채널을 만드세요.', b1i: '🤝', b1: '클라이언트 문의 5배 증가', b2i: '🎯', b2: '나를 꼭 필요로 하는 클라이언트가 찾아오도록', cta: '프리랜서 솔루션 알아보기 →' },
-                  { icon: '🚀', tag: '스타트업', title: '마케터 없이도\n유기 트래픽을 키웁니다', desc: '초기 팀에게 SEO 전담 인력은 사치입니다. AISEO가 콘텐츠 마케팅 전략부터 실행까지 자동화합니다.', b1i: '📊', b1: '유기 트래픽 4배 증가', b2i: '⚙️', b2: '담당자 없이 꼭 필요한 마케팅을 놓치지 않도록', cta: '스타트업 솔루션 알아보기 →' },
+                  { key: 'small-business' as NewsletterPersona, icon: '🏪', tag: '소상공인', title: '동네 가게도\n검색 1위가 됩니다', desc: 'IT 전문 지식 없이도 홈페이지 만들고, 네이버·구글 검색 상위 노출까지 한 번에. 마케팅 비용은 줄이고 고객은 늘어납니다.', b1i: '📈', b1: '고객 문의 3배 증가', b2i: '📣', b2: '온라인 광고 이제 직접 시작하세요', cta: '소상공인 솔루션 알아보기 →' },
+                  { key: 'freelancer' as NewsletterPersona, icon: '💻', tag: '프리랜서', title: '포트폴리오가\n스스로 영업합니다', desc: '전문가 포트폴리오 사이트를 AI로 제작하고, SEO 최적화로 검색을 통한 클라이언트 자동 유입 채널을 만드세요.', b1i: '🤝', b1: '클라이언트 문의 5배 증가', b2i: '🎯', b2: '나를 꼭 필요로 하는 클라이언트가 찾아오도록', cta: '프리랜서 솔루션 알아보기 →' },
+                  { key: 'startup' as NewsletterPersona, icon: '🚀', tag: '스타트업', title: '마케터 없이도\n유기 트래픽을 키웁니다', desc: '초기 팀에게 SEO 전담 인력은 사치입니다. AISEO가 콘텐츠 마케팅 전략부터 실행까지 자동화합니다.', b1i: '📊', b1: '유기 트래픽 4배 증가', b2i: '⚙️', b2: '담당자 없이 꼭 필요한 마케팅을 놓치지 않도록', cta: '스타트업 솔루션 알아보기 →' },
                 ].map((card, i) => (
                   <div className="mp-card" key={`mp-${i}`}>
                     <span className="mp-card-icon">{card.icon}</span>
@@ -897,7 +946,13 @@ export function LandingPage({ authError }: Props) {
                     <p>{card.desc}</p>
                     <div className="mp-benefit-item"><span className="mp-benefit-icon">{card.b1i}</span><span>{card.b1}</span></div>
                     <div className="mp-benefit-item"><span className="mp-benefit-icon">{card.b2i}</span><span>{card.b2}</span></div>
-                    <a href="/?auth=login" className="mp-card-cta">{card.cta}</a>
+                    <button
+                      type="button"
+                      className="mp-card-cta"
+                      onClick={() => openNewsletterModal(card.key)}
+                    >
+                      {card.cta}
+                    </button>
                   </div>
                 ))}
               </div>
@@ -1244,6 +1299,58 @@ export function LandingPage({ authError }: Props) {
       </footer>
 
       <ConsultationWidget open={consultOpen} onClose={() => setConsultOpen(false)} />
+
+      {newsletterPersona && ReactDOM.createPortal(
+        <div
+          className="nl-modal-ov"
+          onClick={(e) => { if (e.target === e.currentTarget) closeNewsletterModal(); }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="nl-modal-title"
+        >
+          <div className="nl-modal">
+            <button type="button" className="nl-modal-x" onClick={closeNewsletterModal} aria-label="닫기">×</button>
+            <div className="nl-modal-icon">🚧</div>
+            <h3 id="nl-modal-title" className="nl-modal-title">준비 중입니다</h3>
+            <p className="nl-modal-sub">
+              {PERSONA_LABEL[newsletterPersona]} 솔루션 페이지를 준비하고 있어요.<br />
+              가장 먼저 출시 소식을 받아보시려면 이메일을 남겨주세요.
+            </p>
+            {newsletterStatus === 'success' ? (
+              <div className="nl-modal-success">
+                <div className="nl-modal-success-icon">✓</div>
+                <p className="nl-modal-success-msg">구독이 완료되었습니다. 출시되면 가장 먼저 알려드릴게요.</p>
+                <button type="button" className="nl-modal-btn" onClick={closeNewsletterModal}>닫기</button>
+              </div>
+            ) : (
+              <form onSubmit={submitNewsletter} className="nl-modal-form">
+                <input
+                  type="email"
+                  className="nl-modal-input"
+                  placeholder="you@example.com"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  required
+                  autoFocus
+                  disabled={newsletterStatus === 'submitting'}
+                />
+                {newsletterError && (
+                  <div className="nl-modal-err" role="alert">{newsletterError}</div>
+                )}
+                <button
+                  type="submit"
+                  className="nl-modal-btn"
+                  disabled={newsletterStatus === 'submitting' || !newsletterEmail.trim()}
+                >
+                  {newsletterStatus === 'submitting' ? '제출 중…' : '뉴스레터 구독하기'}
+                </button>
+                <p className="nl-modal-hint">스팸 없이 출시·업데이트 소식만 보내드려요.</p>
+              </form>
+            )}
+          </div>
+        </div>,
+        document.body,
+      )}
     </>
   );
 }
