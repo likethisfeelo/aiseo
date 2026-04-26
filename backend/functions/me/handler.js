@@ -10,6 +10,13 @@ exports.handler = async (event) => {
   if (errorResponse) return errorResponse;
   const claims = user.claims;
 
+  const rawGroups = claims['cognito:groups'];
+  const groups = Array.isArray(rawGroups)
+    ? rawGroups
+    : typeof rawGroups === 'string'
+      ? rawGroups.split(',').map((g) => g.trim()).filter(Boolean)
+      : [];
+
   const result = {
     user: {
       sub: claims.sub || '',
@@ -17,6 +24,7 @@ exports.handler = async (event) => {
       emailVerified: claims.email_verified === 'true' || claims.email_verified === true,
       name: claims.name || claims['cognito:username'] || '',
       username: claims['cognito:username'] || '',
+      groups,
     },
     siteId: null,
   };

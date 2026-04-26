@@ -117,6 +117,7 @@ export interface UserProfile {
   emailVerified: boolean;
   name: string;
   username: string;
+  groups: string[];
 }
 
 // ── SEO Validation ──

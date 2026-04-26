@@ -11,7 +11,49 @@ export const validateSite = (input: { siteId: string; objectKey: string }) =>
 export const deploySite = (input: { siteId: string; objectKey: string; env: string }) =>
   postJson('/deploy', input);
 
-export const getMe = () => getJson('/me');
+export const getMe = () => getJson('/me') as Promise<{
+  user: {
+    sub: string;
+    email: string;
+    emailVerified: boolean;
+    name: string;
+    username: string;
+    groups: string[];
+  };
+  siteId: string | null;
+}>;
+
+export interface AdminUserRow {
+  sub: string;
+  username: string;
+  email: string;
+  name: string;
+  emailVerified: boolean;
+  enabled: boolean;
+  status: string;
+  createdAt: string;
+  groups: string[];
+  isPaid: boolean;
+  isAdmin: boolean;
+}
+
+export const adminListUsers = (params: { search?: string; paginationToken?: string } = {}) => {
+  const query = new URLSearchParams();
+  if (params.search) query.set('search', params.search);
+  if (params.paginationToken) query.set('paginationToken', params.paginationToken);
+  const qs = query.toString();
+  return getJson(`/admin/users${qs ? `?${qs}` : ''}`) as Promise<{
+    users: AdminUserRow[];
+    nextToken: string | null;
+    count: number;
+  }>;
+};
+
+export const adminGrantPaidMember = (username: string) =>
+  postJson('/admin/users/grant', { username });
+
+export const adminRevokePaidMember = (username: string) =>
+  postJson('/admin/users/revoke', { username });
 
 export const selectSite = (input: { siteId: string }) =>
   postJson('/site/select', input);

@@ -162,9 +162,10 @@ export class CdkStack extends Stack {
     });
 
     let authorizer: apigateway.CognitoUserPoolsAuthorizer | undefined;
+    let userPool: cognito.IUserPool | undefined;
 
     if (userPoolArn) {
-      const userPool = cognito.UserPool.fromUserPoolArn(this, 'AiseoUserPool', userPoolArn);
+      userPool = cognito.UserPool.fromUserPoolArn(this, 'AiseoUserPool', userPoolArn);
       authorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'ApiCognitoAuthorizer', {
         cognitoUserPools: [userPool],
       });
@@ -476,6 +477,29 @@ export class CdkStack extends Stack {
     });
     newsletterTable.grantReadWriteData(newsletterHandler);
 
+    // ── Admin users (Cognito group management) Lambda ──
+    const adminUsersHandler = new lambda.Function(this, 'AdminUsersFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'admin-users/handler.handler',
+      timeout: Duration.seconds(15),
+      environment: {
+        USER_POOL_ID: userPool ? userPool.userPoolId : '',
+      },
+    });
+    if (userPool) {
+      adminUsersHandler.addToRolePolicy(new iam.PolicyStatement({
+        actions: [
+          'cognito-idp:ListUsers',
+          'cognito-idp:AdminListGroupsForUser',
+          'cognito-idp:AdminAddUserToGroup',
+          'cognito-idp:AdminRemoveUserFromGroup',
+          'cognito-idp:AdminGetUser',
+        ],
+        resources: [userPool.userPoolArn],
+      }));
+    }
+
     // ── Blog tables + Lambda ──
     const blogPostsTableName = 'aiseo-blog-posts';
     const blogPostsTable = new dynamodb.Table(this, 'BlogPostsTable', {
@@ -637,6 +661,15 @@ export class CdkStack extends Stack {
     });
     const adminNewsletterResource = adminResource.addResource('newsletter-subscribers');
     addGet(adminNewsletterResource, newsletterIntegration);
+
+    // Admin users (Cognito group management)
+    const adminUsersIntegration = new apigateway.LambdaIntegration(adminUsersHandler);
+    const adminUsersResource = adminResource.addResource('users');
+    addGet(adminUsersResource, adminUsersIntegration);
+    const adminUsersGrantResource = adminUsersResource.addResource('grant');
+    addPost(adminUsersGrantResource, adminUsersIntegration);
+    const adminUsersRevokeResource = adminUsersResource.addResource('revoke');
+    addPost(adminUsersRevokeResource, adminUsersIntegration);
 
     // ── Blog routes ──
     const blogIntegration = new apigateway.LambdaIntegration(blogHandler);

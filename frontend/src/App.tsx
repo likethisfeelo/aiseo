@@ -22,6 +22,7 @@ import { StorePage } from './pages/StorePage';
 import { SiteManagementPage } from './pages/SiteManagementPage';
 import { RoadmapPage } from './pages/RoadmapPage';
 import { ComingSoonPage } from './pages/ComingSoonPage';
+import { MemberWaitingPage } from './pages/MemberWaitingPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { SeoStatusPage } from './pages/SeoStatusPage';
 import { ContentAutomationPage } from './pages/ContentAutomationPage';
@@ -36,6 +37,14 @@ import { BlogPostEditPage } from './pages/admin/BlogPostEditPage';
 import { QuotaPolicyPage } from './pages/admin/QuotaPolicyPage';
 import { BlogListPage } from './pages/public/BlogListPage';
 import { BlogPostPage } from './pages/public/BlogPostPage';
+import { AdminUsersPage } from './pages/admin/AdminUsersPage';
+
+const PAID_GROUP = 'paid_member';
+const ADMIN_GROUP = 'admin';
+const hasServiceAccess = (user: UserProfile) =>
+  Array.isArray(user.groups) && user.groups.includes(PAID_GROUP);
+const isAdminUser = (user: UserProfile) =>
+  Array.isArray(user.groups) && user.groups.includes(ADMIN_GROUP);
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -194,13 +203,17 @@ export default function App() {
   const [pageTitle, setPageTitle] = useState('대시보드');
   const [educationOpen, setEducationOpen] = useState(false);
 
+  const canAccessService = user ? hasServiceAccess(user) : false;
+  const canAccessAdmin = user ? isAdminUser(user) : false;
+
   // Get siteId: server first, then localStorage fallback
   useEffect(() => {
     if (!user) { setSiteIdLoading(false); return; }
+    if (!canAccessService) { setSiteIdLoading(false); return; }
     setSiteIdLoading(true);
     setSiteIdError('');
     // Try server-side siteId (from /me response)
-    getMe().then((data: { siteId?: string }) => {
+    getMe().then((data: { siteId?: string | null }) => {
       if (data.siteId) {
         setSiteId(data.siteId);
         localStorage.setItem('aiseo.siteId', data.siteId);
@@ -218,7 +231,7 @@ export default function App() {
         setSiteIdError('서버 연결에 실패했습니다. 새로고침하거나 잠시 후 다시 시도해 주세요.');
       }
     }).finally(() => setSiteIdLoading(false));
-  }, [user]);
+  }, [user, canAccessService]);
 
   const handleSiteSelected = (id: string) => {
     setSiteId(id);
@@ -254,6 +267,27 @@ export default function App() {
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="*" element={<LandingPage authError={authError} />} />
       </Routes>
+    );
+  }
+
+  // No paid_member group → general member: show waiting page (admin without paid still can access /admin via the shell below)
+  if (!canAccessService && !canAccessAdmin) {
+    return <MemberWaitingPage user={user} onLogout={logout} />;
+  }
+
+  // Admin-only (no paid_member) → bypass siteId requirement, render shell which guards non-admin paths
+  if (!canAccessService && canAccessAdmin) {
+    return (
+      <PageTitleProvider setPageTitle={setPageTitle}>
+        <AuthenticatedShell
+          user={user}
+          siteId=""
+          pageTitle={pageTitle}
+          logout={logout}
+          educationOpen={educationOpen}
+          setEducationOpen={setEducationOpen}
+        />
+      </PageTitleProvider>
     );
   }
 
@@ -328,8 +362,14 @@ function AuthenticatedShell({
   setEducationOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const location = useLocation();
+  const onAdminPath = isAdminPath(location.pathname);
 
-  if (isAdminPath(location.pathname)) {
+  // Admin without paid_member → confine to /admin paths
+  if (!hasServiceAccess(user) && isAdminUser(user) && !onAdminPath) {
+    return <Navigate to="/admin" replace />;
+  }
+
+  if (onAdminPath) {
     return (
       <AdminLayout user={user} onLogout={logout}>
         <Routes>
@@ -337,6 +377,7 @@ function AuthenticatedShell({
           <Route path="/admin/site/:siteId" element={<AdminSiteDetailPage />} />
           <Route path="/mktadmin" element={<MktAdminPage />} />
           <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
+          <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/blog/posts" element={<BlogPostsAdminPage />} />
           <Route path="/admin/blog/posts/new" element={<BlogPostEditPage />} />
           <Route path="/admin/blog/posts/:slug/edit" element={<BlogPostEditPage />} />

@@ -47,6 +47,13 @@ const ADMIN_MENU: MenuCard[] = [
     description: '사용자 업로드·저장 한도 및 교육 모드 설정',
     color: 'var(--info, #0ea5e9)',
   },
+  {
+    to: '/admin/users',
+    icon: '👤',
+    title: '회원 등급 관리',
+    description: '유료 회원(paid_member) 승급·해제',
+    color: 'var(--accent-mid, #6366f1)',
+  },
 ];
 
 function AdminMenuGrid() {
