@@ -1557,6 +1557,25 @@
     .btn-primary-lg, .btn-outline-lg { width: 100%; max-width: 320px; text-align: center; justify-content: center; }
   }
 
+  /* === Footer SNS link === */
+  .footer-sns {
+    display: flex; gap: 12px; align-items: center;
+    padding: 18px 0 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 12px;
+  }
+  .footer-sns-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.1s, opacity 0.15s;
+  }
+  .footer-sns-link:hover { transform: translateY(-1px); opacity: 0.92; }
+  .footer-sns-kakao {
+    background: #FEE500; color: #181600;
+  }
+
   /* === Persona CTA → button reset (also keeps <a> looks identical) === */
   button.ps-cta,
   button.mp-card-cta {

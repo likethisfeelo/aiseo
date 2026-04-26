@@ -4,6 +4,7 @@ import './landing.css';
 import { ConsultationWidget } from '../components/ConsultationWidget';
 import { LandingBlogSection } from './landing/LandingBlogSection';
 import { subscribeNewsletter, type NewsletterPersona } from '../api';
+import { KAKAO_CHANNEL_URL } from '../constants/contact';
 
 const PERSONA_LABEL: Record<NewsletterPersona, string> = {
   'small-business': '소상공인',
@@ -1286,6 +1287,20 @@ export function LandingPage({ authError }: Props) {
                 <a href="#">파트너</a><a href="#">문의</a>
               </div>
             </details>
+          </div>
+          <div className="footer-sns">
+            <a
+              href={KAKAO_CHANNEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-sns-link footer-sns-kakao"
+              aria-label="카카오톡 채널"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.74 5.16 4.4 6.62l-1.06 3.92c-.1.36.27.65.59.46l4.62-2.78c.47.06.94.1 1.45.1 5.52 0 10-3.58 10-8 0-4.42-4.48-8-10-8z"/>
+              </svg>
+              <span>카카오톡 채널</span>
+            </a>
           </div>
           <div className="footer-bottom">
             <span>&copy; 2026 AISEO. All rights reserved.</span>
