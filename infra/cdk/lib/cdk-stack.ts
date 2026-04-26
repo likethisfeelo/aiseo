@@ -457,6 +457,25 @@ export class CdkStack extends Stack {
     });
     courseInquiriesTable.grantReadWriteData(courseInquiryHandler);
 
+    // ── Newsletter subscribers table + Lambda ──
+    const newsletterTableName = 'aiseo-newsletter-subscribers';
+    const newsletterTable = new dynamodb.Table(this, 'NewsletterSubscribersTable', {
+      tableName: newsletterTableName,
+      partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const newsletterHandler = new lambda.Function(this, 'NewsletterFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'newsletter/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        NEWSLETTER_TABLE: newsletterTableName,
+      },
+    });
+    newsletterTable.grantReadWriteData(newsletterHandler);
+
     // ── Blog tables + Lambda ──
     const blogPostsTableName = 'aiseo-blog-posts';
     const blogPostsTable = new dynamodb.Table(this, 'BlogPostsTable', {
@@ -602,6 +621,22 @@ export class CdkStack extends Stack {
     });
     const adminCourseInquiriesResource = adminResource.addResource('course-inquiries');
     addGet(adminCourseInquiriesResource, courseInquiryIntegration);
+
+    // Newsletter routes
+    const newsletterIntegration = new apigateway.LambdaIntegration(newsletterHandler);
+    const newsletterResource = api.root.addResource('newsletter', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: [devOrigin, prodOrigin, siteDevOrigin, siteProdOrigin, b2bDevOrigin, b2bProdOrigin],
+        allowMethods: ['GET', 'POST', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+      },
+    });
+    const newsletterSubscribeResource = newsletterResource.addResource('subscribe');
+    newsletterSubscribeResource.addMethod('POST', newsletterIntegration, {
+      authorizationType: apigateway.AuthorizationType.NONE,
+    });
+    const adminNewsletterResource = adminResource.addResource('newsletter-subscribers');
+    addGet(adminNewsletterResource, newsletterIntegration);
 
     // ── Blog routes ──
     const blogIntegration = new apigateway.LambdaIntegration(blogHandler);

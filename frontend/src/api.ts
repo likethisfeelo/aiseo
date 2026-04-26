@@ -150,6 +150,32 @@ export const submitCourseInquiry = async (input: {
 
 export const adminGetCourseInquiries = () => getJson('/admin/course-inquiries');
 
+// ── Newsletter APIs ──
+export type NewsletterPersona =
+  | 'small-business'
+  | 'freelancer'
+  | 'startup'
+  | 'marketer'
+  | 'creator';
+
+export const subscribeNewsletter = async (input: {
+  email: string;
+  persona?: NewsletterPersona;
+  source?: string;
+}) => {
+  const { API_BASE_URL } = await import('./config.js');
+  const res = await fetch(`${API_BASE_URL}/newsletter/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  const payload = await res.json();
+  if (!res.ok || !payload.success) throw new Error(payload.error || 'Subscription failed');
+  return payload.data as { email: string; persona: string; alreadySubscribed?: boolean };
+};
+
+export const adminGetNewsletterSubscribers = () => getJson('/admin/newsletter-subscribers');
+
 // ── Admin APIs ──
 export const adminGetSites = () => getJson('/admin/sites');
 
