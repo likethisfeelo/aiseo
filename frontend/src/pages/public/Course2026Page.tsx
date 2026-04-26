@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../landing.css';
 import { CoursePage } from './CoursePage';
 import { useSubPageNav } from './useSubPageNav';
+import { ConsultationWidget } from '../../components/ConsultationWidget';
 
 /**
  * 수강안내 2026 — `/course2026`
@@ -28,6 +29,8 @@ import { useSubPageNav } from './useSubPageNav';
 export function Course2026Page() {
   // Shared landing-nav → scrolled transition + mobile hamburger.
   useSubPageNav();
+
+  const [consultOpen, setConsultOpen] = useState(false);
 
   useEffect(() => {
     // ── Mouse gradient blob (from LandingPage) ──
@@ -470,13 +473,13 @@ export function Course2026Page() {
               <div className="entry-price-amount">10만원</div>
               <div className="entry-price-meta">1회 완결 · 당일 배포 · 실습 포함</div>
             </div>
-            <a
-              href="/?auth=signup"
+            <button
+              type="button"
               className="entry-price-btn"
-              style={{ textDecoration: 'none', display: 'inline-block' }}
+              onClick={() => setConsultOpen(true)}
             >
               배포 교육 신청하기 →
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -499,6 +502,8 @@ export function Course2026Page() {
           </div>
         </div>
       </footer>
+
+      <ConsultationWidget open={consultOpen} onClose={() => setConsultOpen(false)} />
     </>
   );
 }
