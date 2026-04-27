@@ -4,7 +4,7 @@ import './landing.css';
 import { ConsultationWidget } from '../components/ConsultationWidget';
 import { LandingBlogSection } from './landing/LandingBlogSection';
 import { subscribeNewsletter, type NewsletterPersona } from '../api';
-import { KAKAO_CHANNEL_URL } from '../constants/contact';
+import { KAKAO_CHANNEL_URL, KAKAO_CHAT_URL } from '../constants/contact';
 
 const PERSONA_LABEL: Record<NewsletterPersona, string> = {
   'small-business': '소상공인',
@@ -1229,8 +1229,15 @@ export function LandingPage({ authError }: Props) {
             <div className="footer-cta-label">지금 시작하세요</div>
             <h2>온라인마케팅의 시작<br/><span>AISEO.TIPS</span></h2>
             <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
-              <a href="/?auth=signup" className="btn-primary-lg" style={{fontSize:16,padding:'16px 36px'}}>수강신청하기 →</a>
-              <a href="/?auth=signup" style={{fontSize:15,fontWeight:600,color:'rgba(255,255,255,0.75)',textDecoration:'none',padding:'16px 28px',border:'1.5px solid rgba(255,255,255,0.2)',borderRadius:12,backdropFilter:'blur(8px)'}}>1:1 상담문의</a>
+              <a href="/course2026#diagnosis" className="btn-primary-lg" style={{fontSize:16,padding:'16px 36px'}}>서비스 신청하기 →</a>
+              <a
+                href={KAKAO_CHAT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{fontSize:15,fontWeight:600,color:'rgba(255,255,255,0.75)',textDecoration:'none',padding:'16px 28px',border:'1.5px solid rgba(255,255,255,0.2)',borderRadius:12,backdropFilter:'blur(8px)'}}
+              >
+                1:1 상담문의
+              </a>
             </div>
           </div>
           <div className="footer-top">
