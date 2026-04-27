@@ -1212,8 +1212,7 @@ export function LandingPage({ authError }: Props) {
           <h2 className="cta-h2">지금 바로 시작하세요</h2>
           <p className="cta-sub">지금 AI시대에 맞춘 온라인 마케팅을 시작하세요.<br/>1시간이면 첫 번째 SEO 최적화 웹사이트가 완성됩니다.</p>
           <div className="cta-row">
-            <a href="/?auth=signup" className="btn-primary-lg">수강신청하기 →</a>
-            <a href="/?auth=signup" className="btn-outline-lg">1:1 상담문의</a>
+            <a href="/course2026" className="btn-primary-lg">지금 시작하기 →</a>
           </div>
           <p style={{marginTop:20,fontSize:13,color:'var(--text-muted)'}}>✓ 사업자만 신청가능 · ✓ 12개월 사이트를 한번만 결제 · ✓ 업종별 컨설팅 포함</p>
         </div>
