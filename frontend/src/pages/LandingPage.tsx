@@ -1316,6 +1316,9 @@ export function LandingPage({ authError }: Props) {
               <a href="#">쿠키 정책</a>
             </div>
           </div>
+          <div className="footer-legal">
+            크리다 · 사업자등록번호 231-88-03647 · 충청남도 천안시 서북구 월봉로 126, 9층 901호 C27(쌍용동, 대림프라자) · 개인정보책임자 김경진 <a href="mailto:jin@k-rida.com">jin@k-rida.com</a>
+          </div>
         </div>
       </footer>
 
