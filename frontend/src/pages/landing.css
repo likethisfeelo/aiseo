@@ -843,6 +843,9 @@
   .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
   .footer-bottom a { color: rgba(255,255,255,0.5); text-decoration: none; }
   .footer-bottom a:hover { color: #fff; }
+  .footer-legal { margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.7; letter-spacing: 0.01em; }
+  .footer-legal a { color: rgba(255,255,255,0.55); text-decoration: none; }
+  .footer-legal a:hover { color: #fff; text-decoration: underline; }
 
   /* ── VIDEO REVEAL ── */
   .video-reveal-section {

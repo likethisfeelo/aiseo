@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import ReactDOM from 'react-dom';
 import { submitCourseInquiry } from '../../api';
+import { KAKAO_CHAT_URL } from '../../constants/contact';
 
 // ============================================================================
 // Types
@@ -3926,20 +3927,15 @@ export function CoursePage() {
               AI 시대에 맞는 온라인 마케팅을 직접 할 수 있게 도와드립니다.
             </p>
             <div className="aiv5-cta-btns">
-              <button
-                type="button"
+              <a
+                href={KAKAO_CHAT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="aiv5-cta-btn-primary"
-                onClick={() => {
-                  if (selectedSvcs.size === 0) {
-                    scrollToId('services');
-                  } else {
-                    openModal();
-                  }
-                }}
               >
                 <span className="aiv5-cta-btn-icon">✉</span>
                 지금 문의하기
-              </button>
+              </a>
               <button
                 type="button"
                 className="aiv5-cta-btn-ghost"

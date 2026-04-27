@@ -4,7 +4,7 @@ import './landing.css';
 import { ConsultationWidget } from '../components/ConsultationWidget';
 import { LandingBlogSection } from './landing/LandingBlogSection';
 import { subscribeNewsletter, type NewsletterPersona } from '../api';
-import { KAKAO_CHANNEL_URL } from '../constants/contact';
+import { KAKAO_CHANNEL_URL, KAKAO_CHAT_URL } from '../constants/contact';
 
 const PERSONA_LABEL: Record<NewsletterPersona, string> = {
   'small-business': '소상공인',
@@ -1212,8 +1212,7 @@ export function LandingPage({ authError }: Props) {
           <h2 className="cta-h2">지금 바로 시작하세요</h2>
           <p className="cta-sub">지금 AI시대에 맞춘 온라인 마케팅을 시작하세요.<br/>1시간이면 첫 번째 SEO 최적화 웹사이트가 완성됩니다.</p>
           <div className="cta-row">
-            <a href="/?auth=signup" className="btn-primary-lg">수강신청하기 →</a>
-            <a href="/?auth=signup" className="btn-outline-lg">1:1 상담문의</a>
+            <a href="/course2026" className="btn-primary-lg">지금 시작하기 →</a>
           </div>
           <p style={{marginTop:20,fontSize:13,color:'var(--text-muted)'}}>✓ 사업자만 신청가능 · ✓ 12개월 사이트를 한번만 결제 · ✓ 업종별 컨설팅 포함</p>
         </div>
@@ -1230,8 +1229,15 @@ export function LandingPage({ authError }: Props) {
             <div className="footer-cta-label">지금 시작하세요</div>
             <h2>온라인마케팅의 시작<br/><span>AISEO.TIPS</span></h2>
             <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
-              <a href="/?auth=signup" className="btn-primary-lg" style={{fontSize:16,padding:'16px 36px'}}>수강신청하기 →</a>
-              <a href="/?auth=signup" style={{fontSize:15,fontWeight:600,color:'rgba(255,255,255,0.75)',textDecoration:'none',padding:'16px 28px',border:'1.5px solid rgba(255,255,255,0.2)',borderRadius:12,backdropFilter:'blur(8px)'}}>1:1 상담문의</a>
+              <a href="/course2026#diagnosis" className="btn-primary-lg" style={{fontSize:16,padding:'16px 36px'}}>서비스 신청하기 →</a>
+              <a
+                href={KAKAO_CHAT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{fontSize:15,fontWeight:600,color:'rgba(255,255,255,0.75)',textDecoration:'none',padding:'16px 28px',border:'1.5px solid rgba(255,255,255,0.2)',borderRadius:12,backdropFilter:'blur(8px)'}}
+              >
+                1:1 상담문의
+              </a>
             </div>
           </div>
           <div className="footer-top">
@@ -1309,6 +1315,9 @@ export function LandingPage({ authError }: Props) {
               <a href="#">이용약관</a>
               <a href="#">쿠키 정책</a>
             </div>
+          </div>
+          <div className="footer-legal">
+            크리다 · 사업자등록번호 231-88-03647 · 충청남도 천안시 서북구 월봉로 126, 9층 901호 C27(쌍용동, 대림프라자) · 개인정보책임자 김경진 <a href="mailto:jin@k-rida.com">jin@k-rida.com</a>
           </div>
         </div>
       </footer>
