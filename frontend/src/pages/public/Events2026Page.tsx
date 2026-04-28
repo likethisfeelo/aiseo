@@ -1,6 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../landing.css';
+import './events2026.css';
 import { useSubPageNav } from './useSubPageNav';
+import { KAKAO_CHAT_URL } from '../../constants/contact';
+
+const BANNER_CLOSED_KEY = 'events2026-banner-closed';
 
 /**
  * 이벤트 2026 — `/events2026`
@@ -26,6 +30,20 @@ import { useSubPageNav } from './useSubPageNav';
 export function Events2026Page() {
   // Shared landing-nav → scrolled transition + mobile hamburger.
   useSubPageNav();
+
+  // ── Top fixed banner (sessionStorage 닫힘 보존) ──
+  const [bannerOpen, setBannerOpen] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return sessionStorage.getItem(BANNER_CLOSED_KEY) !== '1';
+  });
+  const closeBanner = () => {
+    setBannerOpen(false);
+    try {
+      sessionStorage.setItem(BANNER_CLOSED_KEY, '1');
+    } catch {
+      /* sessionStorage 비활성화/사파리 프라이빗 모드 — 무시 */
+    }
+  };
 
   // ── Video reveal (ported from LandingPage) ──
   useEffect(() => {
@@ -182,6 +200,23 @@ export function Events2026Page() {
         }
       `}</style>
 
+      {/* 0-1. 상단 고정 배너 (events2026 전용, sessionStorage) */}
+      {bannerOpen && (
+        <div className="e26-banner" role="region" aria-label="이벤트 안내">
+          <span className="e26-banner-text">
+            * 2026 런칭 파트너 모집 중 — 무료 · 10만원 · 검색 네트워크 등록
+          </span>
+          <button
+            type="button"
+            className="e26-banner-close"
+            aria-label="배너 닫기"
+            onClick={closeBanner}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* NAV — mirrors ComingSoon2026 with activeMenu=events */}
       <nav id="mainNav" className="landing-nav">
         <div className="nav-inner">
@@ -297,6 +332,35 @@ export function Events2026Page() {
           </div>
         </div>
       </div>
+
+      {/*
+        섹션 03~10 — 다음 페이즈에서 채워짐.
+        지금은 페이지 골격만 잡아두고 commit.
+      */}
+      <section className="e26-section" id="benefits" aria-label="benefits placeholder" />
+      <section className="e26-section e26-section-soft" id="step1" aria-label="step1 placeholder" />
+      <section className="e26-section" id="step2" aria-label="step2 placeholder" />
+      <section className="e26-section" id="directory" aria-label="directory placeholder" />
+      <section className="e26-section e26-section-soft" id="why" aria-label="why placeholder" />
+      <section className="e26-section" id="process" aria-label="process placeholder" />
+      <section className="e26-section e26-section-soft" id="faq" aria-label="faq placeholder" />
+      <section className="e26-section" id="finalcta" aria-label="finalcta placeholder" />
+
+      {/* 0-2. 모바일 플로팅 카카오 버튼 */}
+      <a
+        href={KAKAO_CHAT_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="e26-kakao-fab"
+        aria-label="카카오 채팅으로 상담"
+      >
+        <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="#1d1d1f"
+            d="M12 3C6.48 3 2 6.58 2 11c0 2.84 1.86 5.32 4.66 6.74-.2.7-.74 2.55-.84 2.95-.13.49.18.49.38.36.16-.1 2.55-1.74 3.59-2.45.74.1 1.49.16 2.21.16 5.52 0 10-3.58 10-8s-4.48-8-10-8z"
+          />
+        </svg>
+      </a>
 
       {/* Footer */}
       <footer style={{ minHeight: 'auto', padding: '48px 40px' }}>

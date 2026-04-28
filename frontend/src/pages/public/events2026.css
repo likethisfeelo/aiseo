@@ -1,0 +1,113 @@
+/* ============================================================
+ * /events2026 페이지 전용 스타일
+ *
+ * 디자인 토큰은 design-tokens.css 의 :root 를 그대로 사용한다.
+ * 공통 클래스(landing-nav, hero-*, sf-card, entry-section,
+ * footer-*, video-reveal-* …) 는 landing.css 에 정의돼 있다.
+ *
+ * 이 파일은 page-scoped 클래스(`e26-*`)만 정의한다.
+ * ============================================================ */
+
+/* ─ 0-1. 상단 고정 배너 ─ */
+.e26-banner {
+  position: relative;
+  z-index: 95; /* 네비(100)보다 아래, 본문보다 위 */
+  background: #F0EAFF;
+  border-bottom: 1px dashed #C4A8F5;
+  color: var(--accent-dark);
+  font-size: 13px;
+  letter-spacing: -0.2px;
+  padding: 10px 56px 10px 20px;
+  text-align: center;
+  font-weight: 600;
+}
+.e26-banner-text {
+  display: inline-block;
+  line-height: 1.5;
+}
+.e26-banner-close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+.e26-banner-close:hover { background: rgba(139, 111, 212, 0.12); }
+@media (max-width: 600px) {
+  .e26-banner { font-size: 12px; padding: 9px 44px 9px 14px; line-height: 1.45; }
+  .e26-banner-text { white-space: normal; }
+}
+
+/* ─ 0-2. 모바일 플로팅 카카오 버튼 ─ */
+.e26-kakao-fab {
+  display: none;
+}
+@media (max-width: 768px) {
+  .e26-kakao-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 16px;
+    bottom: 18px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #FEE500;
+    color: #1d1d1f;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    z-index: 90;
+  }
+  .e26-kakao-fab:active { transform: translateY(1px); }
+}
+
+/* ── 페이지 컨테이너 (네비 padding 보정 X — landing-nav 는 fixed 가 아님) ── */
+.e26-section {
+  position: relative;
+  padding: 96px 40px;
+  background: var(--bg);
+}
+.e26-section.e26-section-soft { background: var(--bg-soft); }
+.e26-section-inner { max-width: 1100px; margin: 0 auto; }
+.e26-section-head { text-align: center; max-width: 720px; margin: 0 auto 48px; }
+.e26-eyebrow {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+.e26-h2 {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.25;
+  color: var(--text-primary);
+  margin: 0 0 16px;
+}
+.e26-lead {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .e26-section { padding: 64px 20px; }
+  .e26-section-head { margin-bottom: 32px; }
+  .e26-h2 { font-size: 26px; letter-spacing: -1px; }
+  .e26-lead { font-size: 14.5px; }
+}
