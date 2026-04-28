@@ -566,8 +566,165 @@ export function Events2026Page() {
         </div>
       </section>
 
-      <section className="e26-section" id="step2" aria-label="step2 placeholder" />
-      <section className="e26-section" id="directory" aria-label="directory placeholder" />
+      {/* ══ 05. 실전 패키지 (10만원) · 2 카드 ══ */}
+      <section className="e26-section" id="step2">
+        <div className="e26-section-inner">
+          <div className="e26-section-head">
+            <div className="e26-eyebrow">* Step 2</div>
+            <h2 className="e26-h2">
+              혼자 하기 어려운 분을 위한<br />실전 제작 · 개선 패키지
+            </h2>
+            <p className="e26-lead">
+              누구나 신청 가능합니다. 정가 30만원 → 런칭 기간 한정 10만원.
+            </p>
+          </div>
+
+          <div className="e26-pkg-grid">
+            {/* TYPE A · CONTENT BUILD */}
+            <article className="e26-pkg-card">
+              <div className="e26-pkg-label">TYPE A · CONTENT BUILD</div>
+              <h3 className="e26-pkg-title">처음부터 내용을 짜야 할 때</h3>
+
+              <div className="e26-pkg-block">
+                <h4 className="e26-pkg-block-h">이런 분께</h4>
+                <ul className="e26-pkg-list">
+                  <li>뭘 써야 할지 모르겠음</li>
+                  <li>홈페이지 문구가 없음</li>
+                  <li>구조를 못 잡겠음</li>
+                  <li>AI를 어떻게 써야 할지 모르겠음</li>
+                </ul>
+              </div>
+              <div className="e26-pkg-block">
+                <h4 className="e26-pkg-block-h">함께 진행하는 것</h4>
+                <ul className="e26-pkg-list">
+                  <li>업종 맞춤 사이트 구조 설계</li>
+                  <li>페이지 구성안 작성</li>
+                  <li>AI 템플릿 + 프롬프트 제공</li>
+                  <li>시작용 문구 초안</li>
+                  <li>바로 실행 가능한 제작 가이드</li>
+                </ul>
+              </div>
+
+              <div className="e26-pkg-price-row">
+                <span className="e26-pkg-price-old">정가 30만원</span>
+                <span className="e26-pkg-price">10만원</span>
+                <span className="e26-pkg-price-meta">런칭 기간 한정</span>
+              </div>
+              <button
+                type="button"
+                className="e26-pkg-cta"
+                onClick={() => openModal('step2-typeA')}
+              >
+                TYPE A 신청하기 →
+              </button>
+            </article>
+
+            {/* TYPE B · SEO REFRESH */}
+            <article className="e26-pkg-card">
+              <div className="e26-pkg-label">TYPE B · SEO REFRESH</div>
+              <h3 className="e26-pkg-title">기존 내용을 SEO 중심으로 개선할 때</h3>
+
+              <div className="e26-pkg-block">
+                <h4 className="e26-pkg-block-h">이런 분께</h4>
+                <ul className="e26-pkg-list">
+                  <li>홈페이지는 이미 있음</li>
+                  <li>검색 유입이 없음</li>
+                  <li>설명이 약함</li>
+                  <li>전환이 낮음</li>
+                </ul>
+              </div>
+              <div className="e26-pkg-block">
+                <h4 className="e26-pkg-block-h">함께 진행하는 것</h4>
+                <ul className="e26-pkg-list">
+                  <li>서비스 문구 개선</li>
+                  <li>키워드 구조 개선</li>
+                  <li>메타태그 방향 제안</li>
+                  <li>FAQ 구성 제안</li>
+                  <li>검색 친화 구조 리뉴얼</li>
+                </ul>
+              </div>
+
+              <div className="e26-pkg-price-row">
+                <span className="e26-pkg-price-old">정가 30만원</span>
+                <span className="e26-pkg-price">10만원</span>
+                <span className="e26-pkg-price-meta">런칭 기간 한정</span>
+              </div>
+              <button
+                type="button"
+                className="e26-pkg-cta"
+                onClick={() => openModal('step2-typeB')}
+              >
+                TYPE B 신청하기 →
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 06. 디렉토리 SEO 네트워크 (검정 섹션) ══ */}
+      <section className="e26-dir-section" id="directory">
+        <div className="e26-dir-inner">
+          <div className="e26-section-head">
+            <div className="e26-eyebrow">* 공통 혜택</div>
+            <h2 className="e26-h2">
+              내 업종을 찾는 사람이<br />검색하는 곳에도 함께 노출됩니다
+            </h2>
+            <p className="e26-lead">
+              홈페이지 하나만 만드는 게 아닙니다. 업종별 네트워크 페이지에 함께 등록되어, 지역 검색 키워드에서 추가 노출 기회를 만듭니다.
+            </p>
+          </div>
+
+          <div className="e26-dir-grid">
+            <article className="e26-dir-card">
+              <div className="e26-dir-card-icon" aria-hidden="true">🐶</div>
+              <h3 className="e26-dir-card-title">반려동물</h3>
+              <p className="e26-dir-card-sub">미용 · 훈련 · 호텔 · 돌봄 · 장례 · 용품</p>
+            </article>
+            <article className="e26-dir-card">
+              <div className="e26-dir-card-icon" aria-hidden="true">🎨</div>
+              <h3 className="e26-dir-card-title">원데이 클래스</h3>
+              <p className="e26-dir-card-sub">도자기 · 베이킹 · 꽃꽂이 · 가죽공예 · 캔들 · 드로잉</p>
+            </article>
+            <article className="e26-dir-card">
+              <div className="e26-dir-card-icon" aria-hidden="true">💪</div>
+              <h3 className="e26-dir-card-title">1:1 PT · 운동</h3>
+              <p className="e26-dir-card-sub">PT · 필라테스 · 요가 · 재활 · 체형교정</p>
+            </article>
+            <article className="e26-dir-card">
+              <div className="e26-dir-card-icon" aria-hidden="true">🛠</div>
+              <h3 className="e26-dir-card-title">맞춤 제작</h3>
+              <p className="e26-dir-card-sub">가구 · 간판 · 인쇄 · 공방 · 주문제작 · 소품</p>
+            </article>
+            <article className="e26-dir-card">
+              <div className="e26-dir-card-icon" aria-hidden="true">💼</div>
+              <h3 className="e26-dir-card-title">전문 서비스</h3>
+              <p className="e26-dir-card-sub">코칭 · 컨설팅 · 강의 · 상담 · 멘토링 · 과외</p>
+            </article>
+            <article className="e26-dir-card is-future">
+              <div className="e26-dir-card-icon" aria-hidden="true">＋</div>
+              <h3 className="e26-dir-card-title">향후 추가 예정</h3>
+              <p className="e26-dir-card-sub">업종 카테고리는 단계적으로 확장됩니다</p>
+            </article>
+          </div>
+
+          <div className="e26-dir-search" aria-label="검색 예시">
+            "천안 강아지 미용 추천"<br />
+            "세종 도자기 원데이클래스"<br />
+            "대전 PT 추천"<br />
+            "충남 맞춤가구 제작"<br />
+            "청주 1:1 영어 코칭"
+            <span className="e26-dir-search-arrow">→ 내 사이트 + 네트워크 페이지 동시 노출</span>
+          </div>
+
+          <div className="e26-dir-emphasis">
+            <h3 className="e26-dir-emphasis-h">이 네트워크는 광고 플랫폼이 아닙니다.</h3>
+            <p className="e26-dir-emphasis-list">
+              · 매출 수수료 없음 · 중개 수수료 없음 · 월 강제 결제 없음
+            </p>
+            <p className="e26-dir-emphasis-foot">검색될 수 있는 구조를 만드는 데 집중합니다.</p>
+          </div>
+        </div>
+      </section>
       <section className="e26-section e26-section-soft" id="why" aria-label="why placeholder" />
       <section className="e26-section" id="process" aria-label="process placeholder" />
       <section className="e26-section e26-section-soft" id="faq" aria-label="faq placeholder" />

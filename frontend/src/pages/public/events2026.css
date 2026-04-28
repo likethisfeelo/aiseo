@@ -352,6 +352,233 @@
 }
 
 /* ============================================================
+ * 05. 실전 패키지 (10만원) · 2 카드
+ * ============================================================ */
+.e26-pkg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.e26-pkg-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.e26-pkg-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+.e26-pkg-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--accent-dark);
+  margin-bottom: 12px;
+}
+.e26-pkg-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+  color: var(--text-primary);
+  margin: 0 0 24px;
+  line-height: 1.35;
+}
+.e26-pkg-block { margin-bottom: 22px; }
+.e26-pkg-block-h {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+  letter-spacing: -0.2px;
+}
+.e26-pkg-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.e26-pkg-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+.e26-pkg-list li::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+.e26-pkg-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-soft);
+}
+.e26-pkg-price-old {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.e26-pkg-price {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent-dark);
+  letter-spacing: -1px;
+}
+.e26-pkg-price-meta { font-size: 12px; color: var(--text-secondary); margin-left: auto; }
+.e26-pkg-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 13px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent-dark);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.e26-pkg-cta:hover { background: var(--primary-hover); }
+
+@media (max-width: 900px) {
+  .e26-pkg-grid { grid-template-columns: 1fr; gap: 14px; }
+  .e26-pkg-card { padding: 26px 22px; }
+  .e26-pkg-title { font-size: 19px; }
+  .e26-pkg-price { font-size: 24px; }
+}
+
+/* ============================================================
+ * 06. 디렉토리 SEO 네트워크 (검정 섹션)
+ * ============================================================ */
+.e26-dir-section {
+  position: relative;
+  background: #0A0614;
+  color: #fff;
+  padding: 96px 40px;
+  overflow: hidden;
+}
+.e26-dir-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.e26-dir-section .e26-eyebrow { color: var(--accent); }
+.e26-dir-section .e26-h2 { color: #fff; }
+.e26-dir-section .e26-lead { color: rgba(255, 255, 255, 0.72); }
+.e26-dir-section .e26-section-head { margin-bottom: 56px; }
+
+.e26-dir-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 48px;
+}
+.e26-dir-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 22px 22px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.e26-dir-card:hover {
+  border-color: rgba(196, 168, 245, 0.4);
+  transform: translateY(-2px);
+}
+.e26-dir-card.is-future { opacity: 0.5; }
+.e26-dir-card-icon {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.e26-dir-card-title {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+.e26-dir-card-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.e26-dir-search {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 26px 28px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.95;
+  margin-bottom: 36px;
+}
+.e26-dir-search-arrow {
+  display: block;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.e26-dir-emphasis {
+  background: linear-gradient(180deg, rgba(196, 168, 245, 0.12), rgba(196, 168, 245, 0.04));
+  border: 1px solid rgba(196, 168, 245, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  text-align: center;
+}
+.e26-dir-emphasis-h {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 10px;
+  letter-spacing: -0.4px;
+}
+.e26-dir-emphasis-list {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0 0 12px;
+  line-height: 1.7;
+}
+.e26-dir-emphasis-foot {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .e26-dir-section { padding: 64px 20px; }
+  .e26-dir-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 32px; }
+  .e26-dir-search { padding: 20px 22px; font-size: 13px; line-height: 1.95; }
+  .e26-dir-emphasis { padding: 22px 20px; }
+  .e26-dir-emphasis-h { font-size: 16px; }
+}
+
+/* ============================================================
  * 0-3. Placeholder 신청 모달
  * ============================================================ */
 .e26-modal-backdrop {
