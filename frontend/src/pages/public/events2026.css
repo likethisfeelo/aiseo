@@ -111,3 +111,184 @@
   .e26-h2 { font-size: 26px; letter-spacing: -1px; }
   .e26-lead { font-size: 14.5px; }
 }
+
+/* ============================================================
+ * 0-3. Placeholder 신청 모달
+ * ============================================================ */
+.e26-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 6, 20, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: e26-fade-in 0.18s ease;
+}
+@keyframes e26-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.e26-modal {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  animation: e26-modal-up 0.22s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@keyframes e26-modal-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.e26-modal-head {
+  padding: 28px 28px 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.e26-modal-eyebrow {
+  font-size: 12px;
+  color: var(--accent-dark);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.e26-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+.e26-modal-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+.e26-modal-close {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.e26-modal-close:hover { background: var(--bg-soft); color: var(--text-primary); }
+
+.e26-modal-body { padding: 20px 28px 28px; }
+.e26-field { margin-bottom: 16px; }
+.e26-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.e26-field-input,
+.e26-field-select,
+.e26-field-textarea {
+  width: 100%;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.e26-field-input:focus,
+.e26-field-select:focus,
+.e26-field-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(196, 168, 245, 0.18);
+}
+.e26-field-textarea { resize: vertical; min-height: 56px; }
+
+.e26-radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.e26-radio {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+.e26-radio input { position: absolute; opacity: 0; pointer-events: none; }
+.e26-radio-label {
+  display: block;
+  text-align: center;
+  padding: 10px 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: var(--bg);
+}
+.e26-radio input:checked + .e26-radio-label {
+  border-color: var(--accent-dark);
+  background: rgba(139, 111, 212, 0.08);
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.e26-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent-dark);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  margin-top: 8px;
+}
+.e26-submit:hover { background: var(--primary-hover); }
+
+@media (max-width: 600px) {
+  .e26-modal-head { padding: 22px 20px 10px; }
+  .e26-modal-body { padding: 16px 20px 22px; }
+  .e26-modal-title { font-size: 18px; }
+}
+
+/* ── Toast ── */
+.e26-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  background: rgba(10, 6, 20, 0.92);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 22px;
+  border-radius: 999px;
+  z-index: 300;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  animation: e26-toast-up 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@keyframes e26-toast-up {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+@media (max-width: 600px) {
+  .e26-toast { bottom: 88px; font-size: 13px; padding: 10px 18px; max-width: calc(100vw - 32px); text-align: center; }
+}

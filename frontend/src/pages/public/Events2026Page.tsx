@@ -1,10 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import '../landing.css';
 import './events2026.css';
 import { useSubPageNav } from './useSubPageNav';
 import { KAKAO_CHAT_URL } from '../../constants/contact';
 
 const BANNER_CLOSED_KEY = 'events2026-banner-closed';
+
+const INDUSTRY_OPTIONS = [
+  { id: 'pet', label: '반려동물' },
+  { id: 'oneday', label: '원데이클래스' },
+  { id: 'pt', label: 'PT·운동' },
+  { id: 'custom', label: '맞춤제작' },
+  { id: 'pro', label: '전문서비스' },
+  { id: 'etc', label: '기타' },
+];
+
+const HAS_SITE_OPTIONS = [
+  { id: 'yes', label: '있음' },
+  { id: 'no', label: '없음' },
+  { id: 'wip', label: '만드는 중' },
+];
 
 /**
  * 이벤트 2026 — `/events2026`
@@ -43,6 +58,52 @@ export function Events2026Page() {
     } catch {
       /* sessionStorage 비활성화/사파리 프라이빗 모드 — 무시 */
     }
+  };
+
+  // ── Placeholder 신청 모달 + 토스트 ──
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalSource, setModalSource] = useState<string>('');
+  const [toast, setToast] = useState<string>('');
+  const toastTimerRef = useRef<number | undefined>(undefined);
+
+  const openModal = (source: string) => {
+    setModalSource(source);
+    setModalOpen(true);
+  };
+  const closeModal = () => setModalOpen(false);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToast(''), 2800);
+  };
+
+  // 모달 열렸을 때 ESC 닫기 + 본문 스크롤 잠금
+  useEffect(() => {
+    if (!modalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [modalOpen]);
+
+  // 토스트 cleanup
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  const handleModalSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    closeModal();
+    showToast('신청 기능은 준비 중입니다. 잠시 후 다시 시도해주세요.');
   };
 
   // ── Video reveal (ported from LandingPage) ──
@@ -276,7 +337,13 @@ export function Events2026Page() {
             AI 사이트와 검색 노출을 실제로 돌려보는 자리를 가장 먼저 안내해드립니다.
           </p>
           <div className="hero-mobile-cta">
-            <a href="/?auth=signup" className="hero-mobile-btn-primary">이벤트 알림 받기 →</a>
+            <button
+              type="button"
+              className="hero-mobile-btn-primary"
+              onClick={() => openModal('hero')}
+            >
+              이벤트 알림 받기 →
+            </button>
           </div>
         </div>
       </section>
@@ -345,6 +412,121 @@ export function Events2026Page() {
       <section className="e26-section" id="process" aria-label="process placeholder" />
       <section className="e26-section e26-section-soft" id="faq" aria-label="faq placeholder" />
       <section className="e26-section" id="finalcta" aria-label="finalcta placeholder" />
+
+      {/* 0-3. Placeholder 신청 모달 */}
+      {modalOpen && (
+        <div
+          className="e26-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="e26-modal-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeModal();
+          }}
+        >
+          <div className="e26-modal">
+            <button
+              type="button"
+              className="e26-modal-close"
+              aria-label="닫기"
+              onClick={closeModal}
+            >
+              ×
+            </button>
+            <div className="e26-modal-head">
+              <div className="e26-modal-eyebrow">* 2026 런칭 파트너 신청</div>
+              <h3 id="e26-modal-title" className="e26-modal-title">
+                기본 정보를 알려주세요
+              </h3>
+              <p className="e26-modal-sub">
+                업종 적합성 확인 후 1:1 안내드립니다. 모든 정보는 신청 검토 외 용도로 사용되지 않습니다.
+              </p>
+            </div>
+            <form className="e26-modal-body" onSubmit={handleModalSubmit}>
+              <input type="hidden" name="source" value={modalSource} />
+              <div className="e26-field">
+                <label className="e26-field-label" htmlFor="e26-name">이름</label>
+                <input
+                  id="e26-name"
+                  name="name"
+                  type="text"
+                  className="e26-field-input"
+                  placeholder="홍길동"
+                  required
+                />
+              </div>
+              <div className="e26-field">
+                <label className="e26-field-label" htmlFor="e26-industry">업종</label>
+                <select
+                  id="e26-industry"
+                  name="industry"
+                  className="e26-field-select"
+                  defaultValue=""
+                  required
+                >
+                  <option value="" disabled>선택해주세요</option>
+                  {INDUSTRY_OPTIONS.map(o => (
+                    <option key={o.id} value={o.id}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="e26-field">
+                <label className="e26-field-label" htmlFor="e26-region">지역</label>
+                <input
+                  id="e26-region"
+                  name="region"
+                  type="text"
+                  className="e26-field-input"
+                  placeholder="예: 천안 / 세종"
+                  required
+                />
+              </div>
+              <div className="e26-field">
+                <span className="e26-field-label">홈페이지 유무</span>
+                <div className="e26-radio-group" role="radiogroup">
+                  {HAS_SITE_OPTIONS.map((o, i) => (
+                    <label key={o.id} className="e26-radio">
+                      <input
+                        type="radio"
+                        name="hasSite"
+                        value={o.id}
+                        defaultChecked={i === 0}
+                      />
+                      <span className="e26-radio-label">{o.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="e26-field">
+                <label className="e26-field-label" htmlFor="e26-concern">지금 가장 큰 고민 (한 줄)</label>
+                <textarea
+                  id="e26-concern"
+                  name="concern"
+                  className="e26-field-textarea"
+                  rows={2}
+                  placeholder="예: 검색에서 안 나옵니다 / 콘텐츠를 어떻게 시작할지 모르겠어요"
+                  required
+                />
+              </div>
+              <div className="e26-field">
+                <label className="e26-field-label" htmlFor="e26-phone">연락처</label>
+                <input
+                  id="e26-phone"
+                  name="phone"
+                  type="tel"
+                  className="e26-field-input"
+                  placeholder="010-0000-0000"
+                  required
+                />
+              </div>
+              <button type="submit" className="e26-submit">신청 보내기 →</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 토스트 */}
+      {toast && <div className="e26-toast" role="status">{toast}</div>}
 
       {/* 0-2. 모바일 플로팅 카카오 버튼 */}
       <a
