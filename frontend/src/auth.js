@@ -134,6 +134,11 @@ export const confirmSignUpCode = async ({ email, code }) => cognitoRequest('Conf
   ConfirmationCode: code,
 });
 
+export const resendConfirmationCode = async ({ email }) => cognitoRequest('ResendConfirmationCode', {
+  ClientId: COGNITO.clientId,
+  Username: email,
+});
+
 export const signInWithEmail = async ({ email, password }) => {
   const data = await cognitoRequest('InitiateAuth', {
     AuthFlow: 'USER_PASSWORD_AUTH',
