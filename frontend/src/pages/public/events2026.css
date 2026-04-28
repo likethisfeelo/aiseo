@@ -579,6 +579,240 @@
 }
 
 /* ============================================================
+ * 07. WHY (왜 이 이벤트를 하나요)
+ * ============================================================ */
+.e26-why .e26-section-head { margin-bottom: 24px; }
+.e26-why-body {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-primary);
+  line-height: 1.85;
+}
+.e26-why-body p { margin: 0 0 14px; }
+.e26-why-body p:last-child { color: var(--text-secondary); margin: 0; }
+
+@media (max-width: 768px) {
+  .e26-why-body { font-size: 15px; }
+}
+
+/* ============================================================
+ * 08. 신청 프로세스 (4 STEPS)
+ * ============================================================ */
+.e26-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.e26-step-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 22px;
+  position: relative;
+}
+.e26-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-dark);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+.e26-step-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+.e26-step-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .e26-steps-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 540px) {
+  .e26-steps-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+ * 09. FAQ
+ * ============================================================ */
+.e26-faq-list {
+  max-width: 820px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.e26-faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+.e26-faq-item[open] { border-color: var(--accent); }
+.e26-faq-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  letter-spacing: -0.2px;
+}
+.e26-faq-summary::-webkit-details-marker { display: none; }
+.e26-faq-summary::before {
+  content: 'Q';
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-dark);
+  background: rgba(139, 111, 212, 0.12);
+}
+.e26-faq-summary::after {
+  content: '+';
+  margin-left: auto;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+.e26-faq-item[open] .e26-faq-summary::after { transform: rotate(45deg); }
+.e26-faq-answer {
+  padding: 0 24px 20px 62px;
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .e26-faq-summary { padding: 16px 18px; font-size: 14px; gap: 10px; }
+  .e26-faq-answer { padding: 0 18px 18px 52px; font-size: 13.5px; }
+}
+
+/* ============================================================
+ * 10. FINAL CTA (검정 + 프리즘)
+ * ============================================================ */
+.e26-final {
+  position: relative;
+  background: #0A0614;
+  color: #fff;
+  padding: 120px 40px;
+  text-align: center;
+  overflow: hidden;
+}
+.e26-final::before {
+  content: '';
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(196, 168, 245, 0.32), transparent 55%),
+    radial-gradient(circle at 80% 70%, rgba(155, 184, 248, 0.22), transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(139, 111, 212, 0.28), transparent 60%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+.e26-final-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.e26-final-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+.e26-final-h2 {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -1.6px;
+  line-height: 1.25;
+  color: #fff;
+  margin: 0 0 16px;
+}
+.e26-final-sub {
+  font-size: 15.5px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin: 0 0 36px;
+}
+.e26-final-ctas {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.e26-final-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 26px;
+  font-size: 14.5px;
+  font-weight: 700;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+.e26-final-btn:hover { transform: translateY(-1px); }
+.e26-final-btn.is-primary {
+  background: var(--accent);
+  color: #0A0614;
+}
+.e26-final-btn.is-primary:hover { background: #D8C2FA; }
+.e26-final-btn.is-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.e26-final-btn.is-secondary:hover { background: rgba(255, 255, 255, 0.16); }
+.e26-final-btn.is-kakao {
+  background: #FEE500;
+  color: #1d1d1f;
+}
+.e26-final-btn.is-kakao:hover { background: #FFD700; }
+
+@media (max-width: 768px) {
+  .e26-final { padding: 80px 20px; }
+  .e26-final-h2 { font-size: 28px; letter-spacing: -1.2px; }
+  .e26-final-sub { font-size: 14.5px; }
+  .e26-final-ctas { flex-direction: column; align-items: stretch; }
+  .e26-final-btn { width: 100%; padding: 14px; }
+}
+
+/* ============================================================
  * 0-3. Placeholder 신청 모달
  * ============================================================ */
 .e26-modal-backdrop {

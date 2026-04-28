@@ -725,10 +725,144 @@ export function Events2026Page() {
           </div>
         </div>
       </section>
-      <section className="e26-section e26-section-soft" id="why" aria-label="why placeholder" />
-      <section className="e26-section" id="process" aria-label="process placeholder" />
-      <section className="e26-section e26-section-soft" id="faq" aria-label="faq placeholder" />
-      <section className="e26-section" id="finalcta" aria-label="finalcta placeholder" />
+      {/* ══ 07. WHY ══ */}
+      <section className="e26-section e26-section-soft e26-why" id="why">
+        <div className="e26-section-inner">
+          <div className="e26-section-head">
+            <div className="e26-eyebrow">* 솔직히 말하면</div>
+            <h2 className="e26-h2">
+              초기 런칭 단계에서는 광고보다<br />실제 사례와 데이터가 더 중요합니다
+            </h2>
+          </div>
+          <div className="e26-why-body">
+            <p>
+              그래서 지금은 일부 업종 대상으로 혜택가 + 검색 네트워크 등록까지 함께 제공합니다.
+            </p>
+            <p>
+              이 사례들이 AISEO.TIPS의 다음 콘텐츠가 됩니다. 선별이 까다로운 이유입니다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 08. 신청 프로세스 (4 STEPS) ══ */}
+      <section className="e26-section" id="process">
+        <div className="e26-section-inner">
+          <div className="e26-section-head">
+            <div className="e26-eyebrow">* 신청 프로세스</div>
+            <h2 className="e26-h2">신청부터 시작까지, 4단계</h2>
+            <p className="e26-lead">
+              빠르면 5영업일 내에 진행됩니다. 적합성 확인부터 실제 시작까지 흐름을 미리 확인해보세요.
+            </p>
+          </div>
+
+          <div className="e26-steps-grid">
+            <article className="e26-step-card">
+              <div className="e26-step-num">1</div>
+              <h3 className="e26-step-title">정보 입력</h3>
+              <p className="e26-step-desc">업종 · 지역 · 현재 상태 · 연락처</p>
+            </article>
+            <article className="e26-step-card">
+              <div className="e26-step-num">2</div>
+              <h3 className="e26-step-title">적합성 확인</h3>
+              <p className="e26-step-desc">런칭 파트너 / 실전 패키지 중 어디에 맞는지 안내</p>
+            </article>
+            <article className="e26-step-card">
+              <div className="e26-step-num">3</div>
+              <h3 className="e26-step-title">맞춤 방향 제안</h3>
+              <p className="e26-step-desc">어떻게 진행할지 1:1 상담 (15-20분)</p>
+            </article>
+            <article className="e26-step-card">
+              <div className="e26-step-num">4</div>
+              <h3 className="e26-step-title">시작</h3>
+              <p className="e26-step-desc">선별 시 5영업일 내 진행</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 09. FAQ ══ */}
+      <section className="e26-section e26-section-soft" id="faq">
+        <div className="e26-section-inner">
+          <div className="e26-section-head">
+            <div className="e26-eyebrow">* FAQ</div>
+            <h2 className="e26-h2">자주 묻는 질문</h2>
+          </div>
+
+          <div className="e26-faq-list">
+            <details className="e26-faq-item">
+              <summary className="e26-faq-summary">무료는 왜 해주나요?</summary>
+              <p className="e26-faq-answer">
+                초기 성공 사례와 업종별 레퍼런스를 함께 만들기 위해서입니다. 일종의 베타 파트너 개념입니다.
+              </p>
+            </details>
+            <details className="e26-faq-item">
+              <summary className="e26-faq-summary">아무나 무료 가능한가요?</summary>
+              <p className="e26-faq-answer">
+                아닙니다. 카테고리 적합 업종 중심으로 선별합니다. 적합하지 않은 경우 10만원 패키지를 안내드립니다.
+              </p>
+            </details>
+            <details className="e26-faq-item">
+              <summary className="e26-faq-summary">홈페이지가 아예 없어도 되나요?</summary>
+              <p className="e26-faq-answer">네. 10만원 TYPE A 패키지가 적합합니다.</p>
+            </details>
+            <details className="e26-faq-item">
+              <summary className="e26-faq-summary">지역 제한 있나요?</summary>
+              <p className="e26-faq-answer">
+                전국 가능합니다. 다만 일부 지역 키워드부터 우선 노출됩니다.
+              </p>
+            </details>
+            <details className="e26-faq-item">
+              <summary className="e26-faq-summary">디렉토리 등록은 무조건 되나요?</summary>
+              <p className="e26-faq-answer">
+                업종 적합성과 콘텐츠 품질 기준 충족 시 등록됩니다.
+              </p>
+            </details>
+            <details className="e26-faq-item">
+              <summary className="e26-faq-summary">등록 후에 수수료나 월 결제가 있나요?</summary>
+              <p className="e26-faq-answer">
+                없습니다. 디렉토리 등록 자체는 일회성이며, 추후 광고 모델로 전환할 계획도 없습니다.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 10. FINAL CTA (검정 + 프리즘) ══ */}
+      <section className="e26-final" id="finalcta">
+        <div className="e26-final-inner">
+          <div className="e26-final-eyebrow">* 마지막으로</div>
+          <h2 className="e26-final-h2">첫 사례를 함께 만들 분을 찾습니다</h2>
+          <p className="e26-final-sub">
+            광고 플랫폼이 아니라, 검색될 구조를 만듭니다.<br />
+            지금 신청하면 적합성 확인 후 1:1 안내드립니다.
+          </p>
+          <div className="e26-final-ctas">
+            <button
+              type="button"
+              className="e26-final-btn is-primary"
+              onClick={() => openModal('final-eligibility')}
+            >
+              내가 대상인지 확인하기 →
+            </button>
+            <button
+              type="button"
+              className="e26-final-btn is-secondary"
+              onClick={() => openModal('final-package')}
+            >
+              10만원 패키지 신청
+            </button>
+            <a
+              href={KAKAO_CHAT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="e26-final-btn is-kakao"
+            >
+              카카오 상담
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* 0-3. Placeholder 신청 모달 */}
       {modalOpen && (
