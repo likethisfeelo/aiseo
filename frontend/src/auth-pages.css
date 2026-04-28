@@ -1,0 +1,304 @@
+/* ===========================================================
+   Auth pages — Cosmos-style split layout (PC) + stacked (mobile)
+   Used by LoginPage / SignupPage / ForgotPasswordPage.
+   =========================================================== */
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #fff;
+  font-family: var(--font-ko, 'Pretendard', -apple-system, system-ui, sans-serif);
+  color: #0A0614;
+}
+
+.auth-form-pane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 48px 24px;
+  background: #fff;
+}
+
+.auth-form-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.auth-logo {
+  display: inline-flex;
+  align-self: center;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  text-decoration: none;
+  border-radius: 999px;
+}
+.auth-logo:hover { background: #f5f3ff; }
+
+.auth-logo-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #0A0614; opacity: 0.85;
+}
+.auth-logo-dot:nth-child(1) { background: #C4A8F5; }
+.auth-logo-dot:nth-child(2) { background: #8B6FD4; }
+.auth-logo-dot:nth-child(4) { background: #6EBFA5; }
+.auth-logo-dot:nth-child(5) { background: #6E8EE0; }
+.auth-logo-dot:nth-child(6) { background: #E08AA0; }
+
+.auth-brand-foot {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  font-size: 13px;
+  color: #0A0614;
+  padding-top: 24px;
+}
+
+/* ── Form elements ── */
+
+.auth-h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0A0614;
+  margin: 0 0 8px;
+  text-align: center;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+.auth-sub {
+  font-size: 13px;
+  color: #5C5660;
+  text-align: center;
+  margin: 0 0 28px;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.auth-sub strong { color: #0A0614; font-weight: 700; }
+
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+
+.auth-input {
+  width: 100%;
+  height: 52px;
+  padding: 0 18px;
+  border: 1px solid #E5E1EC;
+  border-radius: 14px;
+  font-size: 14px;
+  background: #fff;
+  font-family: inherit;
+  color: #0A0614;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.auth-input::placeholder { color: #9C95A8; }
+.auth-input:focus {
+  outline: none;
+  border-color: #8B6FD4;
+  box-shadow: 0 0 0 3px rgba(139,111,212,0.15);
+}
+.auth-input:disabled { background: #F8F7FB; color: #5C5660; }
+
+.auth-pw-wrap { position: relative; }
+.auth-pw-wrap .auth-input { padding-right: 48px; }
+.auth-pw-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; background: transparent;
+  cursor: pointer; color: #5C5660;
+  border-radius: 8px;
+}
+.auth-pw-toggle:hover { background: #f5f3ff; color: #0A0614; }
+
+.auth-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  border: 0;
+  background: #0A0614;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, opacity 0.15s, transform 0.05s;
+}
+.auth-btn:hover:not(:disabled) { background: #1F1530; }
+.auth-btn:active:not(:disabled) { transform: translateY(1px); }
+.auth-btn:disabled {
+  background: #E5E1EC;
+  color: #9C95A8;
+  cursor: not-allowed;
+}
+
+.auth-error {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FECACA;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.auth-success {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.auth-hint {
+  font-size: 12px;
+  color: #5C5660;
+  text-align: center;
+  margin: 0;
+  line-height: 1.55;
+}
+.auth-hint a { color: #0A0614; font-weight: 600; text-decoration: none; }
+.auth-hint a:hover { text-decoration: underline; }
+
+.auth-aux-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #5C5660;
+}
+.auth-aux-row a {
+  color: #5C5660;
+  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.auth-aux-row a:hover { color: #0A0614; text-decoration: underline; }
+
+.auth-foot-link {
+  font-size: 13px;
+  color: #5C5660;
+  margin-top: 28px;
+  text-align: center;
+}
+.auth-foot-link a {
+  color: #0A0614;
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 4px;
+}
+.auth-foot-link a:hover { text-decoration: underline; }
+
+.auth-resend {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: #5C5660;
+}
+.auth-resend button {
+  background: transparent;
+  border: 0;
+  color: #0A0614;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.auth-resend button:hover:not(:disabled) { background: #f5f3ff; }
+.auth-resend button:disabled { color: #9C95A8; cursor: not-allowed; }
+
+/* ── Right visual pane: gradient placeholders per step ── */
+
+.auth-visual-pane {
+  position: relative;
+  overflow: hidden;
+}
+.auth-visual-caption {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  z-index: 2;
+  color: rgba(255,255,255,0.92);
+  font-size: 12px;
+  line-height: 1.55;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  max-width: 60%;
+}
+.auth-visual-caption strong { display: block; font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+
+/* Step-specific gradient placeholders.
+   To swap to real images later:
+     .auth-visual--login {
+       background: #8B6FD4 url('/auth/login-pc.jpg') center/cover no-repeat;
+     }
+   For mobile-specific images, override inside the (max-width: 768px) block. */
+.auth-visual--login {
+  background: linear-gradient(135deg, #C4A8F5 0%, #8B6FD4 60%, #5E3FB1 100%);
+}
+.auth-visual--signup-email {
+  background: linear-gradient(135deg, #FCE7C2 0%, #F5B68A 60%, #E08654 100%);
+}
+.auth-visual--signup-password {
+  background: linear-gradient(135deg, #BFE3D5 0%, #6EBFA5 60%, #2E8C70 100%);
+}
+.auth-visual--signup-verify {
+  background: linear-gradient(135deg, #C9D6FF 0%, #6E8EE0 60%, #3F5BB9 100%);
+}
+.auth-visual--forgot-request {
+  background: linear-gradient(135deg, #FFD0DC 0%, #E08AA0 60%, #B0556C 100%);
+}
+.auth-visual--forgot-confirm {
+  background: linear-gradient(135deg, #E5DCFB 0%, #B79DE8 60%, #8B6FD4 100%);
+}
+
+/* Subtle ornamental dot field on the visual pane (works over gradient or image) */
+.auth-visual-pane::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.22) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── Mobile: stack form on top, visual short banner below ── */
+@media (max-width: 768px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+  .auth-form-pane {
+    order: 1;
+    padding: 24px 20px 24px;
+    min-height: 70vh;
+  }
+  .auth-form-center { padding: 16px 0; }
+  .auth-visual-pane {
+    order: 2;
+    min-height: 200px;
+    max-height: 30vh;
+  }
+  .auth-visual-caption {
+    left: 20px; bottom: 16px;
+    font-size: 11px;
+    max-width: 70%;
+  }
+  .auth-h1 { font-size: 20px; }
+  .auth-sub { font-size: 12.5px; margin-bottom: 22px; }
+  .auth-brand-foot { padding-top: 16px; }
+}
