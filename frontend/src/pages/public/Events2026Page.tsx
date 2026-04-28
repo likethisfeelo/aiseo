@@ -21,6 +21,14 @@ const HAS_SITE_OPTIONS = [
   { id: 'wip', label: '만드는 중' },
 ];
 
+type DiagKey = 'A' | 'B' | 'C';
+
+const DIAG_TABS: { key: DiagKey; label: string; sub: string }[] = [
+  { key: 'A', label: '이미 콘텐츠가 있는 분', sub: '서비스/가격/사진/후기 보유' },
+  { key: 'B', label: 'AI로 자동화 기틀을 만들고 싶은 분', sub: '예약·문의·콘텐츠 자동화' },
+  { key: 'C', label: '두 경우 모두 해당하지 않는 분', sub: '실전 패키지가 더 잘 맞을 수 있어요' },
+];
+
 /**
  * 이벤트 2026 — `/events2026`
  *
@@ -104,6 +112,14 @@ export function Events2026Page() {
     e.preventDefault();
     closeModal();
     showToast('신청 기능은 준비 중입니다. 잠시 후 다시 시도해주세요.');
+  };
+
+  // ── A/B/C 탭 진단 ──
+  const [diagTab, setDiagTab] = useState<DiagKey>('A');
+  const scrollToId = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // ── Video reveal (ported from LandingPage) ──
@@ -400,12 +416,156 @@ export function Events2026Page() {
         </div>
       </div>
 
-      {/*
-        섹션 03~10 — 다음 페이즈에서 채워짐.
-        지금은 페이지 골격만 잡아두고 commit.
-      */}
-      <section className="e26-section" id="benefits" aria-label="benefits placeholder" />
-      <section className="e26-section e26-section-soft" id="step1" aria-label="step1 placeholder" />
+      {/* ══ 03. BENEFITS OVERVIEW · 3 카드 ══ */}
+      <section className="e26-section" id="benefits">
+        <div className="e26-section-inner">
+          <div className="e26-section-head">
+            <div className="e26-eyebrow">* 한눈에 보기</div>
+            <h2 className="e26-h2">
+              이번 이벤트는<br />세 가지 혜택으로 구성됩니다
+            </h2>
+            <p className="e26-lead">
+              모두를 위한 이벤트가 아닙니다. 무료도, 할인도, 검색 지원도 — 결국 같은 조건 위에서 시작합니다.
+            </p>
+          </div>
+
+          <div className="e26-benefit-grid">
+            <article className="e26-benefit-card is-violet">
+              <div className="e26-benefit-label">CARD 1 · 연보라</div>
+              <h3 className="e26-benefit-title">런칭 파트너 (무료)</h3>
+              <p className="e26-benefit-body">
+                이미 콘텐츠가 있는 분{'\n'}AI로 자동화 기틀을 만들고 싶은 분
+              </p>
+              <div className="e26-benefit-foot">→ 업종 적합성 기준 선별</div>
+            </article>
+
+            <article className="e26-benefit-card is-mint">
+              <div className="e26-benefit-label">CARD 2 · 민트</div>
+              <h3 className="e26-benefit-title">실전 패키지 (10만원)</h3>
+              <p className="e26-benefit-body">
+                홈페이지 내용부터 함께 짜야 하는 분{'\n'}기존 사이트를 SEO로 개선하고 싶은 분
+              </p>
+              <div className="e26-benefit-foot">→ 누구나 신청 가능 / 정가 30만원</div>
+            </article>
+
+            <article className="e26-benefit-card is-yellow">
+              <div className="e26-benefit-label">CARD 3 · 옐로우</div>
+              <h3 className="e26-benefit-title">공통 — 디렉토리 SEO 네트워크</h3>
+              <p className="e26-benefit-body">
+                업종 카테고리에 맞는 분에 한해{'\n'}검색 네트워크에 함께 노출
+              </p>
+              <div className="e26-benefit-foot">수수료 없음 · 중개비 없음 · 강제 결제 없음</div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 04. 런칭 파트너 (무료) · A/B/C 탭 진단 ══ */}
+      <section className="e26-section e26-section-soft" id="step1">
+        <div className="e26-section-inner">
+          <div className="e26-section-head">
+            <div className="e26-eyebrow">* Step 1</div>
+            <h2 className="e26-h2">수업만 무료로 받고 싶은 분께</h2>
+            <p className="e26-lead">
+              이번 무료 혜택은 아무나 받는 이벤트가 아닙니다. 검색 수요가 있고 카테고리 확장이 가능한 업종 중심으로 선별합니다.
+            </p>
+          </div>
+
+          <div className="e26-diag-layout">
+            <div className="e26-diag-tabs" role="tablist" aria-label="런칭 파트너 진단">
+              {DIAG_TABS.map(t => (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={diagTab === t.key}
+                  aria-controls="e26-diag-panel"
+                  className={`e26-diag-tab${diagTab === t.key ? ' is-active' : ''}`}
+                  onClick={() => setDiagTab(t.key)}
+                >
+                  <span className="e26-diag-tab-key">{t.key}</span>
+                  <span className="e26-diag-tab-text">
+                    <span className="e26-diag-tab-label">{t.label}</span>
+                    <span className="e26-diag-tab-sub">{t.sub}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div
+              className="e26-diag-panel"
+              id="e26-diag-panel"
+              role="tabpanel"
+              aria-live="polite"
+            >
+              {diagTab === 'A' && (
+                <>
+                  <h4 className="e26-diag-panel-h4">이미 콘텐츠가 있는 분</h4>
+                  <p className="e26-diag-panel-small">
+                    서비스 소개, 가격표, 사진, 후기 — 콘텐츠는 있는 분. 필요한 건 호스팅 비용 줄이기, 더 쉬운 운영, 검색 노출 구조.
+                  </p>
+                  <h5 className="e26-diag-panel-h5">함께 진행하는 것</h5>
+                  <ul className="e26-diag-list">
+                    <li>기존 콘텐츠 기반 홈페이지 배포 구조 안내</li>
+                    <li>SEO 기초 세팅 (sitemap, robots, 메타태그)</li>
+                    <li>검색 노출 구조 점검</li>
+                    <li>운영 방식 안내</li>
+                  </ul>
+                  <button
+                    type="button"
+                    className="e26-diag-cta"
+                    onClick={() => openModal('step1-A')}
+                  >
+                    이 조건으로 신청하기 →
+                  </button>
+                </>
+              )}
+              {diagTab === 'B' && (
+                <>
+                  <h4 className="e26-diag-panel-h4">AI로 자동화 기틀을 만들고 싶은 분</h4>
+                  <p className="e26-diag-panel-small">
+                    예약, 문의, 콘텐츠 생산, SNS 연결까지 자동화 기반을 만들고 싶은 분.
+                  </p>
+                  <h5 className="e26-diag-panel-h5">함께 진행하는 것</h5>
+                  <ul className="e26-diag-list">
+                    <li>어떤 AI 툴로 만들지 가이드</li>
+                    <li>제작 흐름 설계</li>
+                    <li>자동화 구조 방향성 제안</li>
+                    <li>운영 전략 안내</li>
+                  </ul>
+                  <button
+                    type="button"
+                    className="e26-diag-cta"
+                    onClick={() => openModal('step1-B')}
+                  >
+                    이 조건으로 신청하기 →
+                  </button>
+                </>
+              )}
+              {diagTab === 'C' && (
+                <>
+                  <h4 className="e26-diag-panel-h4">괜찮습니다.</h4>
+                  <p className="e26-diag-panel-small">
+                    아래 실전 패키지(10만원)가 더 잘 맞을 수 있어요.
+                  </p>
+                  <button
+                    type="button"
+                    className="e26-diag-cta is-ghost"
+                    onClick={() => scrollToId('step2')}
+                  >
+                    실전 패키지 보기 →
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="e26-diag-criteria">
+            선별 기준 · 검색 수요가 있는 업종 · 카테고리 확장 가능성 · 실제 운영/실행 의지
+          </div>
+        </div>
+      </section>
+
       <section className="e26-section" id="step2" aria-label="step2 placeholder" />
       <section className="e26-section" id="directory" aria-label="directory placeholder" />
       <section className="e26-section e26-section-soft" id="why" aria-label="why placeholder" />
