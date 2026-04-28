@@ -10,9 +10,9 @@ interface Props {
 const TOTAL_STEPS = 7;
 
 const SERVICE_OPTIONS = [
-  { id: 'free', label: '바로 배포 + SEO 강의 1시간', price: '무료' },
-  { id: 'content_check', label: '바로 배포 + SEO 강의 + 콘텐츠 점검', price: '10만원' },
-  { id: 'ai_consulting', label: '바로 배포 + SEO 강의 + AI 홈페이지 제작 컨설팅', price: '20만원' },
+  { id: 'free', label: '바로 배포 + SEO 강의 1시간', price: '무료', originalPrice: '10만원' },
+  { id: 'content_check', label: '바로 배포 + SEO 강의 + 콘텐츠 점검', price: '10만원', originalPrice: '30만원' },
+  { id: 'ai_consulting', label: '바로 배포 + SEO 강의 + AI 홈페이지 제작 교육', price: '10만원', originalPrice: '30만원' },
 ];
 
 const BUSINESS_OPTIONS = [
@@ -199,7 +199,11 @@ export function ConsultationWidget({ open, onClose }: Props) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={styles.optionLabel}>{opt.label}</div>
-                  <div style={styles.optionPrice}>{opt.price}</div>
+                  <div style={styles.optionPrice}>
+                    <span style={styles.optionPriceOriginal}>{opt.originalPrice}</span>
+                    <span style={styles.optionPriceArrow}> → </span>
+                    <span>{opt.price}</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -410,6 +414,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
   optionPrice: {
     fontSize: 13, color: '#185fa5', fontWeight: 600, marginTop: 2,
+  },
+  optionPriceOriginal: {
+    color: '#9aa0a6', textDecoration: 'line-through', fontWeight: 500, marginRight: 2,
+  },
+  optionPriceArrow: {
+    color: '#9aa0a6', fontWeight: 500,
   },
   radioCard: {
     display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
