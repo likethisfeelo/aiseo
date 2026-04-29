@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import '../landing.css';
-import './events2026.css';
 import { useSubPageNav } from './useSubPageNav';
 import { KAKAO_CHAT_URL } from '../../constants/contact';
 
@@ -139,11 +138,6 @@ export function Events2026Page() {
   const metaDescription =
     'AISEO 2026 런칭 이벤트. 일회성 광고가 아닌, 검색될 구조를 만듭니다. 무료 런칭 파트너 / 10만원 실전 패키지 / 검색 네트워크 등록 — 첫 사례를 함께 만들 분을 찾습니다.';
   const ogImage = `${origin}/events/hero-pc.jpg`;
-
-  // Reference KAKAO_CHAT_URL so the import isn't flagged unused while the
-  // final CTA section (Phase 2.4) is still pending. The actual link is
-  // wired up in the kakao final-btn in that phase.
-  void KAKAO_CHAT_URL;
 
   return (
     <>
@@ -666,6 +660,73 @@ export function Events2026Page() {
           font-weight: 600;
         }
 
+        /* ── 마지막 CTA ── */
+        .evtmain .final-cta {
+          background: var(--bg);
+          padding: 110px 40px 130px;
+          text-align: center;
+        }
+        .evtmain .final-cta-inner { max-width: 760px; margin: 0 auto; }
+        .evtmain .final-cta-h {
+          font-family: var(--font-ko);
+          font-size: clamp(28px, 3.6vw, 40px);
+          font-weight: 700;
+          letter-spacing: -1.2px;
+          line-height: 1.3;
+          margin-bottom: 18px;
+        }
+        .evtmain .final-cta-h .em { color: var(--accent-dark); }
+        .evtmain .final-cta-sub {
+          font-size: 17px;
+          color: var(--text-secondary);
+          line-height: 1.8;
+          margin-bottom: 44px;
+        }
+        .evtmain .final-cta-row {
+          display: inline-flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        .evtmain .final-btn {
+          display: inline-flex; align-items: center; gap: 10px;
+          padding: 16px 30px;
+          border-radius: var(--radius-md);
+          font-size: 15.5px;
+          font-weight: 700;
+          text-decoration: none;
+          transition: background .2s, transform .15s, box-shadow .2s, color .2s, border-color .2s;
+          cursor: pointer;
+          border: 1.5px solid transparent;
+          font-family: var(--font-ko);
+        }
+        .evtmain .final-btn.primary {
+          background: var(--accent-dark); color: #fff;
+          box-shadow: 0 6px 20px rgba(139,111,212,0.25);
+        }
+        .evtmain .final-btn.primary:hover {
+          background: var(--accent-deep);
+          transform: translateY(-2px);
+          box-shadow: 0 10px 28px rgba(139,111,212,0.35);
+        }
+        .evtmain .final-btn.secondary {
+          background: var(--bg-card);
+          color: var(--text-primary);
+          border-color: var(--border);
+        }
+        .evtmain .final-btn.secondary:hover {
+          border-color: var(--accent);
+          background: var(--bg-soft);
+        }
+        .evtmain .final-btn.kakao {
+          background: #FEE500;
+          color: #181600;
+        }
+        .evtmain .final-btn.kakao:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 22px rgba(254, 229, 0, 0.4);
+        }
+
         @media (max-width: 900px) {
           .evtmain section { padding: 80px 24px; }
           .evtmain .solidly { padding: 70px 24px; }
@@ -679,10 +740,13 @@ export function Events2026Page() {
           .evtmain .common-grid { grid-template-columns: 1fr; }
           .evtmain .common-examples { padding: 22px 20px; }
           .evtmain .common-not-ad { padding: 22px 20px; }
+          .evtmain .final-cta { padding: 80px 24px 100px; }
         }
         @media (max-width: 480px) {
           .evtmain .section-h2 { letter-spacing: -.8px; }
           .evtmain .how-grid { grid-template-columns: 1fr; }
+          .evtmain .final-btn { width: 100%; justify-content: center; }
+          .evtmain .final-cta-row { flex-direction: column; width: 100%; }
         }
       `}</style>
 
@@ -1027,6 +1091,37 @@ export function Events2026Page() {
                 <strong>식자재 납품 · 농산물 유통 등 식품 전반은 가능</strong>하지만 음식점은 받지 않습니다.
                 음식점 마케팅은 더 효과적이고 대중적인 여러 홍보 방식이 있어, 저희는 진행하지 않습니다.
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 마지막 CTA ── */}
+        <section className="final-cta">
+          <div className="final-cta-inner">
+            <div className="section-eyebrow">Get Started</div>
+            <h2 className="final-cta-h">
+              첫 사례를 함께 만들 분을 <span className="em">찾습니다</span>
+            </h2>
+            <p className="final-cta-sub">
+              광고 플랫폼이 아니라, 검색될 구조를 만듭니다.<br />
+              지금 신청하면 적합성 확인 후 1:1 안내드립니다.
+            </p>
+            <div className="final-cta-row">
+              <a href="/events2026/free" className="final-btn primary">
+                <span>내가 대상인지 확인하기</span>
+                <span>→</span>
+              </a>
+              <a href="/events2026/paid" className="final-btn secondary">
+                <span>10만원 패키지 신청</span>
+              </a>
+              <a
+                href={KAKAO_CHAT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="final-btn kakao"
+              >
+                <span>💬 카카오 상담</span>
+              </a>
             </div>
           </div>
         </section>
