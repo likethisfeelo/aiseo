@@ -85,7 +85,13 @@ export function ComingSoon2026({
           <div className="nav-links">
             <a href="/course2026" className={activeMenu === 'course' ? 'active' : ''}>수강안내</a>
             <a href="/support2026" className={activeMenu === 'support' ? 'active' : ''}>지원서비스</a>
-            <a href="/events2026" className={activeMenu === 'events' ? 'active' : ''}>이벤트</a>
+            <div className="nav-item-has-sub">
+              <a href="/events2026" className={activeMenu === 'events' ? 'active' : ''}>이벤트</a>
+              <div className="nav-submenu" role="menu">
+                <a href="/events2026/free" role="menuitem">무료이벤트</a>
+                <a href="/events2026/paid" role="menuitem">할인이벤트</a>
+              </div>
+            </div>
             <a href="/blog">블로그</a>
           </div>
           <div className="nav-cta">
@@ -104,6 +110,8 @@ export function ComingSoon2026({
           <a href="/course2026" className="nmm-link">수강안내</a>
           <a href="/support2026" className="nmm-link">지원서비스</a>
           <a href="/events2026" className="nmm-link">이벤트</a>
+          <a href="/events2026/free" className="nmm-link nmm-sublink">└ 무료이벤트</a>
+          <a href="/events2026/paid" className="nmm-link nmm-sublink">└ 할인이벤트</a>
           <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
