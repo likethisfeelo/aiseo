@@ -40,6 +40,13 @@ export function Events2026PaidPage() {
     });
   const isOpen = (id: string) => openCards.has(id);
 
+  // FAQ accordion — single-open, matches the events.html behavior of
+  // collapsing all other items when a new one is opened. `null` means
+  // every item is closed.
+  const [openFaq, setOpenFaq] = useState<string | null>(null);
+  const toggleFaq = (id: string) =>
+    setOpenFaq((prev) => (prev === id ? null : id));
+
   // CSR-only app, so `window` is always defined at render time.
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const canonicalUrl = `${origin}/events2026/paid`;
@@ -807,6 +814,252 @@ export function Events2026PaidPage() {
           letter-spacing: .2px;
         }
 
+        /* ── 공통 타겟 ── */
+        .evtpaid .common-targets {
+          background: var(--bg);
+          padding: 100px 40px 80px;
+        }
+        .evtpaid .common-targets-inner {
+          max-width: 1100px;
+          margin: 0 auto;
+        }
+        .evtpaid .event01-targets {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+          max-width: 920px;
+          margin: 0 auto;
+        }
+        .evtpaid .event01-target {
+          display: flex; align-items: flex-start; gap: 12px;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 18px 20px;
+          transition: border-color .2s, transform .2s;
+        }
+        .evtpaid .event01-target:hover {
+          border-color: rgba(196,168,245,0.35);
+          transform: translateY(-2px);
+        }
+        .evtpaid .event01-target-icon {
+          width: 28px; height: 28px;
+          border-radius: 50%;
+          background: var(--accent-light);
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+        .evtpaid .event01-target-icon svg {
+          width: 14px; height: 14px;
+          stroke: var(--accent-dark);
+          stroke-width: 2.5;
+          fill: none;
+        }
+        .evtpaid .event01-target-text {
+          font-family: var(--font-ko);
+          font-size: 16.5px;
+          color: var(--text-primary);
+          line-height: 1.6;
+          font-weight: 500;
+          margin: 0;
+        }
+
+        /* ── FAQ ── */
+        .evtpaid .faq-section {
+          background: var(--bg-soft);
+          padding: 100px 40px;
+        }
+        .evtpaid .faq-inner {
+          max-width: 800px;
+          margin: 0 auto;
+        }
+        .evtpaid .faq-list { margin-top: 48px; }
+        .evtpaid .faq-item {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          margin-bottom: 10px;
+          transition: border-color .2s, box-shadow .2s;
+          overflow: hidden;
+        }
+        .evtpaid .faq-item:hover {
+          border-color: rgba(196,168,245,0.35);
+        }
+        .evtpaid .faq-q {
+          width: 100%;
+          background: transparent;
+          border: none;
+          padding: 26px 30px;
+          text-align: left;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 16px;
+          font-family: inherit;
+        }
+        .evtpaid .faq-q-text {
+          font-family: var(--font-ko);
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--text-primary);
+          letter-spacing: -.3px;
+          line-height: 1.5;
+          flex: 1;
+        }
+        .evtpaid .faq-q-icon {
+          flex-shrink: 0;
+          width: 32px; height: 32px;
+          border-radius: 50%;
+          background: var(--accent-light);
+          display: flex; align-items: center; justify-content: center;
+          color: var(--accent-dark);
+          transition: transform .35s cubic-bezier(0.65, 0.05, 0.35, 1);
+        }
+        .evtpaid .faq-q-icon svg { width: 15px; height: 15px; }
+        .evtpaid .faq-q[aria-expanded="true"] .faq-q-icon { transform: rotate(180deg); }
+        .evtpaid .faq-a {
+          overflow: hidden;
+          max-height: 0;
+          transition: max-height .4s cubic-bezier(0.65, 0.05, 0.35, 1);
+        }
+        .evtpaid .faq-a.open { max-height: 500px; }
+        .evtpaid .faq-a-inner {
+          padding: 22px 30px 28px;
+          font-size: 16px;
+          color: var(--text-secondary);
+          line-height: 1.8;
+          border-top: 1px dashed var(--border);
+        }
+        .evtpaid .faq-a-inner strong {
+          color: var(--text-primary);
+          font-weight: 700;
+        }
+
+        /* ── A vs B 비교 ── */
+        .evtpaid .compare-section {
+          background: var(--bg);
+          padding: 100px 40px 120px;
+        }
+        .evtpaid .compare-inner {
+          max-width: 1100px;
+          margin: 0 auto;
+        }
+        .evtpaid .compare-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 22px;
+          margin-top: 56px;
+          position: relative;
+        }
+        .evtpaid .compare-grid::before {
+          content: 'OR';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: var(--bg);
+          color: var(--accent-dark);
+          font-family: var(--font-en);
+          font-size: 13px;
+          font-weight: 800;
+          width: 44px; height: 44px;
+          border-radius: 50%;
+          border: 2px solid var(--accent-light);
+          display: flex; align-items: center; justify-content: center;
+          letter-spacing: 1px;
+          z-index: 2;
+        }
+        .evtpaid .compare-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xl);
+          padding: 36px 32px;
+          transition: transform .25s, box-shadow .25s, border-color .25s;
+          display: flex;
+          flex-direction: column;
+        }
+        .evtpaid .compare-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-md);
+          border-color: rgba(196,168,245,0.4);
+        }
+        .evtpaid .compare-card-icon {
+          font-size: 40px;
+          margin-bottom: 18px;
+          line-height: 1;
+        }
+        .evtpaid .compare-card-pkg {
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 800;
+          color: var(--accent-deep);
+          letter-spacing: 1.5px;
+          margin-bottom: 10px;
+        }
+        .evtpaid .compare-card-h {
+          font-family: var(--font-ko);
+          font-size: clamp(24px, 2.6vw, 30px);
+          font-weight: 700;
+          color: var(--text-primary);
+          letter-spacing: -.8px;
+          line-height: 1.3;
+          margin-bottom: 14px;
+        }
+        .evtpaid .compare-card-sub {
+          font-size: 16px;
+          color: var(--text-secondary);
+          line-height: 1.7;
+          margin-bottom: 26px;
+          padding-bottom: 26px;
+          border-bottom: 1px dashed var(--border);
+        }
+        .evtpaid .compare-card-list {
+          list-style: none;
+          display: flex; flex-direction: column;
+          gap: 13px;
+          margin: 0 0 30px;
+          padding: 0;
+        }
+        .evtpaid .compare-card-list li {
+          font-size: 16px;
+          color: var(--text-primary);
+          line-height: 1.55;
+          padding-left: 24px;
+          position: relative;
+          font-weight: 500;
+        }
+        .evtpaid .compare-card-list li::before {
+          content: '✓';
+          position: absolute;
+          left: 0; top: 0;
+          color: var(--accent-dark);
+          font-weight: 800;
+          font-size: 15px;
+        }
+        .evtpaid .compare-cta {
+          display: inline-flex; align-items: center; justify-content: center;
+          gap: 8px;
+          background: var(--accent-dark);
+          color: #fff;
+          padding: 16px 28px;
+          border-radius: var(--radius-md);
+          font-size: 15.5px;
+          font-weight: 700;
+          text-decoration: none;
+          margin-top: auto;
+          transition: background .2s, transform .15s, box-shadow .2s;
+          text-align: center;
+          box-shadow: 0 4px 14px rgba(139,111,212,0.22);
+          cursor: pointer;
+          border: none;
+          font-family: var(--font-ko);
+        }
+        .evtpaid .compare-cta:hover {
+          background: var(--accent-deep);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 22px rgba(139,111,212,0.32);
+        }
+
         @media (max-width: 900px) {
           .evtpaid section { padding: 80px 24px; }
           .evtpaid .hero { padding: 120px 24px 60px; min-height: auto; }
@@ -826,6 +1079,15 @@ export function Events2026PaidPage() {
           .evtpaid .core-notice { padding: 16px 20px; }
           .evtpaid .core-notice-title { font-size: 14px; }
           .evtpaid .core-notice-sub { font-size: 13px; }
+          .evtpaid .common-targets { padding: 80px 24px 60px; }
+          .evtpaid .event01-targets { grid-template-columns: 1fr; }
+          .evtpaid .faq-section { padding: 60px 24px; }
+          .evtpaid .faq-q { padding: 20px 24px; }
+          .evtpaid .faq-q-text { font-size: 16px; }
+          .evtpaid .faq-a-inner { padding: 16px 24px 24px; font-size: 14.5px; }
+          .evtpaid .compare-section { padding: 60px 24px 80px; }
+          .evtpaid .compare-grid { grid-template-columns: 1fr; gap: 30px; }
+          .evtpaid .compare-grid::before { display: none; }
         }
         @media (max-width: 480px) {
           .evtpaid .hero-h1 { letter-spacing: -1.5px; }
@@ -1423,8 +1685,206 @@ export function Events2026PaidPage() {
           </div>
         </section>
 
-        {/* Phases 4.3–4.4 will append common targets, FAQ, compare cards,
-            LAUNCH CTA with countdown, and the cross-link banner. */}
+        {/* ══════════════════════════════════════════════
+              공통: 이런 분께 드리는 기회입니다
+        ══════════════════════════════════════════════ */}
+        <section className="common-targets">
+          <div className="common-targets-inner">
+            <div className="section-eyebrow">FOR YOU</div>
+            <h2 className="section-h2">
+              이런 분께 드리는<br /><span className="em">기회입니다</span>
+            </h2>
+            <p className="event01-lead" style={{ marginBottom: 56 }}>
+              두 패키지 모두 동일하게 적용되는 권장 대상입니다.<br />
+              아래 다섯 가지 중 두 가지 이상 해당되시면 망설이지 말고 신청해주세요.
+            </p>
+
+            <div className="event01-targets">
+              <div className="event01-target">
+                <div className="event01-target-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                </div>
+                <p className="event01-target-text">창업 2년차 이상, 혼자 영업·서비스·마케팅을 다 하시는 1인 대표님</p>
+              </div>
+              <div className="event01-target">
+                <div className="event01-target-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                </div>
+                <p className="event01-target-text">기존 홈페이지의 월간 호스팅 비용이 아까우신 분</p>
+              </div>
+              <div className="event01-target">
+                <div className="event01-target-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                </div>
+                <p className="event01-target-text">AI 자동화 마케팅을 위해 개선된 홈페이지가 필요하신 분</p>
+              </div>
+              <div className="event01-target">
+                <div className="event01-target-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                </div>
+                <p className="event01-target-text">ChatGPT · Claude는 결제해서 쓰고 계시지만, 홈페이지 관리는 막막하신 분</p>
+              </div>
+              <div className="event01-target" style={{ gridColumn: '1 / -1' }}>
+                <div className="event01-target-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                </div>
+                <p className="event01-target-text">유료 광고가 아닌, SEO 검색 최적화를 통해 고객이 직접 검색해서 찾아오는 기반을 다지고 싶으신 분</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+              FAQ
+        ══════════════════════════════════════════════ */}
+        <section className="faq-section">
+          <div className="faq-inner">
+            <div className="section-eyebrow">FAQ</div>
+            <h2 className="section-h2">자주 묻는 질문</h2>
+
+            <div className="faq-list">
+              {[
+                {
+                  id: 'faq-1',
+                  q: 'EVENT 02와 EVENT 03의 차이를 한 줄로 알려주세요',
+                  a: (
+                    <>
+                      EVENT 02는 <strong>"어디서 보일지"</strong>를 먼저 정리하는 검색 전략 패키지, EVENT 03는 <strong>"무엇을 보여줄지"</strong>를 먼저 정리하는 콘텐츠 기획 패키지입니다. 두 패키지 모두 CORE 1 배포 교육이 포함되어 사이트 공개까지 한 번에 끝납니다.
+                    </>
+                  ),
+                },
+                {
+                  id: 'faq-2',
+                  q: '두 패키지를 모두 신청할 수 있나요?',
+                  a: (
+                    <>
+                      가능합니다. 다만 두 패키지를 모두 진행하시면 CORE 1 배포 교육은 한 번만 진행되고, 001과 002 두 사전 교육이 모두 적용됩니다. 가격은 별도 문의 부탁드립니다.
+                    </>
+                  ),
+                },
+                {
+                  id: 'faq-3',
+                  q: 'EVENT 01(무료)과는 무엇이 다른가요?',
+                  a: (
+                    <>
+                      EVENT 01은 선착순 3분 한정 무료 프로그램으로 자격 검토를 거쳐 진행됩니다. EVENT 02와 03은 자격 검토 없이 누구나 신청 가능한 합리적 가격의 정식 패키지입니다. 사전 교육(001 또는 002)이 추가로 포함되어 더 깊이 있게 진행됩니다.
+                    </>
+                  ),
+                },
+                {
+                  id: 'faq-4',
+                  q: '교육 후 사이트 운영은 어떻게 되나요?',
+                  a: (
+                    <>
+                      교육 당일 배포된 사이트는 yourname.aiseo.tips 형태의 서브도메인으로 즉시 운영 가능합니다. 12개월 동안은 호스팅 · 도메인 · SSL 모두 무료로 제공되며, 이후에도 트렌드에 맞는 최소 비용으로 제공할 예정입니다.
+                    </>
+                  ),
+                },
+                {
+                  id: 'faq-5',
+                  q: '교육 일정은 어떻게 잡나요?',
+                  a: (
+                    <>
+                      신청 후 담당 PM이 카카오톡으로 연락드립니다. 사전 미팅(약 30분)에서 사장님 상황을 파악한 뒤, 사장님 일정에 맞춰 1:1 화상 교육 일정을 확정합니다. 평일 저녁이나 주말 진행도 가능합니다.
+                    </>
+                  ),
+                },
+                {
+                  id: 'faq-6',
+                  q: '미리 준비해야 할 자료가 있나요?',
+                  a: (
+                    <>
+                      형식 갖춘 제안서나 기획서는 필요 없습니다. 기존 홈페이지(있으시면), 사업 카탈로그, 서비스 소개서 중 가지고 계신 것이면 충분합니다. 카카오톡 사전 미팅 때 어떤 자료가 필요한지 함께 정리해드립니다.
+                    </>
+                  ),
+                },
+              ].map((item) => {
+                const expanded = openFaq === item.id;
+                return (
+                  <div key={item.id} className="faq-item">
+                    <button
+                      type="button"
+                      className="faq-q"
+                      aria-expanded={expanded}
+                      aria-controls={item.id}
+                      onClick={() => toggleFaq(item.id)}
+                    >
+                      <span className="faq-q-text">{item.q}</span>
+                      <span className="faq-q-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </span>
+                    </button>
+                    <div className={`faq-a${expanded ? ' open' : ''}`} id={item.id}>
+                      <div className="faq-a-inner">{item.a}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+              A vs B 비교 (마지막 결정 도구)
+        ══════════════════════════════════════════════ */}
+        <section className="compare-section">
+          <div className="compare-inner">
+            <div className="section-eyebrow">CHOOSE YOUR PATH</div>
+            <h2 className="section-h2">
+              아직 헷갈리신다면<br /><span className="em">한 번에 비교</span>해보세요
+            </h2>
+            <p className="event01-lead">
+              두 패키지의 출발점이 다릅니다.<br />
+              자기 상황에 가까운 쪽을 골라주시면 됩니다.
+            </p>
+
+            <div className="compare-grid">
+              <article className="compare-card">
+                <div className="compare-card-icon" aria-hidden="true">🎯</div>
+                <div className="compare-card-pkg">EVENT 02 · PACKAGE A</div>
+                <h3 className="compare-card-h">검색에서 보이는 길을<br />먼저 그려두고 싶다면</h3>
+                <p className="compare-card-sub">
+                  홈페이지를 만들기 전에 키워드 · 경쟁군 · 검색 의도를 먼저 정리합니다. 이후 사이트를 올리면 구조 수정 없이 바로 검색 노출 구조로 연결됩니다.
+                </p>
+                <ul className="compare-card-list">
+                  <li>업종에서 어떤 키워드가 효과적인지 모름</li>
+                  <li>경쟁사 분석을 안 해봄</li>
+                  <li>검색 노출이 가장 우선이라고 생각</li>
+                  <li>홈페이지 내용은 어느 정도 잡혀있음</li>
+                </ul>
+                <a href="#event02" className="compare-cta">
+                  <span>EVENT 02 자세히 보기</span>
+                  <span aria-hidden="true">↑</span>
+                </a>
+              </article>
+
+              <article className="compare-card">
+                <div className="compare-card-icon" aria-hidden="true">✍️</div>
+                <div className="compare-card-pkg">EVENT 03 · PACKAGE B</div>
+                <h3 className="compare-card-h">무엇을 어떻게 쓸지<br />먼저 정리하고 싶다면</h3>
+                <p className="compare-card-sub">
+                  메뉴 구조부터 서비스 설명, CTA, 톤앤매너까지 콘텐츠를 먼저 설계합니다. AI 도구에 명확한 방향을 넣을 수 있어 결과물 완성도가 크게 높아집니다.
+                </p>
+                <ul className="compare-card-list">
+                  <li>홈페이지에 뭘 써야 할지 막막함</li>
+                  <li>메뉴 구조를 어떻게 나눌지 모름</li>
+                  <li>서비스 설명이 길고 핵심이 없다는 피드백</li>
+                  <li>키워드보다는 내용 정리가 우선</li>
+                </ul>
+                <a href="#event03" className="compare-cta">
+                  <span>EVENT 03 자세히 보기</span>
+                  <span aria-hidden="true">↑</span>
+                </a>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        {/* Phase 4.4 — LAUNCH CTA(countdown) + cross-link + remaining
+            interactivity (intersection fade-in, video stub click,
+            smooth-scroll for #event* links). */}
 
         {/* Footer placeholder so the page closes cleanly between phases. */}
         <footer style={{ minHeight: 'auto', padding: '48px 40px', background: 'var(--bg-dark)', color: 'rgba(255,255,255,0.6)' }}>
