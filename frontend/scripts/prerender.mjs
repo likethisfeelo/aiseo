@@ -63,8 +63,18 @@ const ROUTES = [
   },
   {
     path: '/events2026',
-    title: '이벤트 2026 | AISEO',
-    description: 'AISEO 2026 이벤트. 최신 이벤트와 프로모션 소식을 안내합니다.',
+    title: 'AISEO 2026 이벤트 — 광고가 아닌 검색될 구조를 만드는',
+    description: 'AISEO 2026 런칭 이벤트. 일회성 광고가 아닌, 검색될 구조를 만듭니다. 무료 런칭 파트너 / 10만원 실전 패키지 / 검색 네트워크 등록 — 첫 사례를 함께 만들 분을 찾습니다.',
+  },
+  {
+    path: '/events2026/free',
+    title: 'AISEO 2026 런칭 이벤트 — 먼저 만나고, 함께 만들고, 한 발 앞서',
+    description: 'AISEO 2026 무료 런칭 파트너 이벤트. AI 홈페이지 제작 + 도메인·호스팅 + SEO 핵심강의 — 정가 30만원 → 0원. 선착순 3팀, 자격 검토 후 1:1 코칭.',
+  },
+  {
+    path: '/events2026/paid',
+    title: 'AISEO 2026 런칭 이벤트 — 두 가지 패키지 중 내게 맞는 한 가지를',
+    description: 'AISEO 2026 EVENT 02 검색 전략 / EVENT 03 콘텐츠 기획 — 각각 CORE 1 즉시 배포 포함, 정가 30만원 → 10만원. 자격 검토 없이 누구나 신청 가능, 각 7팀 한정.',
   },
   {
     path: '/blog',

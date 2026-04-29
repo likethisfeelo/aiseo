@@ -80,6 +80,8 @@ function handler(event) {
         '/course2026': '/site/course2026/index.html',
         '/support2026': '/site/support2026/index.html',
         '/events2026': '/site/events2026/index.html',
+        '/events2026/free': '/site/events2026/free/index.html',
+        '/events2026/paid': '/site/events2026/paid/index.html',
         '/blog': '/site/blog/index.html',
       };
 
