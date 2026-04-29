@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../landing.css';
 import { useSubPageNav } from './useSubPageNav';
 
@@ -46,6 +46,102 @@ export function Events2026PaidPage() {
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const toggleFaq = (id: string) =>
     setOpenFaq((prev) => (prev === id ? null : id));
+
+  // ──────────────────────────────────────────────────────────────
+  //  COUNTDOWN — target: 2026-04-30 00:00 KST (the EVENT 02·03 open
+  //  date). Once the diff hits zero the .launch-countdown is hidden
+  //  and .launch-live gets the `.show` class; matches the source JS.
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const cdEl = document.getElementById('launchCountdown');
+    const liveEl = document.getElementById('launchLive');
+    if (!cdEl || !liveEl) return;
+
+    const numEls = {
+      days: cdEl.querySelector<HTMLElement>('[data-cd="days"]'),
+      hours: cdEl.querySelector<HTMLElement>('[data-cd="hours"]'),
+      minutes: cdEl.querySelector<HTMLElement>('[data-cd="minutes"]'),
+      seconds: cdEl.querySelector<HTMLElement>('[data-cd="seconds"]'),
+    };
+    const target = new Date('2026-04-30T00:00:00+09:00').getTime();
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    const tick = () => {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        cdEl.style.display = 'none';
+        liveEl.classList.add('show');
+        return true; // stop ticking
+      }
+      const days = Math.floor(diff / 86_400_000);
+      const hours = Math.floor((diff / 3_600_000) % 24);
+      const minutes = Math.floor((diff / 60_000) % 60);
+      const seconds = Math.floor((diff / 1_000) % 60);
+      if (numEls.days) numEls.days.textContent = pad(days);
+      if (numEls.hours) numEls.hours.textContent = pad(hours);
+      if (numEls.minutes) numEls.minutes.textContent = pad(minutes);
+      if (numEls.seconds) numEls.seconds.textContent = pad(seconds);
+      return false;
+    };
+
+    if (tick()) return;
+    const intervalId = window.setInterval(() => {
+      if (tick()) window.clearInterval(intervalId);
+    }, 1000);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  // ──────────────────────────────────────────────────────────────
+  //  Reveal-on-scroll fade-in for the secondary card grids. Mirrors
+  //  the events.html behavior so cards rise from translateY(20px).
+  //  Initial dim is applied in JS (not CSS) so a JS-disabled client
+  //  still sees the cards.
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const targets = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.evtpaid .benefit-card, .evtpaid .event01-target, .evtpaid .compare-card, .evtpaid .launch-slot',
+      ),
+    );
+    if (targets.length === 0) return;
+
+    targets.forEach((el) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            el.style.transition = `opacity .6s ease ${i * 0.05}s, transform .6s ease ${i * 0.05}s`;
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+            observer.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.12 },
+    );
+    targets.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Hero video stub — quick scale feedback on click.
+  useEffect(() => {
+    const btn = document.querySelector<HTMLButtonElement>('.evtpaid .hero-video-play');
+    if (!btn) return;
+    const onClick = () => {
+      btn.style.transform = 'translate(-50%, -50%) scale(0.92)';
+      window.setTimeout(() => {
+        btn.style.transform = 'translate(-50%, -50%) scale(1)';
+      }, 150);
+    };
+    btn.addEventListener('click', onClick);
+    return () => btn.removeEventListener('click', onClick);
+  }, []);
 
   // CSR-only app, so `window` is always defined at render time.
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -1060,6 +1156,385 @@ export function Events2026PaidPage() {
           box-shadow: 0 8px 22px rgba(139,111,212,0.32);
         }
 
+        /* ── LAUNCH CTA (선착순 7팀 + 카운트다운) ── */
+        .evtpaid .launch-cta {
+          background: linear-gradient(135deg, #14102A 0%, #1F1840 50%, #2D1F5E 100%);
+          padding: 80px 40px 100px;
+          position: relative;
+          overflow: hidden;
+        }
+        .evtpaid .launch-cta::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image:
+            radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.7), transparent),
+            radial-gradient(1px 1px at 80% 30%, rgba(196,168,245,0.8), transparent),
+            radial-gradient(1.5px 1.5px at 50% 70%, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 25% 85%, rgba(155,184,248,0.7), transparent),
+            radial-gradient(1px 1px at 70% 60%, rgba(196,168,245,0.5), transparent);
+          opacity: 0.7;
+          pointer-events: none;
+        }
+        .evtpaid .launch-cta::after {
+          content: '';
+          position: absolute;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          width: 800px; height: 600px;
+          background: radial-gradient(ellipse, rgba(196,168,245,0.18) 0%, transparent 65%);
+          pointer-events: none;
+        }
+        .evtpaid .launch-cta-inner {
+          position: relative; z-index: 1;
+          max-width: 980px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .evtpaid .launch-cta-eyebrow {
+          display: inline-flex; align-items: center; gap: 10px;
+          background: rgba(255,255,255,0.08);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(255,255,255,0.18);
+          padding: 8px 18px;
+          border-radius: 100px;
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 1.8px;
+          color: rgba(255,255,255,0.9);
+          margin-bottom: 24px;
+        }
+        .evtpaid .launch-cta-eyebrow .star {
+          color: #FFD75A;
+          font-size: 13px;
+          line-height: 1;
+        }
+        .evtpaid .launch-cta-eyebrow .pulse {
+          width: 7px; height: 7px;
+          border-radius: 50%;
+          background: #4ADE80;
+          animation: evtpaidLaunchPulse 2s infinite;
+        }
+        @keyframes evtpaidLaunchPulse {
+          0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); }
+          50% { opacity: 0.6; box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+        }
+        .evtpaid .launch-cta-h {
+          font-family: var(--font-ko);
+          font-size: clamp(28px, 4vw, 44px);
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -1.4px;
+          line-height: 1.25;
+          margin-bottom: 16px;
+        }
+        .evtpaid .launch-cta-h .accent { color: var(--accent); }
+        .evtpaid .launch-cta-sub {
+          font-size: 16px;
+          color: rgba(255,255,255,0.72);
+          line-height: 1.7;
+          margin-bottom: 48px;
+        }
+        .evtpaid .launch-cta-sub strong {
+          color: #fff;
+          font-weight: 600;
+        }
+
+        /* 카운트다운 */
+        .evtpaid .launch-countdown {
+          display: inline-flex;
+          gap: 12px;
+          margin-bottom: 48px;
+          padding: 20px 28px;
+          background: rgba(0,0,0,0.35);
+          border: 1px solid rgba(196,168,245,0.25);
+          border-radius: var(--radius-lg);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+        }
+        .evtpaid .launch-countdown-label {
+          align-self: center;
+          font-family: var(--font-en);
+          font-size: 11px;
+          font-weight: 700;
+          color: rgba(255,255,255,0.55);
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          padding-right: 18px;
+          margin-right: 6px;
+          border-right: 1px solid rgba(255,255,255,0.15);
+        }
+        .evtpaid .launch-countdown-unit {
+          text-align: center;
+          min-width: 60px;
+        }
+        .evtpaid .launch-countdown-num {
+          font-family: var(--font-en);
+          font-size: 32px;
+          font-weight: 800;
+          color: #fff;
+          line-height: 1;
+          letter-spacing: -1px;
+        }
+        .evtpaid .launch-countdown-name {
+          font-family: var(--font-en);
+          font-size: 10px;
+          font-weight: 600;
+          color: rgba(196,168,245,0.85);
+          letter-spacing: 1.2px;
+          margin-top: 6px;
+          text-transform: uppercase;
+        }
+
+        /* 라이브 라벨 (오픈 후) */
+        .evtpaid .launch-live {
+          display: none;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 48px;
+          padding: 16px 24px;
+          background: rgba(74,222,128,0.12);
+          border: 1px solid rgba(74,222,128,0.35);
+          border-radius: 100px;
+          color: #fff;
+          font-size: 15px;
+          font-weight: 600;
+        }
+        .evtpaid .launch-live.show { display: inline-flex; }
+        .evtpaid .launch-live::before {
+          content: '';
+          width: 8px; height: 8px;
+          border-radius: 50%;
+          background: #4ADE80;
+          animation: evtpaidLaunchPulse 2s infinite;
+        }
+
+        /* 두 패키지 슬롯 */
+        .evtpaid .launch-slots {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+          max-width: 720px;
+          margin: 0 auto 36px;
+        }
+        .evtpaid .launch-slot {
+          background: rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: var(--radius-lg);
+          padding: 24px 22px;
+          text-align: left;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          transition: background .25s, border-color .25s, transform .25s;
+          text-decoration: none;
+          display: block;
+        }
+        .evtpaid .launch-slot:hover {
+          background: rgba(196,168,245,0.12);
+          border-color: rgba(196,168,245,0.5);
+          transform: translateY(-3px);
+        }
+        .evtpaid .launch-slot-head {
+          display: flex; align-items: center; justify-content: space-between;
+          margin-bottom: 14px;
+        }
+        .evtpaid .launch-slot-pkg {
+          font-family: var(--font-en);
+          font-size: 11px;
+          font-weight: 800;
+          color: var(--accent);
+          letter-spacing: 1.5px;
+        }
+        .evtpaid .launch-slot-count {
+          font-family: var(--font-en);
+          font-size: 11px;
+          font-weight: 700;
+          color: rgba(255,255,255,0.85);
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.18);
+          padding: 4px 10px;
+          border-radius: 100px;
+          letter-spacing: .5px;
+        }
+        .evtpaid .launch-slot-h {
+          font-family: var(--font-ko);
+          font-size: 18px;
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -.5px;
+          line-height: 1.4;
+          margin-bottom: 14px;
+        }
+        .evtpaid .launch-slot-cta {
+          display: flex; align-items: center; justify-content: space-between;
+          padding-top: 14px;
+          border-top: 1px dashed rgba(255,255,255,0.15);
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--accent);
+          transition: color .2s;
+        }
+        .evtpaid .launch-slot:hover .launch-slot-cta { color: #fff; }
+        .evtpaid .launch-slot-cta-arrow { transition: transform .25s; display: inline-block; }
+        .evtpaid .launch-slot:hover .launch-slot-cta-arrow {
+          transform: translateX(3px);
+        }
+        .evtpaid .launch-cta-note {
+          font-size: 13px;
+          color: rgba(255,255,255,0.55);
+          line-height: 1.65;
+          max-width: 520px;
+          margin: 0 auto;
+        }
+
+        /* ── CROSS-LINK (FREE 페이지로) ── */
+        .evtpaid .cross-link {
+          background: #0A0614;
+          padding: 80px 40px 100px;
+          position: relative;
+          overflow: hidden;
+        }
+        .evtpaid .cross-link::before {
+          content: '';
+          position: absolute;
+          top: -200px; right: -100px;
+          width: 600px; height: 400px;
+          background: radial-gradient(ellipse, rgba(196,168,245,0.18) 0%, transparent 65%);
+          pointer-events: none;
+        }
+        .evtpaid .cross-link::after {
+          content: '';
+          position: absolute;
+          bottom: -150px; left: -80px;
+          width: 500px; height: 350px;
+          background: radial-gradient(ellipse, rgba(155,184,248,0.12) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .evtpaid .cross-link-inner {
+          position: relative; z-index: 1;
+          max-width: 1100px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .evtpaid .cross-link-eyebrow {
+          display: inline-flex; align-items: center; gap: 10px;
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 700;
+          color: rgba(255,255,255,0.55);
+          letter-spacing: 1.8px;
+          text-transform: uppercase;
+          margin-bottom: 18px;
+        }
+        .evtpaid .cross-link-eyebrow::before,
+        .evtpaid .cross-link-eyebrow::after {
+          content: ''; width: 24px; height: 1px;
+          background: rgba(255,255,255,0.3);
+        }
+        .evtpaid .cross-link-h {
+          font-family: var(--font-ko);
+          font-size: clamp(24px, 3vw, 36px);
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -1px;
+          line-height: 1.35;
+          margin-bottom: 18px;
+        }
+        .evtpaid .cross-link-h .em { color: var(--accent); }
+        .evtpaid .cross-link-sub {
+          font-size: 16px;
+          color: rgba(255,255,255,0.7);
+          line-height: 1.75;
+          max-width: 560px;
+          margin: 0 auto 40px;
+        }
+        .evtpaid .cross-card {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: 24px;
+          align-items: center;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: var(--radius-xl);
+          padding: 28px 32px;
+          text-decoration: none;
+          transition: background .3s, border-color .3s, transform .25s;
+          text-align: left;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+        }
+        .evtpaid .cross-card:hover {
+          background: rgba(255,255,255,0.08);
+          border-color: rgba(196,168,245,0.45);
+          transform: translateY(-3px);
+        }
+        .evtpaid .cross-card-badge {
+          width: 64px; height: 64px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          box-shadow: 0 6px 20px rgba(139,111,212,0.4);
+          flex-shrink: 0;
+        }
+        .evtpaid .cross-card-badge-num {
+          font-family: var(--font-en);
+          font-size: 22px;
+          font-weight: 800;
+          color: #fff;
+          letter-spacing: -.5px;
+          line-height: 1;
+        }
+        .evtpaid .cross-card-badge-tag {
+          font-family: var(--font-en);
+          font-size: 9px;
+          font-weight: 700;
+          color: rgba(255,255,255,0.85);
+          letter-spacing: 1.2px;
+          margin-top: 4px;
+        }
+        .evtpaid .cross-card-body { min-width: 0; }
+        .evtpaid .cross-card-pkg {
+          font-family: var(--font-en);
+          font-size: 11px;
+          font-weight: 800;
+          color: var(--accent);
+          letter-spacing: 1.5px;
+          margin-bottom: 6px;
+        }
+        .evtpaid .cross-card-h {
+          font-family: var(--font-ko);
+          font-size: clamp(18px, 2vw, 22px);
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -.5px;
+          line-height: 1.35;
+          margin-bottom: 6px;
+        }
+        .evtpaid .cross-card-desc {
+          font-size: 14.5px;
+          color: rgba(255,255,255,0.62);
+          line-height: 1.55;
+        }
+        .evtpaid .cross-card-arrow {
+          width: 48px; height: 48px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.15);
+          display: flex; align-items: center; justify-content: center;
+          color: #fff;
+          flex-shrink: 0;
+          transition: background .25s, transform .25s, border-color .25s;
+        }
+        .evtpaid .cross-card:hover .cross-card-arrow {
+          background: var(--accent);
+          border-color: var(--accent);
+          transform: translateX(3px);
+        }
+        .evtpaid .cross-card-arrow svg { width: 18px; height: 18px; }
+
         @media (max-width: 900px) {
           .evtpaid section { padding: 80px 24px; }
           .evtpaid .hero { padding: 120px 24px 60px; min-height: auto; }
@@ -1088,6 +1563,18 @@ export function Events2026PaidPage() {
           .evtpaid .compare-section { padding: 60px 24px 80px; }
           .evtpaid .compare-grid { grid-template-columns: 1fr; gap: 30px; }
           .evtpaid .compare-grid::before { display: none; }
+          .evtpaid .launch-cta { padding: 60px 24px 80px; }
+          .evtpaid .launch-countdown { gap: 8px; padding: 16px 18px; flex-wrap: wrap; justify-content: center; }
+          .evtpaid .launch-countdown-label { padding-right: 0; margin-right: 0; border-right: none; padding-bottom: 8px; flex-basis: 100%; text-align: center; }
+          .evtpaid .launch-countdown-unit { min-width: 52px; }
+          .evtpaid .launch-countdown-num { font-size: 26px; }
+          .evtpaid .launch-slots { grid-template-columns: 1fr; gap: 12px; }
+          .evtpaid .launch-slot { padding: 20px 18px; }
+          .evtpaid .cross-link { padding: 60px 24px 80px; }
+          .evtpaid .cross-card { grid-template-columns: auto 1fr; gap: 16px; padding: 22px 22px; }
+          .evtpaid .cross-card-arrow { grid-column: 1 / -1; justify-self: flex-end; width: 40px; height: 40px; }
+          .evtpaid .cross-card-h { font-size: 18px; }
+          .evtpaid .cross-card-badge { width: 56px; height: 56px; }
         }
         @media (max-width: 480px) {
           .evtpaid .hero-h1 { letter-spacing: -1.5px; }
@@ -1882,9 +2369,115 @@ export function Events2026PaidPage() {
           </div>
         </section>
 
-        {/* Phase 4.4 — LAUNCH CTA(countdown) + cross-link + remaining
-            interactivity (intersection fade-in, video stub click,
-            smooth-scroll for #event* links). */}
+        {/* ── LAUNCH CTA — 선착순 7팀 + 4월 30일 오픈 ── */}
+        <section className="launch-cta">
+          <div className="launch-cta-inner">
+            <div className="launch-cta-eyebrow">
+              <span className="star" aria-hidden="true">★</span>
+              <span className="pulse" aria-hidden="true"></span>
+              <span>EARLY BIRD · LIMITED 7 SLOTS</span>
+            </div>
+
+            <h2 className="launch-cta-h">
+              각 이벤트 <span className="accent">선착순 7팀</span>씩만<br />
+              신청 가능합니다
+            </h2>
+            <p className="launch-cta-sub">
+              2026년 4월 30일 정식 오픈 — <strong>EVENT 02와 EVENT 03 각각 7팀 한정</strong>으로<br />
+              진행됩니다. 자리가 마감되는 즉시 신청이 종료됩니다.
+            </p>
+
+            {/* 카운트다운 (오픈 전) */}
+            <div className="launch-countdown" id="launchCountdown">
+              <span className="launch-countdown-label">오픈까지</span>
+              <div className="launch-countdown-unit">
+                <div className="launch-countdown-num" data-cd="days">--</div>
+                <div className="launch-countdown-name">Days</div>
+              </div>
+              <div className="launch-countdown-unit">
+                <div className="launch-countdown-num" data-cd="hours">--</div>
+                <div className="launch-countdown-name">Hours</div>
+              </div>
+              <div className="launch-countdown-unit">
+                <div className="launch-countdown-num" data-cd="minutes">--</div>
+                <div className="launch-countdown-name">Minutes</div>
+              </div>
+              <div className="launch-countdown-unit">
+                <div className="launch-countdown-num" data-cd="seconds">--</div>
+                <div className="launch-countdown-name">Seconds</div>
+              </div>
+            </div>
+
+            {/* 오픈된 후에만 표시 (카운트다운 useEffect가 .show 토글) */}
+            <div className="launch-live" id="launchLive">
+              <span>지금 신청 받습니다 — 자리가 곧 마감됩니다</span>
+            </div>
+
+            {/* 두 패키지 슬롯 */}
+            <div className="launch-slots">
+              <a href="#event02" className="launch-slot">
+                <div className="launch-slot-head">
+                  <span className="launch-slot-pkg">EVENT 02 · PACKAGE A</span>
+                  <span className="launch-slot-count">7팀 한정</span>
+                </div>
+                <h4 className="launch-slot-h">🎯 검색 전략 + 사이트 배포</h4>
+                <div className="launch-slot-cta">
+                  <span>EVENT 02 신청하기</span>
+                  <span className="launch-slot-cta-arrow" aria-hidden="true">→</span>
+                </div>
+              </a>
+
+              <a href="#event03" className="launch-slot">
+                <div className="launch-slot-head">
+                  <span className="launch-slot-pkg">EVENT 03 · PACKAGE B</span>
+                  <span className="launch-slot-count">7팀 한정</span>
+                </div>
+                <h4 className="launch-slot-h">✍️ 콘텐츠 기획 + 사이트 배포</h4>
+                <div className="launch-slot-cta">
+                  <span>EVENT 03 신청하기</span>
+                  <span className="launch-slot-cta-arrow" aria-hidden="true">→</span>
+                </div>
+              </a>
+            </div>
+
+            <p className="launch-cta-note">
+              두 패키지 합쳐 총 14팀 한정 · 신청 후 카카오톡으로 일정 협의<br />
+              자리가 모두 채워지면 다음 회차로 안내드립니다
+            </p>
+          </div>
+        </section>
+
+        {/* ── CROSS-LINK 배너 (FREE 페이지로) ── */}
+        <section className="cross-link">
+          <div className="cross-link-inner">
+            <div className="cross-link-eyebrow">Limited Free Slot</div>
+            <h2 className="cross-link-h">
+              선착순 <span className="em">3분 무료 자리</span>도 열려 있습니다
+            </h2>
+            <p className="cross-link-sub">
+              자격 검토 후 선별되는 런칭 파트너 자리 — 비즈니스를 꾸준히<br />
+              만들어오신 분이라면 무료로 모든 것을 받아가실 수 있습니다.
+            </p>
+
+            <a href="/events2026/free" className="cross-card">
+              <div className="cross-card-badge">
+                <span className="cross-card-badge-num">01</span>
+                <span className="cross-card-badge-tag">FREE</span>
+              </div>
+              <div className="cross-card-body">
+                <div className="cross-card-pkg">EVENT 01 · 선착순 무료</div>
+                <div className="cross-card-h">3가지를 전부 무료로 받아가시는 이벤트</div>
+                <div className="cross-card-desc">AI 홈페이지 제작 + 도메인·호스팅 + SEO 핵심강의 · 정가 30만원 → 0원</div>
+              </div>
+              <div className="cross-card-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </div>
+            </a>
+          </div>
+        </section>
 
         {/* Footer placeholder so the page closes cleanly between phases. */}
         <footer style={{ minHeight: 'auto', padding: '48px 40px', background: 'var(--bg-dark)', color: 'rgba(255,255,255,0.6)' }}>
