@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import '../landing.css';
 import { useSubPageNav } from './useSubPageNav';
 
@@ -22,6 +23,241 @@ export function Events2026FreePage() {
   // Shared landing-nav → scrolled transition + mobile hamburger,
   // matches Course2026 / Support2026 / Events2026.
   useSubPageNav();
+
+  // CORE 1 deployment card — closed by default; toggled by the chevron
+  // button in the card header.
+  const [coreOpen, setCoreOpen] = useState(false);
+
+  // ──────────────────────────────────────────────────────────────
+  //  SCROLL-STEP PHASE ANIMATION
+  //  Direct port of the events.html script: each [data-step] block's
+  //  .scroll-step header lights up (number color → title color → desc
+  //  opacity) as it crosses the viewport, fades out as the next block's
+  //  header enters. Matching colors + thresholds from the source.
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const C_NUM_OFF: [number, number, number, number] = [196, 168, 245, 0.08];
+    const C_NUM_ON: [number, number, number, number] = [107, 79, 184, 1];
+    const C_TITLE_OFF: [number, number, number, number] = [10, 6, 20, 0.06];
+    const C_TITLE_ON: [number, number, number, number] = [10, 6, 20, 1];
+
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+    const phase = (p: number, lo: number, hi: number) => clamp01((p - lo) / (hi - lo));
+    const eio = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+    const lerpRgba = (
+      from: [number, number, number, number],
+      to: [number, number, number, number],
+      t: number,
+    ) => {
+      const r = Math.round(lerp(from[0], to[0], t));
+      const g = Math.round(lerp(from[1], to[1], t));
+      const b = Math.round(lerp(from[2], to[2], t));
+      const a = lerp(from[3], to[3], t).toFixed(3);
+      return `rgba(${r},${g},${b},${a})`;
+    };
+    const headerProgress = (el: Element) => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const headerCenterY = rect.top + rect.height / 2;
+      return clamp01(1 - headerCenterY / vh);
+    };
+
+    const stepBlocks = Array.from(document.querySelectorAll<HTMLElement>('.evtfree [data-step]'));
+    if (stepBlocks.length === 0) return;
+
+    const updateSteps = () => {
+      stepBlocks.forEach((block, idx) => {
+        const headerEl = block.querySelector<HTMLElement>('.scroll-step');
+        if (!headerEl) return;
+
+        const hp = headerProgress(headerEl);
+        const numIn = eio(phase(hp, 0.25, 0.45));
+        const titleIn = eio(phase(hp, 0.4, 0.6));
+        const descIn = eio(phase(hp, 0.5, 0.7));
+
+        let fadeOut = 0;
+        const nextBlock = stepBlocks[idx + 1];
+        if (nextBlock) {
+          const nextHeader = nextBlock.querySelector<HTMLElement>('.scroll-step');
+          if (nextHeader) {
+            const nextHp = headerProgress(nextHeader);
+            fadeOut = eio(phase(nextHp, 0.2, 0.45));
+          }
+        } else {
+          fadeOut = eio(phase(hp, 0.95, 1.05));
+        }
+
+        const numVal = clamp01(numIn - fadeOut);
+        const titleVal = clamp01(titleIn - fadeOut);
+        const descVal = clamp01(descIn - fadeOut);
+
+        const numEl = block.querySelector<HTMLElement>('.scroll-step-num');
+        const titleEl = block.querySelector<HTMLElement>('.scroll-step-title');
+        const descEl = block.querySelector<HTMLElement>('.scroll-step-desc');
+        if (!numEl || !titleEl || !descEl) return;
+
+        numEl.style.color = lerpRgba(C_NUM_OFF, C_NUM_ON, numVal);
+        titleEl.style.color = lerpRgba(C_TITLE_OFF, C_TITLE_ON, titleVal);
+
+        numEl.classList.toggle('lit', numVal > 0.5);
+        titleEl.classList.toggle('lit', titleVal > 0.5);
+
+        descEl.style.opacity = String(descVal);
+        descEl.style.transform = `translateY(${(1 - descVal) * 12}px)`;
+      });
+    };
+
+    let stepRaf = false;
+    const onScroll = () => {
+      if (stepRaf) return;
+      stepRaf = true;
+      requestAnimationFrame(() => {
+        updateSteps();
+        stepRaf = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', updateSteps);
+    updateSteps();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', updateSteps);
+    };
+  }, []);
+
+  // ──────────────────────────────────────────────────────────────
+  //  FREE BUNDLE — auto-flip cycle (front ↔ back) for the 3 cards.
+  //  IntersectionObserver pauses the cycle when the grid is offscreen.
+  //  Timing matches the source: 1.2s initial delay, 0.4s stagger
+  //  between cards, 4s back-face hold, 6s front-face hold, repeat.
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const grid = document.querySelector<HTMLElement>('.evtfree .free-bundle-grid');
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.evtfree .free-card'));
+    if (!grid || cards.length === 0) return;
+
+    let inView = false;
+    let cycleTimer: number | null = null;
+    const staggerTimers: number[] = [];
+
+    const flipAll = (toBack: boolean) => {
+      staggerTimers.forEach(window.clearTimeout);
+      staggerTimers.length = 0;
+      cards.forEach((card, i) => {
+        const t = window.setTimeout(() => {
+          if (toBack) card.classList.add('flipped');
+          else card.classList.remove('flipped');
+        }, i * 400);
+        staggerTimers.push(t);
+      });
+    };
+
+    const stopCycle = () => {
+      if (cycleTimer !== null) {
+        window.clearTimeout(cycleTimer);
+        cycleTimer = null;
+      }
+      staggerTimers.forEach(window.clearTimeout);
+      staggerTimers.length = 0;
+    };
+
+    const cycle = () => {
+      if (!inView) return;
+      flipAll(true);
+      // (cards.length - 1) * 400 stagger + 900ms flip duration + 4000ms back-face hold
+      cycleTimer = window.setTimeout(() => {
+        if (!inView) return;
+        flipAll(false);
+        // same stagger + flip + 6000ms front-face hold
+        cycleTimer = window.setTimeout(cycle, (cards.length - 1) * 400 + 900 + 6000);
+      }, (cards.length - 1) * 400 + 900 + 4000);
+    };
+
+    const startCycle = () => {
+      if (cycleTimer !== null) return;
+      cycleTimer = window.setTimeout(cycle, 1200);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            inView = true;
+            startCycle();
+          } else {
+            inView = false;
+            stopCycle();
+          }
+        });
+      },
+      { threshold: 0.15 },
+    );
+    observer.observe(grid);
+
+    return () => {
+      observer.disconnect();
+      stopCycle();
+      cards.forEach((c) => c.classList.remove('flipped'));
+    };
+  }, []);
+
+  // ──────────────────────────────────────────────────────────────
+  //  Reveal-on-scroll fade-in for the secondary card grids. Mirrors
+  //  the events.html behavior so cards rise from translateY(20px).
+  //  Initial styles are applied here (not in CSS) so a JS-disabled
+  //  client still sees the cards.
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const targets = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.evtfree .event01-target, .evtfree .event01-coach-card, .evtfree .event01-result-card, .evtfree .benefit-card',
+      ),
+    );
+    if (targets.length === 0) return;
+
+    targets.forEach((el) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            el.style.transition = `opacity .6s ease ${i * 0.05}s, transform .6s ease ${i * 0.05}s`;
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+            observer.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.12 },
+    );
+    targets.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // ──────────────────────────────────────────────────────────────
+  //  Hero video stub — quick scale feedback on click. The real
+  //  player wiring lands in a later phase / is intentionally out
+  //  of scope for this layout port.
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const btn = document.querySelector<HTMLButtonElement>('.evtfree .hero-video-play');
+    if (!btn) return;
+    const onClick = () => {
+      btn.style.transform = 'translate(-50%, -50%) scale(0.92)';
+      window.setTimeout(() => {
+        btn.style.transform = 'translate(-50%, -50%) scale(1)';
+      }, 150);
+    };
+    btn.addEventListener('click', onClick);
+    return () => btn.removeEventListener('click', onClick);
+  }, []);
 
   // CSR-only app, so `window` is always defined at render time.
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -899,9 +1135,10 @@ export function Events2026FreePage() {
         }
 
         /*
-          SCROLL-STEP — Phase 3.3 ships these in their LIT (visible)
-          state by default. Phase 3.4 will overwrite the initial color
-          via JS inline styles to start dim and fade in on scroll.
+          SCROLL-STEP — dim by default; the Phase 3.4 useEffect light
+          them up via inline styles as each header crosses the viewport.
+          Without JS the content is still readable (numbers/title fade
+          back in via the noscript fallback below the style block).
         */
         .evtfree .scroll-step {
           min-height: 50vh;
@@ -917,7 +1154,7 @@ export function Events2026FreePage() {
           font-weight: 800;
           line-height: 1;
           letter-spacing: -3px;
-          color: var(--accent-deep);
+          color: rgba(196,168,245,0.08);
           margin-bottom: 20px;
           will-change: color;
           position: relative;
@@ -927,7 +1164,7 @@ export function Events2026FreePage() {
           position: absolute;
           left: 50%;
           bottom: -12px;
-          transform: translateX(-50%) scaleX(1);
+          transform: translateX(-50%) scaleX(0);
           width: 48px;
           height: 2px;
           background: var(--accent);
@@ -936,6 +1173,7 @@ export function Events2026FreePage() {
           transition: transform .4s ease;
           will-change: transform;
         }
+        .evtfree .scroll-step-num.lit::after { transform: translateX(-50%) scaleX(1); }
         .evtfree .scroll-step-title {
           font-family: var(--font-ko);
           font-size: clamp(26px, 3.6vw, 40px);
@@ -943,22 +1181,23 @@ export function Events2026FreePage() {
           letter-spacing: -1.2px;
           line-height: 1.3;
           margin: 0 auto 28px;
-          color: var(--text-primary);
+          color: rgba(10,6,20,0.06);
           will-change: color;
           max-width: 720px;
         }
         .evtfree .scroll-step-title .em {
-          color: var(--accent-dark);
+          color: inherit;
           transition: color .3s ease;
         }
+        .evtfree .scroll-step-title.lit .em { color: var(--accent-dark); }
         .evtfree .scroll-step-desc {
           font-size: 16px;
           line-height: 1.8;
           color: var(--text-secondary);
           max-width: 520px;
           margin: 0 auto;
-          opacity: 1;
-          transform: none;
+          opacity: 0;
+          transform: translateY(12px);
           will-change: opacity, transform;
         }
         .evtfree .scroll-step-content {
@@ -1197,6 +1436,304 @@ export function Events2026FreePage() {
           font-weight: 700;
         }
 
+        /* ── BLOCK 3 — 결과물 ── */
+        .evtfree .event01-results {
+          margin-top: 100px;
+          padding-top: 80px;
+          border-top: 1px solid var(--border-soft);
+          text-align: center;
+        }
+        .evtfree .event01-results-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          max-width: 1080px;
+          margin: 0 auto;
+          text-align: left;
+        }
+        .evtfree .event01-result-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 40px 32px;
+          transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .evtfree .event01-result-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-md);
+          border-color: rgba(196,168,245,0.3);
+        }
+        .evtfree .event01-result-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 4px; height: 0;
+          background: linear-gradient(180deg, var(--accent), var(--accent-mid));
+          transition: height .3s ease;
+        }
+        .evtfree .event01-result-card:hover::before { height: 100%; }
+        .evtfree .event01-result-num {
+          font-family: var(--font-en);
+          font-size: 14px;
+          font-weight: 800;
+          color: var(--accent-dark);
+          letter-spacing: 1px;
+          margin-bottom: 16px;
+          display: flex; align-items: center; gap: 8px;
+        }
+        .evtfree .event01-result-num::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: var(--border);
+        }
+        .evtfree .event01-result-h {
+          font-family: var(--font-ko);
+          font-size: clamp(22px, 2.4vw, 28px);
+          font-weight: 700;
+          letter-spacing: -.8px;
+          margin-bottom: 18px;
+          line-height: 1.3;
+          color: var(--text-primary);
+        }
+        .evtfree .event01-result-list {
+          list-style: none;
+          display: flex; flex-direction: column;
+          gap: 12px;
+          padding: 0; margin: 0;
+        }
+        .evtfree .event01-result-list li {
+          font-size: 18.5px;
+          color: var(--text-secondary);
+          line-height: 1.65;
+          padding-left: 26px;
+          position: relative;
+          font-weight: 400;
+        }
+        .evtfree .event01-result-list li::before {
+          content: '✓';
+          position: absolute;
+          left: 0; top: 0;
+          color: var(--accent-dark);
+          font-weight: 700;
+          font-size: 16px;
+        }
+        .evtfree .event01-result-list li.note {
+          margin-top: 8px;
+          padding: 14px 16px 14px 18px;
+          background: var(--accent-light);
+          border-radius: var(--radius-sm);
+          color: var(--accent-deep);
+          font-size: 16.5px;
+          font-style: italic;
+          line-height: 1.6;
+        }
+        .evtfree .event01-result-list li.note::before { display: none; }
+        .evtfree .event01-result-list li.highlight {
+          color: var(--text-primary);
+          font-weight: 500;
+        }
+
+        /* ── EVENT 01 CTA ── */
+        .evtfree .event01-cta {
+          margin-top: 64px;
+          text-align: center;
+        }
+        .evtfree .event01-cta-row {
+          display: inline-flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        .evtfree .event01-btn {
+          display: inline-flex; align-items: center; gap: 10px;
+          background: var(--accent-dark);
+          color: #fff;
+          padding: 16px 30px;
+          border-radius: var(--radius-md);
+          font-size: 15px;
+          font-weight: 700;
+          text-decoration: none;
+          border: 1.5px solid transparent;
+          cursor: pointer;
+          transition: background .2s, transform .15s, box-shadow .2s, border-color .2s, color .2s;
+          box-shadow: 0 6px 20px rgba(139,111,212,0.25);
+          font-family: var(--font-ko);
+        }
+        .evtfree .event01-btn:hover {
+          background: var(--accent-deep);
+          transform: translateY(-2px);
+          box-shadow: 0 10px 28px rgba(139,111,212,0.35);
+        }
+        .evtfree .event01-btn.secondary {
+          background: var(--bg-card);
+          color: var(--text-primary);
+          border-color: var(--border);
+          box-shadow: none;
+        }
+        .evtfree .event01-btn.secondary:hover {
+          border-color: var(--accent);
+          background: var(--bg-soft);
+          box-shadow: var(--shadow-sm);
+        }
+        .evtfree .event01-btn-arrow { transition: transform .2s; display: inline-block; }
+        .evtfree .event01-btn:hover .event01-btn-arrow { transform: translateX(3px); }
+
+        .evtfree .event01-cta-note {
+          margin-top: 18px;
+          font-size: 12.5px;
+          color: var(--text-muted);
+          letter-spacing: .2px;
+        }
+
+        /* ── CROSS-LINK ── */
+        .evtfree .cross-link {
+          background: #0A0614;
+          padding: 80px 40px 100px;
+          position: relative;
+          overflow: hidden;
+        }
+        .evtfree .cross-link::before {
+          content: '';
+          position: absolute;
+          top: -200px; right: -100px;
+          width: 600px; height: 400px;
+          background: radial-gradient(ellipse, rgba(196,168,245,0.18) 0%, transparent 65%);
+          pointer-events: none;
+        }
+        .evtfree .cross-link::after {
+          content: '';
+          position: absolute;
+          bottom: -150px; left: -80px;
+          width: 500px; height: 350px;
+          background: radial-gradient(ellipse, rgba(155,184,248,0.12) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .evtfree .cross-link-inner {
+          position: relative; z-index: 1;
+          max-width: 1100px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .evtfree .cross-link-eyebrow {
+          display: inline-flex; align-items: center; gap: 10px;
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 700;
+          color: rgba(255,255,255,0.55);
+          letter-spacing: 1.8px;
+          text-transform: uppercase;
+          margin-bottom: 18px;
+        }
+        .evtfree .cross-link-eyebrow::before,
+        .evtfree .cross-link-eyebrow::after {
+          content: ''; width: 24px; height: 1px;
+          background: rgba(255,255,255,0.3);
+        }
+        .evtfree .cross-link-h {
+          font-family: var(--font-ko);
+          font-size: clamp(24px, 3vw, 36px);
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -1px;
+          line-height: 1.35;
+          margin-bottom: 18px;
+        }
+        .evtfree .cross-link-h .em { color: var(--accent); }
+        .evtfree .cross-link-sub {
+          font-size: 16px;
+          color: rgba(255,255,255,0.7);
+          line-height: 1.75;
+          max-width: 560px;
+          margin: 0 auto 40px;
+        }
+        .evtfree .cross-card {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: 24px;
+          align-items: center;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: var(--radius-xl);
+          padding: 28px 32px;
+          text-decoration: none;
+          transition: background .3s, border-color .3s, transform .25s;
+          text-align: left;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+        }
+        .evtfree .cross-card:hover {
+          background: rgba(255,255,255,0.08);
+          border-color: rgba(196,168,245,0.45);
+          transform: translateY(-3px);
+        }
+        .evtfree .cross-card-badge {
+          width: 64px; height: 64px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          box-shadow: 0 6px 20px rgba(139,111,212,0.4);
+          flex-shrink: 0;
+        }
+        .evtfree .cross-card-badge-num {
+          font-family: var(--font-en);
+          font-size: 22px;
+          font-weight: 800;
+          color: #fff;
+          letter-spacing: -.5px;
+          line-height: 1;
+        }
+        .evtfree .cross-card-badge-tag {
+          font-family: var(--font-en);
+          font-size: 9px;
+          font-weight: 700;
+          color: rgba(255,255,255,0.85);
+          letter-spacing: 1.2px;
+          margin-top: 4px;
+        }
+        .evtfree .cross-card-body { min-width: 0; }
+        .evtfree .cross-card-pkg {
+          font-family: var(--font-en);
+          font-size: 11px;
+          font-weight: 800;
+          color: var(--accent);
+          letter-spacing: 1.5px;
+          margin-bottom: 6px;
+        }
+        .evtfree .cross-card-h {
+          font-family: var(--font-ko);
+          font-size: clamp(18px, 2vw, 22px);
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -.5px;
+          line-height: 1.35;
+          margin-bottom: 6px;
+        }
+        .evtfree .cross-card-desc {
+          font-size: 14.5px;
+          color: rgba(255,255,255,0.62);
+          line-height: 1.55;
+        }
+        .evtfree .cross-card-arrow {
+          width: 48px; height: 48px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.15);
+          display: flex; align-items: center; justify-content: center;
+          color: #fff;
+          flex-shrink: 0;
+          transition: background .25s, transform .25s, border-color .25s;
+        }
+        .evtfree .cross-card:hover .cross-card-arrow {
+          background: var(--accent);
+          border-color: var(--accent);
+          transform: translateX(3px);
+        }
+        .evtfree .cross-card-arrow svg { width: 18px; height: 18px; }
+
         @media (max-width: 900px) {
           .evtfree section { padding: 80px 24px; }
           .evtfree .hero { padding: 120px 24px 60px; min-height: auto; }
@@ -1223,11 +1760,20 @@ export function Events2026FreePage() {
           .evtfree .event01-flow-item { padding: 22px 18px; }
           .evtfree .scroll-step { min-height: 40vh; padding: 30px 24px 16px; }
           .evtfree .scroll-step-content { margin-top: 20px; }
+          .evtfree .event01-results-grid { grid-template-columns: 1fr; }
+          .evtfree .event01-results { margin-top: 64px; padding-top: 56px; }
+          .evtfree .cross-link { padding: 60px 24px 80px; }
+          .evtfree .cross-card { grid-template-columns: auto 1fr; gap: 16px; padding: 22px 22px; }
+          .evtfree .cross-card-arrow { grid-column: 1 / -1; justify-self: flex-end; width: 40px; height: 40px; }
+          .evtfree .cross-card-h { font-size: 18px; }
+          .evtfree .cross-card-badge { width: 56px; height: 56px; }
         }
         @media (max-width: 480px) {
           .evtfree .hero-h1 { letter-spacing: -1.5px; }
           .evtfree .section-h2 { letter-spacing: -.8px; }
           .evtfree .event01-flow-list { grid-template-columns: 1fr; }
+          .evtfree .event01-cta-row { flex-direction: column; width: 100%; }
+          .evtfree .event01-btn { width: 100%; justify-content: center; }
         }
       `}</style>
 
@@ -1427,9 +1973,10 @@ export function Events2026FreePage() {
                     <button
                       type="button"
                       className="core-card-toggle"
-                      aria-expanded="true"
+                      aria-expanded={coreOpen}
                       aria-controls="evtfree-core-expand-1"
-                      aria-label="자세히 보기"
+                      aria-label={coreOpen ? '접기' : '자세히 보기'}
+                      onClick={() => setCoreOpen((v) => !v)}
                     >
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="6 9 12 15 18 9" />
@@ -1437,7 +1984,10 @@ export function Events2026FreePage() {
                     </button>
                   </div>
 
-                  <div className="core-card-expand open" id="evtfree-core-expand-1">
+                  <div
+                    className={`core-card-expand${coreOpen ? ' open' : ''}`}
+                    id="evtfree-core-expand-1"
+                  >
                     <div className="core-card-expand-inner">
                       {/* 좌 컬럼: 설명 + 추천 대상 */}
                       <div>
@@ -1734,7 +2284,101 @@ export function Events2026FreePage() {
               </div>
             </div>
 
-            {/* Phase 3.4 — RESULT cards + CTA appended next. */}
+            {/* BLOCK 3 : 결과물 (scroll-step 03) */}
+            <div className="event01-results event01-block" data-step="2">
+              <div className="scroll-step">
+                <div className="section-eyebrow" style={{ marginBottom: 24 }}>AFTER THE SESSION</div>
+                <div className="scroll-step-num">03</div>
+                <h3 className="scroll-step-title">
+                  강의로 끝나지 않습니다.<br />
+                  <span className="em">실제로 운영되는 사이트</span>가 남습니다
+                </h3>
+                <p className="scroll-step-desc">이 1시간이 끝나면, 사장님은 이런 것들을 손에 쥐게 됩니다.</p>
+              </div>
+
+              <div className="scroll-step-content">
+                <div className="event01-results-grid">
+                  <article className="event01-result-card">
+                    <div className="event01-result-num">RESULT 01</div>
+                    <h4 className="event01-result-h">바로 운영 가능한<br />내 사이트</h4>
+                    <ul className="event01-result-list">
+                      <li>SEO 기초 연결이 모두 끝난 상태의 홈페이지</li>
+                      <li className="highlight">수업 후 1시간만 투자하면 바로 배포 가능</li>
+                      <li>OG 태그 등 광고용 메타 정보까지 자동 처리</li>
+                      <li>도메인 연결까지 직접 연결 도움</li>
+                    </ul>
+                  </article>
+
+                  <article className="event01-result-card">
+                    <div className="event01-result-num">RESULT 02</div>
+                    <h4 className="event01-result-h">AI 홈페이지 제작<br />노하우, 통째로</h4>
+                    <ul className="event01-result-list">
+                      <li>업종에 맞는 AI 홈페이지 제작 템플릿</li>
+                      <li>그대로 복사해서 쓰는 프롬프트</li>
+                      <li className="highlight">단순 제작이 아닌, 검색에 노출되는 구조로 만드는 법</li>
+                      <li>다음 페이지 추가 시에도 적용 가능</li>
+                    </ul>
+                  </article>
+
+                  <article className="event01-result-card">
+                    <div className="event01-result-num">RESULT 03</div>
+                    <h4 className="event01-result-h">광고 없이도 고객이<br />찾아오는 기반</h4>
+                    <ul className="event01-result-list">
+                      <li>SEO(검색최적화) 기본 셋팅 완료</li>
+                      <li>홈페이지에서 시작하는 AI 자동화 마케팅의 출발점</li>
+                      <li className="highlight">2027년 2월 28일까지 월 이용료 0원</li>
+                      <li className="note">그 이후에도, 트렌드에 맞는 최소 비용으로 제공하는 것이 저희 운영 정책입니다.</li>
+                    </ul>
+                  </article>
+                </div>
+
+                {/* CTA */}
+                <div className="event01-cta">
+                  <div className="event01-cta-row">
+                    <a href="#" className="event01-btn">
+                      <span>지금 신청하기</span>
+                      <span className="event01-btn-arrow">→</span>
+                    </a>
+                    <a href="#" className="event01-btn secondary">
+                      <span>내 자격이 되는지 먼저 확인</span>
+                    </a>
+                  </div>
+                  <p className="event01-cta-note">선착순 3분 · 자격 검토 후 카카오톡으로 안내드립니다</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── CROSS-LINK 배너 (PAID 페이지로) ── */}
+        <section className="cross-link">
+          <div className="cross-link-inner">
+            <div className="cross-link-eyebrow">More Options</div>
+            <h2 className="cross-link-h">
+              자격 검토 없이 <span className="em">바로 시작</span>하고 싶다면
+            </h2>
+            <p className="cross-link-sub">
+              EVENT 02·03 패키지는 누구나 신청 가능합니다.<br />
+              합리적인 가격에 검색 전략 또는 콘텐츠 기획부터 한 번에.
+            </p>
+
+            <a href="/events2026/paid" className="cross-card">
+              <div className="cross-card-badge">
+                <span className="cross-card-badge-num">02·03</span>
+                <span className="cross-card-badge-tag">PAID</span>
+              </div>
+              <div className="cross-card-body">
+                <div className="cross-card-pkg">EVENT 02 · 03 · 합리적 가격</div>
+                <div className="cross-card-h">두 가지 패키지 중 내게 맞는 한 가지를</div>
+                <div className="cross-card-desc">001 검색 전략 또는 002 콘텐츠 기획 + CORE 1 배포 · 30만원 → 10만원</div>
+              </div>
+              <div className="cross-card-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </div>
+            </a>
           </div>
         </section>
 
