@@ -263,10 +263,590 @@ export function Events2026FreePage() {
           max-width: 620px; margin: 0 auto;
         }
 
+        /* ── 3 BENEFITS CARD GRID ── */
+        .evtfree .benefits {
+          background: var(--bg);
+          padding-top: 120px;
+          padding-bottom: 60px;
+        }
+        .evtfree .benefits-header { margin-bottom: 56px; }
+        .evtfree .benefits-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          max-width: 1080px;
+          margin: 0 auto;
+        }
+        .evtfree .benefit-card {
+          background: var(--bg-soft);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 32px 28px;
+          position: relative;
+          transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+          min-height: 220px;
+          display: flex; flex-direction: column;
+        }
+        .evtfree .benefit-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-md);
+          border-color: rgba(196,168,245,0.3);
+        }
+        .evtfree .benefit-card.violet { background: linear-gradient(180deg, #F5EFFF 0%, #FAF6FF 100%); border-color: rgba(196,168,245,0.25); }
+        .evtfree .benefit-card.mint   { background: linear-gradient(180deg, #E8F7F0 0%, #F1FAF6 100%); border-color: rgba(127,200,166,0.25); }
+        .evtfree .benefit-card.cream  { background: linear-gradient(180deg, #FBF6E8 0%, #FDFAF0 100%); border-color: rgba(220,180,90,0.2); }
+        .evtfree .benefit-eyebrow {
+          font-family: var(--font-en);
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 1.5px;
+          color: var(--text-muted);
+          margin-bottom: 18px;
+        }
+        .evtfree .benefit-eyebrow .dot {
+          display: inline-block; width: 4px; height: 4px;
+          border-radius: 50%; background: var(--text-muted);
+          margin: 0 8px; vertical-align: middle;
+        }
+        .evtfree .benefit-title {
+          font-size: 20px; font-weight: 700;
+          letter-spacing: -.6px;
+          margin-bottom: 12px;
+          line-height: 1.4;
+          color: var(--text-primary);
+        }
+        .evtfree .benefit-desc {
+          font-size: 13.5px;
+          color: var(--text-secondary);
+          line-height: 1.7;
+          flex: 1;
+        }
+        .evtfree .benefit-foot {
+          margin-top: 24px;
+          padding-top: 16px;
+          border-top: 1px dashed rgba(0,0,0,0.08);
+          font-size: 12px;
+          color: var(--text-muted);
+          display: flex; align-items: center; gap: 6px;
+        }
+        .evtfree .benefit-foot::before {
+          content: '→';
+          color: var(--accent-dark);
+          font-weight: 700;
+        }
+
+        /* ── EVENT 01 SECTION ── */
+        .evtfree .event01 {
+          background: var(--bg-soft);
+          padding-top: 100px;
+          padding-bottom: 100px;
+          position: relative;
+          overflow: hidden;
+        }
+        .evtfree .event01::before {
+          content: '';
+          position: absolute;
+          top: -200px; left: 50%;
+          transform: translateX(-50%);
+          width: 800px; height: 400px;
+          background: radial-gradient(ellipse, rgba(196,168,245,0.12) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .evtfree .event01-inner {
+          position: relative; z-index: 1;
+          max-width: 1240px; margin: 0 auto;
+        }
+
+        /* ── FREE BUNDLE ── */
+        .evtfree .free-bundle {
+          max-width: 1240px;
+          margin: 0 auto 80px;
+          text-align: center;
+        }
+        .evtfree .free-bundle-eyebrow {
+          display: inline-flex; align-items: center; gap: 10px;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          padding: 8px 18px;
+          border-radius: 100px;
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          color: var(--accent-deep);
+          margin-bottom: 20px;
+        }
+        .evtfree .free-bundle-eyebrow .num {
+          width: 22px; height: 22px;
+          background: var(--accent);
+          color: #fff;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 11px;
+          font-weight: 800;
+        }
+        .evtfree .free-bundle-title {
+          font-family: var(--font-ko);
+          font-size: clamp(28px, 3.6vw, 42px);
+          font-weight: 700;
+          letter-spacing: -1.2px;
+          color: var(--text-primary);
+          line-height: 1.3;
+          margin-bottom: 18px;
+        }
+        .evtfree .free-bundle-title .free { color: var(--accent-dark); }
+        .evtfree .free-bundle-sub {
+          font-size: 16px;
+          color: var(--text-secondary);
+          line-height: 1.75;
+          margin: 0 auto 56px;
+          max-width: 580px;
+        }
+
+        /* CORE 1 — 2단 구조 (상단 알림 + 하단 카드) */
+        .evtfree .free-bundle-core {
+          margin: -24px auto 56px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        /* 상단: 핵심 교육 알림 박스 */
+        .evtfree .core-notice {
+          display: flex; align-items: flex-start; gap: 14px;
+          background: linear-gradient(135deg, rgba(196,168,245,0.16) 0%, rgba(155,184,248,0.12) 100%);
+          border: 1px solid rgba(196,168,245,0.32);
+          border-radius: var(--radius-lg);
+          padding: 18px 24px;
+        }
+        .evtfree .core-notice-star {
+          flex-shrink: 0;
+          width: 28px; height: 28px;
+          background: #FFE99A;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 2px 6px rgba(255, 200, 80, 0.35);
+          margin-top: 2px;
+        }
+        .evtfree .core-notice-star::before {
+          content: '★';
+          color: #E8A60E;
+          font-size: 14px;
+          line-height: 1;
+        }
+        .evtfree .core-notice-body { text-align: left; flex: 1; }
+        .evtfree .core-notice-title {
+          font-size: 15px; font-weight: 700;
+          color: var(--accent-deep);
+          letter-spacing: -.2px;
+          margin-bottom: 4px;
+          line-height: 1.4;
+        }
+        .evtfree .core-notice-sub {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.55;
+          font-weight: 400;
+        }
+
+        /* 하단: CORE1 배포 카드 */
+        .evtfree .core-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          text-align: left;
+          transition: border-color .2s, box-shadow .2s;
+          overflow: hidden;
+        }
+        .evtfree .core-card:hover {
+          border-color: rgba(196,168,245,0.4);
+          box-shadow: var(--shadow-md);
+        }
+        .evtfree .core-card-header {
+          display: grid;
+          grid-template-columns: auto 1fr auto auto;
+          gap: 22px;
+          align-items: center;
+          padding: 22px 26px;
+        }
+        .evtfree .core-card-icon {
+          width: 56px; height: 56px;
+          background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+          border-radius: var(--radius-md);
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 4px 14px rgba(139,111,212,0.3);
+          flex-shrink: 0;
+        }
+        .evtfree .core-card-icon-text {
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 800;
+          color: #fff;
+          letter-spacing: .5px;
+        }
+        .evtfree .core-card-body { min-width: 0; }
+        .evtfree .core-card-label {
+          display: inline-flex;
+          align-items: center;
+          background: var(--accent-deep);
+          color: #fff;
+          font-family: var(--font-en);
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: .5px;
+          padding: 4px 11px;
+          border-radius: 6px;
+          margin-bottom: 8px;
+        }
+        .evtfree .core-card-h {
+          font-family: var(--font-ko);
+          font-size: clamp(16px, 1.5vw, 18px);
+          font-weight: 700;
+          color: var(--text-primary);
+          letter-spacing: -.3px;
+          margin-bottom: 10px;
+          line-height: 1.4;
+        }
+        .evtfree .core-card-tags {
+          display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .evtfree .core-card-tag {
+          font-size: 12.5px;
+          color: var(--text-muted);
+          background: var(--bg-soft);
+          border: 1px solid var(--border-soft);
+          padding: 4px 10px;
+          border-radius: 100px;
+          font-weight: 500;
+        }
+        .evtfree .core-card-price {
+          text-align: right;
+          flex-shrink: 0;
+          display: flex; align-items: center; gap: 6px;
+        }
+        .evtfree .core-card-price-strike {
+          font-size: 13px;
+          color: var(--text-muted);
+          text-decoration: line-through;
+          text-decoration-color: rgba(155,155,155,0.7);
+          font-weight: 500;
+        }
+        .evtfree .core-card-price-arrow {
+          color: var(--accent-dark);
+          font-weight: 700;
+          margin: 0 2px;
+        }
+        .evtfree .core-card-price-free {
+          font-size: 17px;
+          font-weight: 800;
+          color: var(--accent-deep);
+          letter-spacing: -.4px;
+        }
+
+        .evtfree .core-card-toggle {
+          width: 38px; height: 38px;
+          border-radius: 50%;
+          background: var(--bg-soft);
+          border: 1px solid var(--border);
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer;
+          transition: background .2s, border-color .2s, transform .3s;
+          flex-shrink: 0;
+          padding: 0;
+          color: var(--accent-dark);
+        }
+        .evtfree .core-card-toggle:hover {
+          background: var(--accent-light);
+          border-color: rgba(196,168,245,0.4);
+        }
+        .evtfree .core-card-toggle svg {
+          width: 16px; height: 16px;
+          transition: transform .35s cubic-bezier(0.65, 0.05, 0.35, 1);
+        }
+        .evtfree .core-card-toggle[aria-expanded="true"] svg {
+          transform: rotate(180deg);
+        }
+
+        .evtfree .core-card-expand {
+          overflow: hidden;
+          max-height: 0;
+          transition: max-height .5s cubic-bezier(0.65, 0.05, 0.35, 1);
+        }
+        .evtfree .core-card-expand.open { max-height: 1500px; }
+        .evtfree .core-card-expand-inner {
+          border-top: 1px solid var(--border-soft);
+          padding: 32px 30px 32px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 36px;
+        }
+
+        .evtfree .core-col-section + .core-col-section { margin-top: 26px; }
+        .evtfree .core-col-h {
+          display: inline-flex; align-items: center;
+          background: var(--accent-deep);
+          color: #fff;
+          font-size: 11px;
+          font-weight: 700;
+          padding: 4px 10px;
+          border-radius: 6px;
+          margin-bottom: 12px;
+          letter-spacing: -.1px;
+        }
+        .evtfree .core-col-section.muted .core-col-h {
+          background: var(--text-primary);
+        }
+        .evtfree .core-col-desc {
+          font-size: 14.5px;
+          color: var(--text-secondary);
+          line-height: 1.75;
+        }
+        .evtfree .core-col-desc + .core-col-desc { margin-top: 14px; }
+
+        .evtfree .core-col-list {
+          list-style: none;
+          display: flex; flex-direction: column;
+          gap: 9px;
+          padding: 0; margin: 0;
+        }
+        .evtfree .core-col-list.bullet li {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          padding-left: 16px;
+          position: relative;
+        }
+        .evtfree .core-col-list.bullet li::before {
+          content: '';
+          position: absolute;
+          left: 0; top: 9px;
+          width: 5px; height: 5px;
+          background: var(--accent);
+          border-radius: 50%;
+        }
+        .evtfree .core-col-list.check li {
+          font-size: 14px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          padding-left: 22px;
+          position: relative;
+        }
+        .evtfree .core-col-list.check li::before {
+          content: '✓';
+          position: absolute;
+          left: 0; top: 0;
+          color: var(--accent-dark);
+          font-weight: 700;
+          font-size: 13px;
+        }
+
+        .evtfree .core-col-chips {
+          display: flex; flex-wrap: wrap; gap: 8px;
+          margin-top: 4px;
+        }
+        .evtfree .core-col-chip {
+          display: inline-flex; align-items: center; gap: 6px;
+          background: var(--bg-soft);
+          border: 1px solid var(--border-soft);
+          color: var(--text-primary);
+          font-size: 13px;
+          font-weight: 500;
+          padding: 6px 12px;
+          border-radius: 100px;
+        }
+        .evtfree .core-col-chip-icon { font-size: 14px; line-height: 1; }
+
+        /* ── 3D FLIP CARDS (3 free cards) ── */
+        .evtfree .free-bundle-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 18px;
+          perspective: 1600px;
+        }
+        .evtfree .free-card {
+          position: relative;
+          min-height: 340px;
+          transform-style: preserve-3d;
+          transition: transform .9s cubic-bezier(0.65, 0.05, 0.35, 1);
+          will-change: transform;
+        }
+        .evtfree .free-card.flipped { transform: rotateY(180deg); }
+
+        .evtfree .free-face {
+          position: absolute; inset: 0;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 36px 32px;
+          display: flex; flex-direction: column;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          transition: box-shadow .25s ease, border-color .25s ease;
+        }
+        .evtfree .free-face.face-front { z-index: 2; }
+        .evtfree .free-face.face-back {
+          transform: rotateY(180deg);
+          background: linear-gradient(160deg, var(--accent-deep) 0%, var(--accent-dark) 60%, #4A2D8F 100%);
+          border-color: transparent;
+          color: #fff;
+          text-align: center;
+          align-items: center;
+          justify-content: center;
+          padding: 36px 28px;
+          overflow: hidden;
+        }
+        .evtfree .free-face.face-back::before {
+          content: '';
+          position: absolute;
+          inset: -50%;
+          background:
+            radial-gradient(circle at 30% 20%, rgba(196,168,245,0.35) 0%, transparent 45%),
+            radial-gradient(circle at 70% 80%, rgba(155,184,248,0.25) 0%, transparent 50%);
+          pointer-events: none;
+        }
+        .evtfree .free-card:hover .free-face { box-shadow: var(--shadow-md); }
+
+        .evtfree .free-card-head {
+          display: flex; align-items: center; justify-content: space-between;
+          margin-bottom: 24px;
+        }
+        .evtfree .free-card-icon {
+          font-family: var(--font-en);
+          font-size: 32px;
+          font-weight: 800;
+          color: var(--accent-dark);
+          letter-spacing: -1.5px;
+          line-height: 1;
+        }
+        .evtfree .free-card-icon-unit {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--accent);
+          margin-left: 2px;
+        }
+        .evtfree .free-card-badge {
+          font-family: var(--font-en);
+          font-size: 10px;
+          font-weight: 800;
+          color: #fff;
+          background: var(--accent-dark);
+          padding: 5px 11px;
+          border-radius: 100px;
+          letter-spacing: 1.2px;
+        }
+        .evtfree .free-card-label {
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-muted);
+          letter-spacing: .5px;
+          margin-bottom: 14px;
+          text-transform: uppercase;
+        }
+        .evtfree .free-card-h {
+          font-family: var(--font-ko);
+          font-size: clamp(22px, 2.4vw, 28px);
+          font-weight: 700;
+          letter-spacing: -.8px;
+          color: var(--text-primary);
+          margin-bottom: 22px;
+          line-height: 1.3;
+        }
+        .evtfree .free-card-list {
+          list-style: none;
+          display: flex; flex-direction: column;
+          gap: 12px;
+          margin: auto 0 0;
+          padding: 0;
+        }
+        .evtfree .free-card-list li {
+          font-size: 15.5px;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          padding-left: 16px;
+          position: relative;
+          font-weight: 400;
+        }
+        .evtfree .free-card-list li::before {
+          content: '';
+          position: absolute;
+          left: 0; top: 11px;
+          width: 5px; height: 5px;
+          background: var(--accent);
+          border-radius: 50%;
+        }
+
+        /* BACK FACE — 임팩트 메시지 */
+        .evtfree .face-back-eyebrow {
+          font-family: var(--font-en);
+          font-size: 11px;
+          font-weight: 700;
+          color: rgba(255,255,255,0.6);
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          margin-bottom: 24px;
+          position: relative; z-index: 1;
+        }
+        .evtfree .face-back-strike {
+          font-family: var(--font-en);
+          font-size: 22px;
+          font-weight: 600;
+          color: rgba(255,255,255,0.45);
+          text-decoration: line-through;
+          text-decoration-color: rgba(255,255,255,0.5);
+          text-decoration-thickness: 2px;
+          margin-bottom: 8px;
+          position: relative; z-index: 1;
+        }
+        .evtfree .face-back-arrow {
+          font-size: 20px;
+          color: rgba(255,255,255,0.6);
+          margin-bottom: 8px;
+          position: relative; z-index: 1;
+          line-height: 1;
+        }
+        .evtfree .face-back-headline {
+          font-family: var(--font-en);
+          font-size: clamp(48px, 5.5vw, 68px);
+          font-weight: 800;
+          color: #fff;
+          letter-spacing: -2.5px;
+          line-height: 1;
+          margin-bottom: 10px;
+          position: relative; z-index: 1;
+        }
+        .evtfree .face-back-headline .unit {
+          font-size: 0.5em;
+          font-weight: 600;
+          color: var(--accent);
+          margin-left: 4px;
+          letter-spacing: -1px;
+        }
+        .evtfree .face-back-caption {
+          font-size: 14px;
+          font-weight: 500;
+          color: rgba(255,255,255,0.78);
+          line-height: 1.6;
+          margin-top: 14px;
+          max-width: 220px;
+          position: relative; z-index: 1;
+        }
+
         @media (max-width: 900px) {
           .evtfree section { padding: 80px 24px; }
           .evtfree .hero { padding: 120px 24px 60px; min-height: auto; }
           .evtfree .hero-prism { width: 160px; height: 160px; }
+          .evtfree .benefits-grid { grid-template-columns: 1fr; }
+          .evtfree .free-bundle-grid { grid-template-columns: 1fr; }
+          .evtfree .free-bundle { margin-bottom: 56px; }
+          .evtfree .free-face { padding: 28px 24px; }
+          .evtfree .free-bundle-core { margin: -16px auto 40px; }
+          .evtfree .core-card-header { grid-template-columns: auto 1fr auto; gap: 14px; padding: 18px 20px; }
+          .evtfree .core-card-toggle { grid-column: 3; }
+          .evtfree .core-card-price { grid-column: 1 / -1; justify-content: flex-end; padding-top: 10px; border-top: 1px dashed var(--border); }
+          .evtfree .core-card-expand-inner { grid-template-columns: 1fr; gap: 26px; padding: 24px 22px; }
+          .evtfree .core-notice { padding: 16px 20px; }
+          .evtfree .core-notice-title { font-size: 14px; }
+          .evtfree .core-notice-sub { font-size: 13px; }
         }
         @media (max-width: 480px) {
           .evtfree .hero-h1 { letter-spacing: -1.5px; }
@@ -376,8 +956,247 @@ export function Events2026FreePage() {
           </div>
         </section>
 
-        {/* Phase 3.2–3.4 will append the 3 Benefits / EVENT 01 / CROSS-LINK
-            sections here, between the hero and the footer. */}
+        {/* ── 3 BENEFITS GRID ── */}
+        <section className="benefits">
+          <div className="section-inner">
+            <div className="benefits-header">
+              <div className="section-eyebrow">한눈에 보기</div>
+              <h2 className="section-h2">
+                이번 이벤트는<br /><span className="em">세 가지 혜택</span>으로 구성됩니다
+              </h2>
+              <p className="section-sub" style={{ marginTop: 14 }}>
+                모두를 위한 이벤트가 아닙니다. 무료, 할인도, 검색 미션도 — 준비 같은 것은 안에서 시작됩니다.
+              </p>
+            </div>
+
+            <div className="benefits-grid">
+              <article className="benefit-card violet">
+                <div className="benefit-eyebrow">CASE A <span className="dot"></span> 한정 무료</div>
+                <h3 className="benefit-title">런칭 파트너 (무료)</h3>
+                <p className="benefit-desc">이미 콘텐츠가 있는 분, 사장 자동화 기반을 만들고 싶은 분</p>
+                <div className="benefit-foot">자격 검토 · 기간 한정</div>
+              </article>
+
+              <article className="benefit-card mint">
+                <div className="benefit-eyebrow">CASE B <span className="dot"></span> 할인가</div>
+                <h3 className="benefit-title">실전 패키지 (10만원)</h3>
+                <p className="benefit-desc">홈페이지 내용부터 함께 짜야 할 분, 기존 사이트를 SEO로 개선할 분</p>
+                <div className="benefit-foot">누구나 신청 가능 / 정가 30만원</div>
+              </article>
+
+              <article className="benefit-card cream">
+                <div className="benefit-eyebrow">CASE C <span className="dot"></span> 동반</div>
+                <h3 className="benefit-title">공동 — 디렉토리 SEO 네트워크</h3>
+                <p className="benefit-desc">업종 카테고리에 맞는 검색 위치 검색 네트워크에 함께 노출</p>
+                <div className="benefit-foot">수수료 없음 · 추후 동참 · 검색 결과 공동</div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        {/* ── EVENT 01 SECTION ── */}
+        <section className="event01" id="event01">
+          <div className="event01-inner">
+
+            {/* ── FREE BUNDLE (3가지 무료 제공) ── */}
+            <div className="free-bundle">
+              <div className="free-bundle-eyebrow">
+                <span className="num">1</span>
+                <span>EVENT 01</span>
+              </div>
+              <h3 className="free-bundle-title">
+                3가지를 <span className="free">전부 무료</span>로<br />받아가시는 이벤트입니다
+              </h3>
+              <p className="free-bundle-sub">
+                평소 정가로 제공되는 AISEO 핵심 3종 패키지 —<br />이번 한정으로 전체 무료
+              </p>
+
+              <div className="free-bundle-core">
+                {/* 상단: 핵심 교육 알림 */}
+                <div className="core-notice">
+                  <div className="core-notice-star" aria-hidden="true"></div>
+                  <div className="core-notice-body">
+                    <div className="core-notice-title">CORE 1 — 핵심 교육</div>
+                    <div className="core-notice-sub">사이트를 실제로 웹에 올리는 핵심 실습입니다</div>
+                  </div>
+                </div>
+
+                {/*
+                  하단: CORE1 배포 카드. Phase 3.2 ships the panel
+                  rendered EXPANDED (`aria-expanded="true"` + `.open`)
+                  so its content is visible while the toggle handler
+                  is still pending in Phase 3.4.
+                */}
+                <div className="core-card">
+                  <div className="core-card-header">
+                    <div className="core-card-icon">
+                      <span className="core-card-icon-text">CORE1</span>
+                    </div>
+                    <div className="core-card-body">
+                      <span className="core-card-label">CORE 1 · Deployment</span>
+                      <h4 className="core-card-h">AI 홈페이지 즉시 배포 + 기술적 SEO 셋팅</h4>
+                      <div className="core-card-tags">
+                        <span className="core-card-tag">#즉시배포</span>
+                        <span className="core-card-tag">#서치콘솔</span>
+                        <span className="core-card-tag">#GA4연동</span>
+                        <span className="core-card-tag">#기술적SEO</span>
+                      </div>
+                    </div>
+                    <div className="core-card-price">
+                      <span className="core-card-price-strike">10만원</span>
+                      <span className="core-card-price-arrow">→</span>
+                      <span className="core-card-price-free">무료</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="core-card-toggle"
+                      aria-expanded="true"
+                      aria-controls="evtfree-core-expand-1"
+                      aria-label="자세히 보기"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div className="core-card-expand open" id="evtfree-core-expand-1">
+                    <div className="core-card-expand-inner">
+                      {/* 좌 컬럼: 설명 + 추천 대상 */}
+                      <div>
+                        <div className="core-col-section">
+                          <p className="core-col-desc">
+                            AI로 만든 홈페이지를 실제 웹 주소에 올리는 것에서 끝나지 않습니다. 배포 직후 검색엔진이 내 사이트를 제대로 인식하고 데이터를 쌓을 수 있도록, Google Search Console · GA4 · 네이버 서치어드바이저 연동까지 원클릭 셋팅으로 한 번에 완성합니다.
+                          </p>
+                          <p className="core-col-desc">
+                            ZIP 업로드부터 서브도메인 배포, 기술적 SEO 설정, 측정 코드 삽입까지 — 교육 당일 실제로 공개 가능한 URL과 데이터 수집 환경이 동시에 만들어집니다.
+                          </p>
+                        </div>
+
+                        <div className="core-col-section">
+                          <span className="core-col-h">이런 분께 추천합니다</span>
+                          <ul className="core-col-list bullet">
+                            <li>AI 도구로 홈페이지를 만들었지만 올리는 방법을 모르는 분</li>
+                            <li>배포는 됐는데 Search Console · GA4가 연결이 안 된 분</li>
+                            <li>검색 노출 기반을 처음부터 제대로 잡고 싶은 분</li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* 우 컬럼: 배우게 되는 것 + 진행 방식 */}
+                      <div>
+                        <div className="core-col-section">
+                          <span className="core-col-h">배우게 되는 것</span>
+                          <ul className="core-col-list check">
+                            <li>AWS S3 버킷 생성 및 정적 웹 호스팅 · 서브도메인 배포</li>
+                            <li>기술적 SEO — 메타 태그 · robots.txt · sitemap.xml 설정</li>
+                            <li>Google Search Console 연동 · 소유권 인증 · 색인 요청</li>
+                            <li>GA4 설치 · 기본 이벤트 수집 확인</li>
+                            <li>네이버 서치어드바이저 등록 · 사이트맵 제출</li>
+                            <li>배포 후 수정사항 재업로드 방법</li>
+                          </ul>
+                        </div>
+
+                        <div className="core-col-section muted">
+                          <span className="core-col-h">진행 방식</span>
+                          <div className="core-col-chips">
+                            <span className="core-col-chip"><span className="core-col-chip-icon">⏱</span>약 90~120분</span>
+                            <span className="core-col-chip"><span className="core-col-chip-icon">💻</span>화상 실습</span>
+                            <span className="core-col-chip"><span className="core-col-chip-icon">📋</span>SEO 셋팅 체크리스트</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/*
+                3 FREE CARDS. Phase 3.2 renders the front face only;
+                back-face markup is included so Phase 3.4's auto-flip
+                cycle can toggle the .flipped class without further
+                markup changes.
+              */}
+              <div className="free-bundle-grid">
+                <article className="free-card" data-card="0">
+                  <div className="free-face face-front">
+                    <div className="free-card-head">
+                      <div className="free-card-icon">01<span className="free-card-icon-unit">.</span></div>
+                      <span className="free-card-badge">FREE</span>
+                    </div>
+                    <div className="free-card-label">PART 01 · BUILD</div>
+                    <h4 className="free-card-h">AI 홈페이지 제작</h4>
+                    <ul className="free-card-list">
+                      <li>업종 맞춤 프롬프트 제공</li>
+                      <li>디자인 템플릿 파일 제공</li>
+                      <li>1시간 안에 완성 가능</li>
+                      <li>1:1 라이브 코칭 동반</li>
+                    </ul>
+                  </div>
+                  <div className="free-face face-back">
+                    <div className="face-back-eyebrow">PART 01 · BUILD</div>
+                    <div className="face-back-strike">정가 30만원</div>
+                    <div className="face-back-arrow">↓</div>
+                    <div className="face-back-headline">0<span className="unit">원</span></div>
+                    <p className="face-back-caption">1시간 안에 내 사이트가 완성됩니다</p>
+                  </div>
+                </article>
+
+                <article className="free-card" data-card="1">
+                  <div className="free-face face-front">
+                    <div className="free-card-head">
+                      <div className="free-card-icon">02<span className="free-card-icon-unit">.</span></div>
+                      <span className="free-card-badge">FREE</span>
+                    </div>
+                    <div className="free-card-label">PART 02 · DEPLOY</div>
+                    <h4 className="free-card-h">도메인 &amp; 호스팅</h4>
+                    <ul className="free-card-list">
+                      <li>12개월 무료 서브도메인</li>
+                      <li>1G 웹호스팅 무료 제공</li>
+                      <li>SSL 보안 인증서 자동 적용</li>
+                      <li>yourname.aiseo.tips 형태</li>
+                    </ul>
+                  </div>
+                  <div className="free-face face-back">
+                    <div className="face-back-eyebrow">PART 02 · DEPLOY</div>
+                    <div className="face-back-strike">월 1.2만원 × 12</div>
+                    <div className="face-back-arrow">↓</div>
+                    <div className="face-back-headline">12<span className="unit">개월</span></div>
+                    <p className="face-back-caption">호스팅 · 도메인 · SSL 모두 무료</p>
+                  </div>
+                </article>
+
+                <article className="free-card" data-card="2">
+                  <div className="free-face face-front">
+                    <div className="free-card-head">
+                      <div className="free-card-icon">03<span className="free-card-icon-unit">.</span></div>
+                      <span className="free-card-badge">FREE</span>
+                    </div>
+                    <div className="free-card-label">PART 03 · CONNECT</div>
+                    <h4 className="free-card-h">SEO 핵심강의</h4>
+                    <ul className="free-card-list">
+                      <li>sitemap · robots · 메타태그</li>
+                      <li>네이버 · 구글 등록 노출 전략</li>
+                      <li>키워드 리서치 실전 가이드</li>
+                      <li>강의 후 즉시 적용 체크리스트</li>
+                    </ul>
+                  </div>
+                  <div className="free-face face-back">
+                    <div className="face-back-eyebrow">PART 03 · CONNECT</div>
+                    <div className="face-back-strike">정가 10만원</div>
+                    <div className="face-back-arrow">↓</div>
+                    <div className="face-back-headline">10<span className="unit">년</span></div>
+                    <p className="face-back-caption">노하우를 핵심만 쏙쏙 1시간으로</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            {/* Phase 3.3 will append INTRO H2 + STATS + 5 targets +
+                scroll-step 01·02 below the FREE BUNDLE. */}
+          </div>
+        </section>
+
 
         {/* Footer — matches the other 2026 pages so the page closes cleanly
             even at the partial-port stage. */}
