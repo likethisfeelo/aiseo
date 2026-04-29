@@ -406,15 +406,283 @@ export function Events2026Page() {
         .evtmain .event-card-cta-arrow { transition: transform .25s; display: inline-block; }
         .evtmain .event-card:hover .event-card-cta-arrow { transform: translateX(4px); }
 
+        /* ── HOW IT WORKS ── */
+        .evtmain .how { background: var(--bg-soft); padding: 110px 40px; }
+        .evtmain .how-inner { max-width: 1240px; margin: 0 auto; }
+        .evtmain .how-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          position: relative;
+          margin-top: 48px;
+        }
+        .evtmain .how-grid::before {
+          content: '';
+          position: absolute;
+          top: 38px;
+          left: 12%; right: 12%;
+          height: 1px;
+          background: linear-gradient(90deg, transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
+          opacity: 0.4;
+          z-index: 0;
+        }
+        .evtmain .how-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 28px 26px;
+          position: relative;
+          z-index: 1;
+          transition: border-color .2s, transform .2s, box-shadow .2s;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+        .evtmain .how-card:hover {
+          border-color: rgba(196,168,245,0.4);
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-md);
+        }
+        .evtmain .how-num {
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 800;
+          color: var(--accent-dark);
+          letter-spacing: 1.2px;
+          background: var(--accent-light);
+          padding: 6px 12px;
+          border-radius: 100px;
+          align-self: flex-start;
+        }
+        .evtmain .how-h {
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--text-primary);
+          letter-spacing: -.3px;
+          line-height: 1.4;
+        }
+        .evtmain .how-desc {
+          font-size: 15px;
+          color: var(--text-secondary);
+          line-height: 1.7;
+        }
+        .evtmain .how-note {
+          text-align: center;
+          margin-top: 32px;
+          font-size: 14px;
+          color: var(--text-muted);
+          line-height: 1.7;
+        }
+
+        /* ── COMMON BENEFIT (검색 네트워크) ── */
+        .evtmain .common {
+          background: linear-gradient(180deg, #0A0614 0%, #14102A 100%);
+          padding: 120px 40px;
+          position: relative;
+          overflow: hidden;
+        }
+        .evtmain .common::before {
+          content: '';
+          position: absolute;
+          top: -200px; right: -100px;
+          width: 600px; height: 400px;
+          background: radial-gradient(ellipse, rgba(196,168,245,0.16) 0%, transparent 65%);
+          pointer-events: none;
+        }
+        .evtmain .common::after {
+          content: '';
+          position: absolute;
+          bottom: -150px; left: -80px;
+          width: 500px; height: 350px;
+          background: radial-gradient(ellipse, rgba(155,184,248,0.10) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .evtmain .common-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
+        .evtmain .common-h {
+          font-family: var(--font-ko);
+          font-size: clamp(28px, 3.6vw, 40px);
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -1.2px;
+          line-height: 1.3;
+          text-align: center;
+          margin-bottom: 18px;
+        }
+        .evtmain .common-h .em { color: var(--accent); }
+        .evtmain .common-sub {
+          font-size: 16px;
+          color: rgba(255,255,255,0.7);
+          line-height: 1.8;
+          text-align: center;
+          max-width: 640px;
+          margin: 0 auto 56px;
+        }
+
+        .evtmain .common-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+          margin-bottom: 48px;
+        }
+        .evtmain .common-cat {
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: var(--radius-lg);
+          padding: 24px 22px;
+          transition: background .25s, border-color .25s;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+        }
+        .evtmain .common-cat:hover {
+          background: rgba(196,168,245,0.10);
+          border-color: rgba(196,168,245,0.35);
+        }
+        .evtmain .common-cat.future {
+          background: rgba(255,255,255,0.02);
+          border-style: dashed;
+        }
+        .evtmain .common-cat-icon {
+          font-size: 28px;
+          line-height: 1;
+          margin-bottom: 14px;
+        }
+        .evtmain .common-cat-h {
+          font-size: 17px;
+          font-weight: 700;
+          color: #fff;
+          margin-bottom: 6px;
+          letter-spacing: -.3px;
+        }
+        .evtmain .common-cat-desc {
+          font-size: 13.5px;
+          color: rgba(255,255,255,0.6);
+          line-height: 1.6;
+        }
+        .evtmain .common-cat.future .common-cat-h { color: rgba(255,255,255,0.7); }
+
+        .evtmain .common-examples {
+          background: rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: var(--radius-lg);
+          padding: 28px 32px;
+          text-align: center;
+          margin-bottom: 28px;
+        }
+        .evtmain .common-examples-q {
+          display: inline-flex; flex-wrap: wrap;
+          gap: 8px;
+          justify-content: center;
+          margin-bottom: 18px;
+        }
+        .evtmain .common-examples-q span {
+          font-size: 14px;
+          color: rgba(255,255,255,0.85);
+          background: rgba(255,255,255,0.06);
+          padding: 7px 14px;
+          border-radius: 100px;
+          border: 1px solid rgba(255,255,255,0.1);
+          font-weight: 500;
+        }
+        .evtmain .common-examples-result {
+          font-size: 15px;
+          color: var(--accent);
+          font-weight: 600;
+          letter-spacing: -.2px;
+        }
+        .evtmain .common-examples-result::before { content: '→ '; }
+
+        .evtmain .common-not-ad {
+          background: linear-gradient(135deg, rgba(196,168,245,0.18) 0%, rgba(155,184,248,0.10) 100%);
+          border: 1px solid rgba(196,168,245,0.3);
+          border-radius: var(--radius-lg);
+          padding: 28px 32px;
+          text-align: center;
+        }
+        .evtmain .common-not-ad-h {
+          font-size: 18px;
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -.3px;
+          margin-bottom: 14px;
+        }
+        .evtmain .common-not-ad-list {
+          display: inline-flex; flex-wrap: wrap;
+          gap: 18px;
+          justify-content: center;
+          margin: 0 0 14px;
+          padding: 0;
+          list-style: none;
+        }
+        .evtmain .common-not-ad-list li {
+          font-size: 14px;
+          color: rgba(255,255,255,0.85);
+          font-weight: 500;
+          position: relative;
+          padding-left: 14px;
+        }
+        .evtmain .common-not-ad-list li::before {
+          content: '·';
+          position: absolute;
+          left: 0; top: -2px;
+          color: var(--accent);
+          font-weight: 800;
+          font-size: 18px;
+        }
+        .evtmain .common-not-ad-foot {
+          font-size: 14px;
+          color: rgba(255,255,255,0.6);
+          line-height: 1.7;
+        }
+
+        .evtmain .common-restaurant-note {
+          margin: 28px auto 0;
+          max-width: 720px;
+          background: rgba(255,255,255,0.03);
+          border: 1px dashed rgba(255,255,255,0.18);
+          border-radius: var(--radius-md);
+          padding: 18px 24px;
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+        }
+        .evtmain .common-restaurant-note-icon {
+          flex-shrink: 0;
+          width: 22px; height: 22px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.08);
+          color: rgba(255,255,255,0.6);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 13px;
+          font-weight: 700;
+          margin-top: 1px;
+        }
+        .evtmain .common-restaurant-note-body {
+          font-size: 13.5px;
+          color: rgba(255,255,255,0.65);
+          line-height: 1.7;
+        }
+        .evtmain .common-restaurant-note-body strong {
+          color: rgba(255,255,255,0.85);
+          font-weight: 600;
+        }
+
         @media (max-width: 900px) {
           .evtmain section { padding: 80px 24px; }
           .evtmain .solidly { padding: 70px 24px; }
           .evtmain .events-list { padding: 80px 24px; }
           .evtmain .event-card { padding: 32px 26px; }
           .evtmain .event-card-h { letter-spacing: -.8px; }
+          .evtmain .how { padding: 80px 24px; }
+          .evtmain .how-grid { grid-template-columns: repeat(2, 1fr); }
+          .evtmain .how-grid::before { display: none; }
+          .evtmain .common { padding: 80px 24px; }
+          .evtmain .common-grid { grid-template-columns: 1fr; }
+          .evtmain .common-examples { padding: 22px 20px; }
+          .evtmain .common-not-ad { padding: 22px 20px; }
         }
         @media (max-width: 480px) {
           .evtmain .section-h2 { letter-spacing: -.8px; }
+          .evtmain .how-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -643,6 +911,123 @@ export function Events2026Page() {
                 </span>
               </div>
             </a>
+          </div>
+        </section>
+
+        {/* ── HOW IT WORKS ── */}
+        <section className="how">
+          <div className="how-inner">
+            <div className="section-eyebrow">How It Works</div>
+            <h2 className="section-h2">
+              신청부터 시작까지, <span className="em">4단계</span>
+            </h2>
+            <p className="section-sub">빠르면 5영업일 내에 진행됩니다.</p>
+
+            <div className="how-grid">
+              <div className="how-card">
+                <span className="how-num">STEP 01</span>
+                <div className="how-h">정보 입력</div>
+                <div className="how-desc">업종 · 지역 · 현재 상태 · 연락처</div>
+              </div>
+              <div className="how-card">
+                <span className="how-num">STEP 02</span>
+                <div className="how-h">적합성 확인</div>
+                <div className="how-desc">런칭 파트너 / 실전 패키지 중 어디에 맞는지 안내드립니다.</div>
+              </div>
+              <div className="how-card">
+                <span className="how-num">STEP 03</span>
+                <div className="how-h">맞춤 방향 제안</div>
+                <div className="how-desc">어떻게 진행할지 1:1 상담 (15~20분)</div>
+              </div>
+              <div className="how-card">
+                <span className="how-num">STEP 04</span>
+                <div className="how-h">시작</div>
+                <div className="how-desc">선별 시 5영업일 내 진행됩니다.</div>
+              </div>
+            </div>
+
+            <p className="how-note">적합성 확인부터 실제 시작까지 흐름을 미리 확인해보세요.</p>
+          </div>
+        </section>
+
+        {/* ── COMMON BENEFIT — 검색 네트워크 ── */}
+        <section className="common">
+          <div className="common-inner">
+            <div className="section-eyebrow dark">Common Benefit</div>
+            <h2 className="common-h">
+              내 업종을 찾는 사람이 검색하는 곳에도<br />
+              <span className="em">함께 노출됩니다</span>
+            </h2>
+            <p className="common-sub">
+              홈페이지 하나만 만드는 게 아닙니다. 업종별 네트워크 페이지에 함께 등록되어,
+              지역 검색 키워드에서 추가 노출 기회를 만듭니다.
+            </p>
+
+            {/* 6개 업종 카드 */}
+            <div className="common-grid">
+              <div className="common-cat">
+                <div className="common-cat-icon" aria-hidden="true">🐶</div>
+                <div className="common-cat-h">반려동물</div>
+                <div className="common-cat-desc">미용 · 훈련 · 호텔 · 돌봄 · 장례 · 용품</div>
+              </div>
+              <div className="common-cat">
+                <div className="common-cat-icon" aria-hidden="true">🎨</div>
+                <div className="common-cat-h">원데이 클래스</div>
+                <div className="common-cat-desc">도자기 · 베이킹 · 꽃꽂이 · 가죽공예 · 캔들 · 드로잉</div>
+              </div>
+              <div className="common-cat">
+                <div className="common-cat-icon" aria-hidden="true">💪</div>
+                <div className="common-cat-h">1:1 PT · 운동</div>
+                <div className="common-cat-desc">PT · 필라테스 · 요가 · 재활 · 체형교정</div>
+              </div>
+              <div className="common-cat">
+                <div className="common-cat-icon" aria-hidden="true">🛠</div>
+                <div className="common-cat-h">맞춤 제작</div>
+                <div className="common-cat-desc">가구 · 간판 · 인쇄 · 공방 · 주문제작 · 소품</div>
+              </div>
+              <div className="common-cat">
+                <div className="common-cat-icon" aria-hidden="true">💼</div>
+                <div className="common-cat-h">전문 서비스</div>
+                <div className="common-cat-desc">코칭 · 컨설팅 · 강의 · 상담 · 멘토링 · 과외</div>
+              </div>
+              <div className="common-cat future">
+                <div className="common-cat-icon" aria-hidden="true">＋</div>
+                <div className="common-cat-h">향후 추가 예정</div>
+                <div className="common-cat-desc">업종 카테고리는 단계적으로 확장됩니다.</div>
+              </div>
+            </div>
+
+            {/* 검색어 예시 */}
+            <div className="common-examples">
+              <div className="common-examples-q">
+                <span>"천안 강아지 미용 추천"</span>
+                <span>"세종 도자기 원데이클래스"</span>
+                <span>"대전 PT 추천"</span>
+                <span>"충남 맞춤가구 제작"</span>
+                <span>"청주 1:1 영어 코칭"</span>
+              </div>
+              <div className="common-examples-result">내 사이트 + 네트워크 페이지 동시 노출</div>
+            </div>
+
+            {/* 광고 아님 강조 */}
+            <div className="common-not-ad">
+              <div className="common-not-ad-h">이 네트워크는 광고 플랫폼이 아닙니다</div>
+              <ul className="common-not-ad-list">
+                <li>매출 수수료 없음</li>
+                <li>중개 수수료 없음</li>
+                <li>월 강제 결제 없음</li>
+              </ul>
+              <p className="common-not-ad-foot">검색될 수 있는 구조를 만드는 데 집중합니다.</p>
+            </div>
+
+            {/* 음식점 제외 안내 */}
+            <div className="common-restaurant-note">
+              <div className="common-restaurant-note-icon" aria-hidden="true">i</div>
+              <div className="common-restaurant-note-body">
+                <strong>식자재 납품 · 농산물 유통 등 식품 전반은 가능</strong>하지만 음식점은 받지 않습니다.
+                음식점 마케팅은 더 효과적이고 대중적인 여러 홍보 방식이 있어, 저희는 진행하지 않습니다.
+              </div>
+            </div>
           </div>
         </section>
       </main>
