@@ -831,6 +831,372 @@ export function Events2026FreePage() {
           position: relative; z-index: 1;
         }
 
+        /* ── EVENT 01 — INTRO + STATS ── */
+        .evtfree .event01 .section-h2 { margin-bottom: 16px; }
+        .evtfree .event01-lead {
+          font-family: var(--font-ko);
+          text-align: center;
+          font-size: 16px;
+          color: var(--text-secondary);
+          line-height: 1.8;
+          max-width: 580px;
+          margin: 0 auto 64px;
+        }
+        .evtfree .event01-stats {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0;
+          max-width: 720px;
+          margin: 0 auto 80px;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xl);
+          padding: 28px 0;
+          box-shadow: var(--shadow-sm);
+        }
+        .evtfree .event01-stat {
+          text-align: center;
+          padding: 8px 24px;
+          border-right: 1px solid var(--border-soft);
+        }
+        .evtfree .event01-stat:last-child { border-right: none; }
+        .evtfree .event01-stat-num {
+          font-family: var(--font-en);
+          font-size: 32px;
+          font-weight: 800;
+          color: var(--accent-dark);
+          line-height: 1;
+          margin-bottom: 6px;
+          letter-spacing: -1px;
+        }
+        .evtfree .event01-stat-num-unit {
+          font-size: 18px;
+          color: var(--accent);
+        }
+        .evtfree .event01-stat-label {
+          font-size: 12px;
+          color: var(--text-muted);
+          font-weight: 500;
+        }
+
+        /* ── EVENT 01 — BLOCK 2 (자격 / 진행) ── */
+        .evtfree .event01-block { margin-bottom: 80px; }
+        .evtfree .event01-block-h {
+          font-family: var(--font-ko);
+          font-size: 24px;
+          font-weight: 700;
+          letter-spacing: -.6px;
+          margin-bottom: 8px;
+          color: var(--text-primary);
+          text-align: center;
+        }
+        .evtfree .event01-block-sub {
+          text-align: center;
+          font-size: 14px;
+          color: var(--text-secondary);
+          margin-bottom: 40px;
+          line-height: 1.7;
+        }
+
+        /*
+          SCROLL-STEP — Phase 3.3 ships these in their LIT (visible)
+          state by default. Phase 3.4 will overwrite the initial color
+          via JS inline styles to start dim and fade in on scroll.
+        */
+        .evtfree .scroll-step {
+          min-height: 50vh;
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: flex-end;
+          text-align: center;
+          padding: 40px 24px 24px;
+          position: relative;
+        }
+        .evtfree .scroll-step-num {
+          font-family: var(--font-en);
+          font-size: clamp(56px, 9vw, 96px);
+          font-weight: 800;
+          line-height: 1;
+          letter-spacing: -3px;
+          color: var(--accent-deep);
+          margin-bottom: 20px;
+          will-change: color;
+          position: relative;
+        }
+        .evtfree .scroll-step-num::after {
+          content: '';
+          position: absolute;
+          left: 50%;
+          bottom: -12px;
+          transform: translateX(-50%) scaleX(1);
+          width: 48px;
+          height: 2px;
+          background: var(--accent);
+          border-radius: 2px;
+          transform-origin: center;
+          transition: transform .4s ease;
+          will-change: transform;
+        }
+        .evtfree .scroll-step-title {
+          font-family: var(--font-ko);
+          font-size: clamp(26px, 3.6vw, 40px);
+          font-weight: 700;
+          letter-spacing: -1.2px;
+          line-height: 1.3;
+          margin: 0 auto 28px;
+          color: var(--text-primary);
+          will-change: color;
+          max-width: 720px;
+        }
+        .evtfree .scroll-step-title .em {
+          color: var(--accent-dark);
+          transition: color .3s ease;
+        }
+        .evtfree .scroll-step-desc {
+          font-size: 16px;
+          line-height: 1.8;
+          color: var(--text-secondary);
+          max-width: 520px;
+          margin: 0 auto;
+          opacity: 1;
+          transform: none;
+          will-change: opacity, transform;
+        }
+        .evtfree .scroll-step-content {
+          margin-top: 32px;
+          padding-bottom: 60px;
+        }
+
+        /* 이런 분께 — chip list */
+        .evtfree .event01-targets {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+          max-width: 920px;
+          margin: 0 auto;
+        }
+        .evtfree .event01-target {
+          display: flex; align-items: flex-start; gap: 12px;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 18px 20px;
+          transition: border-color .2s, transform .2s;
+        }
+        .evtfree .event01-target:hover {
+          border-color: rgba(196,168,245,0.35);
+          transform: translateY(-2px);
+        }
+        .evtfree .event01-target-icon {
+          width: 28px; height: 28px;
+          border-radius: 50%;
+          background: var(--accent-light);
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+        .evtfree .event01-target-icon svg {
+          width: 14px; height: 14px;
+          stroke: var(--accent-dark);
+          stroke-width: 2.5;
+          fill: none;
+        }
+        .evtfree .event01-target-text {
+          font-family: var(--font-ko);
+          font-size: 16.5px;
+          color: var(--text-primary);
+          line-height: 1.6;
+          font-weight: 500;
+          margin: 0;
+        }
+
+        /* 진행 단계 — timeline */
+        .evtfree .event01-flow {
+          max-width: 1240px;
+          margin: 0 auto;
+        }
+        .evtfree .event01-flow-title {
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: 32px;
+        }
+        .evtfree .event01-flow-title-pill {
+          background: var(--accent-light);
+          color: var(--accent-deep);
+          padding: 7px 18px;
+          border-radius: 100px;
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+        }
+        .evtfree .event01-flow-list {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          position: relative;
+        }
+        .evtfree .event01-flow-list::before {
+          content: '';
+          position: absolute;
+          top: 38px;
+          left: 12%; right: 12%;
+          height: 1px;
+          background: linear-gradient(90deg, transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
+          opacity: 0.35;
+          z-index: 0;
+        }
+        .evtfree .event01-flow-item {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 28px 24px;
+          position: relative;
+          z-index: 1;
+          transition: border-color .2s, transform .2s, box-shadow .2s;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 14px;
+        }
+        .evtfree .event01-flow-item:hover {
+          border-color: rgba(196,168,245,0.4);
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-md);
+        }
+        .evtfree .event01-flow-num {
+          font-family: var(--font-en);
+          font-size: 12px;
+          font-weight: 800;
+          color: var(--accent-dark);
+          letter-spacing: 1.2px;
+          background: var(--accent-light);
+          padding: 6px 12px;
+          border-radius: 100px;
+        }
+        .evtfree .event01-flow-body strong {
+          display: block;
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin-bottom: 10px;
+          letter-spacing: -.3px;
+          line-height: 1.4;
+        }
+        .evtfree .event01-flow-body span {
+          font-size: 17px;
+          color: var(--text-secondary);
+          line-height: 1.65;
+          display: block;
+        }
+        .evtfree .event01-flow-time {
+          display: inline-block;
+          margin-top: 10px;
+          font-family: var(--font-en);
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--accent-deep);
+          background: var(--accent-light);
+          padding: 4px 11px;
+          border-radius: 100px;
+          letter-spacing: .3px;
+        }
+
+        .evtfree .event01-easy {
+          text-align: center;
+          margin: 32px auto 0;
+          max-width: 720px;
+          font-size: 13.5px;
+          color: var(--text-muted);
+          line-height: 1.7;
+          font-style: italic;
+        }
+        .evtfree .event01-easy::before { content: '“ '; opacity: .5; }
+        .evtfree .event01-easy::after { content: ' ”'; opacity: .5; }
+
+        /* 1:1 코칭 — dual block */
+        .evtfree .event01-coaching {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+          max-width: 920px;
+          margin: 0 auto;
+        }
+        .evtfree .event01-coach-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 40px 36px;
+          position: relative;
+          transition: border-color .2s, transform .2s;
+        }
+        .evtfree .event01-coach-card:hover {
+          border-color: rgba(196,168,245,0.4);
+          transform: translateY(-3px);
+        }
+        .evtfree .event01-coach-time {
+          font-family: var(--font-en);
+          font-size: 36px;
+          font-weight: 800;
+          color: var(--accent-dark);
+          letter-spacing: -1.5px;
+          line-height: 1;
+          margin-bottom: 6px;
+        }
+        .evtfree .event01-coach-time-unit {
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--accent);
+          margin-left: 2px;
+        }
+        .evtfree .event01-coach-label {
+          font-family: var(--font-en);
+          font-size: 12px; font-weight: 600;
+          color: var(--text-muted);
+          letter-spacing: .5px;
+          margin-bottom: 18px;
+          text-transform: uppercase;
+        }
+        .evtfree .event01-coach-h {
+          font-family: var(--font-ko);
+          font-size: clamp(24px, 2.6vw, 30px);
+          font-weight: 700;
+          margin-bottom: 18px;
+          letter-spacing: -.8px;
+          line-height: 1.3;
+          color: var(--text-primary);
+        }
+        .evtfree .event01-coach-list {
+          list-style: none;
+          display: flex; flex-direction: column;
+          gap: 10px;
+          padding: 0; margin: 0;
+        }
+        .evtfree .event01-coach-list li {
+          font-size: 18.5px;
+          color: var(--text-secondary);
+          line-height: 1.65;
+          padding-left: 18px;
+          position: relative;
+          font-weight: 400;
+        }
+        .evtfree .event01-coach-list li::before {
+          content: '';
+          position: absolute;
+          left: 0; top: 13px;
+          width: 6px; height: 6px;
+          background: var(--accent);
+          border-radius: 50%;
+        }
+        .evtfree .event01-coach-total {
+          text-align: center;
+          margin: 28px auto 0;
+          font-size: 14px;
+          color: var(--text-secondary);
+        }
+        .evtfree .event01-coach-total strong {
+          color: var(--accent-dark);
+          font-weight: 700;
+        }
+
         @media (max-width: 900px) {
           .evtfree section { padding: 80px 24px; }
           .evtfree .hero { padding: 120px 24px 60px; min-height: auto; }
@@ -847,10 +1213,21 @@ export function Events2026FreePage() {
           .evtfree .core-notice { padding: 16px 20px; }
           .evtfree .core-notice-title { font-size: 14px; }
           .evtfree .core-notice-sub { font-size: 13px; }
+          .evtfree .event01-stats { grid-template-columns: 1fr; padding: 8px 0; }
+          .evtfree .event01-stat { border-right: none; border-bottom: 1px solid var(--border-soft); padding: 18px; }
+          .evtfree .event01-stat:last-child { border-bottom: none; }
+          .evtfree .event01-targets { grid-template-columns: 1fr; }
+          .evtfree .event01-coaching { grid-template-columns: 1fr; }
+          .evtfree .event01-flow-list { grid-template-columns: repeat(2, 1fr); }
+          .evtfree .event01-flow-list::before { display: none; }
+          .evtfree .event01-flow-item { padding: 22px 18px; }
+          .evtfree .scroll-step { min-height: 40vh; padding: 30px 24px 16px; }
+          .evtfree .scroll-step-content { margin-top: 20px; }
         }
         @media (max-width: 480px) {
           .evtfree .hero-h1 { letter-spacing: -1.5px; }
           .evtfree .section-h2 { letter-spacing: -.8px; }
+          .evtfree .event01-flow-list { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -1192,8 +1569,172 @@ export function Events2026FreePage() {
               </div>
             </div>
 
-            {/* Phase 3.3 will append INTRO H2 + STATS + 5 targets +
-                scroll-step 01·02 below the FREE BUNDLE. */}
+            {/* Phase 3.3 — INTRO + STATS + 5 targets + scroll-step 01·02 */}
+
+            {/* INTRO */}
+            <h2 className="section-h2">
+              아무에게나 드리는<br />
+              이벤트가 <span className="em">아닙니다</span>
+            </h2>
+            <p className="event01-lead">
+              자기만의 비즈니스를 꾸준히 만들어오신 분들께,<br />
+              선별하여 제공해드리는 런칭 한정 프로그램입니다.
+            </p>
+
+            {/* HERO STATS */}
+            <div className="event01-stats">
+              <div className="event01-stat">
+                <div className="event01-stat-num">3<span className="event01-stat-num-unit">분</span></div>
+                <div className="event01-stat-label">선착순 모집</div>
+              </div>
+              <div className="event01-stat">
+                <div className="event01-stat-num">1:1</div>
+                <div className="event01-stat-label">맞춤 코칭 1시간</div>
+              </div>
+              <div className="event01-stat">
+                <div className="event01-stat-num">0<span className="event01-stat-num-unit">원</span></div>
+                <div className="event01-stat-label">호스팅료 무료</div>
+              </div>
+            </div>
+
+            {/* BLOCK 2-1 : 이런 분께 */}
+            <div className="event01-block">
+              <h3 className="event01-block-h">이런 분께 드리는 기회입니다</h3>
+              <p className="event01-block-sub">아래 다섯 가지 중 두 가지 이상 해당되시는 분이라면, 망설이지 말고 신청해주세요.</p>
+
+              <div className="event01-targets">
+                <div className="event01-target">
+                  <div className="event01-target-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                  </div>
+                  <p className="event01-target-text">창업 2년차 이상, 혼자 영업·서비스·마케팅을 다 하시는 1인 대표님</p>
+                </div>
+                <div className="event01-target">
+                  <div className="event01-target-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                  </div>
+                  <p className="event01-target-text">기존 홈페이지의 월간 호스팅 비용이 아까우신 분</p>
+                </div>
+                <div className="event01-target">
+                  <div className="event01-target-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                  </div>
+                  <p className="event01-target-text">AI 자동화 마케팅을 위해 개선된 홈페이지가 필요하신 분</p>
+                </div>
+                <div className="event01-target">
+                  <div className="event01-target-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                  </div>
+                  <p className="event01-target-text">ChatGPT · Claude는 결제해서 쓰고 계시지만, 홈페이지 관리는 막막하신 분</p>
+                </div>
+                <div className="event01-target" style={{ gridColumn: '1 / -1' }}>
+                  <div className="event01-target-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" /></svg>
+                  </div>
+                  <p className="event01-target-text">유료 광고가 아닌, SEO 검색 최적화를 통해 고객이 직접 검색해서 찾아오는 기반을 다지고 싶으신 분</p>
+                </div>
+              </div>
+            </div>
+
+            {/* BLOCK 2-2 : 자격 검사 / 진행 (scroll-step 01) */}
+            <div className="event01-block" data-step="0">
+              <div className="scroll-step">
+                <div className="scroll-step-num">01</div>
+                <h3 className="scroll-step-title">
+                  무료 진행 대상을 <span className="em">선발</span>하기는 합니다.<br />하지만, 어렵지는 않습니다
+                </h3>
+                <p className="scroll-step-desc">
+                  준비하실 것은 이미 사장님이 가지고 계신 자료뿐. 완성된 제안서나 정리된 기획서가 아니어도 괜찮습니다.
+                </p>
+              </div>
+
+              <div className="scroll-step-content">
+                <div className="event01-flow">
+                  <div className="event01-flow-title">
+                    <span className="event01-flow-title-pill">PROCESS</span>
+                  </div>
+
+                  <div className="event01-flow-list">
+                    <div className="event01-flow-item">
+                      <div className="event01-flow-num">STEP 01</div>
+                      <div className="event01-flow-body">
+                        <strong>신청 폼 작성</strong>
+                        <span>사이트 하단의 신청 폼을 채워주세요. 담당 PM이 카카오톡으로 직접 연락드립니다.</span>
+                      </div>
+                    </div>
+                    <div className="event01-flow-item">
+                      <div className="event01-flow-num">STEP 02</div>
+                      <div className="event01-flow-body">
+                        <strong>카카오톡 사전 미팅</strong>
+                        <span>업체 정보 · 목표 · 현황을 채팅으로 전달해주시면 됩니다.</span>
+                        <span className="event01-flow-time">약 30분 소요</span>
+                      </div>
+                    </div>
+                    <div className="event01-flow-item">
+                      <div className="event01-flow-num">STEP 03</div>
+                      <div className="event01-flow-body">
+                        <strong>준비 자료 정리</strong>
+                        <span>기존 홈페이지 · 카탈로그 · 사업 소개서 중 가지고 계신 것 무엇이든. 새로 만들어 오실 필요 없습니다.</span>
+                      </div>
+                    </div>
+                    <div className="event01-flow-item">
+                      <div className="event01-flow-num">STEP 04</div>
+                      <div className="event01-flow-body">
+                        <strong>1:1 코칭 일정 확정</strong>
+                        <span>업종에 맞는 AI 홈페이지 제작 템플릿과 프롬프트를 미리 준비해 드립니다.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="event01-easy">형식 갖춘 제안서가 아니어도 됩니다. 이미 사장님이 가지고 계신 자료면 충분합니다.</p>
+              </div>
+            </div>
+
+            {/* BLOCK 2-3 : 1:1 코칭 (scroll-step 02) */}
+            <div className="event01-block" data-step="1">
+              <div className="scroll-step">
+                <div className="scroll-step-num">02</div>
+                <h3 className="scroll-step-title">
+                  1:1 코칭, 정해진 시간 안에서<br /><span className="em">섬세하게</span>
+                </h3>
+                <p className="scroll-step-desc">총 1시간. 그 안에서 사장님 사이트가 실제로 움직이기 시작합니다.</p>
+              </div>
+
+              <div className="scroll-step-content">
+                <div className="event01-coaching">
+                  <div className="event01-coach-card">
+                    <div className="event01-coach-time">30<span className="event01-coach-time-unit">min</span></div>
+                    <div className="event01-coach-label">PART 01 · BUILD</div>
+                    <h4 className="event01-coach-h">AI 템플릿 활용 홈페이지 제작 강의</h4>
+                    <ul className="event01-coach-list">
+                      <li>업종 맞춤 프롬프트 제공</li>
+                      <li>디자인 템플릿 파일 제공</li>
+                      <li>그대로 복사해서 쓰는 구조</li>
+                      <li>완성까지 함께 따라가는 라이브 가이드</li>
+                    </ul>
+                  </div>
+
+                  <div className="event01-coach-card">
+                    <div className="event01-coach-time">30<span className="event01-coach-time-unit">min</span></div>
+                    <div className="event01-coach-label">PART 02 · CONNECT</div>
+                    <h4 className="event01-coach-h">SEO 기초 셋팅 직접 연결</h4>
+                    <ul className="event01-coach-list">
+                      <li>사이트맵 · robots · 메타태그</li>
+                      <li>검색 노출 기본 구조</li>
+                      <li>OG 태그 등 광고용 메타 정보</li>
+                      <li>운영 가능한 상태로 마무리</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <p className="event01-coach-total">
+                  <strong>총 60분 · 1:1 진행</strong> &nbsp;·&nbsp; 강의 후 1시간만 더 투자하면 바로 배포 가능
+                </p>
+              </div>
+            </div>
+
+            {/* Phase 3.4 — RESULT cards + CTA appended next. */}
           </div>
         </section>
 
