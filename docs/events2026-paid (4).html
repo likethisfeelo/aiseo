@@ -1,0 +1,3421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AISEO 2026 런칭 이벤트 — 두 가지 패키지 중 내게 맞는 한 가지를</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --accent: #C4A8F5;
+    --accent-light: rgba(196,168,245,0.14);
+    --accent-mid: #9BB8F8;
+    --accent-dark: #8B6FD4;
+    --accent-deep: #6B4FB8;
+    --text-primary: #0A0614;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #FFFFFF;
+    --bg-soft: #F9FAFB;
+    --bg-card: #FFFFFF;
+    --bg-dark: #0A0614;
+    --bg-dark-2: #14102A;
+    --border: #E5E7EB;
+    --border-soft: #F3F4F6;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.05);
+    --font-ko: 'Noto Sans KR', sans-serif;
+    --font-en: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-ko); background: var(--bg); color: var(--text-primary); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: transparent;
+    border: none;
+    padding: 0;
+    transition: padding .48s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  nav.scrolled {
+    padding: 10px clamp(24px, calc((100% - 1100px) / 2), 600px);
+  }
+  .nav-inner {
+    display: flex; align-items: center;
+    width: 100%; max-width: 1200px; margin: 0 auto; gap: 40px;
+    background: rgba(0,0,0,0.22);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    border-radius: 0;
+    height: 72px;
+    padding: 0 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    transition:
+      background .48s ease,
+      border-radius .48s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      box-shadow .48s ease,
+      height .48s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      border-color .48s ease;
+  }
+  nav.scrolled .nav-inner {
+    max-width: 100%;
+    height: 58px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.93);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    box-shadow: 0 8px 28px rgba(10,6,20,0.08);
+  }
+  .nav-logo { font-family: var(--font-en); font-size: 22px; font-weight: 800; letter-spacing: -1px; color: #fff; transition: color .3s ease; }
+  nav.scrolled .nav-logo { color: var(--text-primary); }
+  .nav-menu { display: flex; gap: 32px; flex: 1; }
+  .nav-menu a { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .2s; }
+  .nav-menu a:hover { color: var(--accent); }
+  nav.scrolled .nav-menu a { color: var(--text-secondary); }
+  nav.scrolled .nav-menu a:hover { color: var(--accent-dark); }
+  .nav-cta { display: flex; gap: 10px; align-items: center; }
+  .nav-login { font-size: 14px; color: rgba(255,255,255,0.85); text-decoration: none; padding: 8px 14px; transition: color .2s; }
+  nav.scrolled .nav-login { color: var(--text-secondary); }
+  .btn-nav-primary {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    background: #fff; padding: 9px 18px; border-radius: 10px;
+    text-decoration: none; transition: transform .15s, box-shadow .2s;
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+  nav.scrolled .btn-nav-primary { background: var(--accent); color: #fff; border-color: transparent; }
+  .btn-nav-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(196,168,245,0.3); }
+
+  /* ── HERO (다크 배경, 별, 프리즘) ── */
+  .hero {
+    position: relative;
+    min-height: 92vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 140px 40px 80px;
+    background: radial-gradient(ellipse at top, #1A1235 0%, #0A0614 60%, #050309 100%);
+    overflow: hidden;
+    text-align: center;
+  }
+  .hero-stars {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 60% 20%, rgba(196,168,245,0.7), transparent),
+      radial-gradient(1.5px 1.5px at 40% 70%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 80% 50%, rgba(155,184,248,0.7), transparent),
+      radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1.5px 1.5px at 90% 80%, rgba(196,168,245,0.6), transparent),
+      radial-gradient(1px 1px at 35% 15%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1px 1px at 70% 90%, rgba(155,184,248,0.5), transparent),
+      radial-gradient(1.2px 1.2px at 50% 50%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 25% 65%, rgba(196,168,245,0.5), transparent);
+    background-size: 100% 100%;
+    animation: twinkle 8s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+  .hero-glow {
+    position: absolute; left: 50%; top: 50%;
+    width: 800px; height: 800px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(196,168,245,0.18) 0%, rgba(196,168,245,0.05) 35%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 860px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.08); color: #fff;
+    font-size: 12px; font-weight: 600; padding: 7px 16px;
+    border-radius: 100px; border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    margin-bottom: 28px;
+    letter-spacing: .4px;
+    opacity: 0; transform: translateY(16px);
+    animation: fadeUp .6s ease forwards .1s;
+  }
+  .hero-badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(0.7)} }
+  .hero-h1 {
+    font-family: var(--font-ko);
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -2.5px;
+    color: #fff;
+    margin-bottom: 28px;
+  }
+  .hero-h1 .accent-text { color: var(--accent); }
+  .hero-h1 .line {
+    display: block;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp .7s ease forwards;
+  }
+  .hero-h1 .line:nth-child(1) { animation-delay: .2s; }
+  .hero-h1 .line:nth-child(2) { animation-delay: .35s; }
+  .hero-h1 .line:nth-child(3) { animation-delay: .5s; }
+  .hero-sub {
+    font-size: 16px; line-height: 1.85;
+    color: rgba(255,255,255,0.7);
+    max-width: 540px; margin: 0 auto;
+    opacity: 0; animation: fadeUp .6s ease forwards .7s;
+  }
+
+  .hero-prism {
+    margin: 56px auto 0;
+    width: 220px; height: 220px;
+    position: relative;
+    opacity: 0; animation: fadeUp .8s ease forwards .9s;
+  }
+  .hero-prism::before {
+    content: '';
+    position: absolute; inset: -40px;
+    background: radial-gradient(circle, rgba(196,168,245,0.35) 0%, transparent 60%);
+    filter: blur(20px);
+    z-index: 0;
+  }
+  .prism-svg {
+    width: 100%; height: 100%;
+    position: relative; z-index: 1;
+    animation: prismFloat 8s ease-in-out infinite;
+  }
+  @keyframes prismFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+  }
+
+  /* video card */
+  .hero-video {
+    margin: 80px auto 0;
+    max-width: 880px;
+    background: rgba(20, 16, 42, 0.6);
+    border: 1px solid rgba(196,168,245,0.18);
+    border-radius: var(--radius-xl);
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 30px 80px rgba(196,168,245,0.15), 0 10px 30px rgba(0,0,0,0.3);
+    opacity: 0; animation: fadeUp .8s ease forwards 1.1s;
+    z-index: 2;
+  }
+  .hero-video::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at center, rgba(196,168,245,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-video-play {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .hero-video-play:hover { transform: translate(-50%, -50%) scale(1.08); box-shadow: 0 14px 40px rgba(196,168,245,0.4); }
+  .hero-video-play svg { width: 22px; height: 22px; margin-left: 3px; }
+  .hero-video-label {
+    position: absolute; bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-en);
+    font-size: 11px; font-weight: 600;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  /* ── SECTION COMMON ── */
+  section { padding: 120px 40px; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-eyebrow {
+    font-family: var(--font-en);
+    font-size: 12px; font-weight: 600;
+    color: var(--accent-dark);
+    letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .section-eyebrow::before, .section-eyebrow::after {
+    content: ''; width: 24px; height: 1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+  .section-h2 {
+    font-size: clamp(28px, 3.6vw, 42px);
+    font-weight: 700; line-height: 1.3;
+    letter-spacing: -1.2px;
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .section-h2 .em { color: var(--accent-dark); }
+  .section-sub {
+    font-size: 16px; color: var(--text-secondary);
+    line-height: 1.75; text-align: center;
+    max-width: 620px; margin: 0 auto;
+  }
+
+  /* ── 3 BENEFITS CARD GRID (기존 events 페이지 유지) ── */
+  .benefits {
+    background: var(--bg);
+    padding-top: 120px;
+    padding-bottom: 60px;
+  }
+  .benefits-header { margin-bottom: 56px; }
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  .benefit-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px 28px;
+    position: relative;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    min-height: 220px;
+    display: flex; flex-direction: column;
+  }
+  .benefit-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(196,168,245,0.3);
+  }
+  .benefit-card.violet { background: linear-gradient(180deg, #F5EFFF 0%, #FAF6FF 100%); border-color: rgba(196,168,245,0.25); }
+  .benefit-card.mint { background: linear-gradient(180deg, #E8F7F0 0%, #F1FAF6 100%); border-color: rgba(127,200,166,0.25); }
+  .benefit-card.cream { background: linear-gradient(180deg, #FBF6E8 0%, #FDFAF0 100%); border-color: rgba(220,180,90,0.2); }
+  .benefit-eyebrow {
+    font-family: var(--font-en);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+  .benefit-eyebrow .dot { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); margin: 0 8px; vertical-align: middle; }
+  .benefit-title { font-size: clamp(22px, 2.4vw, 26px); font-weight: 700; letter-spacing: -.7px; margin-bottom: 14px; line-height: 1.35; }
+  .benefit-desc { font-size: 15.5px; color: var(--text-secondary); line-height: 1.7; flex: 1; }
+  .benefit-foot {
+    margin-top: 26px;
+    padding-top: 18px;
+    border-top: 1px dashed rgba(0,0,0,0.08);
+    font-size: 13.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .benefit-foot::before { content: '→'; color: var(--accent-dark); font-weight: 700; }
+
+  /* ── EVENT 1 SECTION (NEW) ── */
+  .event01 {
+    background: var(--bg-soft);
+    padding-top: 100px;
+    padding-bottom: 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .event01::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse, rgba(196,168,245,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .event01-inner { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; }
+
+  .event01-tag {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--accent-deep);
+    margin: 0 auto 20px;
+  }
+  .event01-tag .num {
+    width: 22px; height: 22px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .event01-tag-row { text-align: center; }
+
+  /* ── FREE BUNDLE (3가지 무료 제공) ── */
+  .free-bundle {
+    max-width: 1240px;
+    margin: 0 auto 80px;
+    text-align: center;
+  }
+  .free-bundle-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--accent-deep);
+    margin-bottom: 20px;
+  }
+  .free-bundle-eyebrow .num {
+    width: 22px; height: 22px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .free-bundle-title {
+    font-size: clamp(28px, 3.6vw, 42px);
+    font-weight: 700;
+    letter-spacing: -1.2px;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 18px;
+  }
+  .free-bundle-title .free {
+    color: var(--accent-dark);
+  }
+  .free-bundle-sub {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    margin-bottom: 56px;
+    max-width: 580px;
+    margin-left: auto; margin-right: auto;
+  }
+
+  /* CORE 1 강조 — 2단 구조 (상단 알림 + 하단 카드) */
+  .free-bundle-core {
+    margin: -24px auto 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* 상단: 핵심 교육 알림 박스 */
+  .core-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: linear-gradient(135deg, rgba(196,168,245,0.16) 0%, rgba(155,184,248,0.12) 100%);
+    border: 1px solid rgba(196,168,245,0.32);
+    border-radius: var(--radius-lg);
+    padding: 18px 24px;
+  }
+  .core-notice-star {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    background: #FFE99A;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(255, 200, 80, 0.35);
+    margin-top: 2px;
+  }
+  .core-notice-star::before {
+    content: '★';
+    color: #E8A60E;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .core-notice-body {
+    text-align: left;
+    flex: 1;
+  }
+  .core-notice-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-deep);
+    letter-spacing: -.2px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .core-notice-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    font-weight: 400;
+  }
+
+  /* 하단: CORE1 배포 카드 */
+  .core-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-align: left;
+    transition: border-color .2s, box-shadow .2s;
+    overflow: hidden;
+  }
+  .core-card:hover {
+    border-color: rgba(196,168,245,0.4);
+    box-shadow: var(--shadow-md);
+  }
+  /* 헤더 행: 아이콘 / 본문 / 가격 / 토글버튼 */
+  .core-card-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 22px;
+    align-items: center;
+    padding: 22px 26px;
+  }
+  .core-card-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(139,111,212,0.3);
+    flex-shrink: 0;
+  }
+  .core-card-icon-text {
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: .5px;
+  }
+  .core-card-body { min-width: 0; }
+  .core-card-label {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent-deep);
+    color: #fff;
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .core-card-h {
+    font-size: clamp(20px, 2.2vw, 24px);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -.5px;
+    margin-bottom: 12px;
+    line-height: 1.35;
+  }
+  .core-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .core-card-tag {
+    font-size: 14px;
+    color: var(--text-muted);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-weight: 500;
+  }
+  .core-card-price {
+    text-align: right;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .core-card-price-strike {
+    font-size: 14.5px;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: rgba(155,155,155,0.7);
+    font-weight: 500;
+  }
+  .core-card-price-arrow {
+    color: var(--accent-dark);
+    font-weight: 700;
+    margin: 0 2px;
+  }
+  .core-card-price-free {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--accent-deep);
+    letter-spacing: -.4px;
+  }
+
+  /* 토글 버튼 */
+  .core-card-toggle {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, transform .3s;
+    flex-shrink: 0;
+    padding: 0;
+    color: var(--accent-dark);
+  }
+  .core-card-toggle:hover {
+    background: var(--accent-light);
+    border-color: rgba(196,168,245,0.4);
+  }
+  .core-card-toggle svg {
+    width: 16px; height: 16px;
+    transition: transform .35s cubic-bezier(0.65, 0.05, 0.35, 1);
+  }
+  .core-card-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  /* 확장 영역 */
+  .core-card-expand {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .5s cubic-bezier(0.65, 0.05, 0.35, 1);
+  }
+  .core-card-expand.open {
+    max-height: 1500px;  /* 충분히 큰 값 */
+  }
+  .core-card-expand-inner {
+    border-top: 1px solid var(--border-soft);
+    padding: 32px 30px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+
+  /* 좌우 컬럼 */
+  .core-col-section { }
+  .core-col-section + .core-col-section { margin-top: 26px; }
+
+  .core-col-h {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent-deep);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    letter-spacing: -.1px;
+  }
+  .core-col-section.muted .core-col-h {
+    background: var(--text-primary);
+  }
+
+  .core-col-desc {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+  .core-col-desc + .core-col-desc { margin-top: 14px; }
+
+  .core-col-list {
+    list-style: none;
+    display: flex; flex-direction: column;
+    gap: 11px;
+  }
+  .core-col-list.bullet li {
+    font-size: 15.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    padding-left: 18px;
+    position: relative;
+  }
+  .core-col-list.bullet li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 11px;
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .core-col-list.check li {
+    font-size: 15.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    padding-left: 24px;
+    position: relative;
+  }
+  .core-col-list.check li::before {
+    content: '✓';
+    position: absolute;
+    left: 0; top: 0;
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* 진행 방식 chips */
+  .core-col-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 4px;
+  }
+  .core-col-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 100px;
+  }
+  .core-col-chip-icon {
+    font-size: 15px;
+    line-height: 1;
+  }
+  .free-bundle-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    perspective: 1600px;  /* 3D 깊이 */
+  }
+
+  /* ── 3D FLIP CARD ── */
+  .free-card {
+    position: relative;
+    min-height: 340px;
+    transform-style: preserve-3d;
+    transition: transform .9s cubic-bezier(0.65, 0.05, 0.35, 1);
+    will-change: transform;
+  }
+  .free-card.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .free-face {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: box-shadow .25s ease, border-color .25s ease;
+  }
+  .free-face.face-front { z-index: 2; }
+  .free-face.face-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(160deg, var(--accent-deep) 0%, var(--accent-dark) 60%, #4A2D8F 100%);
+    border-color: transparent;
+    color: #fff;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 28px;
+    overflow: hidden;
+  }
+  .free-face.face-back::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(196,168,245,0.35) 0%, transparent 45%),
+      radial-gradient(circle at 70% 80%, rgba(155,184,248,0.25) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .free-card:hover .free-face {
+    box-shadow: var(--shadow-md);
+  }
+
+  .free-card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .free-card-icon {
+    font-family: var(--font-en);
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent-dark);
+    letter-spacing: -1.5px;
+    line-height: 1;
+  }
+  .free-card-icon-unit {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-left: 2px;
+  }
+
+  .free-card-badge {
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 800;
+    color: #fff;
+    background: var(--accent-dark);
+    padding: 5px 11px;
+    border-radius: 100px;
+    letter-spacing: 1.2px;
+  }
+
+  .free-card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: .5px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    font-family: var(--font-en);
+  }
+
+  .free-card-h {
+    font-size: clamp(22px, 2.4vw, 28px);
+    font-weight: 700;
+    letter-spacing: -.8px;
+    color: var(--text-primary);
+    margin-bottom: 22px;
+    line-height: 1.3;
+  }
+
+  .free-card-list {
+    list-style: none;
+    display: flex; flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+  }
+  .free-card-list li {
+    font-size: 15.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    padding-left: 16px;
+    position: relative;
+    font-weight: 400;
+  }
+  .free-card-list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 11px;
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  /* ── BACK FACE: 임팩트 메시지 ── */
+  .face-back-eyebrow {
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    position: relative; z-index: 1;
+  }
+  .face-back-strike {
+    font-family: var(--font-en);
+    font-size: 22px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    text-decoration: line-through;
+    text-decoration-color: rgba(255,255,255,0.5);
+    text-decoration-thickness: 2px;
+    margin-bottom: 8px;
+    position: relative; z-index: 1;
+  }
+  .face-back-arrow {
+    font-size: 20px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+    position: relative; z-index: 1;
+    line-height: 1;
+  }
+  .face-back-headline {
+    font-family: var(--font-en);
+    font-size: clamp(48px, 5.5vw, 68px);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -2.5px;
+    line-height: 1;
+    margin-bottom: 10px;
+    position: relative; z-index: 1;
+  }
+  .face-back-headline .unit {
+    font-size: 0.5em;
+    font-weight: 600;
+    color: var(--accent);
+    margin-left: 4px;
+    letter-spacing: -1px;
+  }
+  .face-back-caption {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.78);
+    line-height: 1.6;
+    margin-top: 14px;
+    max-width: 220px;
+    position: relative; z-index: 1;
+  }
+
+  .event01 .section-h2 { margin-bottom: 16px; }
+  .event01-lead {
+    text-align: center;
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    max-width: 580px;
+    margin: 0 auto 64px;
+  }
+
+  /* Hero stats strip */
+  .event01-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    max-width: 720px;
+    margin: 0 auto 80px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 28px 0;
+    box-shadow: var(--shadow-sm);
+  }
+  .event01-stat {
+    text-align: center;
+    padding: 8px 24px;
+    border-right: 1px solid var(--border-soft);
+  }
+  .event01-stat:last-child { border-right: none; }
+  .event01-stat-num {
+    font-family: var(--font-en);
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent-dark);
+    line-height: 1;
+    margin-bottom: 6px;
+    letter-spacing: -1px;
+  }
+  .event01-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* ── BLOCK 2: 자격 / 진행 ── */
+  .event01-block {
+    margin-bottom: 80px;
+  }
+  .event01-block-h {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -.6px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    text-align: center;
+  }
+  .event01-block-sub {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+
+  /* ── SCROLL STEP ANIMATION (NEW) ── */
+  /* 헤더 영역에서 번호 → 제목 → 설명이 회색→보라색으로 fade-in되는 시퀀스 */
+  .scroll-step {
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;  /* 헤더를 아래쪽으로 정렬 → 카드와 가깝게 */
+    text-align: center;
+    padding: 40px 24px 24px;
+    position: relative;
+  }
+  .scroll-step-num {
+    font-family: var(--font-en);
+    font-size: clamp(56px, 9vw, 96px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -3px;
+    color: rgba(196,168,245,0.08);  /* nearly invisible at start */
+    margin-bottom: 20px;
+    will-change: color;
+    position: relative;
+  }
+  .scroll-step-num::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -12px;
+    transform: translateX(-50%) scaleX(0);
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+    transform-origin: center;
+    transition: transform .4s ease;
+    will-change: transform;
+  }
+  .scroll-step-num.lit::after { transform: translateX(-50%) scaleX(1); }
+
+  .scroll-step-title {
+    font-size: clamp(26px, 3.6vw, 40px);
+    font-weight: 700;
+    letter-spacing: -1.2px;
+    line-height: 1.3;
+    margin-bottom: 28px;
+    color: rgba(10,6,20,0.06);  /* nearly invisible at start */
+    will-change: color;
+    max-width: 720px;
+  }
+  .scroll-step-title .em {
+    color: inherit;
+    transition: color .3s ease;
+  }
+  .scroll-step-title.lit .em { color: var(--accent-dark); }
+
+  .scroll-step-desc {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(12px);
+    will-change: opacity, transform;
+  }
+
+  /* The actual content (cards/flows) flows immediately after the scroll-step header */
+  .scroll-step-content {
+    margin-top: 32px;
+    padding-bottom: 60px;
+  }
+
+  /* 이런 분께 - chip list */
+  .event01-targets {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .event01-target {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    transition: border-color .2s, transform .2s;
+  }
+  .event01-target:hover {
+    border-color: rgba(196,168,245,0.35);
+    transform: translateY(-2px);
+  }
+  .event01-target-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .event01-target-icon svg {
+    width: 14px; height: 14px;
+    stroke: var(--accent-dark);
+    stroke-width: 2.5;
+    fill: none;
+  }
+  .event01-target-text {
+    font-size: 16.5px;
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  /* 진행 단계 - timeline */
+  .event01-flow {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  .event01-flow-title {
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 32px;
+  }
+  .event01-flow-title-pill {
+    background: var(--accent-light);
+    color: var(--accent-deep);
+    padding: 7px 18px;
+    border-radius: 100px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+  }
+  .event01-flow-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    position: relative;
+  }
+  /* connecting line behind cards */
+  .event01-flow-list::before {
+    content: '';
+    position: absolute;
+    top: 38px;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
+    opacity: 0.35;
+    z-index: 0;
+  }
+  .event01-flow-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    position: relative;
+    z-index: 1;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .event01-flow-item:hover {
+    border-color: rgba(196,168,245,0.4);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  .event01-flow-num {
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent-dark);
+    letter-spacing: 1.2px;
+    background: var(--accent-light);
+    padding: 6px 12px;
+    border-radius: 100px;
+  }
+  .event01-flow-body { }
+  .event01-flow-body strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    letter-spacing: -.3px;
+    line-height: 1.4;
+  }
+  .event01-flow-body span {
+    font-size: 17px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    display: block;
+  }
+  .event01-flow-time {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-deep);
+    background: var(--accent-light);
+    padding: 4px 11px;
+    border-radius: 100px;
+    letter-spacing: .3px;
+  }
+
+  .event01-easy {
+    text-align: center;
+    margin: 32px auto 0;
+    max-width: 720px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-style: italic;
+  }
+  .event01-easy::before { content: '“ '; opacity: .5; }
+  .event01-easy::after { content: ' ”'; opacity: .5; }
+
+  /* 1:1 코칭 - dual block */
+  .event01-coaching {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .event01-coach-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px 36px;
+    position: relative;
+    transition: border-color .2s, transform .2s;
+  }
+  .event01-coach-card:hover {
+    border-color: rgba(196,168,245,0.4);
+    transform: translateY(-3px);
+  }
+  .event01-coach-time {
+    font-family: var(--font-en);
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--accent-dark);
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .event01-coach-time-unit { font-size: 18px; font-weight: 600; color: var(--accent); margin-left: 2px; }
+  .event01-coach-label {
+    font-size: 12px; font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: .5px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    font-family: var(--font-en);
+  }
+  .event01-coach-h {
+    font-size: clamp(24px, 2.6vw, 30px);
+    font-weight: 700;
+    margin-bottom: 18px;
+    letter-spacing: -.8px;
+    line-height: 1.3;
+  }
+  .event01-coach-list {
+    list-style: none;
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+  .event01-coach-list li {
+    font-size: 18.5px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    padding-left: 18px;
+    position: relative;
+    font-weight: 400;
+  }
+  .event01-coach-list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 13px;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .event01-coach-total {
+    text-align: center;
+    margin: 28px auto 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .event01-coach-total strong {
+    color: var(--accent-dark);
+    font-weight: 700;
+  }
+
+  /* ── BLOCK 3: 결과물 ── */
+  .event01-results {
+    margin-top: 100px;
+    padding-top: 80px;
+    border-top: 1px solid var(--border-soft);
+    text-align: center;
+  }
+  .event01-results-h {
+    font-size: clamp(26px, 3.4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .event01-results-h .em { color: var(--accent-dark); }
+  .event01-results-sub {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 56px;
+    line-height: 1.7;
+  }
+  .event01-results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1080px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .event01-result-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px 32px;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .event01-result-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(196,168,245,0.3);
+  }
+  .event01-result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 0;
+    background: linear-gradient(180deg, var(--accent), var(--accent-mid));
+    transition: height .3s ease;
+  }
+  .event01-result-card:hover::before { height: 100%; }
+  .event01-result-num {
+    font-family: var(--font-en);
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--accent-dark);
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .event01-result-num::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .event01-result-h {
+    font-size: clamp(22px, 2.4vw, 28px);
+    font-weight: 700;
+    letter-spacing: -.8px;
+    margin-bottom: 18px;
+    line-height: 1.3;
+  }
+  .event01-result-list {
+    list-style: none;
+    display: flex; flex-direction: column;
+    gap: 12px;
+  }
+  .event01-result-list li {
+    font-size: 18.5px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    padding-left: 26px;
+    position: relative;
+    font-weight: 400;
+  }
+  .event01-result-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0; top: 0;
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .event01-result-list li.note {
+    margin-top: 8px;
+    padding: 14px 16px 14px 18px;
+    background: var(--accent-light);
+    border-radius: var(--radius-sm);
+    color: var(--accent-deep);
+    font-size: 16.5px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .event01-result-list li.note::before { display: none; }
+  .event01-result-list li.highlight {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* CTA */
+  .event01-cta {
+    margin-top: 64px;
+    text-align: center;
+  }
+  .event01-cta-row {
+    display: inline-flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .event01-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent-dark);
+    color: #fff;
+    padding: 16px 30px;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 6px 20px rgba(139,111,212,0.25);
+    font-family: var(--font-ko);
+  }
+  .event01-btn:hover {
+    background: var(--accent-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(139,111,212,0.35);
+  }
+  .event01-btn.secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1.5px solid var(--border);
+    box-shadow: none;
+  }
+  .event01-btn.secondary:hover {
+    border-color: var(--accent);
+    background: var(--bg-soft);
+    box-shadow: var(--shadow-sm);
+  }
+  .event01-btn-arrow {
+    transition: transform .2s;
+  }
+  .event01-btn:hover .event01-btn-arrow { transform: translateX(3px); }
+
+  .event01-cta-note {
+    margin-top: 18px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    letter-spacing: .2px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg-dark);
+    color: rgba(255,255,255,0.6);
+    padding: 60px 40px 40px;
+    text-align: center;
+    font-size: 13px;
+  }
+  footer .footer-logo {
+    font-family: var(--font-en);
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+  footer p { line-height: 1.8; }
+  footer .footer-meta { margin-top: 14px; font-size: 12px; opacity: 0.6; }
+  /* ─────────────────────────────────────────────
+     LAUNCH CTA 배너 (선착순 + 오픈일)
+  ───────────────────────────────────────────── */
+  .launch-cta {
+    background: linear-gradient(135deg, #14102A 0%, #1F1840 50%, #2D1F5E 100%);
+    padding: 80px 40px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .launch-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1px 1px at 80% 30%, rgba(196,168,245,0.8), transparent),
+      radial-gradient(1.5px 1.5px at 50% 70%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 25% 85%, rgba(155,184,248,0.7), transparent),
+      radial-gradient(1px 1px at 70% 60%, rgba(196,168,245,0.5), transparent);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .launch-cta::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px; height: 600px;
+    background: radial-gradient(ellipse, rgba(196,168,245,0.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .launch-cta-inner {
+    position: relative; z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  /* 상단 알림 라벨 */
+  .launch-cta-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 24px;
+  }
+  .launch-cta-eyebrow .star {
+    color: #FFD75A;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .launch-cta-eyebrow .pulse {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4ADE80;
+    animation: launchPulse 2s infinite;
+  }
+  @keyframes launchPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+  }
+
+  /* 메인 헤드라인 */
+  .launch-cta-h {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1.4px;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+  .launch-cta-h .accent {
+    color: var(--accent);
+  }
+  .launch-cta-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+  .launch-cta-sub strong {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* 카운트다운 (오픈 전) */
+  .launch-countdown {
+    display: inline-flex;
+    gap: 12px;
+    margin-bottom: 48px;
+    padding: 20px 28px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(196,168,245,0.25);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .launch-countdown-label {
+    align-self: center;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding-right: 18px;
+    margin-right: 6px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+  }
+  .launch-countdown-unit {
+    text-align: center;
+    min-width: 60px;
+  }
+  .launch-countdown-num {
+    font-family: var(--font-en);
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .launch-countdown-name {
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(196,168,245,0.85);
+    letter-spacing: 1.2px;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  /* 오픈된 후 표시되는 라이브 표시 (JS가 토글) */
+  .launch-live {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 48px;
+    padding: 16px 24px;
+    background: rgba(74,222,128,0.12);
+    border: 1px solid rgba(74,222,128,0.35);
+    border-radius: 100px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .launch-live.show { display: inline-flex; }
+  .launch-live::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4ADE80;
+    animation: launchPulse 2s infinite;
+  }
+
+  /* 두 패키지 슬롯 카드 */
+  .launch-slots {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 720px;
+    margin: 0 auto 36px;
+  }
+  .launch-slot {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-lg);
+    padding: 24px 22px;
+    text-align: left;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background .25s, border-color .25s, transform .25s;
+    text-decoration: none;
+    display: block;
+  }
+  .launch-slot:hover {
+    background: rgba(196,168,245,0.12);
+    border-color: rgba(196,168,245,0.5);
+    transform: translateY(-3px);
+  }
+  .launch-slot-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .launch-slot-pkg {
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+  }
+  .launch-slot-count {
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 4px 10px;
+    border-radius: 100px;
+    letter-spacing: .5px;
+  }
+  .launch-slot-h {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.5px;
+    line-height: 1.4;
+    margin-bottom: 14px;
+  }
+  .launch-slot-cta {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    transition: color .2s;
+  }
+  .launch-slot:hover .launch-slot-cta { color: #fff; }
+  .launch-slot-cta-arrow {
+    transition: transform .25s;
+  }
+  .launch-slot:hover .launch-slot-cta-arrow {
+    transform: translateX(3px);
+  }
+
+  /* 하단 메모 */
+  .launch-cta-note {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.65;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+
+  .cross-link {
+    background: #0A0614;
+    padding: 80px 40px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cross-link::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -100px;
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(196,168,245,0.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .cross-link::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; left: -80px;
+    width: 500px; height: 350px;
+    background: radial-gradient(ellipse, rgba(155,184,248,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cross-link-inner {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .cross-link-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .cross-link-eyebrow::before, .cross-link-eyebrow::after {
+    content: ''; width: 24px; height: 1px;
+    background: rgba(255,255,255,0.3);
+  }
+  .cross-link-h {
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+    line-height: 1.35;
+    margin-bottom: 18px;
+  }
+  .cross-link-h .em {
+    color: var(--accent);
+  }
+  .cross-link-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.75;
+    max-width: 560px;
+    margin: 0 auto 40px;
+  }
+
+  /* 다음 페이지로 이동하는 큰 카드 */
+  .cross-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 24px;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-xl);
+    padding: 28px 32px;
+    text-decoration: none;
+    transition: background .3s, border-color .3s, transform .25s;
+    text-align: left;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .cross-card:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(196,168,245,0.45);
+    transform: translateY(-3px);
+  }
+  .cross-card-badge {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px rgba(139,111,212,0.4);
+    flex-shrink: 0;
+  }
+  .cross-card-badge-num {
+    font-family: var(--font-en);
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.5px;
+    line-height: 1;
+  }
+  .cross-card-badge-tag {
+    font-family: var(--font-en);
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 1.2px;
+    margin-top: 4px;
+  }
+  .cross-card-body { min-width: 0; }
+  .cross-card-pkg {
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  .cross-card-h {
+    font-size: clamp(18px, 2vw, 22px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.5px;
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+  .cross-card-desc {
+    font-size: 14.5px;
+    color: rgba(255,255,255,0.62);
+    line-height: 1.55;
+  }
+  .cross-card-arrow {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+    transition: background .25s, transform .25s;
+  }
+  .cross-card:hover .cross-card-arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: translateX(3px);
+  }
+  .cross-card-arrow svg { width: 18px; height: 18px; }
+
+
+  /* ═══════════════════════════════════════════════
+     EVENT 02 / 03 (PAID) NEW COMPONENTS
+  ═══════════════════════════════════════════════ */
+
+  /* 패키지 가격 박스 (30만원 → 10만원) */
+  .pkg-price {
+    max-width: 520px;
+    margin: 0 auto 56px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 32px 36px;
+    box-shadow: var(--shadow-sm);
+  }
+  .pkg-price-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    font-size: 16px;
+    color: var(--text-secondary);
+    gap: 20px;
+  }
+  .pkg-price-row .label {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -.2px;
+  }
+  .pkg-price-row .label small {
+    display: block;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 400;
+    letter-spacing: .1px;
+  }
+  .pkg-price-row .num {
+    font-family: var(--font-en);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+  .pkg-price-divider {
+    border-top: 1px dashed var(--border);
+    margin: 14px 0 10px;
+  }
+  .pkg-price-sum {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0 18px;
+    font-size: 15px;
+    color: var(--text-muted);
+  }
+  .pkg-price-sum .num {
+    font-family: var(--font-en);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+  .pkg-price-final {
+    background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent-dark) 100%);
+    color: #fff;
+    border-radius: var(--radius-md);
+    padding: 22px 26px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 8px;
+    box-shadow: 0 6px 18px rgba(107, 79, 184, 0.25);
+  }
+  .pkg-price-final .label {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: .3px;
+  }
+  .pkg-price-final .num {
+    font-family: var(--font-en);
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -1.8px;
+    line-height: 1;
+  }
+  .pkg-price-final .num .unit {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-left: 3px;
+  }
+  .pkg-price-saved {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--accent-deep);
+    font-weight: 700;
+    letter-spacing: .2px;
+  }
+  .pkg-price-saved::before {
+    content: '★ ';
+    color: #E8A60E;
+  }
+
+  /* 패키지 섹션 (event02 / event03) */
+  .pkg-section {
+    background: var(--bg-soft);
+    padding: 100px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pkg-section.alt {
+    background: var(--bg);
+  }
+  .pkg-section::before {
+    content: '';
+    position: absolute;
+    top: -160px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 380px;
+    background: radial-gradient(ellipse, rgba(196,168,245,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .pkg-section-inner {
+    position: relative; z-index: 1;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  /* 공통 자격 섹션 */
+  .common-targets {
+    background: var(--bg);
+    padding: 100px 40px 80px;
+  }
+  .common-targets-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* FAQ */
+  .faq-section {
+    background: var(--bg-soft);
+    padding: 100px 40px;
+  }
+  .faq-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .faq-list {
+    margin-top: 48px;
+  }
+  .faq-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 10px;
+    transition: border-color .2s, box-shadow .2s;
+    overflow: hidden;
+  }
+  .faq-item:hover {
+    border-color: rgba(196,168,245,0.35);
+  }
+  .faq-q {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 26px 30px;
+    text-align: left;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    font-family: inherit;
+  }
+  .faq-q-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -.3px;
+    line-height: 1.5;
+    flex: 1;
+  }
+  .faq-q-icon {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-dark);
+    transition: transform .35s cubic-bezier(0.65, 0.05, 0.35, 1);
+  }
+  .faq-q-icon svg { width: 15px; height: 15px; }
+  .faq-q[aria-expanded="true"] .faq-q-icon { transform: rotate(180deg); }
+  .faq-a {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .4s cubic-bezier(0.65, 0.05, 0.35, 1);
+  }
+  .faq-a.open { max-height: 500px; }
+  .faq-a-inner {
+    padding: 0 30px 28px;
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    border-top: 1px dashed var(--border);
+    padding-top: 22px;
+  }
+
+  /* A vs B 비교박스 */
+  .compare-section {
+    background: var(--bg);
+    padding: 100px 40px 120px;
+  }
+  .compare-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-top: 56px;
+    position: relative;
+  }
+  .compare-grid::before {
+    content: 'OR';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg);
+    color: var(--accent-dark);
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 800;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 1px;
+    z-index: 2;
+  }
+  .compare-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 36px 32px;
+    transition: transform .25s, box-shadow .25s, border-color .25s;
+    display: flex;
+    flex-direction: column;
+  }
+  .compare-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(196,168,245,0.4);
+  }
+  .compare-card-icon {
+    font-size: 40px;
+    margin-bottom: 18px;
+    line-height: 1;
+  }
+  .compare-card-pkg {
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent-deep);
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .compare-card-h {
+    font-size: clamp(24px, 2.6vw, 30px);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -.8px;
+    line-height: 1.3;
+    margin-bottom: 14px;
+  }
+  .compare-card-sub {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 26px;
+    padding-bottom: 26px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .compare-card-list {
+    list-style: none;
+    display: flex; flex-direction: column;
+    gap: 13px;
+    margin-bottom: 30px;
+  }
+  .compare-card-list li {
+    font-size: 16px;
+    color: var(--text-primary);
+    line-height: 1.55;
+    padding-left: 24px;
+    position: relative;
+    font-weight: 500;
+  }
+  .compare-card-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0; top: 0;
+    color: var(--accent-dark);
+    font-weight: 800;
+    font-size: 15px;
+  }
+  .compare-cta {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
+    background: var(--accent-dark);
+    color: #fff;
+    padding: 16px 28px;
+    border-radius: var(--radius-md);
+    font-size: 15.5px;
+    font-weight: 700;
+    text-decoration: none;
+    margin-top: auto;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(139,111,212,0.22);
+    cursor: pointer;
+    border: none;
+    font-family: var(--font-ko);
+  }
+  .compare-cta:hover {
+    background: var(--accent-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(139,111,212,0.32);
+  }
+
+  /* ── PAID 페이지 미디어쿼리 추가 (한 번에) ── */
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    section { padding: 80px 24px; }
+    .nav-menu { display: none; }
+    nav.scrolled { padding: 8px 16px; }
+    .nav-inner { padding: 0 20px; gap: 16px; }
+    .hero { padding: 120px 24px 60px; min-height: auto; }
+    .benefits-grid { grid-template-columns: 1fr; }
+    .event01-stats { grid-template-columns: 1fr; padding: 8px 0; }
+    .event01-stat { border-right: none; border-bottom: 1px solid var(--border-soft); padding: 18px; }
+    .event01-stat:last-child { border-bottom: none; }
+    .event01-targets { grid-template-columns: 1fr; }
+    .event01-coaching { grid-template-columns: 1fr; }
+    .event01-results-grid { grid-template-columns: 1fr; }
+    .event01-flow-list { grid-template-columns: repeat(2, 1fr); }
+    .event01-flow-list::before { display: none; }
+    .event01-flow-item { padding: 22px 18px; }
+    .hero-prism { width: 160px; height: 160px; }
+    .cross-link { padding: 60px 24px 80px; }
+    .cross-card { grid-template-columns: auto 1fr; gap: 16px; padding: 22px 22px; }
+    .cross-card-arrow { grid-column: 1 / -1; justify-self: flex-end; width: 40px; height: 40px; }
+    .cross-card-h { font-size: 18px; }
+    .cross-card-badge { width: 56px; height: 56px; }
+    .launch-cta { padding: 60px 24px 80px; }
+    .launch-countdown { gap: 8px; padding: 16px 18px; flex-wrap: wrap; justify-content: center; }
+    .launch-countdown-label { padding-right: 0; margin-right: 0; border-right: none; padding-bottom: 8px; flex-basis: 100%; text-align: center; }
+    .launch-countdown-unit { min-width: 52px; }
+    .launch-countdown-num { font-size: 26px; }
+    .launch-slots { grid-template-columns: 1fr; gap: 12px; }
+    .launch-slot { padding: 20px 18px; }
+    .event01-results { margin-top: 64px; padding-top: 56px; }
+    .scroll-step { min-height: 40vh; padding: 30px 24px 16px; }
+    .scroll-step-content { margin-top: 20px; }
+    .free-bundle-grid { grid-template-columns: 1fr; }
+    .free-bundle { margin-bottom: 56px; }
+    .free-card { padding: 28px 24px; }
+    .free-bundle-core { margin: -16px auto 40px; }
+    .core-card-header { grid-template-columns: auto 1fr auto; gap: 14px; padding: 18px 20px; }
+    .core-card-toggle { grid-column: 3; }
+    .core-card-price { grid-column: 1 / -1; justify-content: flex-end; padding-top: 10px; border-top: 1px dashed var(--border); }
+    .core-card-expand-inner { grid-template-columns: 1fr; gap: 26px; padding: 24px 22px; }
+    .core-notice { padding: 16px 20px; }
+    .core-notice-title { font-size: 14px; }
+    .core-notice-sub { font-size: 13px; }
+    /* PAID NEW */
+    .pkg-section { padding: 60px 24px; }
+    .common-targets { padding: 80px 24px 60px; }
+    .faq-section { padding: 60px 24px; }
+    .compare-section { padding: 60px 24px 80px; }
+    .compare-grid { grid-template-columns: 1fr; gap: 30px; }
+    .compare-grid::before { display: none; }
+    .pkg-price { padding: 26px 24px; }
+    .pkg-price-final { padding: 18px 20px; }
+    .pkg-price-final .num { font-size: 30px; }
+    .pkg-price-row .label { font-size: 14.5px; }
+    .pkg-price-row .label small { font-size: 12px; }
+    .pkg-price-row .num { font-size: 15px; }
+    .faq-q { padding: 20px 24px; }
+    .faq-q-text { font-size: 16px; }
+    .faq-a-inner { padding: 16px 24px 24px; font-size: 14.5px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-h1 { letter-spacing: -1.5px; }
+    .section-h2 { letter-spacing: -.8px; }
+    .event01-cta-row { flex-direction: column; width: 100%; }
+    .event01-btn { width: 100%; justify-content: center; }
+    .event01-flow-list { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="mainNav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">AISEO</a>
+    <div class="nav-menu">
+      <a href="#">서비스 안내</a>
+      <a href="#">가격 안내</a>
+      <a href="#">이벤트</a>
+      <a href="#">블로그</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="nav-login">로그인</a>
+      <a href="#event02" class="btn-nav-primary">지금 시작하기</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-stars"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      <span>EVENTS 2026 · AISEO.TIPS</span>
+    </div>
+    <h1 class="hero-h1">
+      <span class="line">지금 사장님께 더 필요한</span>
+      <span class="line"><span class="accent-text">한 가지를</span> 골라보세요</span>
+      <span class="line">합리적인 가격으로</span>
+    </h1>
+    <p class="hero-sub">
+      검색 전략 또는 콘텐츠 기획 중 하나를 선택하시면,<br>
+      배포까지 포함한 2단계 패키지로 한 번에 완성해드립니다.
+    </p>
+
+    <div class="hero-prism">
+      <svg class="prism-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="prismGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#C4A8F5"/>
+            <stop offset="50%" stop-color="#9BB8F8"/>
+            <stop offset="100%" stop-color="#F5C4E8"/>
+          </linearGradient>
+          <linearGradient id="prismGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFD4A8"/>
+            <stop offset="100%" stop-color="#C4A8F5"/>
+          </linearGradient>
+          <linearGradient id="prismGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#9BB8F8" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#6B4FB8" stop-opacity="0.6"/>
+          </linearGradient>
+        </defs>
+        <!-- prism shape -->
+        <polygon points="100,30 160,90 130,160 70,160 40,90" fill="url(#prismGrad1)" opacity="0.85"/>
+        <polygon points="100,30 160,90 100,100" fill="url(#prismGrad2)" opacity="0.7"/>
+        <polygon points="100,100 160,90 130,160" fill="url(#prismGrad3)" opacity="0.8"/>
+        <polygon points="100,100 130,160 70,160" fill="url(#prismGrad1)" opacity="0.6"/>
+        <polygon points="100,100 70,160 40,90" fill="url(#prismGrad2)" opacity="0.5"/>
+        <polygon points="100,30 100,100 40,90" fill="url(#prismGrad3)" opacity="0.7"/>
+        <!-- highlights -->
+        <line x1="100" y1="30" x2="100" y2="100" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+        <line x1="100" y1="100" x2="160" y2="90" stroke="#fff" stroke-width="0.5" opacity="0.3"/>
+        <line x1="100" y1="100" x2="40" y2="90" stroke="#fff" stroke-width="0.5" opacity="0.3"/>
+      </svg>
+    </div>
+
+    <div class="hero-video">
+      <button class="hero-video-play" aria-label="이벤트 영상 재생">
+        <svg viewBox="0 0 24 24" fill="#0A0614" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+      <div class="hero-video-label">AISEO.TIPS 이벤트 영상 · 1분</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 두 패키지 미리보기 ── -->
+<section class="benefits">
+  <div class="section-inner">
+    <div class="benefits-header">
+      <div class="section-eyebrow">두 가지 옵션</div>
+      <h2 class="section-h2">시작점이 다른<br><span class="em">두 가지 패키지</span></h2>
+      <p class="section-sub" style="margin-top: 14px;">
+        둘 다 같은 결과(검색 노출되는 사이트)로 끝나지만, 출발점이 다릅니다.<br>
+        사장님 상황에 맞는 한 가지를 선택하시면 됩니다.
+      </p>
+    </div>
+
+    <div class="benefits-grid" style="grid-template-columns: 1fr 1fr; max-width: 920px;">
+      <a href="#event02" class="benefit-card violet" style="text-decoration: none; cursor: pointer;">
+        <div class="benefit-eyebrow">EVENT 02 <span class="dot"></span> PACKAGE A</div>
+        <h3 class="benefit-title">🎯 검색 전략부터</h3>
+        <p class="benefit-desc">키워드 · 경쟁군 · 검색 의도를 먼저 정리하고, 그 위에 사이트를 올립니다.</p>
+        <div class="benefit-foot">001 + CORE1 · 30만원 → 10만원</div>
+      </a>
+
+      <a href="#event03" class="benefit-card mint" style="text-decoration: none; cursor: pointer;">
+        <div class="benefit-eyebrow">EVENT 03 <span class="dot"></span> PACKAGE B</div>
+        <h3 class="benefit-title">✍️ 콘텐츠 기획부터</h3>
+        <p class="benefit-desc">메뉴 구조 · 서비스 설명 · CTA · 톤앤매너를 먼저 설계하고 사이트를 올립니다.</p>
+        <div class="benefit-foot">002 + CORE1 · 30만원 → 10만원</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     EVENT 02 — 패키지 A (검색 전략 + 배포)
+══════════════════════════════════════════════ -->
+<section class="pkg-section" id="event02">
+  <div class="pkg-section-inner">
+
+    <!-- TAG -->
+    <div class="event01-tag-row">
+      <div class="event01-tag">
+        <span class="num">2</span>
+        <span>EVENT 02 · 패키지 A</span>
+      </div>
+    </div>
+
+    <!-- INTRO -->
+    <h2 class="section-h2">
+      검색에서 보이는 길을<br>
+      <span class="em">먼저 그려두는</span> 패키지
+    </h2>
+    <p class="event01-lead">
+      "어떤 키워드로, 어떤 고객에게 보일 것인가"를 먼저 정리하고,<br>
+      그 위에 사이트를 올립니다.
+    </p>
+
+    <!-- 가격 박스 -->
+    <div class="pkg-price">
+      <div class="pkg-price-row">
+        <span class="label">001 SEO 검색노출전략 점검<small>업종 분석 · 키워드 전략 · 경쟁군 분석</small></span>
+        <span class="num">20만원</span>
+      </div>
+      <div class="pkg-price-row">
+        <span class="label">CORE1 즉시 배포 + 기술적 SEO 셋팅<small>실제 웹 주소에 올리고 검색엔진 연동까지</small></span>
+        <span class="num">10만원</span>
+      </div>
+      <div class="pkg-price-divider"></div>
+      <div class="pkg-price-sum">
+        <span>합계</span>
+        <span class="num">30만원</span>
+      </div>
+      <div class="pkg-price-final">
+        <span class="label">EVENT 02 패키지 가격</span>
+        <span class="num">10<span class="unit">만원</span></span>
+      </div>
+      <div class="pkg-price-saved">20만원 절감 · 약 66% off</div>
+    </div>
+
+    <!-- 001 카드 + CORE 1 카드 -->
+    <div class="free-bundle-core" style="margin: 0 auto 56px;">
+      <!-- 001 카드 (확장 가능) -->
+      <div class="core-card">
+        <div class="core-card-header">
+          <div class="core-card-icon">
+            <span class="core-card-icon-text">001</span>
+          </div>
+          <div class="core-card-body">
+            <span class="core-card-label">001 · Pre-launch</span>
+            <h4 class="core-card-h">SEO 검색노출전략 점검</h4>
+            <div class="core-card-tags">
+              <span class="core-card-tag">#업종분석</span>
+              <span class="core-card-tag">#키워드전략</span>
+              <span class="core-card-tag">#경쟁군분석</span>
+            </div>
+          </div>
+          <div class="core-card-price">
+            <span class="core-card-price-strike">20만원</span>
+            <span class="core-card-price-arrow">→</span>
+            <span class="core-card-price-free">포함</span>
+          </div>
+          <button class="core-card-toggle" aria-expanded="false" aria-controls="expand-001" aria-label="자세히 보기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+        </div>
+        <div class="core-card-expand" id="expand-001">
+          <div class="core-card-expand-inner">
+            <div>
+              <div class="core-col-section">
+                <p class="core-col-desc">
+                  홈페이지를 만들기 전에 "어떤 키워드로, 어떤 고객에게 보여야 하는가"를 먼저 정리하는 세션입니다. 사업자 기준으로 업종 포지셔닝, 경쟁군 분석, 메인·서브 키워드 선정, 검색 의도 분류까지 한 번에 다룹니다.
+                </p>
+                <p class="core-col-desc">
+                  제작 방향이 잡힌 후 홈페이지를 만들면, 구조 수정 없이 바로 검색 노출 구조로 연결됩니다.
+                </p>
+              </div>
+              <div class="core-col-section">
+                <span class="core-col-h">이런 분께 추천합니다</span>
+                <ul class="core-col-list bullet">
+                  <li>홈페이지를 만들기 전에 검색 전략부터 잡고 싶은 사업자</li>
+                  <li>내 업종에서 어떤 키워드가 효과적인지 모르는 분</li>
+                  <li>경쟁사 대비 차별화 포인트를 검색 관점에서 정리하고 싶은 분</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <div class="core-col-section">
+                <span class="core-col-h">다루는 내용</span>
+                <ul class="core-col-list check">
+                  <li>업종 포지셔닝 및 타겟 고객 정의</li>
+                  <li>경쟁군 분석 및 검색 상위 구조 파악</li>
+                  <li>메인/서브 키워드 선정 (지역 키워드 포함)</li>
+                  <li>검색 의도 유형 분류</li>
+                  <li>키워드 우선순위 문서화</li>
+                </ul>
+              </div>
+              <div class="core-col-section muted">
+                <span class="core-col-h">진행 방식</span>
+                <div class="core-col-chips">
+                  <span class="core-col-chip"><span class="core-col-chip-icon">⏱</span>1회 약 60분</span>
+                  <span class="core-col-chip"><span class="core-col-chip-icon">💬</span>화상 컨설팅</span>
+                  <span class="core-col-chip"><span class="core-col-chip-icon">📋</span>키워드 전략서</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CORE 1 알림 -->
+      <div class="core-notice">
+        <div class="core-notice-star"></div>
+        <div class="core-notice-body">
+          <div class="core-notice-title">CORE 1 — 핵심 교육</div>
+          <div class="core-notice-sub">사이트를 실제로 웹에 올리는 핵심 실습입니다</div>
+        </div>
+      </div>
+
+      <!-- CORE 1 카드 -->
+      <div class="core-card">
+        <div class="core-card-header">
+          <div class="core-card-icon">
+            <span class="core-card-icon-text">CORE1</span>
+          </div>
+          <div class="core-card-body">
+            <span class="core-card-label">CORE 1 · Deployment</span>
+            <h4 class="core-card-h">AI 홈페이지 즉시 배포 + 기술적 SEO 셋팅</h4>
+            <div class="core-card-tags">
+              <span class="core-card-tag">#즉시배포</span>
+              <span class="core-card-tag">#서치콘솔</span>
+              <span class="core-card-tag">#GA4연동</span>
+              <span class="core-card-tag">#기술적SEO</span>
+            </div>
+          </div>
+          <div class="core-card-price">
+            <span class="core-card-price-strike">10만원</span>
+            <span class="core-card-price-arrow">→</span>
+            <span class="core-card-price-free">포함</span>
+          </div>
+          <button class="core-card-toggle" aria-expanded="false" aria-controls="expand-core-02" aria-label="자세히 보기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+        </div>
+        <div class="core-card-expand" id="expand-core-02">
+          <div class="core-card-expand-inner">
+            <div>
+              <div class="core-col-section">
+                <p class="core-col-desc">
+                  AI로 만든 홈페이지를 실제 웹 주소에 올리는 것에서 끝나지 않습니다. 배포 직후 검색엔진이 내 사이트를 제대로 인식하고 데이터를 쌓을 수 있도록, Google Search Console · GA4 · 네이버 서치어드바이저 연동까지 원클릭 셋팅으로 한 번에 완성합니다.
+                </p>
+                <p class="core-col-desc">
+                  ZIP 업로드부터 서브도메인 배포, 기술적 SEO 설정, 측정 코드 삽입까지 — 교육 당일 실제로 공개 가능한 URL과 데이터 수집 환경이 동시에 만들어집니다.
+                </p>
+              </div>
+              <div class="core-col-section">
+                <span class="core-col-h">이런 분께 추천합니다</span>
+                <ul class="core-col-list bullet">
+                  <li>AI 도구로 홈페이지를 만들었지만 올리는 방법을 모르는 분</li>
+                  <li>배포는 됐는데 Search Console · GA4가 연결이 안 된 분</li>
+                  <li>검색 노출 기반을 처음부터 제대로 잡고 싶은 분</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <div class="core-col-section">
+                <span class="core-col-h">배우게 되는 것</span>
+                <ul class="core-col-list check">
+                  <li>AWS S3 버킷 생성 및 정적 웹 호스팅 · 서브도메인 배포</li>
+                  <li>기술적 SEO — 메타 태그 · robots.txt · sitemap.xml 설정</li>
+                  <li>Google Search Console 연동 · 소유권 인증 · 색인 요청</li>
+                  <li>GA4 설치 · 기본 이벤트 수집 확인</li>
+                  <li>네이버 서치어드바이저 등록 · 사이트맵 제출</li>
+                  <li>배포 후 수정사항 재업로드 방법</li>
+                </ul>
+              </div>
+              <div class="core-col-section muted">
+                <span class="core-col-h">진행 방식</span>
+                <div class="core-col-chips">
+                  <span class="core-col-chip"><span class="core-col-chip-icon">⏱</span>약 90~120분</span>
+                  <span class="core-col-chip"><span class="core-col-chip-icon">💻</span>화상 실습</span>
+                  <span class="core-col-chip"><span class="core-col-chip-icon">📋</span>SEO 셋팅 체크리스트</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="event01-cta">
+      <div class="event01-cta-row">
+        <a href="#" class="event01-btn">
+          <span>EVENT 02 신청하기</span>
+          <span class="event01-btn-arrow">→</span>
+        </a>
+        <a href="#event03" class="event01-btn secondary">
+          <span>EVENT 03도 비교해보기</span>
+        </a>
+      </div>
+      <p class="event01-cta-note">누구나 신청 가능 · 자격 검토 없이 바로 진행</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     EVENT 03 — 패키지 B (콘텐츠 기획 + 배포)
+══════════════════════════════════════════════ -->
+<section class="pkg-section alt" id="event03">
+  <div class="pkg-section-inner">
+
+    <!-- TAG -->
+    <div class="event01-tag-row">
+      <div class="event01-tag">
+        <span class="num">3</span>
+        <span>EVENT 03 · 패키지 B</span>
+      </div>
+    </div>
+
+    <!-- INTRO -->
+    <h2 class="section-h2">
+      무엇을 어떻게 쓸지<br>
+      <span class="em">먼저 정리하는</span> 패키지
+    </h2>
+    <p class="event01-lead">
+      메뉴 구조 · 서비스 설명 · CTA · 톤앤매너까지 —<br>
+      홈페이지에 들어갈 모든 것을 기획하고, 사이트를 올립니다.
+    </p>
+
+    <!-- 가격 박스 -->
+    <div class="pkg-price">
+      <div class="pkg-price-row">
+        <span class="label">002 홈페이지 · 콘텐츠 기획<small>메뉴 구조 · CTA 작성 · 콘텐츠 기획</small></span>
+        <span class="num">20만원</span>
+      </div>
+      <div class="pkg-price-row">
+        <span class="label">CORE1 즉시 배포 + 기술적 SEO 셋팅<small>실제 웹 주소에 올리고 검색엔진 연동까지</small></span>
+        <span class="num">10만원</span>
+      </div>
+      <div class="pkg-price-divider"></div>
+      <div class="pkg-price-sum">
+        <span>합계</span>
+        <span class="num">30만원</span>
+      </div>
+      <div class="pkg-price-final">
+        <span class="label">EVENT 03 패키지 가격</span>
+        <span class="num">10<span class="unit">만원</span></span>
+      </div>
+      <div class="pkg-price-saved">20만원 절감 · 약 66% off</div>
+    </div>
+
+    <!-- 002 카드 + CORE 1 카드 -->
+    <div class="free-bundle-core" style="margin: 0 auto 56px;">
+      <!-- 002 카드 -->
+      <div class="core-card">
+        <div class="core-card-header">
+          <div class="core-card-icon">
+            <span class="core-card-icon-text">002</span>
+          </div>
+          <div class="core-card-body">
+            <span class="core-card-label">002 · Pre-launch</span>
+            <h4 class="core-card-h">홈페이지 및 콘텐츠 기획 · 내용 설계</h4>
+            <div class="core-card-tags">
+              <span class="core-card-tag">#메뉴구조</span>
+              <span class="core-card-tag">#CTA작성</span>
+              <span class="core-card-tag">#콘텐츠기획</span>
+            </div>
+          </div>
+          <div class="core-card-price">
+            <span class="core-card-price-strike">20만원</span>
+            <span class="core-card-price-arrow">→</span>
+            <span class="core-card-price-free">포함</span>
+          </div>
+          <button class="core-card-toggle" aria-expanded="false" aria-controls="expand-002" aria-label="자세히 보기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+        </div>
+        <div class="core-card-expand" id="expand-002">
+          <div class="core-card-expand-inner">
+            <div>
+              <div class="core-col-section">
+                <p class="core-col-desc">
+                  홈페이지에 어떤 내용을, 어떤 순서로, 어떤 문장으로 담을지 설계하는 교육입니다. 단순히 문장을 다듬는 수준이 아니라, 메뉴 구조부터 서비스 설명 정리, 소개 문장과 CTA, 전체 콘텐츠 방향까지 홈페이지 제작 전 필요한 모든 기획을 한 번에 마칩니다.
+                </p>
+                <p class="core-col-desc">
+                  이 교육을 마치면 AI 도구에 명확한 방향을 넣을 수 있는 상태가 되어, 만들어지는 결과물의 완성도가 크게 높아집니다.
+                </p>
+              </div>
+              <div class="core-col-section">
+                <span class="core-col-h">이런 분께 추천합니다</span>
+                <ul class="core-col-list bullet">
+                  <li>홈페이지에 뭘 써야 할지 막막한 분</li>
+                  <li>서비스 설명이 너무 길거나 핵심이 없다는 피드백을 받은 분</li>
+                  <li>기획 없이 만들었다가 처음부터 다시 고친 경험이 있는 분</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <div class="core-col-section">
+                <span class="core-col-h">다루는 내용</span>
+                <ul class="core-col-list check">
+                  <li>홈페이지 메뉴 구조 설계 (페이지 수 · 우선순위)</li>
+                  <li>서비스 설명 정리 및 핵심 문장 추출</li>
+                  <li>소개 문장 · CTA 문구 작성</li>
+                  <li>콘텐츠 방향 및 톤앤매너 설정</li>
+                  <li>AI 도구에 넣을 프롬프트 방향 정리</li>
+                </ul>
+              </div>
+              <div class="core-col-section muted">
+                <span class="core-col-h">진행 방식</span>
+                <div class="core-col-chips">
+                  <span class="core-col-chip"><span class="core-col-chip-icon">⏱</span>1회 약 60~80분</span>
+                  <span class="core-col-chip"><span class="core-col-chip-icon">💬</span>화상 컨설팅</span>
+                  <span class="core-col-chip"><span class="core-col-chip-icon">📋</span>콘텐츠 기획서</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CORE 1 알림 -->
+      <div class="core-notice">
+        <div class="core-notice-star"></div>
+        <div class="core-notice-body">
+          <div class="core-notice-title">CORE 1 — 핵심 교육</div>
+          <div class="core-notice-sub">사이트를 실제로 웹에 올리는 핵심 실습입니다</div>
+        </div>
+      </div>
+
+      <!-- CORE 1 카드 -->
+      <div class="core-card">
+        <div class="core-card-header">
+          <div class="core-card-icon">
+            <span class="core-card-icon-text">CORE1</span>
+          </div>
+          <div class="core-card-body">
+            <span class="core-card-label">CORE 1 · Deployment</span>
+            <h4 class="core-card-h">AI 홈페이지 즉시 배포 + 기술적 SEO 셋팅</h4>
+            <div class="core-card-tags">
+              <span class="core-card-tag">#즉시배포</span>
+              <span class="core-card-tag">#서치콘솔</span>
+              <span class="core-card-tag">#GA4연동</span>
+              <span class="core-card-tag">#기술적SEO</span>
+            </div>
+          </div>
+          <div class="core-card-price">
+            <span class="core-card-price-strike">10만원</span>
+            <span class="core-card-price-arrow">→</span>
+            <span class="core-card-price-free">포함</span>
+          </div>
+          <button class="core-card-toggle" aria-expanded="false" aria-controls="expand-core-03" aria-label="자세히 보기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+        </div>
+        <div class="core-card-expand" id="expand-core-03">
+          <div class="core-card-expand-inner">
+            <div>
+              <div class="core-col-section">
+                <p class="core-col-desc">
+                  AI로 만든 홈페이지를 실제 웹 주소에 올리는 것에서 끝나지 않습니다. 배포 직후 검색엔진이 내 사이트를 제대로 인식하고 데이터를 쌓을 수 있도록, Google Search Console · GA4 · 네이버 서치어드바이저 연동까지 원클릭 셋팅으로 한 번에 완성합니다.
+                </p>
+                <p class="core-col-desc">
+                  ZIP 업로드부터 서브도메인 배포, 기술적 SEO 설정, 측정 코드 삽입까지 — 교육 당일 실제로 공개 가능한 URL과 데이터 수집 환경이 동시에 만들어집니다.
+                </p>
+              </div>
+              <div class="core-col-section">
+                <span class="core-col-h">이런 분께 추천합니다</span>
+                <ul class="core-col-list bullet">
+                  <li>AI 도구로 홈페이지를 만들었지만 올리는 방법을 모르는 분</li>
+                  <li>배포는 됐는데 Search Console · GA4가 연결이 안 된 분</li>
+                  <li>검색 노출 기반을 처음부터 제대로 잡고 싶은 분</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <div class="core-col-section">
+                <span class="core-col-h">배우게 되는 것</span>
+                <ul class="core-col-list check">
+                  <li>AWS S3 버킷 생성 및 정적 웹 호스팅 · 서브도메인 배포</li>
+                  <li>기술적 SEO — 메타 태그 · robots.txt · sitemap.xml 설정</li>
+                  <li>Google Search Console 연동 · 소유권 인증 · 색인 요청</li>
+                  <li>GA4 설치 · 기본 이벤트 수집 확인</li>
+                  <li>네이버 서치어드바이저 등록 · 사이트맵 제출</li>
+                  <li>배포 후 수정사항 재업로드 방법</li>
+                </ul>
+              </div>
+              <div class="core-col-section muted">
+                <span class="core-col-h">진행 방식</span>
+                <div class="core-col-chips">
+                  <span class="core-col-chip"><span class="core-col-chip-icon">⏱</span>약 90~120분</span>
+                  <span class="core-col-chip"><span class="core-col-chip-icon">💻</span>화상 실습</span>
+                  <span class="core-col-chip"><span class="core-col-chip-icon">📋</span>SEO 셋팅 체크리스트</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="event01-cta">
+      <div class="event01-cta-row">
+        <a href="#" class="event01-btn">
+          <span>EVENT 03 신청하기</span>
+          <span class="event01-btn-arrow">→</span>
+        </a>
+        <a href="#event02" class="event01-btn secondary">
+          <span>EVENT 02도 비교해보기</span>
+        </a>
+      </div>
+      <p class="event01-cta-note">누구나 신청 가능 · 자격 검토 없이 바로 진행</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     공통: 이런 분께 드리는 기회입니다
+══════════════════════════════════════════════ -->
+<section class="common-targets">
+  <div class="common-targets-inner">
+    <div class="section-eyebrow">FOR YOU</div>
+    <h2 class="section-h2">이런 분께 드리는<br><span class="em">기회입니다</span></h2>
+    <p class="event01-lead" style="margin-bottom: 56px;">
+      두 패키지 모두 동일하게 적용되는 권장 대상입니다.<br>
+      아래 다섯 가지 중 두 가지 이상 해당되시면 망설이지 말고 신청해주세요.
+    </p>
+
+    <div class="event01-targets">
+      <div class="event01-target">
+        <div class="event01-target-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <p class="event01-target-text">창업 2년차 이상, 혼자 영업·서비스·마케팅을 다 하시는 1인 대표님</p>
+      </div>
+      <div class="event01-target">
+        <div class="event01-target-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <p class="event01-target-text">기존 홈페이지의 월간 호스팅 비용이 아까우신 분</p>
+      </div>
+      <div class="event01-target">
+        <div class="event01-target-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <p class="event01-target-text">AI 자동화 마케팅을 위해 개선된 홈페이지가 필요하신 분</p>
+      </div>
+      <div class="event01-target">
+        <div class="event01-target-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <p class="event01-target-text">ChatGPT · Claude는 결제해서 쓰고 계시지만, 홈페이지 관리는 막막하신 분</p>
+      </div>
+      <div class="event01-target" style="grid-column: 1 / -1;">
+        <div class="event01-target-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <p class="event01-target-text">유료 광고가 아닌, SEO 검색 최적화를 통해 고객이 직접 검색해서 찾아오는 기반을 다지고 싶으신 분</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     FAQ
+══════════════════════════════════════════════ -->
+<section class="faq-section">
+  <div class="faq-inner">
+    <div class="section-eyebrow">FAQ</div>
+    <h2 class="section-h2">자주 묻는 질문</h2>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq-1">
+          <span class="faq-q-text">EVENT 02와 EVENT 03의 차이를 한 줄로 알려주세요</span>
+          <span class="faq-q-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-a" id="faq-1">
+          <div class="faq-a-inner">
+            EVENT 02는 <strong>"어디서 보일지"</strong>를 먼저 정리하는 검색 전략 패키지, EVENT 03는 <strong>"무엇을 보여줄지"</strong>를 먼저 정리하는 콘텐츠 기획 패키지입니다. 두 패키지 모두 CORE 1 배포 교육이 포함되어 사이트 공개까지 한 번에 끝납니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq-2">
+          <span class="faq-q-text">두 패키지를 모두 신청할 수 있나요?</span>
+          <span class="faq-q-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-a" id="faq-2">
+          <div class="faq-a-inner">
+            가능합니다. 다만 두 패키지를 모두 진행하시면 CORE 1 배포 교육은 한 번만 진행되고, 001과 002 두 사전 교육이 모두 적용됩니다. 가격은 별도 문의 부탁드립니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq-3">
+          <span class="faq-q-text">EVENT 01(무료)과는 무엇이 다른가요?</span>
+          <span class="faq-q-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-a" id="faq-3">
+          <div class="faq-a-inner">
+            EVENT 01은 선착순 3분 한정 무료 프로그램으로 자격 검토를 거쳐 진행됩니다. EVENT 02와 03은 자격 검토 없이 누구나 신청 가능한 합리적 가격의 정식 패키지입니다. 사전 교육(001 또는 002)이 추가로 포함되어 더 깊이 있게 진행됩니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq-4">
+          <span class="faq-q-text">교육 후 사이트 운영은 어떻게 되나요?</span>
+          <span class="faq-q-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-a" id="faq-4">
+          <div class="faq-a-inner">
+            교육 당일 배포된 사이트는 yourname.aiseo.tips 형태의 서브도메인으로 즉시 운영 가능합니다. 12개월 동안은 호스팅 · 도메인 · SSL 모두 무료로 제공되며, 이후에도 트렌드에 맞는 최소 비용으로 제공할 예정입니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq-5">
+          <span class="faq-q-text">교육 일정은 어떻게 잡나요?</span>
+          <span class="faq-q-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-a" id="faq-5">
+          <div class="faq-a-inner">
+            신청 후 담당 PM이 카카오톡으로 연락드립니다. 사전 미팅(약 30분)에서 사장님 상황을 파악한 뒤, 사장님 일정에 맞춰 1:1 화상 교육 일정을 확정합니다. 평일 저녁이나 주말 진행도 가능합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false" aria-controls="faq-6">
+          <span class="faq-q-text">미리 준비해야 할 자료가 있나요?</span>
+          <span class="faq-q-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-a" id="faq-6">
+          <div class="faq-a-inner">
+            형식 갖춘 제안서나 기획서는 필요 없습니다. 기존 홈페이지(있으시면), 사업 카탈로그, 서비스 소개서 중 가지고 계신 것이면 충분합니다. 카카오톡 사전 미팅 때 어떤 자료가 필요한지 함께 정리해드립니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     A vs B 비교 (마지막 결정 도구)
+══════════════════════════════════════════════ -->
+<section class="compare-section">
+  <div class="compare-inner">
+    <div class="section-eyebrow">CHOOSE YOUR PATH</div>
+    <h2 class="section-h2">아직 헷갈리신다면<br><span class="em">한 번에 비교</span>해보세요</h2>
+    <p class="event01-lead">
+      두 패키지의 출발점이 다릅니다.<br>
+      자기 상황에 가까운 쪽을 골라주시면 됩니다.
+    </p>
+
+    <div class="compare-grid">
+      <article class="compare-card">
+        <div class="compare-card-icon">🎯</div>
+        <div class="compare-card-pkg">EVENT 02 · PACKAGE A</div>
+        <h3 class="compare-card-h">검색에서 보이는 길을<br>먼저 그려두고 싶다면</h3>
+        <p class="compare-card-sub">
+          홈페이지를 만들기 전에 키워드 · 경쟁군 · 검색 의도를 먼저 정리합니다. 이후 사이트를 올리면 구조 수정 없이 바로 검색 노출 구조로 연결됩니다.
+        </p>
+        <ul class="compare-card-list">
+          <li>업종에서 어떤 키워드가 효과적인지 모름</li>
+          <li>경쟁사 분석을 안 해봄</li>
+          <li>검색 노출이 가장 우선이라고 생각</li>
+          <li>홈페이지 내용은 어느 정도 잡혀있음</li>
+        </ul>
+        <a href="#event02" class="compare-cta">
+          <span>EVENT 02 자세히 보기</span>
+          <span>↑</span>
+        </a>
+      </article>
+
+      <article class="compare-card">
+        <div class="compare-card-icon">✍️</div>
+        <div class="compare-card-pkg">EVENT 03 · PACKAGE B</div>
+        <h3 class="compare-card-h">무엇을 어떻게 쓸지<br>먼저 정리하고 싶다면</h3>
+        <p class="compare-card-sub">
+          메뉴 구조부터 서비스 설명, CTA, 톤앤매너까지 콘텐츠를 먼저 설계합니다. AI 도구에 명확한 방향을 넣을 수 있어 결과물 완성도가 크게 높아집니다.
+        </p>
+        <ul class="compare-card-list">
+          <li>홈페이지에 뭘 써야 할지 막막함</li>
+          <li>메뉴 구조를 어떻게 나눌지 모름</li>
+          <li>서비스 설명이 길고 핵심이 없다는 피드백</li>
+          <li>키워드보다는 내용 정리가 우선</li>
+        </ul>
+        <a href="#event03" class="compare-cta">
+          <span>EVENT 03 자세히 보기</span>
+          <span>↑</span>
+        </a>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── LAUNCH CTA — 선착순 7팀 + 4월 30일 오픈 ── -->
+<section class="launch-cta">
+  <div class="launch-cta-inner">
+    <div class="launch-cta-eyebrow">
+      <span class="star">★</span>
+      <span class="pulse"></span>
+      <span>EARLY BIRD · LIMITED 7 SLOTS</span>
+    </div>
+
+    <h2 class="launch-cta-h">
+      각 이벤트 <span class="accent">선착순 7팀</span>씩만<br>
+      신청 가능합니다
+    </h2>
+    <p class="launch-cta-sub">
+      2026년 4월 30일 정식 오픈 — <strong>EVENT 02와 EVENT 03 각각 7팀 한정</strong>으로<br>
+      진행됩니다. 자리가 마감되는 즉시 신청이 종료됩니다.
+    </p>
+
+    <!-- 카운트다운 (오픈 전) -->
+    <div class="launch-countdown" id="launchCountdown">
+      <span class="launch-countdown-label">오픈까지</span>
+      <div class="launch-countdown-unit">
+        <div class="launch-countdown-num" data-cd="days">--</div>
+        <div class="launch-countdown-name">Days</div>
+      </div>
+      <div class="launch-countdown-unit">
+        <div class="launch-countdown-num" data-cd="hours">--</div>
+        <div class="launch-countdown-name">Hours</div>
+      </div>
+      <div class="launch-countdown-unit">
+        <div class="launch-countdown-num" data-cd="minutes">--</div>
+        <div class="launch-countdown-name">Minutes</div>
+      </div>
+      <div class="launch-countdown-unit">
+        <div class="launch-countdown-num" data-cd="seconds">--</div>
+        <div class="launch-countdown-name">Seconds</div>
+      </div>
+    </div>
+
+    <!-- 오픈된 후에만 표시 -->
+    <div class="launch-live" id="launchLive">
+      <span>지금 신청 받습니다 — 자리가 곧 마감됩니다</span>
+    </div>
+
+    <!-- 두 패키지 슬롯 -->
+    <div class="launch-slots">
+      <a href="#event02" class="launch-slot">
+        <div class="launch-slot-head">
+          <span class="launch-slot-pkg">EVENT 02 · PACKAGE A</span>
+          <span class="launch-slot-count">7팀 한정</span>
+        </div>
+        <h4 class="launch-slot-h">🎯 검색 전략 + 사이트 배포</h4>
+        <div class="launch-slot-cta">
+          <span>EVENT 02 신청하기</span>
+          <span class="launch-slot-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <a href="#event03" class="launch-slot">
+        <div class="launch-slot-head">
+          <span class="launch-slot-pkg">EVENT 03 · PACKAGE B</span>
+          <span class="launch-slot-count">7팀 한정</span>
+        </div>
+        <h4 class="launch-slot-h">✍️ 콘텐츠 기획 + 사이트 배포</h4>
+        <div class="launch-slot-cta">
+          <span>EVENT 03 신청하기</span>
+          <span class="launch-slot-cta-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <p class="launch-cta-note">
+      두 패키지 합쳐 총 14팀 한정 · 신청 후 카카오톡으로 일정 협의<br>
+      자리가 모두 채워지면 다음 회차로 안내드립니다
+    </p>
+  </div>
+</section>
+
+<!-- ── CROSS-LINK 배너 (EVENT 01 무료 페이지로) ── -->
+<section class="cross-link">
+  <div class="cross-link-inner">
+    <div class="cross-link-eyebrow">Limited Free Slot</div>
+    <h2 class="cross-link-h">
+      선착순 <span class="em">3분 무료 자리</span>도 열려 있습니다
+    </h2>
+    <p class="cross-link-sub">
+      자격 검토 후 선별되는 런칭 파트너 자리 — 비즈니스를 꾸준히<br>
+      만들어오신 분이라면 무료로 모든 것을 받아가실 수 있습니다.
+    </p>
+
+    <a href="aiseo-events-2026.html" class="cross-card">
+      <div class="cross-card-badge">
+        <span class="cross-card-badge-num">01</span>
+        <span class="cross-card-badge-tag">FREE</span>
+      </div>
+      <div class="cross-card-body">
+        <div class="cross-card-pkg">EVENT 01 · 선착순 무료</div>
+        <div class="cross-card-h">3가지를 전부 무료로 받아가시는 이벤트</div>
+        <div class="cross-card-desc">AI 홈페이지 제작 + 도메인·호스팅 + SEO 핵심강의 · 정가 30만원 → 0원</div>
+      </div>
+      <div class="cross-card-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">AISEO</div>
+  <p>AI로 만들고, SEO로 팔린다 — 구독료 없이.</p>
+  <p class="footer-meta">© 2026 AISEO.TIPS · K-RIDA</p>
+</footer>
+
+<script>
+  // NAV scroll effect
+  const nav = document.getElementById('mainNav');
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        if (window.scrollY > 40) nav.classList.add('scrolled');
+        else nav.classList.remove('scrolled');
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  // simple intersection reveal for event01 cards
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        entry.target.style.transition = `opacity .6s ease ${i * 0.05}s, transform .6s ease ${i * 0.05}s`;
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.event01-target, .event01-coach-card, .event01-result-card, .benefit-card').forEach((el) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    observer.observe(el);
+  });
+
+  // ═══════════════════════════════════════════════
+  // SCROLL-STEP PHASE ANIMATION (01 / 02 / 03)
+  // ═══════════════════════════════════════════════
+  // 핵심 설계:
+  //   - 등장(in)은 *헤더 요소(.scroll-step) 자체의 화면 내 위치*로 결정
+  //     → 사용자가 실제로 헤더를 볼 때 진해짐
+  //   - 페이드아웃(out)은 *다음 블록 헤더의 진입*으로 결정
+  //   - 마지막 블록은 자체 끝부분에서 페이드아웃
+
+  const C_NUM_OFF   = [196, 168, 245, 0.08];
+  const C_NUM_ON    = [107,  79, 184, 1];
+  const C_TITLE_OFF = [10,    6,  20, 0.06];
+  const C_TITLE_ON  = [10,    6,  20, 1];
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function clamp01(v) { return Math.min(1, Math.max(0, v)); }
+  function phase(p, lo, hi) { return clamp01((p - lo) / (hi - lo)); }
+  function eio(t) { return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+
+  function lerpRgba(from, to, t) {
+    const r = Math.round(lerp(from[0], to[0], t));
+    const g = Math.round(lerp(from[1], to[1], t));
+    const b = Math.round(lerp(from[2], to[2], t));
+    const a = lerp(from[3], to[3], t).toFixed(3);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  // 헤더 요소(.scroll-step)가 viewport 안에서 어느 위치에 있는지를 0~1로 반환
+  // 0 = 헤더 상단이 화면 하단(아직 안 보임)
+  // 0.5 = 헤더 중앙이 화면 중앙
+  // 1 = 헤더 하단이 화면 상단(이미 위로 빠짐)
+  function headerProgress(headerEl) {
+    const rect = headerEl.getBoundingClientRect();
+    const vh = window.innerHeight;
+    // 헤더 중앙 y 좌표 (화면 좌표계)
+    const headerCenterY = rect.top + rect.height / 2;
+    // 화면 하단(vh)에서 시작해서 화면 상단(0)으로 갈수록 진행
+    return clamp01(1 - headerCenterY / vh);
+  }
+
+  const stepBlocks = Array.from(document.querySelectorAll('[data-step]'));
+
+  function updateSteps() {
+    stepBlocks.forEach((block, idx) => {
+      const headerEl = block.querySelector('.scroll-step');
+      if (!headerEl) return;
+
+      // 헤더가 화면 아래(0)에서 위(1)로 이동하는 진행도
+      const hp = headerProgress(headerEl);
+
+      // ── 등장 페이즈 ──
+      // hp 0.30 → 헤더가 화면 아래쪽에 보이기 시작 → 숫자 등장 시작
+      // hp 0.50 → 헤더가 화면 중앙 → 숫자 완전 진함, 제목 거의 진함
+      // hp 0.65 → 헤더가 약간 위 → 모두 완전히 진함
+      const numIn   = eio(phase(hp, 0.25, 0.45));
+      const titleIn = eio(phase(hp, 0.40, 0.60));
+      const descIn  = eio(phase(hp, 0.50, 0.70));
+
+      // ── 페이드아웃 결정 ──
+      // 다음 블록 헤더가 화면에 들어오기 시작하면 페이드아웃
+      let fadeOut = 0;
+      const nextBlock = stepBlocks[idx + 1];
+      if (nextBlock) {
+        const nextHeader = nextBlock.querySelector('.scroll-step');
+        if (nextHeader) {
+          const nextHp = headerProgress(nextHeader);
+          // 다음 헤더가 hp 0.20~0.45 사이일 때 현재 헤더 페이드아웃
+          fadeOut = eio(phase(nextHp, 0.20, 0.45));
+        }
+      } else {
+        // 마지막 블록은 자기 헤더가 한참 위로 빠진 후에만 살짝 페이드
+        fadeOut = eio(phase(hp, 0.95, 1.05));
+      }
+
+      const numVal   = clamp01(numIn   - fadeOut);
+      const titleVal = clamp01(titleIn - fadeOut);
+      const descVal  = clamp01(descIn  - fadeOut);
+
+      const numEl   = block.querySelector('.scroll-step-num');
+      const titleEl = block.querySelector('.scroll-step-title');
+      const descEl  = block.querySelector('.scroll-step-desc');
+
+      if (!numEl || !titleEl || !descEl) return;
+
+      numEl.style.color   = lerpRgba(C_NUM_OFF, C_NUM_ON, numVal);
+      titleEl.style.color = lerpRgba(C_TITLE_OFF, C_TITLE_ON, titleVal);
+
+      if (numVal > 0.5) numEl.classList.add('lit');
+      else numEl.classList.remove('lit');
+
+      if (titleVal > 0.5) titleEl.classList.add('lit');
+      else titleEl.classList.remove('lit');
+
+      descEl.style.opacity   = descVal;
+      descEl.style.transform = `translateY(${(1 - descVal) * 12}px)`;
+    });
+  }
+
+  let stepRaf = false;
+  window.addEventListener('scroll', () => {
+    if (!stepRaf) {
+      requestAnimationFrame(() => { updateSteps(); stepRaf = false; });
+      stepRaf = true;
+    }
+  }, { passive: true });
+  window.addEventListener('resize', updateSteps);
+  updateSteps();
+
+  // ═══════════════════════════════════════════════
+  // FREE BUNDLE — 자동 플립 카드
+  // ═══════════════════════════════════════════════
+  // 동작 흐름:
+  //   1. 페이지 로드 → 5초 대기 (앞면 충분히 보여줌)
+  //   2. 카드 1 → 2 → 3 순서로 0.4초 간격 stagger 플립 (앞→뒷)
+  //   3. 4초 hold (뒷면 메시지 보여줌)
+  //   4. 같은 순서로 다시 stagger 플립 (뒷→앞)
+  //   5. 6초 hold → 다시 2번부터 반복
+  //
+  // 카드가 화면 밖이면 (IntersectionObserver) 애니메이션 일시정지
+
+  const flipCards = Array.from(document.querySelectorAll('.free-card'));
+  let flipCycleTimer = null;
+  let isInView = false;
+
+  function flipAll(toBack) {
+    flipCards.forEach((card, i) => {
+      setTimeout(() => {
+        if (toBack) card.classList.add('flipped');
+        else card.classList.remove('flipped');
+      }, i * 400);
+    });
+  }
+
+  function startFlipCycle() {
+    if (flipCycleTimer) return;
+
+    function cycle() {
+      if (!isInView) return;
+      // 앞 → 뒷
+      flipAll(true);
+      // 뒷면 hold (마지막 카드 플립 완료 + 4초)
+      flipCycleTimer = setTimeout(() => {
+        if (!isInView) return;
+        // 뒷 → 앞
+        flipAll(false);
+        // 앞면 hold (6초)
+        flipCycleTimer = setTimeout(cycle, (flipCards.length - 1) * 400 + 900 + 6000);
+      }, (flipCards.length - 1) * 400 + 900 + 4000);
+    }
+
+    // 처음 진입 시 1.2초 대기 후 시작 (사용자가 카드를 인지하는 순간)
+    flipCycleTimer = setTimeout(cycle, 1200);
+  }
+
+  function stopFlipCycle() {
+    if (flipCycleTimer) {
+      clearTimeout(flipCycleTimer);
+      flipCycleTimer = null;
+    }
+  }
+
+  if (flipCards.length) {
+    const flipObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          isInView = true;
+          startFlipCycle();
+        } else {
+          isInView = false;
+          stopFlipCycle();
+        }
+      });
+    }, { threshold: 0.15 });
+
+    const flipTarget = document.querySelector('.free-bundle-grid');
+    if (flipTarget) flipObserver.observe(flipTarget);
+  }
+
+  // ═══════════════════════════════════════════════
+  // CORE CARD — 확장/축소 토글
+  // ═══════════════════════════════════════════════
+  document.querySelectorAll('.core-card-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const expandId = btn.getAttribute('aria-controls');
+      const expandEl = document.getElementById(expandId);
+      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+      if (isExpanded) {
+        btn.setAttribute('aria-expanded', 'false');
+        expandEl.classList.remove('open');
+      } else {
+        btn.setAttribute('aria-expanded', 'true');
+        expandEl.classList.add('open');
+      }
+    });
+  });
+
+  // ═══════════════════════════════════════════════
+  // FAQ — 아코디언
+  // ═══════════════════════════════════════════════
+  document.querySelectorAll('.faq-q').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const expandId = btn.getAttribute('aria-controls');
+      const expandEl = document.getElementById(expandId);
+      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+      // 다른 모든 항목 닫기 (한 번에 하나만 열리도록)
+      document.querySelectorAll('.faq-q').forEach(b => {
+        if (b !== btn) {
+          b.setAttribute('aria-expanded', 'false');
+          const otherId = b.getAttribute('aria-controls');
+          document.getElementById(otherId).classList.remove('open');
+        }
+      });
+
+      if (isExpanded) {
+        btn.setAttribute('aria-expanded', 'false');
+        expandEl.classList.remove('open');
+      } else {
+        btn.setAttribute('aria-expanded', 'true');
+        expandEl.classList.add('open');
+      }
+    });
+  });
+
+  // ═══════════════════════════════════════════════
+  // 비교 카드 CTA — 부드러운 스크롤
+  // ═══════════════════════════════════════════════
+  document.querySelectorAll('.compare-cta, .launch-slot, a[href^="#event"]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // ═══════════════════════════════════════════════
+  // 카운트다운 — 2026.04.30 00:00 KST 오픈
+  // 오픈 전: 카운트다운 표시
+  // 오픈 후: "지금 오픈" 라이브 메시지로 자동 전환
+  // ═══════════════════════════════════════════════
+  (function() {
+    const target = new Date('2026-04-30T00:00:00+09:00').getTime();
+    const cdEl = document.getElementById('launchCountdown');
+    const liveEl = document.getElementById('launchLive');
+    if (!cdEl || !liveEl) return;
+
+    const numEls = {
+      days: cdEl.querySelector('[data-cd="days"]'),
+      hours: cdEl.querySelector('[data-cd="hours"]'),
+      minutes: cdEl.querySelector('[data-cd="minutes"]'),
+      seconds: cdEl.querySelector('[data-cd="seconds"]')
+    };
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+      const now = Date.now();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        // 오픈됨
+        cdEl.style.display = 'none';
+        liveEl.classList.add('show');
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      numEls.days.textContent = pad(days);
+      numEls.hours.textContent = pad(hours);
+      numEls.minutes.textContent = pad(minutes);
+      numEls.seconds.textContent = pad(seconds);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  // video play stub
+  document.querySelectorAll('.hero-video-play').forEach((b) => {
+    b.addEventListener('click', () => {
+      b.style.transform = 'translate(-50%, -50%) scale(0.92)';
+      setTimeout(() => b.style.transform = 'translate(-50%, -50%) scale(1)', 150);
+    });
+  });
+</script>
+
+</body>
+</html>
