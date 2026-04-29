@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import '../landing.css';
 import { useSubPageNav } from './useSubPageNav';
+import { EventSignupModal } from '../../components/EventSignupModal';
 
 /**
  * 무료 이벤트 — `/events2026/free`
@@ -27,6 +28,15 @@ export function Events2026FreePage() {
   // CORE 1 deployment card — closed by default; toggled by the chevron
   // button in the card header.
   const [coreOpen, setCoreOpen] = useState(false);
+
+  // Event signup modal — `EVENT_01_FREE` is hardcoded for this page;
+  // `signupSource` traces which CTA opened the modal.
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [signupSource, setSignupSource] = useState('');
+  const openSignup = (source: string) => {
+    setSignupSource(source);
+    setSignupOpen(true);
+  };
 
   // ──────────────────────────────────────────────────────────────
   //  SCROLL-STEP PHASE ANIMATION
@@ -2335,13 +2345,21 @@ export function Events2026FreePage() {
                 {/* CTA */}
                 <div className="event01-cta">
                   <div className="event01-cta-row">
-                    <a href="#" className="event01-btn">
+                    <button
+                      type="button"
+                      className="event01-btn"
+                      onClick={() => openSignup('free-block3-primary')}
+                    >
                       <span>지금 신청하기</span>
                       <span className="event01-btn-arrow">→</span>
-                    </a>
-                    <a href="#" className="event01-btn secondary">
+                    </button>
+                    <button
+                      type="button"
+                      className="event01-btn secondary"
+                      onClick={() => openSignup('free-block3-secondary')}
+                    >
                       <span>내 자격이 되는지 먼저 확인</span>
-                    </a>
+                    </button>
                   </div>
                   <p className="event01-cta-note">선착순 3분 · 자격 검토 후 카카오톡으로 안내드립니다</p>
                 </div>
@@ -2397,6 +2415,13 @@ export function Events2026FreePage() {
           </div>
         </footer>
       </div>
+
+      <EventSignupModal
+        open={signupOpen}
+        onClose={() => setSignupOpen(false)}
+        eventCode="EVENT_01_FREE"
+        source={signupSource}
+      />
     </>
   );
 }

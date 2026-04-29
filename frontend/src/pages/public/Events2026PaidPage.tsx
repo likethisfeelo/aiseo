@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import '../landing.css';
 import { useSubPageNav } from './useSubPageNav';
+import { EventSignupModal } from '../../components/EventSignupModal';
+import type { EventCode } from '../../api';
 
 /**
  * 할인 이벤트 — `/events2026/paid`
@@ -46,6 +48,18 @@ export function Events2026PaidPage() {
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const toggleFaq = (id: string) =>
     setOpenFaq((prev) => (prev === id ? null : id));
+
+  // Event signup modal — `eventCode` toggles between EVENT 02 / 03
+  // depending on which CTA was clicked. `signupSource` traces the
+  // origin button so we can attribute conversions later.
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [signupCode, setSignupCode] = useState<EventCode>('EVENT_02_PAID');
+  const [signupSource, setSignupSource] = useState('');
+  const openSignup = (code: EventCode, source: string) => {
+    setSignupCode(code);
+    setSignupSource(source);
+    setSignupOpen(true);
+  };
 
   // ──────────────────────────────────────────────────────────────
   //  COUNTDOWN — target: 2026-04-30 00:00 KST (the EVENT 02·03 open
@@ -1330,6 +1344,10 @@ export function Events2026PaidPage() {
           transition: background .25s, border-color .25s, transform .25s;
           text-decoration: none;
           display: block;
+          width: 100%;
+          font: inherit;
+          color: inherit;
+          cursor: pointer;
         }
         .evtpaid .launch-slot:hover {
           background: rgba(196,168,245,0.12);
@@ -1932,10 +1950,14 @@ export function Events2026PaidPage() {
             {/* CTA */}
             <div className="event01-cta">
               <div className="event01-cta-row">
-                <a href="#" className="event01-btn">
+                <button
+                  type="button"
+                  className="event01-btn"
+                  onClick={() => openSignup('EVENT_02_PAID', 'paid-event02-cta')}
+                >
                   <span>EVENT 02 신청하기</span>
                   <span className="event01-btn-arrow">→</span>
-                </a>
+                </button>
                 <a href="#event03" className="event01-btn secondary">
                   <span>EVENT 03도 비교해보기</span>
                 </a>
@@ -2159,10 +2181,14 @@ export function Events2026PaidPage() {
             {/* CTA */}
             <div className="event01-cta">
               <div className="event01-cta-row">
-                <a href="#" className="event01-btn">
+                <button
+                  type="button"
+                  className="event01-btn"
+                  onClick={() => openSignup('EVENT_03_PAID', 'paid-event03-cta')}
+                >
                   <span>EVENT 03 신청하기</span>
                   <span className="event01-btn-arrow">→</span>
-                </a>
+                </button>
                 <a href="#event02" className="event01-btn secondary">
                   <span>EVENT 02도 비교해보기</span>
                 </a>
@@ -2415,7 +2441,11 @@ export function Events2026PaidPage() {
 
             {/* 두 패키지 슬롯 */}
             <div className="launch-slots">
-              <a href="#event02" className="launch-slot">
+              <button
+                type="button"
+                className="launch-slot"
+                onClick={() => openSignup('EVENT_02_PAID', 'paid-launch-slot-event02')}
+              >
                 <div className="launch-slot-head">
                   <span className="launch-slot-pkg">EVENT 02 · PACKAGE A</span>
                   <span className="launch-slot-count">7팀 한정</span>
@@ -2425,9 +2455,13 @@ export function Events2026PaidPage() {
                   <span>EVENT 02 신청하기</span>
                   <span className="launch-slot-cta-arrow" aria-hidden="true">→</span>
                 </div>
-              </a>
+              </button>
 
-              <a href="#event03" className="launch-slot">
+              <button
+                type="button"
+                className="launch-slot"
+                onClick={() => openSignup('EVENT_03_PAID', 'paid-launch-slot-event03')}
+              >
                 <div className="launch-slot-head">
                   <span className="launch-slot-pkg">EVENT 03 · PACKAGE B</span>
                   <span className="launch-slot-count">7팀 한정</span>
@@ -2437,7 +2471,7 @@ export function Events2026PaidPage() {
                   <span>EVENT 03 신청하기</span>
                   <span className="launch-slot-cta-arrow" aria-hidden="true">→</span>
                 </div>
-              </a>
+              </button>
             </div>
 
             <p className="launch-cta-note">
@@ -2492,6 +2526,13 @@ export function Events2026PaidPage() {
           </div>
         </footer>
       </div>
+
+      <EventSignupModal
+        open={signupOpen}
+        onClose={() => setSignupOpen(false)}
+        eventCode={signupCode}
+        source={signupSource}
+      />
     </>
   );
 }
