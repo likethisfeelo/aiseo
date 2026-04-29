@@ -12,6 +12,8 @@ import type { UserProfile } from './types';
 import { Course2026Page } from './pages/public/Course2026Page';
 import { Support2026Page } from './pages/public/Support2026Page';
 import { Events2026Page } from './pages/public/Events2026Page';
+import { Events2026FreePage } from './pages/public/Events2026FreePage';
+import { Events2026PaidPage } from './pages/public/Events2026PaidPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { AdminLayout } from './components/layout/AdminLayout';
 import { EducationDrawer } from './components/education/EducationDrawer';
@@ -263,6 +265,8 @@ export default function App() {
         <Route path="/course2026" element={<Course2026Page />} />
         <Route path="/support2026" element={<Support2026Page />} />
         <Route path="/events2026" element={<Events2026Page />} />
+        <Route path="/events2026/free" element={<Events2026FreePage />} />
+        <Route path="/events2026/paid" element={<Events2026PaidPage />} />
         <Route path="/blog" element={<BlogListPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="*" element={<LandingPage authError={authError} />} />
