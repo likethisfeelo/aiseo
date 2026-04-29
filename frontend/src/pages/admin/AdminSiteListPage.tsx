@@ -34,6 +34,13 @@ const ADMIN_MENU: MenuCard[] = [
     color: 'var(--warning)',
   },
   {
+    to: '/admin/event-signups',
+    icon: '🎟',
+    title: '이벤트 신청',
+    description: 'EVENT 01·02·03 신청 내역 확인',
+    color: 'var(--accent-dark)',
+  },
+  {
     to: '/mktadmin',
     icon: '📊',
     title: '마케팅 어드민',
