@@ -267,10 +267,84 @@ export function Events2026PaidPage() {
           max-width: 620px; margin: 0 auto;
         }
 
+        /* ── 두 패키지 미리보기 (Benefits) ── */
+        .evtpaid .benefits {
+          background: var(--bg);
+          padding-top: 120px;
+          padding-bottom: 60px;
+        }
+        .evtpaid .benefits-header { margin-bottom: 56px; }
+        .evtpaid .benefits-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+          max-width: 920px;
+          margin: 0 auto;
+        }
+        .evtpaid .benefit-card {
+          background: var(--bg-soft);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 32px 28px;
+          position: relative;
+          transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+          min-height: 220px;
+          display: flex; flex-direction: column;
+          text-decoration: none;
+          color: inherit;
+        }
+        .evtpaid .benefit-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-md);
+          border-color: rgba(196,168,245,0.3);
+        }
+        .evtpaid .benefit-card.violet { background: linear-gradient(180deg, #F5EFFF 0%, #FAF6FF 100%); border-color: rgba(196,168,245,0.25); }
+        .evtpaid .benefit-card.mint   { background: linear-gradient(180deg, #E8F7F0 0%, #F1FAF6 100%); border-color: rgba(127,200,166,0.25); }
+        .evtpaid .benefit-eyebrow {
+          font-family: var(--font-en);
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 1.5px;
+          color: var(--text-muted);
+          margin-bottom: 18px;
+        }
+        .evtpaid .benefit-eyebrow .dot {
+          display: inline-block; width: 4px; height: 4px;
+          border-radius: 50%; background: var(--text-muted);
+          margin: 0 8px; vertical-align: middle;
+        }
+        .evtpaid .benefit-title {
+          font-family: var(--font-ko);
+          font-size: 20px; font-weight: 700;
+          letter-spacing: -.6px;
+          margin-bottom: 12px;
+          line-height: 1.4;
+          color: var(--text-primary);
+        }
+        .evtpaid .benefit-desc {
+          font-size: 13.5px;
+          color: var(--text-secondary);
+          line-height: 1.7;
+          flex: 1;
+        }
+        .evtpaid .benefit-foot {
+          margin-top: 24px;
+          padding-top: 16px;
+          border-top: 1px dashed rgba(0,0,0,0.08);
+          font-size: 12px;
+          color: var(--text-muted);
+          display: flex; align-items: center; gap: 6px;
+        }
+        .evtpaid .benefit-foot::before {
+          content: '→';
+          color: var(--accent-dark);
+          font-weight: 700;
+        }
+
         @media (max-width: 900px) {
           .evtpaid section { padding: 80px 24px; }
           .evtpaid .hero { padding: 120px 24px 60px; min-height: auto; }
           .evtpaid .hero-prism { width: 160px; height: 160px; }
+          .evtpaid .benefits-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
           .evtpaid .hero-h1 { letter-spacing: -1.5px; }
@@ -380,10 +454,40 @@ export function Events2026PaidPage() {
           </div>
         </section>
 
-        {/* Phases 4.1b–4.4 will append the two-package preview, EVENT 02
-            and EVENT 03 details, common targets, FAQ, compare cards,
-            LAUNCH CTA with countdown, and the cross-link banner here,
-            between the hero and the footer. */}
+        {/* ── 두 패키지 미리보기 ── */}
+        <section className="benefits">
+          <div className="section-inner">
+            <div className="benefits-header">
+              <div className="section-eyebrow">두 가지 옵션</div>
+              <h2 className="section-h2">
+                시작점이 다른<br /><span className="em">두 가지 패키지</span>
+              </h2>
+              <p className="section-sub" style={{ marginTop: 14 }}>
+                둘 다 같은 결과(검색 노출되는 사이트)로 끝나지만, 출발점이 다릅니다.<br />
+                사장님 상황에 맞는 한 가지를 선택하시면 됩니다.
+              </p>
+            </div>
+
+            <div className="benefits-grid">
+              <a href="#event02" className="benefit-card violet">
+                <div className="benefit-eyebrow">EVENT 02 <span className="dot"></span> PACKAGE A</div>
+                <h3 className="benefit-title">🎯 검색 전략부터</h3>
+                <p className="benefit-desc">키워드 · 경쟁군 · 검색 의도를 먼저 정리하고, 그 위에 사이트를 올립니다.</p>
+                <div className="benefit-foot">001 + CORE1 · 30만원 → 10만원</div>
+              </a>
+
+              <a href="#event03" className="benefit-card mint">
+                <div className="benefit-eyebrow">EVENT 03 <span className="dot"></span> PACKAGE B</div>
+                <h3 className="benefit-title">✍️ 콘텐츠 기획부터</h3>
+                <p className="benefit-desc">메뉴 구조 · 서비스 설명 · CTA · 톤앤매너를 먼저 설계하고 사이트를 올립니다.</p>
+                <div className="benefit-foot">002 + CORE1 · 30만원 → 10만원</div>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Phases 4.2–4.4 will append EVENT 02/03 details, common
+            targets, FAQ, compare cards, LAUNCH CTA, and cross-link. */}
 
         {/* Footer placeholder so the page closes cleanly between phases. */}
         <footer style={{ minHeight: 'auto', padding: '48px 40px', background: 'var(--bg-dark)', color: 'rgba(255,255,255,0.6)' }}>
