@@ -458,6 +458,32 @@ export class CdkStack extends Stack {
     });
     courseInquiriesTable.grantReadWriteData(courseInquiryHandler);
 
+    // ── Event signups table + Lambda (events 2026: free/paid 패키지 신청) ──
+    const eventSignupsTableName = 'aiseo-event-signups';
+    const eventSignupsTable = new dynamodb.Table(this, 'EventSignupsTable', {
+      tableName: eventSignupsTableName,
+      partitionKey: { name: 'signupId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+    eventSignupsTable.addGlobalSecondaryIndex({
+      indexName: 'eventCode-createdAt-index',
+      partitionKey: { name: 'eventCode', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: dynamodb.AttributeType.STRING },
+    });
+
+    const eventSignupHandler = new lambda.Function(this, 'EventSignupFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'event-signup/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        EVENT_SIGNUPS_TABLE: eventSignupsTableName,
+        SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL ?? '',
+      },
+    });
+    eventSignupsTable.grantReadWriteData(eventSignupHandler);
+
     // ── Newsletter subscribers table + Lambda ──
     const newsletterTableName = 'aiseo-newsletter-subscribers';
     const newsletterTable = new dynamodb.Table(this, 'NewsletterSubscribersTable', {
@@ -645,6 +671,21 @@ export class CdkStack extends Stack {
     });
     const adminCourseInquiriesResource = adminResource.addResource('course-inquiries');
     addGet(adminCourseInquiriesResource, courseInquiryIntegration);
+
+    // Event signup routes (events 2026: free/paid)
+    const eventSignupIntegration = new apigateway.LambdaIntegration(eventSignupHandler);
+    const eventSignupResource = api.root.addResource('event-signup', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: [devOrigin, prodOrigin, siteDevOrigin, siteProdOrigin, b2bDevOrigin, b2bProdOrigin],
+        allowMethods: ['GET', 'POST', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+      },
+    });
+    eventSignupResource.addMethod('POST', eventSignupIntegration, {
+      authorizationType: apigateway.AuthorizationType.NONE,
+    });
+    const adminEventSignupsResource = adminResource.addResource('event-signups');
+    addGet(adminEventSignupsResource, eventSignupIntegration);
 
     // Newsletter routes
     const newsletterIntegration = new apigateway.LambdaIntegration(newsletterHandler);

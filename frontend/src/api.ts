@@ -192,6 +192,37 @@ export const submitCourseInquiry = async (input: {
 
 export const adminGetCourseInquiries = () => getJson('/admin/course-inquiries');
 
+// ── Event signup APIs (events 2026: free / paid) ──
+export type EventCode = 'EVENT_01_FREE' | 'EVENT_02_PAID' | 'EVENT_03_PAID';
+export type EventHasSite = 'yes' | 'no' | 'wip';
+
+export interface EventSignupPayload {
+  eventCode: EventCode;
+  name: string;
+  phone: string;
+  email?: string;
+  industry?: string;
+  region?: string;
+  hasSite?: EventHasSite;
+  concern?: string;
+  kakaoConsent: boolean;
+  source?: string;
+}
+
+export const submitEventSignup = async (input: EventSignupPayload) => {
+  const { API_BASE_URL } = await import('./config.js');
+  const res = await fetch(`${API_BASE_URL}/event-signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  const payload = await res.json();
+  if (!res.ok || !payload.success) throw new Error(payload.error || 'Submission failed');
+  return payload.data as { signupId: string };
+};
+
+export const adminGetEventSignups = () => getJson('/admin/event-signups');
+
 // ── Newsletter APIs ──
 export type NewsletterPersona =
   | 'small-business'
