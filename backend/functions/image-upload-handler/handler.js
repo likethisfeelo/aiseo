@@ -54,9 +54,14 @@ exports.handler = async (event) => {
     // Blog images (siteId === 'blog') are admin operating resources and
     // therefore only subject to absolute hard caps, not per-user quotas.
     const appConfig = await getAppConfig();
-    const effective = resolveEffectivePolicy(appConfig, {
-      userCreatedAt: user.claims?.iat ? new Date(Number(user.claims.iat) * 1000).toISOString() : undefined,
-    });
+    // Defensive iat parse — see upload-handler/handler.js for why; some
+    // Cognito tokens have a missing or non-numeric `iat` and the naive
+    // `new Date(NaN).toISOString()` throws RangeError.
+    const iat = Number(user.claims?.iat);
+    const userCreatedAt = Number.isFinite(iat) && iat > 0
+      ? new Date(iat * 1000).toISOString()
+      : undefined;
+    const effective = resolveEffectivePolicy(appConfig, { userCreatedAt });
     const usage = siteId === 'blog' ? null : await getUsage(user.sub);
 
     const sizeNumber = fileSize ? Number(fileSize) : 0;
