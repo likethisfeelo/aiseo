@@ -355,20 +355,29 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             <button onClick={handleSaveSnippets} disabled={savingSnippets} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 13, cursor: savingSnippets ? 'not-allowed' : 'pointer', opacity: savingSnippets ? 0.5 : 1 }}>
               {savingSnippets ? '저장 중...' : '설정 저장'}
             </button>
+            {/*
+              Dev 배포 버튼은 의도적으로 항상 비활성화 상태로 유지합니다.
+              현재 dev CloudFront/Route 53가 `*.dev.aiseo.tips` 와일드카드를
+              지원하지 않아 사용자 서브도메인이 라우팅되지 않습니다. 인프라
+              와일드카드(인증서 + Aliases + Route 53)가 추가되면 아래
+              `DEV_DEPLOY_ENABLED` 플래그를 true 로 바꿔 즉시 복원하세요.
+              테스트 목적상 마크업 자체는 그대로 둡니다.
+            */}
             <button
               onClick={() => handleDeploy('dev')}
-              disabled={loading || !objectKey}
-              title={!objectKey ? 'ZIP 업로드 후 활성화됩니다' : 'Dev 환경에 배포합니다'}
+              disabled
+              title="Dev 환경 와일드카드 DNS 미구성으로 사용 중지 — Prod 배포를 사용하세요"
+              aria-disabled="true"
               style={{
                 padding: '8px 16px', borderRadius: 6,
-                border: '1px solid var(--border-strong)',
-                background: '#fff', fontSize: 13,
-                color: 'var(--text-secondary)',
-                cursor: (loading || !objectKey) ? 'not-allowed' : 'pointer',
-                opacity: (loading || !objectKey) ? 0.45 : 1,
+                border: '1px dashed var(--border-strong)',
+                background: 'var(--bg-soft)', fontSize: 13,
+                color: 'var(--text-muted)',
+                cursor: 'not-allowed',
+                opacity: 0.5,
               }}
             >
-              Dev 배포
+              Dev 배포 <span style={{ fontSize: 11, marginLeft: 4 }}>(준비중)</span>
             </button>
             <button
               onClick={() => handleDeploy('prod')}
