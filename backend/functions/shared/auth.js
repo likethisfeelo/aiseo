@@ -31,13 +31,29 @@ const requireUser = (event) => {
   return { user, errorResponse: null };
 };
 
-const isAdmin = (event) => {
-  const claims = getClaims(event);
-  if (!claims) return false;
-  const groups = claims['cognito:groups'] || [];
-  if (Array.isArray(groups)) return groups.includes('admin');
-  return groups === 'admin';
+// Normalize the `cognito:groups` claim to an array of group names.
+// API Gateway REST API delivers this claim in three different shapes
+// depending on the user's group count and the authorizer flavor:
+//   - HTTP API v2 / single group via Lambda authorizer → JS array
+//   - REST API + single group                          → "admin"
+//   - REST API + multiple groups                       → "[admin paid_member]"
+//                                                        (brackets + space-separated)
+// Without this normalizer an admin who is ALSO a paid_member fails
+// the `=== 'admin'` check and gets a spurious 403.
+const parseGroupsClaim = (raw) => {
+  if (Array.isArray(raw)) return raw.filter(Boolean);
+  if (typeof raw !== 'string' || !raw) return [];
+  const trimmed = raw.trim().replace(/^\[|\]$/g, '');
+  return trimmed.split(/[\s,]+/).map((s) => s.trim()).filter(Boolean);
 };
+
+const getGroups = (event) => {
+  const claims = getClaims(event);
+  if (!claims) return [];
+  return parseGroupsClaim(claims['cognito:groups']);
+};
+
+const isAdmin = (event) => getGroups(event).includes('admin');
 
 const requireAdmin = (event) => {
   const { user, errorResponse } = requireUser(event);
@@ -49,6 +65,8 @@ const requireAdmin = (event) => {
 module.exports = {
   getClaims,
   getUserContext,
+  parseGroupsClaim,
+  getGroups,
   requireUser,
   isAdmin,
   requireAdmin,

@@ -1,7 +1,7 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 const { ok, serverError } = require('../shared/response');
-const { requireUser } = require('../shared/auth');
+const { requireUser, parseGroupsClaim } = require('../shared/auth');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -10,12 +10,12 @@ exports.handler = async (event) => {
   if (errorResponse) return errorResponse;
   const claims = user.claims;
 
-  const rawGroups = claims['cognito:groups'];
-  const groups = Array.isArray(rawGroups)
-    ? rawGroups
-    : typeof rawGroups === 'string'
-      ? rawGroups.split(',').map((g) => g.trim()).filter(Boolean)
-      : [];
+  // Use the shared `parseGroupsClaim` helper so we handle every shape
+  // API Gateway delivers (array, "name", or "[a b c]" multi-group form).
+  // Without this a user with admin + paid_member would land here as one
+  // unsplit "[admin paid_member]" entry and the frontend's
+  // `groups.includes('paid_member')` check would silently fail.
+  const groups = parseGroupsClaim(claims['cognito:groups']);
 
   const result = {
     user: {
