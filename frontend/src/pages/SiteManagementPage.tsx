@@ -345,14 +345,44 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
 
           {snippetMsg && <div style={{ fontSize: 12, color: snippetMsg.includes('실패') ? 'var(--danger)' : 'var(--success)', marginBottom: 8 }}>{snippetMsg}</div>}
 
+          {!objectKey && (
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, padding: '8px 12px', background: 'var(--bg-soft)', border: '1px dashed var(--border)', borderRadius: 6 }}>
+              ⓘ 배포는 사이트 파일(ZIP) 업로드 후에 활성화됩니다. 좌측 “사이트 파일” 영역에서 업로드 & 검증을 먼저 진행해주세요.
+            </div>
+          )}
+
           <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-            <button onClick={handleSaveSnippets} disabled={savingSnippets} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 13, cursor: 'pointer' }}>
+            <button onClick={handleSaveSnippets} disabled={savingSnippets} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 13, cursor: savingSnippets ? 'not-allowed' : 'pointer', opacity: savingSnippets ? 0.5 : 1 }}>
               {savingSnippets ? '저장 중...' : '설정 저장'}
             </button>
-            <button onClick={() => handleDeploy('dev')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid var(--border-strong)', background: '#fff', fontSize: 13, cursor: 'pointer', color: 'var(--text-secondary)' }}>
+            <button
+              onClick={() => handleDeploy('dev')}
+              disabled={loading || !objectKey}
+              title={!objectKey ? 'ZIP 업로드 후 활성화됩니다' : 'Dev 환경에 배포합니다'}
+              style={{
+                padding: '8px 16px', borderRadius: 6,
+                border: '1px solid var(--border-strong)',
+                background: '#fff', fontSize: 13,
+                color: 'var(--text-secondary)',
+                cursor: (loading || !objectKey) ? 'not-allowed' : 'pointer',
+                opacity: (loading || !objectKey) ? 0.45 : 1,
+              }}
+            >
               Dev 배포
             </button>
-            <button onClick={() => handleDeploy('prod')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--success)', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+            <button
+              onClick={() => handleDeploy('prod')}
+              disabled={loading || !objectKey}
+              title={!objectKey ? 'ZIP 업로드 후 활성화됩니다' : 'Prod 환경에 배포합니다'}
+              style={{
+                padding: '8px 16px', borderRadius: 6,
+                border: 'none',
+                background: 'var(--success)', color: '#fff',
+                fontSize: 13, fontWeight: 600,
+                cursor: (loading || !objectKey) ? 'not-allowed' : 'pointer',
+                opacity: (loading || !objectKey) ? 0.45 : 1,
+              }}
+            >
               🚀 Prod 배포
             </button>
           </div>
