@@ -51,9 +51,16 @@ exports.handler = async (event) => {
     // Resolve the user's effective policy (training/normal) and verify
     // the ZIP size + monthly deploy count + projected storage.
     const appConfig = await getAppConfig();
-    const effective = resolveEffectivePolicy(appConfig, {
-      userCreatedAt: user.claims?.iat ? new Date(Number(user.claims.iat) * 1000).toISOString() : undefined,
-    });
+    // Some Cognito tokens arrive with a missing or non-numeric `iat`
+    // claim. Multiplying NaN through `new Date(NaN).toISOString()`
+    // throws `RangeError: Invalid time value` and the whole upload
+    // request 500s. Guard against that and let the policy resolver
+    // treat the user as "creation date unknown" (= normal policy).
+    const iat = Number(user.claims?.iat);
+    const userCreatedAt = Number.isFinite(iat) && iat > 0
+      ? new Date(iat * 1000).toISOString()
+      : undefined;
+    const effective = resolveEffectivePolicy(appConfig, { userCreatedAt });
     const usage = await getUsage(user.sub);
 
     const sizeNumber = fileSize ? Number(fileSize) : 0;
