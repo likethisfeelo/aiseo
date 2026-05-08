@@ -51,18 +51,70 @@ const escapeAttr = (str) =>
 
 const normalizeEntryName = (entryName) => String(entryName).replace(/^\/+/, '');
 
+// Drop entries we never want to deploy: macOS resource forks, dotfiles
+// dropped in by Finder, and zero-byte directory placeholders. These
+// otherwise inflate the upload count and (in the case of __MACOSX/
+// shadow files) get served as text/html for asset paths the CF
+// function rewrites them to.
+const isJunkEntry = (relativePath) => {
+  if (!relativePath) return true;
+  if (relativePath.startsWith('__MACOSX/')) return true;
+  if (relativePath.includes('/__MACOSX/')) return true;
+  const base = relativePath.split('/').pop() || '';
+  if (base === '.DS_Store' || base === 'Thumbs.db') return true;
+  if (base.startsWith('._')) return true;
+  return false;
+};
+
+// If every entry in the zip lives under the same single top-level
+// folder (e.g. `mysite/index.html`, `mysite/assets/*.css`), strip
+// that prefix so the deployed S3 keys are `{siteId}/index.html`
+// rather than `{siteId}/mysite/index.html`. Without this, the SPA's
+// absolute `/assets/...` requests resolve to keys that don't exist
+// and CloudFront returns its default text/html error page — which
+// surfaces as the "MIME type 'text/html'" stylesheet/module errors.
+const detectCommonPrefix = (relativePaths) => {
+  if (!relativePaths.length) return '';
+  const first = relativePaths[0];
+  const slash = first.indexOf('/');
+  if (slash <= 0) return '';
+  const prefix = first.substring(0, slash + 1);
+  for (let i = 0; i < relativePaths.length; i += 1) {
+    if (!relativePaths[i].startsWith(prefix)) return '';
+  }
+  // Only strip if the prefix wraps the entire site — refuse to strip
+  // when there's an `index.html` at the root, even if every other
+  // file is under a folder.
+  if (relativePaths.some((p) => p === 'index.html' || p.indexOf('/') === -1)) {
+    return '';
+  }
+  return prefix;
+};
+
 const detectContentType = (path) => {
   const lower = path.toLowerCase();
 
-  if (lower.endsWith('.html')) return 'text/html; charset=utf-8';
+  if (lower.endsWith('.html') || lower.endsWith('.htm')) return 'text/html; charset=utf-8';
   if (lower.endsWith('.css')) return 'text/css; charset=utf-8';
-  if (lower.endsWith('.js')) return 'application/javascript; charset=utf-8';
+  if (lower.endsWith('.mjs') || lower.endsWith('.js')) return 'application/javascript; charset=utf-8';
+  if (lower.endsWith('.map')) return 'application/json; charset=utf-8';
   if (lower.endsWith('.json')) return 'application/json; charset=utf-8';
   if (lower.endsWith('.xml')) return 'application/xml; charset=utf-8';
   if (lower.endsWith('.svg')) return 'image/svg+xml';
   if (lower.endsWith('.png')) return 'image/png';
   if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
   if (lower.endsWith('.webp')) return 'image/webp';
+  if (lower.endsWith('.gif')) return 'image/gif';
+  if (lower.endsWith('.avif')) return 'image/avif';
+  if (lower.endsWith('.ico')) return 'image/x-icon';
+  if (lower.endsWith('.woff2')) return 'font/woff2';
+  if (lower.endsWith('.woff')) return 'font/woff';
+  if (lower.endsWith('.ttf')) return 'font/ttf';
+  if (lower.endsWith('.otf')) return 'font/otf';
+  if (lower.endsWith('.eot')) return 'application/vnd.ms-fontobject';
+  if (lower.endsWith('.mp4')) return 'video/mp4';
+  if (lower.endsWith('.webm')) return 'video/webm';
+  if (lower.endsWith('.pdf')) return 'application/pdf';
   if (lower.endsWith('.txt')) return 'text/plain; charset=utf-8';
 
   return 'application/octet-stream';
@@ -166,18 +218,38 @@ const uploadZipEntries = async ({ uploadBucket, objectKey, targetBucket, siteId,
   const zipBuffer = await streamToBuffer(zipObject.Body);
   const zip = new AdmZip(zipBuffer);
 
-  const entries = zip.getEntries().filter((entry) => !entry.isDirectory);
-  const uploadedKeys = [];
-  let uploadedBytes = 0;
+  const rawEntries = zip.getEntries().filter((entry) => !entry.isDirectory);
 
-  for (const entry of entries) {
+  // First pass: normalize names, drop OS junk, collect for prefix detection.
+  const cleaned = [];
+  let skippedJunk = 0;
+  for (const entry of rawEntries) {
     const relativePath = normalizeEntryName(entry.entryName);
     if (!relativePath) continue;
+    if (isJunkEntry(relativePath)) {
+      skippedJunk += 1;
+      continue;
+    }
+    cleaned.push({ entry, relativePath });
+  }
 
-    const targetKey = `${siteId}/${relativePath}`;
+  const commonPrefix = detectCommonPrefix(cleaned.map((c) => c.relativePath));
+
+  const uploadedKeys = [];
+  let uploadedBytes = 0;
+  let hasIndexHtml = false;
+  let hasAssetsDir = false;
+
+  for (const { entry, relativePath } of cleaned) {
+    const deployPath = commonPrefix && relativePath.startsWith(commonPrefix)
+      ? relativePath.substring(commonPrefix.length)
+      : relativePath;
+    if (!deployPath) continue;
+
+    const targetKey = `${siteId}/${deployPath}`;
     let body = entry.getData();
 
-    if (headInjection && relativePath.toLowerCase().endsWith('.html')) {
+    if (headInjection && deployPath.toLowerCase().endsWith('.html')) {
       const html = body.toString('utf-8');
       const injected = injectHeadSnippets(html, headInjection);
       body = Buffer.from(injected, 'utf-8');
@@ -188,15 +260,18 @@ const uploadZipEntries = async ({ uploadBucket, objectKey, targetBucket, siteId,
         Bucket: targetBucket,
         Key: targetKey,
         Body: body,
-        ContentType: detectContentType(relativePath),
+        ContentType: detectContentType(deployPath),
       }),
     );
+
+    if (deployPath === 'index.html') hasIndexHtml = true;
+    if (deployPath.startsWith('assets/')) hasAssetsDir = true;
 
     uploadedKeys.push(targetKey);
     uploadedBytes += body.length || 0;
   }
 
-  return { uploadedKeys, uploadedBytes };
+  return { uploadedKeys, uploadedBytes, skippedJunk, commonPrefix, hasIndexHtml, hasAssetsDir };
 };
 
 const invalidateSite = async ({ distributionId, siteId }) => {
@@ -250,7 +325,14 @@ exports.handler = async (event) => {
 
     const headInjection = await loadHeadSnippets(siteId, sitesTable);
 
-    const { uploadedKeys, uploadedBytes } = await uploadZipEntries({
+    const {
+      uploadedKeys,
+      uploadedBytes,
+      skippedJunk,
+      commonPrefix,
+      hasIndexHtml,
+      hasAssetsDir,
+    } = await uploadZipEntries({
       uploadBucket: process.env.UPLOAD_BUCKET,
       objectKey,
       targetBucket: target.targetBucket,
@@ -260,6 +342,25 @@ exports.handler = async (event) => {
 
     if (!uploadedKeys.length) {
       return badRequest('No deployable files found in ZIP', event);
+    }
+
+    // Surface deploy-shape problems that produce silent prod failures
+    // (white screen, MIME-type errors on /assets/*) so they show up in
+    // CloudWatch instead of needing a browser repro.
+    if (!hasIndexHtml) {
+      console.warn(JSON.stringify({
+        message: 'deploy-warn-no-index-html',
+        siteId,
+        env: resolvedEnv,
+        sampleKeys: uploadedKeys.slice(0, 5),
+      }));
+    }
+    if (!hasAssetsDir) {
+      console.warn(JSON.stringify({
+        message: 'deploy-warn-no-assets-dir',
+        siteId,
+        env: resolvedEnv,
+      }));
     }
 
     // Record a successful deploy against the user's monthly quota.
@@ -292,6 +393,10 @@ exports.handler = async (event) => {
         targetBucket: target.targetBucket,
         uploadedCount: uploadedKeys.length,
         uploadedBytes,
+        skippedJunk,
+        strippedPrefix: commonPrefix || null,
+        hasIndexHtml,
+        hasAssetsDir,
         invalidationId,
       }),
     );

@@ -110,6 +110,49 @@ Live 버전입니다. **이 저장소의 파일을 수정했다면 반드시 아
 경우. 예를 들어 밑줄 `_` 을 허용하게 되면 regex 를 업데이트하고 함수도
 다시 publish 해야 합니다.
 
+## prod distribution 에 함수가 attach 됐는지 확인
+
+> **증상 — 사용자 사이트가 흰화면 + `Refused to apply style ... MIME
+> type ('text/html')` 콘솔 에러:** 거의 100% prod CloudFront
+> distribution (`EZSNEM80TUP6K`) 에 `subdomain-router` 가 attach
+> 되어 있지 않거나, `*.aiseo.tips` 서브도메인 라우팅 추가 이전의
+> 구버전이 publish 되어 있어서 `real.aiseo.tips/assets/*.css` →
+> `/real/assets/*.css` 로 리라이트되지 못하고 S3 가 404 → CF 기본
+> 에러 페이지(`text/html`)가 응답되는 케이스.
+
+dev 에선 잘 되는데 prod 만 깨진다면 아래 순서로 확인:
+
+1. AWS 콘솔 → CloudFront → Distributions → `EZSNEM80TUP6K`
+   (aiseo-sites) 클릭 → **Behaviors** 탭 → Default behavior 선택
+   → **Function associations** 섹션에 `viewer-request` 가
+   `subdomain-router` 로 채워져 있는지 확인.
+2. 비어 있다면 **Edit** → Function type: CloudFront Functions,
+   Function ARN: `subdomain-router` 선택 → **Save changes**.
+3. 같은 화면에서 dev distribution (aiseo-sites-dev) 와 비교해서
+   동일한 함수 이름이 양쪽에 붙어 있는지 확인.
+4. CLI 로 한 번에 확인하려면:
+
+   ```bash
+   aws cloudfront get-distribution-config --id EZSNEM80TUP6K \
+     --profile aiseo \
+     --query 'DistributionConfig.DefaultCacheBehavior.FunctionAssociations'
+   ```
+
+   결과의 `Items[].FunctionARN` 이 `subdomain-router` 를 가리키지
+   않으면 1–2 단계 적용.
+5. 적용 후 라이브 검증:
+
+   ```bash
+   curl -sI https://<test-siteId>.aiseo.tips/ | head -5
+   curl -sI https://<test-siteId>.aiseo.tips/assets/index-<hash>.css | head -5
+   ```
+
+   두 번째 요청의 `content-type` 헤더가 `text/css; charset=utf-8`
+   여야 함. `text/html` 이면 (a) S3 에 키가 없거나 (b) 함수가 여전히
+   라우팅하지 않음. CloudWatch Logs 에서 Lambda `DeploySite` 의
+   `deploy-complete` 로그를 보고 `hasIndexHtml`/`hasAssetsDir` 이
+   둘 다 `true` 인지 확인.
+
 ## 롤백
 
 배포된 함수가 잘못 동작할 때:
