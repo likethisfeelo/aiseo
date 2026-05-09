@@ -3,6 +3,7 @@ import { createUploadUrl, validateSite, deploySite, getSiteSettings, saveSiteSet
 import { ProgressRing } from '../components/common/ProgressRing';
 import { OgTagEditor } from '../components/og/OgTagEditor';
 import { OgPreviewCards } from '../components/og/OgPreviewCards';
+import { DeployConfirmModal, type DeployPhase } from '../components/site/DeployConfirmModal';
 import type { HeadSnippets, ValidateResult, DeployResult } from '../types';
 
 type FocusedColumn = 'left' | 'center' | 'right' | null;
@@ -67,6 +68,9 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [prodPhase, setProdPhase] = useState<DeployPhase | null>(null);
+  const [prodError, setProdError] = useState('');
+  const [deployedAt, setDeployedAt] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -128,12 +132,41 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
     try {
       const data = await deploySite({ siteId, objectKey, env });
       setDeployResult(data);
+      setDeployedAt(Date.now());
       setFocused('right');
     } catch (e) {
       setError(e instanceof Error ? e.message : '배포 실패');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleProdDeployClick = () => {
+    if (!objectKey) { setError('먼저 파일을 업로드하세요.'); return; }
+    setProdError('');
+    setProdPhase('confirm');
+  };
+
+  const runProdDeploy = async () => {
+    if (!objectKey) return;
+    setProdPhase('progress');
+    setProdError('');
+    try {
+      const data = await deploySite({ siteId, objectKey, env: 'prod' });
+      setDeployResult(data);
+      setDeployedAt(Date.now());
+      setFocused('right');
+      setProdPhase('done');
+    } catch (e) {
+      setProdError(e instanceof Error ? e.message : '배포 실패');
+      setProdPhase('error');
+    }
+  };
+
+  const closeProdModal = () => {
+    if (prodPhase === 'progress') return;
+    setProdPhase(null);
+    setProdError('');
   };
 
   const handleSaveSnippets = async () => {
@@ -352,7 +385,7 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
             <button onClick={() => handleDeploy('dev')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid var(--border-strong)', background: '#fff', fontSize: 13, cursor: 'pointer', color: 'var(--text-secondary)' }}>
               Dev 배포
             </button>
-            <button onClick={() => handleDeploy('prod')} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--success)', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+            <button onClick={handleProdDeployClick} disabled={loading || !objectKey} style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--success)', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
               🚀 Prod 배포
             </button>
           </div>
@@ -388,12 +421,25 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
                 </div>
               )}
               <div style={{ padding: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  {deployedAt && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, color: '#fff', background: 'var(--success)',
+                      padding: '2px 6px', borderRadius: 10, letterSpacing: '0.02em',
+                    }}>방금 배포됨</span>
+                  )}
+                </div>
                 <a href={deployResult.deployedUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'var(--primary)', wordBreak: 'break-all' }}>
                   {deployResult.deployedUrl}
                 </a>
                 <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>
                   {deployResult.uploadedCount}개 파일 배포됨
                 </div>
+                {deployResult.invalidationId && (
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                    CDN 캐시 갱신 중 — 30~60초 내 반영
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -465,6 +511,19 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
           </div>
         </div>
       )}
+
+      <DeployConfirmModal
+        open={prodPhase !== null}
+        phase={prodPhase ?? 'confirm'}
+        siteId={siteId}
+        uploadedFileName={uploadedFileName}
+        validatePassed={validateResult?.summary.passed}
+        validateTotal={validateResult?.summary.total}
+        result={deployResult}
+        errorMessage={prodError}
+        onConfirm={runProdDeploy}
+        onClose={closeProdModal}
+      />
     </div>
   );
 }
