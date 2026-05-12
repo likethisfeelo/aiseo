@@ -9,14 +9,22 @@ const handleList = async (event, sitesTable) => {
   const { user, errorResponse } = requireAdmin(event);
   if (errorResponse) return errorResponse;
 
+  // Reserved-word workaround: `status` is a DynamoDB reserved word, but
+  // the field we want lives at `domainChangeRequest.status` and the dot
+  // path bypasses the reservation. Pull the whole sub-map for simplicity.
   const result = await ddb.send(new ScanCommand({
     TableName: sitesTable,
-    ProjectionExpression: 'siteId, ownerSub, ownerEmail, createdAt, updatedAt, brandCompleteness',
+    ProjectionExpression: 'siteId, ownerSub, ownerEmail, createdAt, updatedAt, brandCompleteness, deactivated, deactivatedAt, movedTo, domainChangeRequest',
   }));
 
-  const sites = (result.Items || []).sort((a, b) =>
-    (b.updatedAt || b.createdAt || '').localeCompare(a.updatedAt || a.createdAt || '')
-  );
+  // Sort: active first, then by most-recently-updated. Deactivated rows
+  // bottom of the list so the live sites are the default focus.
+  const sites = (result.Items || []).sort((a, b) => {
+    const aDeact = a.deactivated ? 1 : 0;
+    const bDeact = b.deactivated ? 1 : 0;
+    if (aDeact !== bDeact) return aDeact - bDeact;
+    return (b.updatedAt || b.createdAt || '').localeCompare(a.updatedAt || a.createdAt || '');
+  });
 
   return ok({ sites, count: sites.length }, event);
 };

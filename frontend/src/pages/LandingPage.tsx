@@ -421,7 +421,7 @@ export function LandingPage({ authError }: Props) {
         vidThumbnail.style.pointerEvents = 'none';
         if (!videoStarted && ytPlayer) {
           videoStarted = true;
-          ytPlayer.src = 'https://www.youtube.com/embed/mXlMAkHhgYs?autoplay=1&rel=0&modestbranding=1&color=white&enablejsapi=1';
+          ytPlayer.src = 'https://www.youtube.com/embed/HMV6PMtG720?autoplay=1&rel=0&modestbranding=1&color=white&enablejsapi=1';
           ytPlayer.style.pointerEvents = 'auto';
           vidWrap?.classList.add('playing');
         }
@@ -435,7 +435,7 @@ export function LandingPage({ authError }: Props) {
         entries.forEach(e => {
           if (!e.isIntersecting && videoStarted) {
             // Pause by removing autoplay src, show thumbnail again
-            ytPlayer.src = 'https://www.youtube.com/embed/mXlMAkHhgYs?enablejsapi=1&rel=0&modestbranding=1&color=white';
+            ytPlayer.src = 'https://www.youtube.com/embed/HMV6PMtG720?enablejsapi=1&rel=0&modestbranding=1&color=white';
             ytPlayer.style.pointerEvents = 'none';
             vidWrap.classList.remove('playing');
             videoStarted = false;
@@ -561,7 +561,7 @@ export function LandingPage({ authError }: Props) {
             <div className="video-play-overlay" id="videoPlayOverlay"></div>
             <iframe
               id="ytPlayer"
-              src="https://www.youtube.com/embed/mXlMAkHhgYs?enablejsapi=1&rel=0&modestbranding=1&color=white"
+              src="https://www.youtube.com/embed/HMV6PMtG720?enablejsapi=1&rel=0&modestbranding=1&color=white"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
@@ -768,11 +768,8 @@ export function LandingPage({ authError }: Props) {
                     <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>비개발자도 1시간 안에 완성</span></li>
                   </ul>
                 </div>
-                <div className="sf-card-img" style={{'--card-bg1':'#F0EBFF','--card-bg2':'#EBE4FF'} as React.CSSProperties}>
-                  <div className="sf-img-placeholder">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C4A8F5" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h4"/><circle cx="17" cy="17" r="3"/><path d="M19.5 19.5L22 22"/></svg>
-                    <span>이미지 영역</span>
-                  </div>
+                <div className="sf-card-img" style={{'--card-bg1':'#0B0414','--card-bg2':'#1A0F2E'} as React.CSSProperties}>
+                  <img src="/landing/sf-card-0.webp" alt="AI 홈페이지 제작 — 프롬프트로 사이트 생성" className="sf-card-photo" loading="lazy" />
                 </div>
               </div>
             </div>
@@ -795,11 +792,8 @@ export function LandingPage({ authError }: Props) {
                     <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>SSL 보안 인증서 자동 적용</span></li>
                   </ul>
                 </div>
-                <div className="sf-card-img" style={{'--card-bg1':'#D1FAE5','--card-bg2':'#A7F3D0'} as React.CSSProperties}>
-                  <div className="sf-img-placeholder">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="1.5"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
-                    <span>이미지 영역</span>
-                  </div>
+                <div className="sf-card-img" style={{'--card-bg1':'#021510','--card-bg2':'#062B22'} as React.CSSProperties}>
+                  <img src="/landing/sf-card-1.webp" alt="도메인 & 호스팅 — 서브도메인 + 1G 무료 호스팅" className="sf-card-photo" loading="lazy" />
                 </div>
               </div>
             </div>
@@ -822,11 +816,8 @@ export function LandingPage({ authError }: Props) {
                     <li className="sf-feature-item"><div className="sf-check" style={{background:'#FEF3C7',color:'#D97706'}}>✓</div><span>강의 수강 후 즉시 적용 가능한 체크리스트</span></li>
                   </ul>
                 </div>
-                <div className="sf-card-img" style={{'--card-bg1':'#FEF3C7','--card-bg2':'#FDE68A'} as React.CSSProperties}>
-                  <div className="sf-img-placeholder">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="1.5"><path d="M12 3L2 9l10 6 10-6-10-6z"/><path d="M2 15l10 6 10-6"/><path d="M2 12l10 6 10-6"/></svg>
-                    <span>이미지 영역</span>
-                  </div>
+                <div className="sf-card-img" style={{'--card-bg1':'#1A0F03','--card-bg2':'#2A1A05'} as React.CSSProperties}>
+                  <img src="/landing/sf-card-2.webp" alt="SEO 핵심강의 — 검색 노출 핵심 자료" className="sf-card-photo" loading="lazy" />
                 </div>
               </div>
             </div>
@@ -849,11 +840,8 @@ export function LandingPage({ authError }: Props) {
                     <li className="sf-feature-item"><div className="sf-check" style={{background:'#EBF2FF',color:'#5B8DEF'}}>✓</div><span>월간 성과 리포트 자동 생성 · 실전 운영 가이드</span></li>
                   </ul>
                 </div>
-                <div className="sf-card-img" style={{'--card-bg1':'#EBF2FF','--card-bg2':'#DBEAFE'} as React.CSSProperties}>
-                  <div className="sf-img-placeholder">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9BB8F8" strokeWidth="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><polyline points="7 10 10 7 13 10 17 6"/></svg>
-                    <span>이미지 영역</span>
-                  </div>
+                <div className="sf-card-img" style={{'--card-bg1':'#1A0A03','--card-bg2':'#2A1505'} as React.CSSProperties}>
+                  <img src="/landing/sf-card-3.webp" alt="성과 분석 & 마케팅 자동화 — 채널 연동 자동화" className="sf-card-photo" loading="lazy" />
                 </div>
               </div>
             </div>
