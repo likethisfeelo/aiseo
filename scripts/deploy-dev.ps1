@@ -32,6 +32,8 @@ aws s3 cp frontend/dist/philo-main.html "s3://$BUCKET/index.html" --content-type
 Write-Host "[3/5] Uploading B2B page..." -ForegroundColor Yellow
 aws s3 cp frontend/dist/b2b.html "s3://$BUCKET/b2b.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
 aws s3 cp frontend/dist/b2b.html "s3://$BUCKET/b2b/index.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
+# b2b.dev.aiseo.tips 가 /landing/* 을 /b2b/landing/* 로 리라이트하므로 hero 이미지도 같이 복사
+aws s3 sync frontend/public/landing/ "s3://$BUCKET/b2b/landing/" --exclude "*.md" --profile $PROFILE
 
 # 4. SPA 대시보드 + 프리렌더 HTML을 /site/에 업로드 (site.dev.aiseo.tips)
 #    - index.html (SPA shell) + assets/ + 프리렌더 서브디렉토리
