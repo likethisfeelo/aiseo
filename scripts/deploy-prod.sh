@@ -61,6 +61,12 @@ aws s3 cp frontend/dist/b2b.html s3://$BUCKET/b2b.html \
   --content-type "text/html; charset=utf-8" --profile $PROFILE
 aws s3 cp frontend/dist/b2b.html s3://$BUCKET/b2b/index.html \
   --content-type "text/html; charset=utf-8" --profile $PROFILE
+# b2b.aiseo.tips 는 CF subdomain-router 가 `/landing/*` 요청을
+# `/b2b/landing/*` 로 리라이트하므로, b2b.html 안에서 참조되는 hero
+# 이미지도 같은 prefix 아래로 함께 복사한다.
+aws s3 sync frontend/public/landing/ s3://$BUCKET/b2b/landing/ \
+  --exclude "*.md" \
+  --profile $PROFILE
 
 # 4. SPA 대시보드 + 프리렌더 HTML을 /site/에 업로드 (site.aiseo.tips)
 #    - index.html (SPA shell) + assets/ + 프리렌더 서브디렉토리
