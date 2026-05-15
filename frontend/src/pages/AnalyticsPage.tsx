@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getSiteSettings, saveSiteSettings } from '../api';
 import type { HeadSnippets } from '../types';
+import { MetaPixelConnectCard } from '../components/analytics/MetaPixelConnectCard';
 
 type Tab = 'gtm' | 'ga4' | 'meta' | 'kakao';
 
@@ -160,34 +161,16 @@ function Ga4Tab({ snippets }: { snippets: HeadSnippets }) {
 }
 
 /* ── Meta Pixel Tab ── */
-function MetaPixelTab({ snippets, onChange }: { snippets: HeadSnippets; onChange: (s: HeadSnippets) => void }) {
+function MetaPixelTab({ snippets, onChange, onSave }: { snippets: HeadSnippets; onChange: (s: HeadSnippets) => void; onSave: (next: HeadSnippets) => Promise<unknown> | void }) {
   return (
     <div>
-      <StatusBanner
-        active={!!snippets.metaPixelId}
-        activeText={`Meta Pixel 연동됨 (${snippets.metaPixelId})`}
-        inactiveText="Meta Pixel이 설정되지 않았습니다"
-      />
-
-      <div style={cardStyle}>
-        <label style={labelStyle}>Meta Pixel ID</label>
-        <input
-          value={snippets.metaPixelId || ''}
-          onChange={(e) => onChange({ ...snippets, metaPixelId: e.target.value })}
-          placeholder="123456789012345"
-          style={inputStyle}
-        />
-      </div>
-
-      <div style={cardStyle}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>설치 가이드</div>
-        <GuideStep step={1} title="Meta Business Suite 접속" desc="business.facebook.com에서 Pixel을 생성하세요" />
-        <GuideStep step={2} title="Pixel ID 입력" desc="생성된 숫자 ID를 위 필드에 입력하세요" />
-        <GuideStep step={3} title="사이트 배포" desc="저장 후 배포하면 Meta Pixel 코드가 자동 삽입됩니다" />
-      </div>
+      <MetaPixelConnectCard snippets={snippets} onChange={onChange} onSave={onSave} />
 
       <div style={cardStyle}>
         <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>표준 이벤트</div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 12, lineHeight: 1.7 }}>
+          연결되면 PageView 가 자동 발사됩니다. 아래 이벤트는 추가 코드 없이 GTM/Meta Events Manager 에서 표준 이벤트로 잡힙니다.
+        </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {['PageView', 'ViewContent', 'AddToCart', 'Purchase', 'Lead', 'CompleteRegistration', 'Search', 'Contact'].map((ev) => (
             <span key={ev} style={{
@@ -296,6 +279,24 @@ export function AnalyticsPage({ siteId }: { siteId: string }) {
     }
   };
 
+  // MetaPixelConnectCard 의 "연결" 단계에서 onChange + onSave 가 함께
+  // 호출되는데, 부모 setState 는 비동기여서 그 다음 즉시 호출되는 save
+  // 가 아직 옛 snippets 를 본다. 그래서 카드에서 전달한 최신값을 직접
+  // 받아 저장하는 경로를 별도로 노출한다.
+  const handleSaveOverride = async (override?: HeadSnippets) => {
+    setSaving(true);
+    setMsg('');
+    try {
+      await saveSiteSettings({ siteId, headSnippets: override || snippets });
+      setMsg('저장 완료. 다음 배포 시 반영됩니다.');
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : '저장 실패');
+      throw e;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>불러오는 중...</div>;
   }
@@ -311,7 +312,7 @@ export function AnalyticsPage({ siteId }: { siteId: string }) {
 
       {tab === 'gtm' && <GtmTab snippets={snippets} onChange={setSnippets} />}
       {tab === 'ga4' && <Ga4Tab snippets={snippets} />}
-      {tab === 'meta' && <MetaPixelTab snippets={snippets} onChange={setSnippets} />}
+      {tab === 'meta' && <MetaPixelTab snippets={snippets} onChange={setSnippets} onSave={handleSaveOverride} />}
       {tab === 'kakao' && <KakaoTab snippets={snippets} onChange={setSnippets} />}
 
       {tab !== 'ga4' && (
