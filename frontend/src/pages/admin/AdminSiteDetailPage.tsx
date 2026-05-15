@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { adminGetSite, adminCreateComment, getComments } from '../../api';
-import type { Brand, Product, Service, Store } from '../../types';
+import { adminGetSite, adminCreateComment, getComments, saveSiteSettings } from '../../api';
+import type { Brand, HeadSnippets, Product, Service, Store } from '../../types';
 
 interface SiteData {
   siteId: string;
@@ -11,6 +11,8 @@ interface SiteData {
   services: Service[];
   store: Store;
   brandCompleteness: number;
+  headSnippets?: HeadSnippets;
+  updatedAt?: string;
 }
 
 interface Comment {
@@ -89,6 +91,133 @@ function CommentForm({ siteId, targetType, targetId, onCreated }: {
   );
 }
 
+// Head snippet 필드 표 — 마케팅/검증 코드를 관리자에서 한 눈에 보고
+// 문제가 있을 때 필드 단위로 즉시 클리어. 변경은 backend site-settings
+// POST 핸들러를 admin 권한으로 호출 (deactivated 사이트도 통과).
+const HEAD_SNIPPET_FIELDS: Array<{
+  key: keyof HeadSnippets;
+  label: string;
+  hint: string;
+  format?: (v: string) => string;
+}> = [
+  { key: 'ga4Id', label: 'GA4 측정 ID', hint: 'G-XXXXXXXXXX' },
+  { key: 'googleAdsId', label: 'Google Ads 전환 ID', hint: 'AW-XXXXXXXXX' },
+  { key: 'gscMeta', label: 'GSC 메타', hint: '<meta google-site-verification>', format: (v) => v.replace(/^<meta\s+name="google-site-verification"\s+content="([^"]+)"\s*\/?>$/, '$1') },
+  { key: 'naverMeta', label: 'Naver 메타', hint: '<meta naver-site-verification>' },
+  { key: 'gtmId', label: 'GTM', hint: 'GTM-XXXXXXX' },
+  { key: 'metaPixelId', label: 'Meta Pixel', hint: '15~16자리 숫자' },
+  { key: 'kakaoPixelId', label: 'Kakao Pixel', hint: 'Pixel ID' },
+  { key: 'customHead', label: 'Custom <head>', hint: '자유 HTML' },
+];
+
+function HeadSnippetsCard({ site, onReload }: { site: SiteData; onReload: () => void }) {
+  const [busyKey, setBusyKey] = useState<keyof HeadSnippets | ''>('');
+  const [msg, setMsg] = useState('');
+  const snippets = site.headSnippets || {};
+
+  const clearField = async (key: keyof HeadSnippets) => {
+    const label = HEAD_SNIPPET_FIELDS.find((f) => f.key === key)?.label || key;
+    if (!confirm(`"${label}" 값을 지우시겠습니까?\n사용자 측에서 즉시 반영되며, 다음 prod 배포 시 해당 코드가 사이트에서 제거됩니다.`)) return;
+    setBusyKey(key);
+    setMsg('');
+    try {
+      // 다른 필드는 유지하고 해당 키만 비움
+      const next: HeadSnippets = { ...snippets, [key]: '' };
+      await saveSiteSettings({ siteId: site.siteId, headSnippets: next });
+      setMsg(`${label} 지움 완료`);
+      onReload();
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : '처리 실패');
+    } finally {
+      setBusyKey('');
+    }
+  };
+
+  const clearAll = async () => {
+    if (!confirm('이 사이트의 모든 head snippets 를 초기화하시겠습니까?\nGA4, GTM, Meta Pixel, GSC/Naver 메타 등이 모두 제거됩니다.')) return;
+    setBusyKey('ga4Id'); // 표시용
+    setMsg('');
+    try {
+      const cleared: HeadSnippets = Object.fromEntries(HEAD_SNIPPET_FIELDS.map((f) => [f.key, ''])) as HeadSnippets;
+      await saveSiteSettings({ siteId: site.siteId, headSnippets: { ...snippets, ...cleared } });
+      setMsg('전체 초기화 완료');
+      onReload();
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : '처리 실패');
+    } finally {
+      setBusyKey('');
+    }
+  };
+
+  return (
+    <div style={{ background: '#fff', borderRadius: 10, border: '1px solid var(--border)', padding: 20, marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+          Head Snippets (마케팅 · 검증 코드)
+        </h3>
+        <button onClick={clearAll} disabled={!!busyKey} style={{
+          padding: '4px 10px', borderRadius: 6, border: '1px solid var(--danger-soft)',
+          background: '#fff', color: 'var(--danger)', fontSize: 11, fontWeight: 600,
+          cursor: busyKey ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: busyKey ? 0.6 : 1,
+        }}>전체 초기화</button>
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+        사용자가 직접 등록한 마케팅·검증 코드입니다. 잘못된 GSC 토큰이나 의심스러운 custom head 가 있으면 해당 필드만 지울 수 있습니다.
+        {site.updatedAt && <> · 마지막 수정 {new Date(site.updatedAt).toLocaleString('ko-KR')}</>}
+      </div>
+      {msg && (
+        <div style={{
+          padding: 8, borderRadius: 6, marginBottom: 10, fontSize: 12,
+          background: msg.includes('실패') ? 'var(--danger-soft)' : 'var(--success-soft)',
+          color: msg.includes('실패') ? 'var(--danger-dark)' : 'var(--success-dark)',
+        }}>{msg}</div>
+      )}
+      <div style={{ display: 'grid', gap: 6 }}>
+        {HEAD_SNIPPET_FIELDS.map((f) => {
+          const raw = (snippets[f.key] || '') as string;
+          const display = raw ? (f.format ? f.format(raw) : raw) : '';
+          const set = !!raw;
+          return (
+            <div key={f.key} style={{
+              display: 'grid', gridTemplateColumns: '140px 1fr 80px',
+              gap: 10, alignItems: 'center',
+              padding: '8px 10px', borderRadius: 6,
+              background: set ? 'var(--bg-soft)' : 'transparent',
+              border: '1px solid var(--border-soft)',
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>
+                {f.label}
+              </div>
+              <div style={{
+                fontSize: 12, fontFamily: set ? 'monospace' : 'inherit',
+                color: set ? 'var(--text-primary)' : 'var(--text-muted)',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }} title={set ? raw : ''}>
+                {set ? display : `미설정 · ${f.hint}`}
+              </div>
+              <button
+                onClick={() => clearField(f.key)}
+                disabled={!set || !!busyKey}
+                style={{
+                  padding: '4px 8px', borderRadius: 5, fontSize: 11, fontWeight: 600,
+                  fontFamily: 'inherit',
+                  border: set ? '1px solid var(--danger-soft)' : '1px solid var(--border-soft)',
+                  background: '#fff',
+                  color: set ? 'var(--danger)' : 'var(--text-muted)',
+                  cursor: set && !busyKey ? 'pointer' : 'not-allowed',
+                  opacity: busyKey === f.key ? 0.6 : 1,
+                }}
+              >
+                {busyKey === f.key ? '...' : '지우기'}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function CommentList({ comments }: { comments: Comment[] }) {
   if (comments.length === 0) return <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: 8 }}>코멘트 없음</div>;
   return (
@@ -162,6 +291,9 @@ export function AdminSiteDetailPage() {
         <span style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'var(--border-soft)', padding: '4px 10px', borderRadius: 6 }}>{site.ownerEmail}</span>
         <span style={{ fontSize: 12, color: 'var(--primary)', background: 'var(--primary-soft)', padding: '4px 10px', borderRadius: 6 }}>완성도 {site.brandCompleteness || 0}%</span>
       </div>
+
+      {/* Head Snippets (admin oversight + per-field clear) */}
+      <HeadSnippetsCard site={site} onReload={loadData} />
 
       {/* Brand Section */}
       <div style={{ background: '#fff', borderRadius: 10, border: '1px solid var(--border)', padding: 20, marginBottom: 16 }}>

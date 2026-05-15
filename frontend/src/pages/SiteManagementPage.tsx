@@ -368,7 +368,12 @@ export function SiteManagementPage({ siteId, initialFocus }: { siteId: string; i
           <input value={snippets.googleAdsId || ''} onChange={(e) => setSnippets({ ...snippets, googleAdsId: e.target.value })} placeholder="AW-XXXXXXXXX (선택)" style={inputStyle} />
 
           <label style={labelStyle}>Google Search Console 메타</label>
-          <input value={snippets.gscMeta || ''} onChange={(e) => setSnippets({ ...snippets, gscMeta: e.target.value })} placeholder='<meta name="google-site-verification" ...>' style={inputStyle} />
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, lineHeight: 1.55 }}>
+            본인 사이트(<code style={{ fontFamily: 'monospace', background: 'var(--bg-soft)', padding: '0 4px', borderRadius: 3 }}>{siteId}.aiseo.tips</code>)의
+            URL-prefix 속성 토큰만 등록하세요. 부모 도메인의 권한은 부여되지 않으며, 잘못된 형식은 저장 시 거절됩니다.
+            토큰만(예: <code style={{ fontFamily: 'monospace' }}>aBcD…xyz</code>) 붙여넣어도 자동으로 meta 태그로 감싸집니다.
+          </div>
+          <input value={snippets.gscMeta || ''} onChange={(e) => setSnippets({ ...snippets, gscMeta: e.target.value })} placeholder='토큰만 또는 <meta name="google-site-verification" content="…">' style={inputStyle} />
 
           <label style={labelStyle}>Naver 웹마스터 메타</label>
           <input value={snippets.naverMeta || ''} onChange={(e) => setSnippets({ ...snippets, naverMeta: e.target.value })} placeholder='<meta name="naver-site-verification" ...>' style={inputStyle} />
