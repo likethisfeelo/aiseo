@@ -29,7 +29,12 @@ exports.handler = async (event) => {
     siteId: null,
   };
 
-  // Find user's site
+  // Find user's site.
+  // 한 사용자가 도메인 변경 승인 후 (예: real → best) 두 개의 record 를
+  // 갖게 된다. 옛 record 는 deactivated=true 로 마킹되어 있어야 하지만
+  // 과거에는 scan 결과 순서가 보장되지 않아서 옛 siteId 가 먼저 잡혀
+  // dashboard 의 "현재 사이트"가 비활성 주소로 표시되는 케이스가 있었음.
+  // 활성 사이트(가장 최근 updated/created) 를 우선해서 반환한다.
   try {
     const sitesTable = process.env.SITES_TABLE;
     if (sitesTable) {
@@ -37,11 +42,20 @@ exports.handler = async (event) => {
         TableName: sitesTable,
         FilterExpression: 'ownerSub = :sub',
         ExpressionAttributeValues: { ':sub': user.sub },
-        ProjectionExpression: 'siteId',
-        Limit: 10,
+        ProjectionExpression: 'siteId, deactivated, createdAt, updatedAt',
+        Limit: 20,
       }));
-      if (scan.Items && scan.Items.length > 0) {
-        result.siteId = scan.Items[0].siteId;
+      const items = scan.Items || [];
+      if (items.length > 0) {
+        const ts = (it) => it.updatedAt || it.createdAt || '';
+        // 활성 우선, 그 다음 최신 갱신 순
+        items.sort((a, b) => {
+          const aDeact = a.deactivated ? 1 : 0;
+          const bDeact = b.deactivated ? 1 : 0;
+          if (aDeact !== bDeact) return aDeact - bDeact;
+          return ts(b).localeCompare(ts(a));
+        });
+        result.siteId = items[0].siteId;
       }
     }
   } catch (e) {
