@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AISEO sitemap — site.aiseo.tips
+  ------------------------------------------------------------
+  여기 등록되는 라우트는 frontend/scripts/prerender.mjs 의 ROUTES
+  배열과 1:1 로 일치해야 한다. 새 마케팅 sub-page 를 추가할 때
+  ROUTES 와 이 파일을 함께 업데이트.
+
+  블로그 포스트(/blog/<slug>)는 백엔드 블로그 Lambda 가 런타임에
+  생성하므로 여기 정적 sitemap 에는 포함하지 않는다. 별도
+  /blog/sitemap.xml 을 자동 생성하는 follow-up 으로 다룰 예정.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://site.aiseo.tips/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://site.aiseo.tips/course2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://site.aiseo.tips/support2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://site.aiseo.tips/events2026</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://site.aiseo.tips/events2026/free</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://site.aiseo.tips/events2026/paid</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://site.aiseo.tips/blog</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>

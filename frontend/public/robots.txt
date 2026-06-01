@@ -1,0 +1,68 @@
+# AISEO robots.txt (site.aiseo.tips)
+# ------------------------------------------------------------
+# 1. 마케팅·블로그 라우트는 모두 허용 (프리렌더된 페이지 + SPA 루트)
+# 2. 인증 필요 대시보드/관리자 페이지는 Disallow — 색인되지 않게
+# 3. 주요 AI 크롤러는 명시적으로 허용해서 LLM 검색 노출 확보
+# 4. Sitemap 위치 명시
+#
+# 메인 도메인(aiseo.tips), b2b.aiseo.tips 는 별도 static 페이지
+# 라서 동일 robots 가 deploy 스크립트에 의해 S3 root 에도 복사된다.
+
+User-agent: *
+Allow: /
+
+# 인증 필요 — 색인 불필요 / 색인되면 안 되는 영역
+Disallow: /site/upload
+Disallow: /site/seo
+Disallow: /site/deployed
+Disallow: /seo-status
+Disallow: /analytics
+Disallow: /brand
+Disallow: /products
+Disallow: /services
+Disallow: /store
+Disallow: /domain
+Disallow: /content
+Disallow: /ads
+Disallow: /roadmap
+Disallow: /admin
+Disallow: /admin/
+Disallow: /mktadmin
+Disallow: /?auth=
+Disallow: /api/
+
+# ── 주요 AI 크롤러 (LLM 검색·답변 인용용) ──
+# GPT/ChatGPT — OpenAI
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+
+# Claude — Anthropic
+User-agent: ClaudeBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: Claude-Web
+Allow: /
+
+# Google AI (Gemini)
+User-agent: Google-Extended
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# Bing AI / Copilot
+User-agent: bingbot
+Allow: /
+
+# Naver (한국 주요 검색)
+User-agent: Yeti
+Allow: /
+
+# Sitemap
+Sitemap: https://site.aiseo.tips/sitemap.xml

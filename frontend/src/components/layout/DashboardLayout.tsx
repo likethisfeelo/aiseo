@@ -1,6 +1,31 @@
+import { useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import type { UserProfile } from '../../types';
+
+// 대시보드/관리자 영역이 마운트되어 있는 동안 robots/googlebot
+// noindex,nofollow meta 를 head 에 주입한다. robots.txt 의 Disallow
+// 와 이중 방어 — robots.txt 를 무시하는 일부 크롤러나 외부 링크로
+// 직접 도달한 케이스도 인덱싱되지 않게.
+// (마운트가 풀리면 자동으로 제거되어 공개 라우트에는 영향 없음.)
+function useDashboardNoIndex() {
+  useEffect(() => {
+    const robots = document.createElement('meta');
+    robots.name = 'robots';
+    robots.content = 'noindex,nofollow';
+    document.head.appendChild(robots);
+
+    const googlebot = document.createElement('meta');
+    googlebot.name = 'googlebot';
+    googlebot.content = 'noindex,nofollow';
+    document.head.appendChild(googlebot);
+
+    return () => {
+      robots.remove();
+      googlebot.remove();
+    };
+  }, []);
+}
 
 interface Props {
   user: UserProfile;
@@ -25,6 +50,7 @@ export function DashboardLayout({
   onToggleEducation,
   children,
 }: Props) {
+  useDashboardNoIndex();
   return (
     <div
       style={{
