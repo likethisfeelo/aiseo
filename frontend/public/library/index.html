@@ -25,6 +25,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <title>AISEO 라이브러리 — 성공사례·SEO전략 모음 | AISEO.TIPS</title>
 <meta name="description" content="AISEO.TIPS 가 운영하는 공개 라이브러리. SEO·AEO·GEO 실전 성공 사례와 검색 노출 전략을 한 곳에서 탐색하세요.">
+<!-- 카탈로그·리더가 공유하는 Cognito + API base URL.
+     deploy 스크립트가 sed 로 placeholder 를 채워서 S3 에 올림. -->
+<script src="/library/reader-config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -246,9 +249,30 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .book.open .feature{transform:rotateY(0deg) translateX(0) translateZ(1px) scale(1);pointer-events:auto;opacity:1;box-shadow:0 18px 45px rgba(0,0,0,.3),0 52px 90px -28px rgba(0,0,0,.6)}
   .feature h3{font-family:var(--display);font-weight:700;font-size:25px;line-height:1.18;color:var(--ink);letter-spacing:-.01em}
   .feature .fmeta{margin-top:16px;font-size:13px;font-weight:600;color:var(--ink-soft)}
+  .feature .fdesc{margin-top:12px;font-size:13px;line-height:1.6;color:var(--ink-soft);
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
   .feature .fread{margin-top:16px;font-size:14.5px;font-weight:700;color:var(--accent-dark);display:inline-flex;gap:8px;align-items:center;cursor:pointer}
   .feature .fillo{margin-top:auto;width:100%}
   .feature .fillo svg{width:100%;display:block}
+  /* 책 펼침 상태에서 노출되는 챕터 목록 (글목록).
+     항목 클릭 시 /library/{cover}/{post}/ 로 navigation. */
+  .feature .chap-head{margin-top:18px;font-size:11px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink-muted);border-top:1px solid var(--line-soft);padding-top:14px}
+  .feature .chap-list{margin-top:8px;max-height:200px;overflow-y:auto;padding-right:6px}
+  .feature .chap-list::-webkit-scrollbar{width:4px}
+  .feature .chap-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+  .feature .chap-list a{display:flex;gap:10px;align-items:flex-start;padding:8px 4px;font-size:13px;
+    color:var(--ink-soft);border-bottom:1px solid var(--line-soft);line-height:1.4;transition:color .15s}
+  .feature .chap-list a:hover{color:var(--accent-deep)}
+  .feature .chap-list a:last-child{border-bottom:none}
+  .feature .chap-list .cidx{flex:0 0 22px;font-variant-numeric:tabular-nums;color:var(--ink-muted);
+    font-size:11px;font-weight:700;padding-top:2px}
+  .feature .chap-list .cempty{padding:14px 4px;font-size:13px;color:var(--ink-muted);font-style:italic}
+  /* skeleton placeholder while API loads */
+  .book.skel .spine{background:linear-gradient(135deg,#E5E0F2,#D4CBE8) !important;animation:skelpulse 1.4s ease-in-out infinite}
+  @keyframes skelpulse{0%,100%{opacity:.6}50%{opacity:1}}
+  .lib-error{padding:40px 24px;text-align:center;color:var(--ink-soft)}
+  .lib-error button{margin-top:14px;background:var(--accent-dark);color:#fff;border:none;padding:10px 20px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13px}
   .shelf-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:#fff;border:none;box-shadow:0 8px 18px -6px rgba(0,0,0,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;z-index:30;color:var(--ink);transition:transform .15s,opacity .2s}
   .shelf-arrow:hover{transform:translateY(-50%) scale(1.06)}
   .shelf-arrow.left{left:14px}.shelf-arrow.right{right:14px}
@@ -1168,71 +1192,316 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </main>
 
 <script>
-/* ===== Library bookshelf carousel — aiseo-main.html 과 동일 ===== */
-const BOOKS=[
-  {t:"구글에 내 브랜드 검색되게 만들기 — 웨딩스냅 1인작가 스튜디오",c:"case",r:"4분 읽기",col:"#7a6fa8"},
-  {t:"AI 마케팅의 시작은 홈페이지가 맞을까?",c:"case",r:"3분 읽기",col:"#6f7aa8"},
-  {t:"1인 대표·작가님을 위한 스튜디오 검색 노출 셋업",c:"case",r:"4분 읽기",col:"#7a6fa8"},
-  {t:"AI로 홈페이지 제대로 만들 때, 체크리스트",c:"play",r:"6분 읽기",col:"#6f7aa8"},
-  {t:"SEO·AEO·GEO 통합 최적화 전략",c:"play",r:"5분 읽기",col:"#7a6fa8"},
-  {t:"GA4·서치콘솔 데이터로 개선 방향 잡기",c:"play",r:"4분 읽기",col:"#6f7aa8"},
-  {t:"AI 사이트, 나 혼자 SEO 노리고 제대로 배포하기",c:"play",r:"5분 읽기",col:"#7a6fa8"},
-  {t:"구글·Bing에서 우리 회사 추천하게 만들기 — B2B 제조 설비 업체",c:"case",r:"5분 읽기",col:"#8b6fd4",feat:true},
-  {t:"사이트가 SEO에 더 잘 걸리게 하는 프롬프트 비법",c:"play",r:"3분 읽기",col:"#7d72a8"},
-  {t:"3개월 만에 오가닉 트래픽 2배로",c:"case",r:"4분 읽기",col:"#8478ac"},
-  {t:"AI 인용 점유율을 올리는 콘텐츠 구조",c:"play",r:"5분 읽기",col:"#7d72a8"},
-  {t:"카카오 공유 OG 태그 디버깅 노트",c:"play",r:"3분 읽기",col:"#8478ac"},
-  {t:"검색 키워드 발굴에서 '나를 찾는 맥락 찾기'로",c:"case",r:"4분 읽기",col:"#7d72a8"},
-  {t:"AI에서 내 브랜드 검색 현황 점검하는 법",c:"play",r:"4분 읽기",col:"#8478ac"}
-];
-const CATLABEL={play:"SEO전략",case:"성공사례"};
-const PRISM=['#E7DDFB','#D9C7FA','#C9D4FF','#BFE3FF','#C7F2E8','#D7F5DD','#FFE6C7','#FFD9EC','#E4D2FF','#CDE8FF'];
-let libFilter='all', libQuery='', openIdx=BOOKS.findIndex(b=>b.feat); if(openIdx<0)openIdx=0;
-const shelf=document.getElementById('shelf'),libSearch=document.getElementById('libSearch');
-shelf.innerHTML=BOOKS.map((b,i)=>`<div class="book" data-i="${i}" tabindex="0" role="button" aria-label="${b.t} 열기"><div class="spine" style="background:${b.col}"><span class="stitle">${b.t}</span><span class="sbadge"><span class="glyph">A</span><span class="lab">AISEO</span></span></div><div class="feature" style="--prismc:${PRISM[(Math.random()*PRISM.length)|0]}"><h3>${b.t}</h3><div class="fmeta">${CATLABEL[b.c]} | ${b.r}</div><div class="fread">글 읽기 →</div></div></div>`).join('');
-const books=[...shelf.querySelectorAll('.book')];
-let emptyMsg=null,centerTimer=null;
-const isVis=i=>{const b=BOOKS[i];return (libFilter==='all'||b.c===libFilter)&&b.t.toLowerCase().includes(libQuery.toLowerCase());};
-const visIdxs=()=>BOOKS.map((_,i)=>i).filter(isVis);
-function getCoverWidth(){const v=getComputedStyle(shelf).getPropertyValue('--cover-w').trim();return Number.parseFloat(v)||342;}
-function centerOpen(smooth){
-  const o=books[openIdx];if(!o||o.classList.contains('hidden'))return;
-  const coverW=Math.max(getCoverWidth(), o.offsetWidth);
-  const target=o.offsetLeft-(shelf.clientWidth-coverW)/2;
-  const max=shelf.scrollWidth-shelf.clientWidth;
-  shelf.scrollTo({left:Math.max(0,Math.min(max,target)),behavior:smooth?'smooth':'auto'});
-}
-function update(smooth){
-  if(emptyMsg){emptyMsg.remove();emptyMsg=null;}
-  clearTimeout(centerTimer);
-  if(smooth){shelf.classList.add('library-switching');setTimeout(()=>shelf.classList.remove('library-switching'),820);}
-  const previous=shelf.querySelector('.book.open');
-  if(previous){previous.classList.add('flipping');setTimeout(()=>previous.classList.remove('flipping'),820);}
-  books.forEach((el,i)=>{const visible=isVis(i);el.classList.toggle('hidden',!visible);el.setAttribute('aria-hidden',String(!visible));});
-  const vis=visIdxs();
-  if(!vis.length){emptyMsg=document.createElement('div');emptyMsg.style.cssText='color:#9a9a9e;margin:auto;font-size:14px';emptyMsg.textContent='검색 결과가 없습니다';shelf.appendChild(emptyMsg);return;}
-  if(!vis.includes(openIdx))openIdx=vis[0];
-  books.forEach((el,i)=>{const isOpen=i===openIdx;el.classList.toggle('open',isOpen);el.setAttribute('aria-expanded',String(isOpen));});
-  if(smooth){centerTimer=setTimeout(()=>centerOpen(true),360);}else{centerOpen(false);}
-}
-books.forEach((el,i)=>{
-  const openBook=()=>{if(i!==openIdx){openIdx=i;update(true);}};
-  el.addEventListener('click',openBook);
-  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openBook();}});
-});
-document.querySelectorAll('#libTabs button').forEach(b=>b.addEventListener('click',()=>{
-  document.querySelectorAll('#libTabs button').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');libFilter=b.dataset.c;update(true);
-}));
-libSearch.addEventListener('input',e=>{libQuery=e.target.value;update(true);});
-document.getElementById('libPrev').addEventListener('click',()=>{const v=visIdxs(),p=v.indexOf(openIdx);if(p>0){openIdx=v[p-1];update(true);}});
-document.getElementById('libNext').addEventListener('click',()=>{const v=visIdxs(),p=v.indexOf(openIdx);if(p<v.length-1){openIdx=v[p+1];update(true);}});
-update(false);
-window.addEventListener('resize',()=>centerOpen(false));
+/* ============================================================
+   AI SEO LIBRARY catalogue — covers (책장의 책) 를 API 에서
+   동적 로드. 책 하나 = 표지(Cover) 한 권. 펼치면 그 책의 챕터
+   목록(글목록) 노출, 챕터 클릭 시 /library/{cover}/{post}/ 리더로.
 
-/* reveal animation 트리거 (aiseo-main 에선 IntersectionObserver 가 .reveal 클래스를
-   다른 곳에서 활성화하지만, 이 페이지엔 그게 없으니 즉시 visible 처리) */
-document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
+   "북 > 글목록 > 글" 흐름의 카탈로그 진입점.
+   ============================================================ */
+(function(){
+  var CFG = window.AISEO_READER_CONFIG || {};
+  var API_BASE = (CFG.apiBase || 'https://api.aiseo.tips').replace(/\/+$/, '');
+
+  // 책등 색상 팔레트 (DB 에 색 정보 없으므로 sortOrder 기준 cycling).
+  var SPINE_COLORS = ['#7a6fa8','#6f7aa8','#8b6fd4','#7d72a8','#8478ac','#6f8aa8','#9779b8'];
+
+  var shelf = document.getElementById('shelf');
+  var libSearch = document.getElementById('libSearch');
+  var libTabs = document.getElementById('libTabs');
+
+  // ── State ────────────────────────────────────────────────────
+  // covers: [{slug,title,description,tag,sortOrder,chapters:[{slug,title,readMinutes}],_chaptersLoaded}]
+  var STATE = {
+    covers: [],
+    filterTag: 'all',  // 'all' | tag value (예: 'Case Studies', 'Playbooks')
+    query: '',
+    openIdx: 0,
+  };
+  var bookEls = [];
+  var emptyMsg = null;
+  var centerTimer = null;
+
+  // ── DOM helpers ──────────────────────────────────────────────
+  function escapeHtml(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ── Skeleton (로딩 중 책장 placeholder) ──────────────────────
+  function renderSkeleton(){
+    var html = '';
+    for (var i = 0; i < 4; i++) {
+      html += '<div class="book skel" aria-hidden="true">'
+        + '<div class="spine"><span class="stitle">&nbsp;</span></div>'
+        + '</div>';
+    }
+    shelf.innerHTML = html;
+  }
+
+  // ── Error fallback ───────────────────────────────────────────
+  function renderError(msg){
+    shelf.innerHTML = '<div class="lib-error">'
+      + '<p>' + escapeHtml(msg || '콘텐츠를 불러올 수 없습니다.') + '</p>'
+      + '<button id="lib-retry">다시 시도</button>'
+      + '</div>';
+    var btn = document.getElementById('lib-retry');
+    if (btn) btn.addEventListener('click', boot);
+  }
+
+  // ── Render covers (books) ────────────────────────────────────
+  function renderShelf(){
+    if (!STATE.covers.length) {
+      shelf.innerHTML = '<div class="lib-error"><p>아직 발행된 표지가 없습니다.<br>관리자가 곧 콘텐츠를 채울 예정입니다.</p></div>';
+      return;
+    }
+    shelf.innerHTML = STATE.covers.map(function(c, i){
+      var color = SPINE_COLORS[i % SPINE_COLORS.length];
+      return '<div class="book" data-i="' + i + '" tabindex="0" role="button" aria-label="' + escapeHtml(c.title) + ' 펼치기">'
+        +   '<div class="spine" style="background:' + color + '">'
+        +     '<span class="stitle">' + escapeHtml(c.title) + '</span>'
+        +     '<span class="sbadge"><span class="glyph">A</span><span class="lab">AISEO</span></span>'
+        +   '</div>'
+        +   '<div class="feature" data-cover="' + escapeHtml(c.slug) + '">'
+        +     '<h3>' + escapeHtml(c.title) + '</h3>'
+        +     '<div class="fmeta">' + escapeHtml(c.tag || 'AI SEO LIBRARY') + '</div>'
+        +     (c.description ? '<div class="fdesc">' + escapeHtml(c.description) + '</div>' : '')
+        +     '<div class="chap-head">글목록</div>'
+        +     '<div class="chap-list" data-list-for="' + escapeHtml(c.slug) + '">'
+        +       '<div class="cempty">불러오는 중…</div>'
+        +     '</div>'
+        +   '</div>'
+        + '</div>';
+    }).join('');
+
+    bookEls = Array.prototype.slice.call(shelf.querySelectorAll('.book'));
+    bookEls.forEach(function(el, i){
+      var openBook = function(){
+        if (i !== STATE.openIdx) {
+          STATE.openIdx = i;
+          update(true);
+        }
+        // 챕터 목록은 책이 열린 후 lazy fetch (이미 로드된 표지는 skip).
+        ensureChaptersLoaded(STATE.covers[i]);
+      };
+      el.addEventListener('click', openBook);
+      el.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBook(); }
+      });
+    });
+  }
+
+  // ── Chapter list inside a feature panel ──────────────────────
+  function renderChaptersFor(cover){
+    var listEl = shelf.querySelector('[data-list-for="' + cssEscape(cover.slug) + '"]');
+    if (!listEl) return;
+    var chapters = cover.chapters || [];
+    var visible = chapters.filter(function(ch){
+      if (!STATE.query) return true;
+      return (ch.title || '').toLowerCase().indexOf(STATE.query.toLowerCase()) !== -1;
+    });
+    if (!visible.length) {
+      listEl.innerHTML = '<div class="cempty">'
+        + (chapters.length ? '검색어와 일치하는 글이 없습니다.' : '이 표지에는 아직 글이 없습니다.')
+        + '</div>';
+      return;
+    }
+    listEl.innerHTML = visible.map(function(ch, i){
+      var href = '/library/' + encodeURIComponent(cover.slug) + '/' + encodeURIComponent(ch.slug) + '/';
+      var meta = ch.readMinutes ? (' · ' + ch.readMinutes + '분') : '';
+      return '<a href="' + href + '" aria-label="' + escapeHtml(ch.title) + ' 읽기">'
+        +   '<span class="cidx">' + String(i + 1).padStart(2, '0') + '</span>'
+        +   '<span>' + escapeHtml(ch.title || ch.slug) + '<span style="color:var(--ink-muted);font-weight:500">' + escapeHtml(meta) + '</span></span>'
+        + '</a>';
+    }).join('');
+  }
+
+  // CSS.escape polyfill — 한국어 slug 가 들어와도 안전하지만 표지 slug 는
+  // 영문이라 사실상 안 쓰임. 그래도 attribute selector 안전을 위해 적용.
+  function cssEscape(s){
+    if (window.CSS && CSS.escape) return CSS.escape(s);
+    return String(s).replace(/[^a-zA-Z0-9_-]/g, function(c){ return '\\' + c; });
+  }
+
+  // ── Lazy chapter fetch ───────────────────────────────────────
+  function ensureChaptersLoaded(cover){
+    if (!cover || cover._chaptersLoaded || cover._chaptersLoading) return;
+    cover._chaptersLoading = true;
+    fetch(API_BASE + '/library/covers/' + encodeURIComponent(cover.slug))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if (j && j.success) {
+          cover.chapters = (j.data && j.data.chapters) || [];
+          cover._chaptersLoaded = true;
+        } else {
+          cover.chapters = [];
+          cover._chaptersLoaded = true;
+        }
+      })
+      .catch(function(){
+        cover.chapters = [];
+        cover._chaptersLoaded = true;
+      })
+      .then(function(){
+        cover._chaptersLoading = false;
+        renderChaptersFor(cover);
+      });
+  }
+
+  // ── Filter / visibility ──────────────────────────────────────
+  function isVisible(cover){
+    if (STATE.filterTag !== 'all') {
+      // tag 정확 매칭 (대소문자 무시).
+      var t = (cover.tag || '').toLowerCase();
+      if (t.indexOf(STATE.filterTag.toLowerCase()) === -1) return false;
+    }
+    if (!STATE.query) return true;
+    // 검색은 cover title + chapter titles 양쪽 매칭.
+    var q = STATE.query.toLowerCase();
+    if ((cover.title || '').toLowerCase().indexOf(q) !== -1) return true;
+    if (Array.isArray(cover.chapters)) {
+      for (var i = 0; i < cover.chapters.length; i++) {
+        if ((cover.chapters[i].title || '').toLowerCase().indexOf(q) !== -1) return true;
+      }
+    }
+    return false;
+  }
+  function visIdxs(){
+    var arr = [];
+    for (var i = 0; i < STATE.covers.length; i++) if (isVisible(STATE.covers[i])) arr.push(i);
+    return arr;
+  }
+
+  function getCoverWidth(){
+    var v = getComputedStyle(shelf).getPropertyValue('--cover-w').trim();
+    return parseFloat(v) || 342;
+  }
+  function centerOpen(smooth){
+    var o = bookEls[STATE.openIdx];
+    if (!o || o.classList.contains('hidden')) return;
+    var coverW = Math.max(getCoverWidth(), o.offsetWidth);
+    var target = o.offsetLeft - (shelf.clientWidth - coverW) / 2;
+    var max = shelf.scrollWidth - shelf.clientWidth;
+    shelf.scrollTo({ left: Math.max(0, Math.min(max, target)), behavior: smooth ? 'smooth' : 'auto' });
+  }
+  function update(smooth){
+    if (emptyMsg) { emptyMsg.remove(); emptyMsg = null; }
+    if (centerTimer) clearTimeout(centerTimer);
+    if (smooth) {
+      shelf.classList.add('library-switching');
+      setTimeout(function(){ shelf.classList.remove('library-switching'); }, 820);
+    }
+    var previous = shelf.querySelector('.book.open');
+    if (previous) {
+      previous.classList.add('flipping');
+      setTimeout(function(){ previous.classList.remove('flipping'); }, 820);
+    }
+    bookEls.forEach(function(el, i){
+      var visible = isVisible(STATE.covers[i]);
+      el.classList.toggle('hidden', !visible);
+      el.setAttribute('aria-hidden', String(!visible));
+    });
+    var vis = visIdxs();
+    if (!vis.length) {
+      emptyMsg = document.createElement('div');
+      emptyMsg.style.cssText = 'color:#9a9a9e;margin:auto;font-size:14px';
+      emptyMsg.textContent = '검색 결과가 없습니다';
+      shelf.appendChild(emptyMsg);
+      return;
+    }
+    if (vis.indexOf(STATE.openIdx) === -1) STATE.openIdx = vis[0];
+    bookEls.forEach(function(el, i){
+      var isOpen = i === STATE.openIdx;
+      el.classList.toggle('open', isOpen);
+      el.setAttribute('aria-expanded', String(isOpen));
+    });
+    if (smooth) centerTimer = setTimeout(function(){ centerOpen(true); }, 360);
+    else centerOpen(false);
+
+    // 열린 책의 챕터 목록은 검색 필터 변경 시 다시 그려야 함.
+    var openCover = STATE.covers[STATE.openIdx];
+    if (openCover && openCover._chaptersLoaded) renderChaptersFor(openCover);
+    if (openCover) ensureChaptersLoaded(openCover);
+  }
+
+  // ── Category tab buttons ─────────────────────────────────────
+  // 시드 데이터의 tag: 'Case Studies' (case-studies), 'Playbooks' (playbooks).
+  // 기존 탭 (전체/성공사례/SEO전략) 의 data-c 값 'case'/'play' 를 tag 매칭용으로 매핑.
+  var TAB_TAG_MAP = { 'all': 'all', 'case': 'case studies', 'play': 'playbooks' };
+  function setupTabs(){
+    if (!libTabs) return;
+    var tabBtns = libTabs.querySelectorAll('button');
+    tabBtns.forEach(function(b){
+      b.addEventListener('click', function(){
+        tabBtns.forEach(function(x){ x.classList.remove('active'); });
+        b.classList.add('active');
+        STATE.filterTag = TAB_TAG_MAP[b.dataset.c] || 'all';
+        update(true);
+      });
+    });
+  }
+
+  // ── Search input ─────────────────────────────────────────────
+  function setupSearch(){
+    if (!libSearch) return;
+    libSearch.addEventListener('input', function(e){
+      STATE.query = e.target.value;
+      update(true);
+    });
+  }
+
+  // ── Prev / Next arrows ───────────────────────────────────────
+  function setupArrows(){
+    var prev = document.getElementById('libPrev');
+    var next = document.getElementById('libNext');
+    if (prev) prev.addEventListener('click', function(){
+      var v = visIdxs(), p = v.indexOf(STATE.openIdx);
+      if (p > 0) { STATE.openIdx = v[p - 1]; update(true); ensureChaptersLoaded(STATE.covers[STATE.openIdx]); }
+    });
+    if (next) next.addEventListener('click', function(){
+      var v = visIdxs(), p = v.indexOf(STATE.openIdx);
+      if (p < v.length - 1) { STATE.openIdx = v[p + 1]; update(true); ensureChaptersLoaded(STATE.covers[STATE.openIdx]); }
+    });
+  }
+
+  // ── Boot ─────────────────────────────────────────────────────
+  function boot(){
+    renderSkeleton();
+    fetch(API_BASE + '/library/covers')
+      .then(function(r){
+        return r.json().then(function(j){ return { ok: r.ok, j: j }; });
+      })
+      .then(function(res){
+        if (!res.ok || !res.j || !res.j.success) {
+          throw new Error((res.j && res.j.error) || ('API error ' + (res.ok ? 'unknown' : 'http')));
+        }
+        var covers = (res.j.data && res.j.data.covers) || [];
+        // sortOrder 오름차순 (API 가 이미 정렬해서 보내지만 한 번 더 안전하게).
+        covers.sort(function(a, b){ return (a.sortOrder || 9999) - (b.sortOrder || 9999); });
+        STATE.covers = covers;
+        STATE.openIdx = 0;
+        renderShelf();
+        update(false);
+        // 첫 번째 책의 챕터를 미리 받아두면 사용자가 펼치자마자 보임.
+        if (STATE.covers[0]) ensureChaptersLoaded(STATE.covers[0]);
+      })
+      .catch(function(err){
+        console.error('library catalogue fetch failed', err);
+        renderError(err.message || '콘텐츠를 불러올 수 없습니다.');
+      });
+  }
+
+  setupTabs();
+  setupSearch();
+  setupArrows();
+  boot();
+  window.addEventListener('resize', function(){ centerOpen(false); });
+
+  /* reveal animation 트리거 (aiseo-main 에선 IntersectionObserver 가 .reveal 을
+     다른 곳에서 활성화하지만, 이 페이지엔 그게 없으니 즉시 visible 처리). */
+  document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+})();
 </script>
 
 <!-- 사람 아이콘 로그인 상태 분기 (aiseo-main 과 동일) -->
