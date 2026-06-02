@@ -78,6 +78,11 @@ aws s3 cp frontend/public/aiseo-main-sitemap.xml s3://$BUCKET/sitemap.xml \
 aws s3 cp frontend/public/account.html s3://$BUCKET/account.html \
   --content-type "text/html; charset=utf-8" --profile $PROFILE
 
+# /library/ — apex 라이브러리 페이지. CF subdomain-router 가 /library,
+# /library/ clean URL 을 /library/index.html 로 rewrite.
+aws s3 sync frontend/public/library/ s3://$BUCKET/library/ \
+  --content-type "text/html; charset=utf-8" --profile $PROFILE
+
 # /login.html + /login-config.js — HTML 은 그대로 복사하고 ASCII-only 인
 # login-config.js 에만 sed 로 Cognito 값 치환. HTML 에 sed 를 직접 걸면
 # 한국어 인코딩이 일부 환경에서 손상되어 mojibake 발생.
@@ -124,6 +129,7 @@ aws s3 sync frontend/dist/ s3://$BUCKET/site/ \
   --exclude "icon/*" \
   --exclude "images/*" \
   --exclude "principle-icons/*" \
+  --exclude "library/*" \
   --exclude "_archive/*" \
   --profile $PROFILE
 

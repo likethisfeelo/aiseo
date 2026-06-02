@@ -118,6 +118,16 @@ function handler(event) {
     } else {
       request.uri = '/' + siteId + uri;
     }
+  } else {
+    // ── apex (aiseo.tips / dev.aiseo.tips) clean URL rewrites ──
+    // S3 는 sub-directory 의 implicit index 를 제공하지 않으므로
+    // `/library` 같은 확장자 없는 깔끔한 경로는 여기서 명시적으로
+    // index.html 로 리라이트. 신규 페이지 추가 시 같은 패턴으로
+    // 이 블록에 한 줄씩 추가.
+    var apexUri = request.uri;
+    if (apexUri === '/library' || apexUri === '/library/') {
+      request.uri = '/library/index.html';
+    }
   }
 
   return request;
