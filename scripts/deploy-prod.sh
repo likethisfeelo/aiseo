@@ -69,6 +69,10 @@ aws s3 cp frontend/public/robots.txt s3://$BUCKET/robots.txt \
   --content-type "text/plain; charset=utf-8" --profile $PROFILE
 aws s3 cp frontend/public/robots.txt s3://$BUCKET/b2b/robots.txt \
   --content-type "text/plain; charset=utf-8" --profile $PROFILE
+# aiseo.tips (apex) 전용 sitemap. b2b./site. 는 각각 별도 sitemap 을
+# 관리하므로 (광고계정·서치콘솔 분리) 여기서는 apex 한 곳에만 업로드.
+aws s3 cp frontend/public/aiseo-main-sitemap.xml s3://$BUCKET/sitemap.xml \
+  --content-type "application/xml; charset=utf-8" --profile $PROFILE
 
 # 3. B2B 페이지 업로드
 echo "[3/5] Uploading B2B page..."
@@ -91,6 +95,7 @@ aws s3 sync frontend/public/landing/ s3://$BUCKET/b2b/landing/ \
 echo "[4/5] Uploading SPA + prerendered HTML to /site/..."
 aws s3 sync frontend/dist/ s3://$BUCKET/site/ \
   --exclude "aiseo-main.html" \
+  --exclude "aiseo-main-sitemap.xml" \
   --exclude "b2b.html" \
   --exclude "hero.mp4" \
   --exclude "icon/*" \
