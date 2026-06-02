@@ -27,9 +27,17 @@ cd frontend
 npm run build
 cd ..
 
-# 2. 랜딩페이지를 S3 루트에 업로드 (dev.aiseo.tips)
-echo "[2/5] Uploading landing page to root..."
-aws s3 cp frontend/dist/philo-main.html s3://$BUCKET/index.html --content-type "text/html; charset=utf-8" --profile $PROFILE
+# 2. 랜딩페이지 + 자산을 S3 루트에 업로드 (dev.aiseo.tips)
+echo "[2/5] Uploading landing page + apex assets to root..."
+# apex 메인은 aiseo-main.html 로 교체 (이전: philo-main.html, _archive/ 에 보관)
+aws s3 cp frontend/dist/aiseo-main.html s3://$BUCKET/index.html --content-type "text/html; charset=utf-8" --profile $PROFILE
+# aiseo-main.html 이 참조하는 자산들 (hero.mp4, icon/, images/, principle-icons/) 을
+# apex 루트에 그대로 배치 — HTML 의 상대 경로(`src="icon/..."` 등)가 동작하려면
+# S3 버킷 루트에 동일 트리로 존재해야 함.
+aws s3 sync frontend/public/icon/             s3://$BUCKET/icon/             --profile $PROFILE
+aws s3 sync frontend/public/images/           s3://$BUCKET/images/           --profile $PROFILE
+aws s3 sync frontend/public/principle-icons/  s3://$BUCKET/principle-icons/  --profile $PROFILE
+aws s3 cp   frontend/public/hero.mp4          s3://$BUCKET/hero.mp4          --content-type "video/mp4" --profile $PROFILE
 # robots.txt 는 apex(dev.aiseo.tips), b2b(b2b.dev.aiseo.tips),
 # site(site.dev.aiseo.tips) 셋 다 자기 도메인 루트에서 보여야 하므로
 # 세 prefix 에 모두 복사. site/* 는 4단계 sync 에서 dist 와 함께 처리.
@@ -52,11 +60,17 @@ aws s3 sync frontend/public/landing/ s3://$BUCKET/b2b/landing/ \
 #      (course2026/, support2026/, events2026/, blog/)
 #    - `--delete` 는 쓰지 않는다. 블로그 Lambda 가 런타임에 생성하는
 #      `site/blog/<slug>/index.html` 이 같이 삭제되기 때문.
-#      대신 landing 전용 파일(philo-main/b2b)만 제외하고 sync.
+#    - landing 전용(b2b)·apex 전용(aiseo-main + 자산 트리)·archive 는
+#      site/ 에 중복으로 들어가면 안 되므로 제외.
 echo "[4/5] Uploading SPA + prerendered HTML to /site/..."
 aws s3 sync frontend/dist/ s3://$BUCKET/site/ \
-  --exclude "philo-main.html" \
+  --exclude "aiseo-main.html" \
   --exclude "b2b.html" \
+  --exclude "hero.mp4" \
+  --exclude "icon/*" \
+  --exclude "images/*" \
+  --exclude "principle-icons/*" \
+  --exclude "_archive/*" \
   --profile $PROFILE
 
 # 5. CloudFront 캐시 무효화
