@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AISEO sitemap — aiseo.tips (apex / 회사 소개 랜딩)
+  ------------------------------------------------------------
+  aiseo.tips 는 단일 랜딩 페이지(aiseo-main.html)이므로 sitemap 에는
+  apex URL 하나만 등록한다.
+
+  b2b.aiseo.tips, site.aiseo.tips 는 광고계정·검색콘솔이 분리된 별도
+  property 로 등록·관리되며, 각각 자체 sitemap.xml 을 가진다:
+    - b2b.aiseo.tips/sitemap.xml   (TODO: 별도 작업)
+    - site.aiseo.tips/sitemap.xml  (frontend/public/sitemap.xml)
+
+  배포 스크립트가 이 파일을 s3://bucket/sitemap.xml 로 업로드한다.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://aiseo.tips/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+</urlset>
