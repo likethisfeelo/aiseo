@@ -68,6 +68,23 @@ aws s3 cp frontend/public/aiseo-main-sitemap.xml "s3://$BUCKET/sitemap.xml" --co
 # apex stub /account.html — 로그인 후 진입할 회원 페이지 placeholder (P-7 까지). noindex.
 aws s3 cp frontend/public/account.html "s3://$BUCKET/account.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
 
+# /login.html — Cognito 값을 .env 에서 읽어 %%PLACEHOLDER%% 치환 후 업로드.
+$envFile = "frontend/.env"
+$poolId   = if ($env:VITE_COGNITO_USER_POOL_ID) { $env:VITE_COGNITO_USER_POOL_ID }
+            elseif (Test-Path $envFile) { (Get-Content $envFile | Where-Object {$_ -match '^VITE_COGNITO_USER_POOL_ID='} | Select-Object -First 1) -replace '^VITE_COGNITO_USER_POOL_ID=','' }
+            else { '' }
+$clientId = if ($env:VITE_COGNITO_CLIENT_ID) { $env:VITE_COGNITO_CLIENT_ID }
+            elseif (Test-Path $envFile) { (Get-Content $envFile | Where-Object {$_ -match '^VITE_COGNITO_CLIENT_ID='} | Select-Object -First 1) -replace '^VITE_COGNITO_CLIENT_ID=','' }
+            else { '' }
+$region   = ($poolId -split '_')[0]
+$loginHtml = (Get-Content "frontend/public/login.html" -Raw) `
+  -replace '%%COGNITO_REGION%%', $region `
+  -replace '%%COGNITO_CLIENT_ID%%', $clientId
+$tmpLogin = [System.IO.Path]::GetTempFileName() + ".html"
+[System.IO.File]::WriteAllText($tmpLogin, $loginHtml, [System.Text.Encoding]::UTF8)
+aws s3 cp $tmpLogin "s3://$BUCKET/login.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
+Remove-Item $tmpLogin
+
 # 3. Upload B2B page
 Write-Host "[3/5] Uploading B2B page..." -ForegroundColor Yellow
 aws s3 cp frontend/dist/b2b.html "s3://$BUCKET/b2b.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
@@ -84,6 +101,7 @@ aws s3 sync frontend/dist/ "s3://$BUCKET/site/" `
   --exclude "aiseo-main.html" `
   --exclude "aiseo-main-sitemap.xml" `
   --exclude "account.html" `
+  --exclude "login.html" `
   --exclude "b2b.html" `
   --exclude "hero.mp4" `
   --exclude "icon/*" `

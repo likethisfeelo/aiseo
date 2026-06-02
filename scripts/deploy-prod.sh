@@ -78,6 +78,17 @@ aws s3 cp frontend/public/aiseo-main-sitemap.xml s3://$BUCKET/sitemap.xml \
 aws s3 cp frontend/public/account.html s3://$BUCKET/account.html \
   --content-type "text/html; charset=utf-8" --profile $PROFILE
 
+# /login.html — Cognito 값을 .env 에서 읽어 %%PLACEHOLDER%% 치환 후 업로드.
+_POOL_ID="${VITE_COGNITO_USER_POOL_ID:-$(grep '^VITE_COGNITO_USER_POOL_ID=' frontend/.env 2>/dev/null | cut -d= -f2-)}"
+_CLIENT_ID="${VITE_COGNITO_CLIENT_ID:-$(grep '^VITE_COGNITO_CLIENT_ID=' frontend/.env 2>/dev/null | cut -d= -f2-)}"
+_REGION="$(echo "$_POOL_ID" | cut -d_ -f1)"
+sed -e "s|%%COGNITO_REGION%%|${_REGION}|g" \
+    -e "s|%%COGNITO_CLIENT_ID%%|${_CLIENT_ID}|g" \
+    frontend/public/login.html > /tmp/aiseo-login-injected.html
+aws s3 cp /tmp/aiseo-login-injected.html s3://$BUCKET/login.html \
+  --content-type "text/html; charset=utf-8" --profile $PROFILE
+rm /tmp/aiseo-login-injected.html
+
 # 3. B2B 페이지 업로드
 echo "[3/5] Uploading B2B page..."
 aws s3 cp frontend/dist/b2b.html s3://$BUCKET/b2b.html \
@@ -101,6 +112,7 @@ aws s3 sync frontend/dist/ s3://$BUCKET/site/ \
   --exclude "aiseo-main.html" \
   --exclude "aiseo-main-sitemap.xml" \
   --exclude "account.html" \
+  --exclude "login.html" \
   --exclude "b2b.html" \
   --exclude "hero.mp4" \
   --exclude "icon/*" \
