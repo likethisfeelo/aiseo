@@ -263,6 +263,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .news-form{display:flex;gap:10px;max-width:460px;margin:0 auto}
   .news-form input{flex:1;padding:14px 18px;border:1px solid var(--line);border-radius:999px;font-family:var(--body);font-size:15px;outline:none}
   .news-form input:focus{border-color:var(--accent)}
+  .news-form button[disabled]{opacity:.55;cursor:not-allowed}
+  .news-status{min-height:1.5em;margin-top:14px;font-size:14px;color:var(--ink-soft);transition:color .2s}
+  .news-status[data-state="success"]{color:var(--accent-deep);font-weight:600}
+  .news-status[data-state="error"]{color:#c0392b;font-weight:600}
 
   /* ===== FOOTER ===== */
   footer.ft{background:var(--bg-dark);color:rgba(255,255,255,.65);padding:64px 0 36px}
@@ -1287,7 +1291,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="wrap"><div class="news reveal">
   <h2>AISEO.TIPS에서 SEO 마케팅과 관련 소식을 받아보세요</h2>
   <p>SEO·AEO·GEO와 AI 마케팅, 소상공인 디지털 전환에 대한 실전 인사이트를 메일로 전해드립니다.</p>
-  <div class="news-form"><input type="email" placeholder="email@company.com"><button class="btn btn-dark">구독</button></div>
+  <form class="news-form" id="newsletterForm" novalidate>
+    <input type="email" name="email" id="newsletterEmail" placeholder="email@company.com" required autocomplete="email" aria-label="이메일 주소">
+    <button type="submit" class="btn btn-dark" id="newsletterSubmit">구독</button>
+  </form>
+  <div class="news-status" id="newsletterStatus" role="status" aria-live="polite"></div>
 </div></div>
 
 <!-- ===================== FOOTER ===================== -->
@@ -1697,6 +1705,69 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   }
   ['pointerdown','keydown','touchstart','scroll','click'].forEach(function(e){
     window.addEventListener(e,enableSound,{passive:true,once:false});
+  });
+})();
+</script>
+
+<script>
+/* Newsletter subscribe — POST to api.aiseo.tips/newsletter/subscribe.
+   CORS 는 CDK 에서 https://aiseo.tips 를 허용 origin 으로 등록해 둠. */
+(function(){
+  var API_BASE = 'https://api.aiseo.tips';
+  var form = document.getElementById('newsletterForm');
+  var emailInput = document.getElementById('newsletterEmail');
+  var submitBtn = document.getElementById('newsletterSubmit');
+  var statusEl = document.getElementById('newsletterStatus');
+  if(!form || !emailInput || !submitBtn || !statusEl) return;
+
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function setStatus(state, msg){
+    if(state){ statusEl.setAttribute('data-state', state); } else { statusEl.removeAttribute('data-state'); }
+    statusEl.textContent = msg || '';
+  }
+
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var email = (emailInput.value || '').trim().toLowerCase();
+    if(!email || !EMAIL_RE.test(email)){
+      setStatus('error', '유효한 이메일 주소를 입력해 주세요.');
+      emailInput.focus();
+      return;
+    }
+    submitBtn.disabled = true;
+    var originalText = submitBtn.textContent;
+    submitBtn.textContent = '구독 중…';
+    setStatus('', '');
+
+    fetch(API_BASE + '/newsletter/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, source: 'aiseo-main' })
+    })
+    .then(function(res){ return res.json().then(function(p){ return { ok: res.ok, payload: p }; }); })
+    .then(function(r){
+      if(!r.ok || !r.payload || r.payload.success === false){
+        throw new Error((r.payload && r.payload.error) || '구독 처리에 실패했습니다.');
+      }
+      var data = r.payload.data || {};
+      if(data.alreadySubscribed){
+        setStatus('success', '이미 구독 중인 이메일입니다. 곧 새 소식을 보내드릴게요.');
+      } else {
+        setStatus('success', '구독이 완료되었습니다. 새 소식을 메일로 보내드릴게요.');
+      }
+      emailInput.value = '';
+      if(window.dataLayer){
+        window.dataLayer.push({ event: 'newsletter_subscribe', source: 'aiseo-main' });
+      }
+    })
+    .catch(function(err){
+      setStatus('error', (err && err.message) || '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    })
+    .then(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    });
   });
 })();
 </script>
