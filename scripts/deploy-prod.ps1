@@ -51,9 +51,15 @@ Remove-Item Env:\VITE_APP_ENV -ErrorAction SilentlyContinue
 Remove-Item Env:\PRERENDER_BASE_URL -ErrorAction SilentlyContinue
 Pop-Location
 
-# 2. Upload landing page to S3 root (aiseo.tips)
-Write-Host "[2/5] Uploading landing page to root..." -ForegroundColor Yellow
-aws s3 cp frontend/dist/philo-main.html "s3://$BUCKET/index.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
+# 2. Upload landing page + apex assets to S3 root (aiseo.tips)
+Write-Host "[2/5] Uploading landing page + apex assets to root..." -ForegroundColor Yellow
+# apex 메인은 aiseo-main.html 로 교체 (이전: philo-main.html, _archive/ 에 보관)
+aws s3 cp frontend/dist/aiseo-main.html "s3://$BUCKET/index.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
+# aiseo-main.html 이 참조하는 자산 (hero.mp4, icon/, images/, principle-icons/) 을 apex 루트에 배치
+aws s3 sync frontend/public/icon/             "s3://$BUCKET/icon/"            --profile $PROFILE
+aws s3 sync frontend/public/images/           "s3://$BUCKET/images/"          --profile $PROFILE
+aws s3 sync frontend/public/principle-icons/  "s3://$BUCKET/principle-icons/" --profile $PROFILE
+aws s3 cp   frontend/public/hero.mp4          "s3://$BUCKET/hero.mp4"         --content-type "video/mp4" --profile $PROFILE
 # robots.txt 를 apex + b2b prefix 에 복사 (site/* 는 4단계 sync 에 포함)
 aws s3 cp frontend/public/robots.txt "s3://$BUCKET/robots.txt" --content-type "text/plain; charset=utf-8" --profile $PROFILE
 aws s3 cp frontend/public/robots.txt "s3://$BUCKET/b2b/robots.txt" --content-type "text/plain; charset=utf-8" --profile $PROFILE
@@ -71,8 +77,13 @@ aws s3 sync frontend/public/landing/ "s3://$BUCKET/b2b/landing/" --exclude "*.md
 #    - Do NOT use --delete (blog Lambda creates site/blog/<slug>/index.html at runtime)
 Write-Host "[4/5] Uploading SPA + prerendered HTML to /site/..." -ForegroundColor Yellow
 aws s3 sync frontend/dist/ "s3://$BUCKET/site/" `
-  --exclude "philo-main.html" `
+  --exclude "aiseo-main.html" `
   --exclude "b2b.html" `
+  --exclude "hero.mp4" `
+  --exclude "icon/*" `
+  --exclude "images/*" `
+  --exclude "principle-icons/*" `
+  --exclude "_archive/*" `
   --profile $PROFILE
 
 # 5. CloudFront cache invalidation

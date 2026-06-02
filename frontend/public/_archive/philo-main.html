@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Philo Production Group — 온라인 마케팅 그룹</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --void: #0a0a0f; --deep: #0f0f18; --surface: #15151f; --surface2: #1c1c28;
+  --rim: #2a2a3a; --rim2: #363648;
+  --paper: #f0ede6; --paper-dim: #a8a49c; --paper-faint: #4a4a5a;
+  --gold: #c9a84c; --gold-light: #e8c96a; --gold-dim: rgba(201,168,76,0.15);
+  --teal: #2dd4bf; --teal-dim: rgba(45,212,191,0.12);
+  --nav-h: 64px; --max: 1160px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--void); color: var(--paper); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h); background: rgba(10,10,15,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--rim); display: flex; align-items: center; padding: 0 40px; }
+.nav-logo { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-right: auto; text-decoration: none; }
+.nav-logo span { color: var(--paper-dim); }
+.nav-links { display: flex; align-items: center; gap: 0; background: var(--surface2); border: 1px solid var(--rim); border-radius: 8px; padding: 4px; margin-right: 20px; }
+.nav-tab { padding: 7px 18px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; color: var(--paper-dim); border: none; background: none; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; }
+.nav-tab:hover { color: var(--paper); }
+.nav-tab.active { background: var(--gold); color: var(--void); }
+.nav-cta { padding: 9px 22px; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid var(--gold); background: transparent; color: var(--gold); font-family: 'Noto Sans KR', sans-serif; transition: all .2s; white-space: nowrap; text-decoration: none; }
+.nav-cta:hover { background: var(--gold); color: var(--void); }
+
+/* COMMON */
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+.eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--gold); display: block; }
+.btn-primary { display: inline-flex; align-items: center; gap: 10px; padding: 16px 32px; background: var(--gold); color: var(--void); border: none; border-radius: 6px; font-size: 14px; font-weight: 900; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all .2s; text-decoration: none; }
+.btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201,168,76,0.3); }
+.btn-ghost { display: inline-flex; align-items: center; gap: 10px; padding: 15px 28px; background: transparent; color: var(--paper-dim); border: 1px solid var(--rim2); border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all .2s; text-decoration: none; }
+.btn-ghost:hover { border-color: var(--paper-dim); color: var(--paper); }
+
+/* HERO */
+.hero { min-height: 100vh; display: flex; align-items: center; padding-top: var(--nav-h); background: var(--void); overflow: hidden; position: relative; }
+.hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 70% 50%, rgba(201,168,76,0.06) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 20% 80%, rgba(45,212,191,0.04) 0%, transparent 60%); }
+.hero-grid-line { position: absolute; inset: 0; background-image: linear-gradient(var(--rim) 1px, transparent 1px), linear-gradient(90deg, var(--rim) 1px, transparent 1px); background-size: 80px 80px; opacity: 0.18; mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); }
+.hero-inner { display: grid; grid-template-columns: 1fr 420px; gap: 80px; align-items: center; padding: 80px 40px; max-width: var(--max); margin: 0 auto; width: 100%; position: relative; }
+.hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3); border-radius: 100px; padding: 6px 16px; font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 28px; }
+.hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 5.5vw, 72px); font-weight: 900; line-height: 1.12; letter-spacing: -1.5px; color: var(--paper); margin-bottom: 24px; }
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero-sub { font-size: 17px; color: var(--paper-dim); line-height: 1.8; margin-bottom: 40px; font-weight: 300; max-width: 520px; }
+.hero-cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-stat-card { background: var(--surface); border: 1px solid var(--rim); border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+.stat-row { display: flex; align-items: flex-end; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--rim); }
+.stat-row:last-child { padding-bottom: 0; border-bottom: none; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: var(--gold); line-height: 1; }
+.stat-unit { font-size: 20px; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+.stat-label { font-size: 13px; color: var(--paper-dim); line-height: 1.5; }
+.stat-label strong { color: var(--paper); font-weight: 700; display: block; }
+
+/* VISION */
+.vision-band { background: var(--surface); border-top: 1px solid var(--rim); border-bottom: 1px solid var(--rim); padding: 60px 40px; }
+.vision-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.vision-quote { font-family: 'Noto Serif KR', serif; font-size: 26px; font-weight: 600; line-height: 1.6; color: var(--paper); letter-spacing: -0.5px; }
+.vision-quote em { font-style: normal; color: var(--gold); border-bottom: 1px solid var(--gold); }
+.vision-pillars { display: flex; flex-direction: column; gap: 20px; }
+.pillar { display: flex; gap: 16px; align-items: flex-start; }
+.pillar-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); font-weight: 500; flex-shrink: 0; padding-top: 3px; width: 24px; }
+.pillar-title { font-size: 14px; font-weight: 700; color: var(--paper); margin-bottom: 3px; }
+.pillar-desc { font-size: 12px; color: var(--paper-dim); line-height: 1.6; }
+
+/* SERVICES */
+.services { padding: 120px 40px; background: var(--void); }
+.services-inner { max-width: var(--max); margin: 0 auto; }
+.services-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 56px; flex-wrap: wrap; gap: 20px; }
+.services-title { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; color: var(--paper); letter-spacing: -1px; line-height: 1.2; }
+.service-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--rim); border-radius: 16px; overflow: hidden; }
+.service-card { background: var(--surface); padding: 48px; position: relative; overflow: hidden; transition: background .3s; }
+.service-card:hover { background: var(--surface2); }
+.service-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), transparent); transform: scaleX(0); transform-origin: left; transition: transform .4s ease; }
+.service-card:hover::after { transform: scaleX(1); }
+.service-card.teal::after { background: linear-gradient(90deg, var(--teal), transparent); }
+.service-num { font-family: 'Playfair Display', serif; font-size: 80px; font-weight: 900; color: var(--rim2); line-height: 1; margin-bottom: 24px; letter-spacing: -3px; }
+.service-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; margin-bottom: 16px; }
+.service-badge.gold { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+.service-badge.teal { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(45,212,191,0.3); }
+.service-name { font-family: 'Noto Serif KR', serif; font-size: 26px; font-weight: 700; color: var(--paper); margin-bottom: 16px; line-height: 1.3; letter-spacing: -0.5px; }
+.service-desc { font-size: 14px; color: var(--paper-dim); line-height: 1.85; margin-bottom: 28px; }
+.service-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.service-feat { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--paper-dim); }
+.service-feat::before { content: '—'; color: var(--gold); font-size: 12px; margin-top: 2px; flex-shrink: 0; }
+.service-card.teal .service-feat::before { color: var(--teal); }
+.service-target { background: var(--void); border-radius: 8px; padding: 14px 16px; font-size: 12px; color: var(--paper-dim); line-height: 1.6; }
+.service-target strong { color: var(--paper); font-weight: 700; }
+
+/* TEAM */
+.team { padding: 100px 40px; background: var(--surface); border-top: 1px solid var(--rim); }
+.team-inner { max-width: var(--max); margin: 0 auto; }
+.team-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1px; background: var(--rim); border-radius: 12px; overflow: hidden; margin-top: 48px; }
+.team-cell { background: var(--surface2); padding: 32px 28px; }
+.team-cell-num { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 8px; letter-spacing: -1px; }
+.team-cell-label { font-size: 12px; color: var(--paper-dim); line-height: 1.5; }
+.team-cell-label strong { color: var(--paper); display: block; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.award-strip { margin-top: 48px; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.25); border-radius: 12px; padding: 24px 32px; display: flex; align-items: center; gap: 20px; }
+.award-icon { font-size: 32px; flex-shrink: 0; }
+.award-text { font-size: 14px; color: var(--paper-dim); line-height: 1.7; }
+.award-text strong { color: var(--gold); font-weight: 700; font-size: 15px; display: block; margin-bottom: 3px; }
+
+/* MAIN CTA */
+.main-cta { padding: 120px 40px; background: var(--void); text-align: center; position: relative; overflow: hidden; }
+.main-cta-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%); }
+.main-cta-inner { position: relative; max-width: 700px; margin: 0 auto; }
+.main-cta h2 { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; color: var(--paper); margin-bottom: 20px; letter-spacing: -1.5px; line-height: 1.15; }
+.main-cta p { font-size: 17px; color: var(--paper-dim); margin-bottom: 36px; line-height: 1.7; }
+.cta-btn-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* FOOTER */
+footer { background: var(--deep); border-top: 1px solid var(--rim); padding: 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.footer-logo { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 2px; color: var(--gold); }
+.footer-info { font-size: 12px; color: var(--paper-faint); line-height: 1.7; }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 12px; color: var(--paper-faint); text-decoration: none; transition: color .15s; }
+.footer-links a:hover { color: var(--paper-dim); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+.hero-inner > * { animation: fadeUp .7s ease both; }
+.hero-inner > *:nth-child(1) { animation-delay: .1s; }
+.hero-inner > *:nth-child(2) { animation-delay: .25s; }
+
+@media (max-width: 900px) {
+  .hero-inner, .vision-inner { grid-template-columns: 1fr; }
+  .hero-stat-card { display: none; }
+  .service-cards, .team-grid { grid-template-columns: 1fr; }
+  nav { padding: 0 16px; }
+}
+</style>
+<script>
+// Domain helper — automatically detect dev vs prod
+var BASE = location.hostname.includes('dev.') ? 'dev.aiseo.tips' : 'aiseo.tips';
+var B2B_URL = 'https://b2b.' + BASE;
+var SITE_URL = 'https://site.' + BASE;
+</script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">PHILO<span> Production Group</span></a>
+  <div class="nav-links">
+    <a class="nav-tab active" href="/">회사 소개</a>
+    <a class="nav-tab" id="nav-b2b">B2B 서비스</a>
+    <a class="nav-tab" id="nav-b2c">B2C 교육</a>
+  </div>
+  <a class="nav-cta" id="nav-cta">도입 문의 →</a>
+</nav>
+<script>
+document.getElementById('nav-b2b').href = B2B_URL;
+document.getElementById('nav-b2c').href = SITE_URL;
+document.getElementById('nav-cta').href = B2B_URL;
+</script>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-line"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag">온라인 마케팅 그룹 · Philo Production Group</div>
+      <h1>데이터가 증명하는<br><em>마케팅</em>만 합니다</h1>
+      <p class="hero-sub">유행을 쫓지 않습니다. 지금 당신의 사업에 꼭 필요한 만큼만, 가장 원리에 맞는 방식으로, 현황 데이터를 기반으로 개선합니다.</p>
+      <div class="hero-cta-row">
+        <a class="btn-primary" id="hero-b2b">B2B 성과 기반 도입 →</a>
+        <a class="btn-ghost" id="hero-b2c">B2C 교육 플랫폼</a>
+      </div>
+      <script>
+      document.getElementById('hero-b2b').href = B2B_URL;
+      document.getElementById('hero-b2c').href = SITE_URL;
+      </script>
+    </div>
+    <div class="hero-stat-card">
+      <div class="stat-row"><div class="stat-num">10</div><div class="stat-unit">년+</div><div class="stat-label"><strong>온라인 마케팅 경력</strong>퍼포먼스·브랜드·SEO 실전 운영</div></div>
+      <div class="stat-row"><div class="stat-num">50</div><div class="stat-unit">개</div><div class="stat-label"><strong>B2B 슬롯 한정</strong>업종 소분류 중복 없이 독점 운영</div></div>
+      <div class="stat-row"><div class="stat-num">0</div><div class="stat-unit">원</div><div class="stat-label"><strong>성과 없으면 잔금 없음</strong>인바운드 매출 발생 시에만 후불</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<section class="vision-band">
+  <div class="vision-inner">
+    <div>
+      <div class="eyebrow">Our Philosophy</div>
+      <div class="vision-quote">"<em>꼭 필요한 것</em>을<br>가장 원리적으로,<br>데이터로 증명하며"</div>
+    </div>
+    <div class="vision-pillars">
+      <div class="pillar"><div class="pillar-num">01</div><div><div class="pillar-title">현재 트렌드에 맞게</div><div class="pillar-desc">SEO에서 AEO(AI 검색)까지, 지금 효과있는 방식만 적용합니다</div></div></div>
+      <div class="pillar"><div class="pillar-num">02</div><div><div class="pillar-title">꼭 필요한 만큼만</div><div class="pillar-desc">과잉 제안 없이 지금 단계에 맞는 액션만 실행합니다</div></div></div>
+      <div class="pillar"><div class="pillar-num">03</div><div><div class="pillar-title">원리에 맞는 기술 작업</div><div class="pillar-desc">꼼수·트릭 없이 검색 원칙에 맞는 방식으로만 작업합니다</div></div></div>
+      <div class="pillar"><div class="pillar-num">04</div><div><div class="pillar-title">현황 데이터 중심 피드백</div><div class="pillar-desc">GA4·서치콘솔 데이터를 기반으로 개선 방향을 제안합니다</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services">
+  <div class="services-inner">
+    <div class="services-header">
+      <div><div class="eyebrow">Services</div><div class="services-title">두 가지 서비스,<br>하나의 철학</div></div>
+      <div style="font-size:14px; color:var(--paper-dim); max-width:260px; line-height:1.7; text-align:right;">기업과 소상공인, 두 방향에서<br>온라인 마케팅의 격차를 줄입니다</div>
+    </div>
+    <div class="service-cards">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <div class="service-badge gold">B2B Premium</div>
+        <div class="service-name">기업 인바운드 마케팅<br>성과 기반 도입</div>
+        <div class="service-desc">기술력은 있지만 온라인 마케팅에 신경 쓸 여력이 없는 기업을 위한 풀서비스. 성과가 나야 잔금을 냅니다.</div>
+        <div class="service-features">
+          <div class="service-feat">온라인 마케팅 현황 진단 & 전략 수립</div>
+          <div class="service-feat">홈페이지 SEO · 검색 노출 최적화</div>
+          <div class="service-feat">GA4 · 서치콘솔 · 광고 세팅 전체 구축</div>
+          <div class="service-feat">월간 데이터 리뷰 & 개선 피드백</div>
+          <div class="service-feat">2년 내 인바운드 매출 발생 시 잔금 정산</div>
+        </div>
+        <div class="service-target"><strong>대상:</strong> 기술력 있는 제조업·B2B 전문 기업, 영업 중심으로 운영 중이나 온라인 채널이 약한 곳</div>
+        <div style="margin-top:24px;"><a class="btn-primary" id="svc-b2b">상세 오퍼 보기 →</a></div>
+      </div>
+      <div class="service-card teal">
+        <div class="service-num">02</div>
+        <div class="service-badge teal">B2C Platform</div>
+        <div class="service-name">소상공인 SEO 사이트<br>원클릭 배포 플랫폼</div>
+        <div class="service-desc">AI로 만든 웹사이트를 SEO 검증 후 즉시 배포. 가방 공방, 웨딩스냅 등 1인 기업 대표님을 위한 디지털 전환 교육과 플랫폼.</div>
+        <div class="service-features">
+          <div class="service-feat">AI 사이트 ZIP 업로드 → SEO 자동 검증</div>
+          <div class="service-feat">원클릭 배포 (AWS S3 + CloudFront CDN)</div>
+          <div class="service-feat">GA4 · 서치콘솔 · 네이버 마케팅 코드 자동 삽입</div>
+          <div class="service-feat">브랜드 · 상품 · 서비스 · 매장 통합 관리</div>
+          <div class="service-feat">단계별 교육 커리큘럼 + 컨설팅 연계</div>
+        </div>
+        <div class="service-target"><strong>대상:</strong> 1인 사업자, 공방·스튜디오·클래스 운영자, 디지털 마케팅을 처음 시작하는 소상공인</div>
+        <div style="margin-top:24px;"><a class="btn-ghost" id="svc-b2c" style="border-color:var(--teal); color:var(--teal);">플랫폼 시작하기 →</a></div>
+      </div>
+    </div>
+    <script>
+    document.getElementById('svc-b2b').href = B2B_URL;
+    document.getElementById('svc-b2c').href = SITE_URL;
+    </script>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team">
+  <div class="team-inner">
+    <div class="eyebrow">Team</div>
+    <div class="services-title" style="font-family:'Playfair Display',serif; font-size:40px; font-weight:700; color:var(--paper); letter-spacing:-1px; margin-bottom:0;">말이 아닌 실적으로<br>증명된 팀</div>
+    <div class="team-grid">
+      <div class="team-cell"><div class="team-cell-num">10+</div><div class="team-cell-label"><strong>온라인 마케팅 경력</strong>퍼포먼스·브랜드·SEO·콘텐츠 실전 전 분야 운영 경험</div></div>
+      <div class="team-cell"><div class="team-cell-num">🏆</div><div class="team-cell-label"><strong>대한민국 앱 대상 수상</strong>기획·UX·서비스 설계 역량 공식 인정</div></div>
+      <div class="team-cell"><div class="team-cell-num">50</div><div class="team-cell-label"><strong>B2B 업체 한정</strong>집중 관리를 위해 업종 소분류 중복 없이 슬롯 제한 운영</div></div>
+      <div class="team-cell"><div class="team-cell-num">100</div><div class="team-cell-label"><strong>B2C 카테고리별 한정</strong>교육 품질 유지를 위해 카테고리당 100명 상한</div></div>
+    </div>
+    <div class="award-strip">
+      <div class="award-icon">🏆</div>
+      <div class="award-text"><strong>대한민국 앱 대상 수상</strong>기술적 구현에 머물지 않고, 사용자 행동 데이터와 비즈니스 목표가 연결된 서비스를 설계합니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN CTA -->
+<section class="main-cta">
+  <div class="main-cta-bg"></div>
+  <div class="main-cta-inner">
+    <div class="eyebrow" style="justify-content:center; margin-bottom:20px;">지금 시작하기</div>
+    <h2>어디서 시작해야<br>할지 모르겠다면</h2>
+    <p>업종과 현재 상황을 알려주시면 B2B·B2C 중 어떤 서비스가 맞는지 먼저 안내드립니다.</p>
+    <div class="cta-btn-row">
+      <a class="btn-primary" id="cta-b2b">B2B 성과 기반 도입 문의</a>
+      <a class="btn-ghost" id="cta-b2c">B2C 플랫폼 무료 시작</a>
+    </div>
+    <script>
+    document.getElementById('cta-b2b').href = B2B_URL;
+    document.getElementById('cta-b2c').href = SITE_URL;
+    </script>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">PHILO PRODUCTION GROUP</div>
+  <div class="footer-info">philo.productiongroup@gmail.com</div>
+  <div class="footer-links">
+    <a href="#">개인정보처리방침</a>
+    <a href="#">이용약관</a>
+  </div>
+</footer>
+
+</body>
+</html>

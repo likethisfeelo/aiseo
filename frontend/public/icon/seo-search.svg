@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">seo search</title>
+  <desc id="desc">AISEO orbital icon, transparent background, glassmorphic 3D object only.</desc>
+
+  <defs>
+    <filter id="softShadow" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="34" stdDeviation="30" flood-color="#6B4FB8" flood-opacity="0.24"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#75ADC9" flood-opacity="0.18"/>
+    </filter>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="11" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.73  0 0 0 0 0.58  0 0 0 0 1  0 0 0 .42 0" result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="glass" cx="32%" cy="24%" r="76%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".92"/>
+      <stop offset="45%" stop-color="#E7DDFB" stop-opacity=".40"/>
+      <stop offset="100%" stop-color="#75ADC9" stop-opacity=".10"/>
+    </radialGradient>
+    <linearGradient id="violet" x1="20%" y1="4%" x2="78%" y2="96%">
+      <stop offset="0%" stop-color="#F4F7EA"/>
+      <stop offset="34%" stop-color="#CDB9DD"/>
+      <stop offset="68%" stop-color="#9580D4"/>
+      <stop offset="100%" stop-color="#75ADC9"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="12%" y1="18%" x2="88%" y2="84%">
+      <stop offset="0%" stop-color="#F4F7EA"/>
+      <stop offset="46%" stop-color="#75ADC9"/>
+      <stop offset="100%" stop-color="#9580D4"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="13%" y1="10%" x2="82%" y2="91%">
+      <stop offset="0%" stop-color="#F4F7EA"/>
+      <stop offset="38%" stop-color="#E2D9E2"/>
+      <stop offset="68%" stop-color="#D98DD7"/>
+      <stop offset="100%" stop-color="#9580D4"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="5%" y1="0%" x2="95%" y2="100%">
+      <stop offset="0%" stop-color="#9BB8F8"/>
+      <stop offset="58%" stop-color="#2EA7FF"/>
+      <stop offset="100%" stop-color="#6B4FB8"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#65F6A4"/>
+      <stop offset="62%" stop-color="#00C73C"/>
+      <stop offset="100%" stop-color="#087F5B"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="5%" y1="0%" x2="95%" y2="100%">
+      <stop offset="0%" stop-color="#FFC8A7"/>
+      <stop offset="55%" stop-color="#FF7B54"/>
+      <stop offset="100%" stop-color="#D94CFF"/>
+    </linearGradient>
+    <linearGradient id="yellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF7A8"/>
+      <stop offset="50%" stop-color="#FFE500"/>
+      <stop offset="100%" stop-color="#FFB800"/>
+    </linearGradient>
+    <style>
+      .stroke{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:42;}
+      .thin{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:28;}
+      .hi{fill:#fff;opacity:.62}
+      .edge{fill:none;stroke:#fff;stroke-opacity:.52;stroke-width:10}
+      .label{font-family:'Plus Jakarta Sans','Inter','Arial',sans-serif;font-weight:800;letter-spacing:-8px;}
+      .small{font-family:'Plus Jakarta Sans','Inter','Arial',sans-serif;font-weight:800;}
+    </style>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <circle cx="440" cy="420" r="205" fill="url(#glass)" opacity="0.72"/><circle cx="440" cy="420" r="197" class="edge"/>
+    <circle cx="438" cy="420" r="150" fill="none" stroke="url(#sky)" stroke-width="54"/>
+    <circle cx="392" cy="360" r="64" fill="#fff" opacity=".56"/>
+    <path d="M584 568 L742 726" stroke="url(#violet)" stroke-width="76" stroke-linecap="round"/>
+    <path d="M620 606 L728 714" stroke="#fff" stroke-width="22" opacity=".35" stroke-linecap="round"/>
+  </g>
+</svg>
