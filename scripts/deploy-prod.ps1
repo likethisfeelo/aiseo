@@ -69,8 +69,11 @@ aws s3 cp frontend/public/aiseo-main-sitemap.xml "s3://$BUCKET/sitemap.xml" --co
 aws s3 cp frontend/public/account.html "s3://$BUCKET/account.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
 
 # /library/ — apex 라이브러리 페이지. CF subdomain-router 가 /library,
-# /library/ clean URL 을 /library/index.html 로 rewrite.
-aws s3 sync frontend/public/library/ "s3://$BUCKET/library/" --content-type "text/html; charset=utf-8" --profile $PROFILE
+# /library/ clean URL 을 /library/index.html 로 rewrite. reader-config.js 는
+# 별도 sed-치환 후 cp 하므로 sync 에서 exclude (text/html 강제 덮어쓰기 방지).
+aws s3 sync frontend/public/library/ "s3://$BUCKET/library/" `
+  --exclude "reader-config.js" `
+  --content-type "text/html; charset=utf-8" --profile $PROFILE
 
 # /login.html + /login-config.js — HTML 은 그대로 복사하고, ASCII-only 인
 # login-config.js 에만 Cognito 값 치환. (PowerShell 의 Get-Content 가
@@ -94,6 +97,18 @@ $tmpCfg = [System.IO.Path]::GetTempFileName() + ".js"
 [System.IO.File]::WriteAllText($tmpCfg, $cfgText, $utf8NoBom)
 aws s3 cp $tmpCfg "s3://$BUCKET/login-config.js" --content-type "application/javascript; charset=utf-8" --profile $PROFILE
 Remove-Item $tmpCfg
+
+# /library/reader-config.js — apex /library/{cover}/{post} reader 설정.
+# Cognito region/client + API base URL 을 같은 sed 패턴으로 치환.
+$apiBase = if ($env:VITE_API_BASE_URL_PROD) { $env:VITE_API_BASE_URL_PROD } else { 'https://api.aiseo.tips' }
+$readerCfg = [System.IO.File]::ReadAllText((Resolve-Path "frontend/public/library/reader-config.js"), $utf8NoBom)
+$readerCfg = $readerCfg -replace '%%COGNITO_REGION%%', $region
+$readerCfg = $readerCfg -replace '%%COGNITO_CLIENT_ID%%', $clientId
+$readerCfg = $readerCfg -replace '%%API_BASE_URL%%', $apiBase
+$tmpReaderCfg = [System.IO.Path]::GetTempFileName() + ".js"
+[System.IO.File]::WriteAllText($tmpReaderCfg, $readerCfg, $utf8NoBom)
+aws s3 cp $tmpReaderCfg "s3://$BUCKET/library/reader-config.js" --content-type "application/javascript; charset=utf-8" --profile $PROFILE
+Remove-Item $tmpReaderCfg
 
 # 3. Upload B2B page
 Write-Host "[3/5] Uploading B2B page..." -ForegroundColor Yellow

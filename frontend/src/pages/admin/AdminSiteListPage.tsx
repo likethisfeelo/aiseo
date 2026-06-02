@@ -27,6 +27,20 @@ const ADMIN_MENU: MenuCard[] = [
     color: 'var(--success)',
   },
   {
+    to: '/admin/library/covers',
+    icon: '📚',
+    title: '라이브러리 표지',
+    description: 'AI SEO Library 의 표지(카테고리) 및 챕터 배치 관리',
+    color: 'var(--primary)',
+  },
+  {
+    to: '/admin/library/posts',
+    icon: '📖',
+    title: '라이브러리 포스트',
+    description: '라이브러리 챕터 본문(lead + bodyHtml) 작성 및 표지 배치',
+    color: 'var(--accent-mid, #6366f1)',
+  },
+  {
     to: '/admin/course-inquiries',
     icon: '📞',
     title: '수강 문의',

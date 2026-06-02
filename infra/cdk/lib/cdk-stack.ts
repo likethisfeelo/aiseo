@@ -607,6 +607,54 @@ export class CdkStack extends Stack {
       ],
     }));
 
+    // ── AI SEO Library — covers + posts + cover↔post join ──
+    // See backend/functions/library/handler.js for the route map.
+    const libraryCoversTableName = 'aiseo-library-covers';
+    const libraryCoversTable = new dynamodb.Table(this, 'LibraryCoversTable', {
+      tableName: libraryCoversTableName,
+      partitionKey: { name: 'slug', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const libraryPostsTableName = 'aiseo-library-posts';
+    const libraryPostsTable = new dynamodb.Table(this, 'LibraryPostsTable', {
+      tableName: libraryPostsTableName,
+      partitionKey: { name: 'slug', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const libraryCoverPostsTableName = 'aiseo-library-cover-posts';
+    const libraryCoverPostsTable = new dynamodb.Table(this, 'LibraryCoverPostsTable', {
+      tableName: libraryCoverPostsTableName,
+      // PK = coverSlug, SK = `${pad4(order)}#${postSlug}` so a Query
+      // by coverSlug returns chapters already sorted by SK.
+      partitionKey: { name: 'coverSlug', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'sortKey', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+    // Inverse lookup — "어떤 표지들에 이 포스트가 들어있는가" for the
+    // admin post-edit page and cascade-delete on post removal.
+    libraryCoverPostsTable.addGlobalSecondaryIndex({
+      indexName: 'postSlug-index',
+      partitionKey: { name: 'postSlug', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
+
+    const libraryHandler = new lambda.Function(this, 'LibraryFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'library/handler.handler',
+      timeout: Duration.seconds(30),
+      environment: {
+        LIBRARY_COVERS_TABLE: libraryCoversTableName,
+        LIBRARY_POSTS_TABLE: libraryPostsTableName,
+        LIBRARY_COVER_POSTS_TABLE: libraryCoverPostsTableName,
+      },
+    });
+    libraryCoversTable.grantReadWriteData(libraryHandler);
+    libraryPostsTable.grantReadWriteData(libraryHandler);
+    libraryCoverPostsTable.grantReadWriteData(libraryHandler);
+
     // ── Comments table + Lambda handlers ──
     const commentsTableName = this.node.tryGetContext('commentsTableName') ?? 'aiseo-comments';
     const commentsTable = new dynamodb.Table(this, 'CommentsTable', {
@@ -769,6 +817,39 @@ export class CdkStack extends Stack {
     const adminBlogCategorySlugResource = adminBlogCategoriesResource.addResource('{slug}');
     addPut(adminBlogCategorySlugResource, blogIntegration);
     addDelete(adminBlogCategorySlugResource, blogIntegration);
+
+    // ── AI SEO Library routes ──
+    const libraryIntegration = new apigateway.LambdaIntegration(libraryHandler);
+
+    // Public — /library/covers, /library/covers/{slug}, /library/posts/{slug}
+    const libraryResource = api.root.addResource('library');
+    const libraryCoversResource = libraryResource.addResource('covers');
+    addPublicGet(libraryCoversResource, libraryIntegration);
+    const libraryCoverSlugResource = libraryCoversResource.addResource('{slug}');
+    addPublicGet(libraryCoverSlugResource, libraryIntegration);
+    const libraryPostsResource = libraryResource.addResource('posts');
+    const libraryPostSlugResource = libraryPostsResource.addResource('{slug}');
+    addPublicGet(libraryPostSlugResource, libraryIntegration);
+
+    // Admin — /admin/library/covers, /admin/library/posts (+ /chapters bulk reorder)
+    const adminLibraryResource = adminResource.addResource('library');
+    const adminLibraryCoversResource = adminLibraryResource.addResource('covers');
+    addGet(adminLibraryCoversResource, libraryIntegration);
+    addPost(adminLibraryCoversResource, libraryIntegration);
+    const adminLibraryCoverSlugResource = adminLibraryCoversResource.addResource('{slug}');
+    addGet(adminLibraryCoverSlugResource, libraryIntegration);
+    addPut(adminLibraryCoverSlugResource, libraryIntegration);
+    addDelete(adminLibraryCoverSlugResource, libraryIntegration);
+    const adminLibraryCoverChaptersResource = adminLibraryCoverSlugResource.addResource('chapters');
+    addPut(adminLibraryCoverChaptersResource, libraryIntegration);
+
+    const adminLibraryPostsResource = adminLibraryResource.addResource('posts');
+    addGet(adminLibraryPostsResource, libraryIntegration);
+    addPost(adminLibraryPostsResource, libraryIntegration);
+    const adminLibraryPostSlugResource = adminLibraryPostsResource.addResource('{slug}');
+    addGet(adminLibraryPostSlugResource, libraryIntegration);
+    addPut(adminLibraryPostSlugResource, libraryIntegration);
+    addDelete(adminLibraryPostSlugResource, libraryIntegration);
 
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,

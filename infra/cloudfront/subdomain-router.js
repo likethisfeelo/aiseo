@@ -127,6 +127,11 @@ function handler(event) {
     var apexUri = request.uri;
     if (apexUri === '/library' || apexUri === '/library/') {
       request.uri = '/library/index.html';
+    } else if (apexUri.match(/^\/library\/[a-z0-9-]+\/[a-z0-9-]+\/?$/)) {
+      // /library/{cover}/{post} 또는 /library/{cover}/{post}/ →
+      // 단일 reader 템플릿. JS 가 URL pathname 에서 두 slug 를 읽고
+      // API 에 fetch 해 콘텐츠를 채움. (frontend/public/library/reader/)
+      request.uri = '/library/reader/index.html';
     }
   }
 
