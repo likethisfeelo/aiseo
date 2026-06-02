@@ -38,6 +38,10 @@ import { EventSignupAdminPage } from './pages/admin/EventSignupAdminPage';
 import { BlogCategoriesAdminPage } from './pages/admin/BlogCategoriesAdminPage';
 import { BlogPostsAdminPage } from './pages/admin/BlogPostsAdminPage';
 import { BlogPostEditPage } from './pages/admin/BlogPostEditPage';
+import { LibraryCoversAdminPage } from './pages/admin/LibraryCoversAdminPage';
+import { LibraryCoverEditPage } from './pages/admin/LibraryCoverEditPage';
+import { LibraryPostsAdminPage } from './pages/admin/LibraryPostsAdminPage';
+import { LibraryPostEditPage } from './pages/admin/LibraryPostEditPage';
 import { QuotaPolicyPage } from './pages/admin/QuotaPolicyPage';
 import { BlogListPage } from './pages/public/BlogListPage';
 import { BlogPostPage } from './pages/public/BlogPostPage';
@@ -74,6 +78,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin': '관리자',
   '/admin/blog/posts': '블로그 글 관리',
   '/admin/blog/categories': '블로그 카테고리',
+  '/admin/library/covers': '라이브러리 표지 관리',
+  '/admin/library/posts': '라이브러리 포스트 관리',
   '/admin/quota-policy': '쿼터 정책 관리',
   '/admin/event-signups': '이벤트 신청 관리',
 };
@@ -401,6 +407,12 @@ function AuthenticatedShell({
           <Route path="/admin/blog/posts/new" element={<BlogPostEditPage />} />
           <Route path="/admin/blog/posts/:slug/edit" element={<BlogPostEditPage />} />
           <Route path="/admin/blog/categories" element={<BlogCategoriesAdminPage />} />
+          <Route path="/admin/library/covers" element={<LibraryCoversAdminPage />} />
+          <Route path="/admin/library/covers/new" element={<LibraryCoverEditPage />} />
+          <Route path="/admin/library/covers/:slug/edit" element={<LibraryCoverEditPage />} />
+          <Route path="/admin/library/posts" element={<LibraryPostsAdminPage />} />
+          <Route path="/admin/library/posts/new" element={<LibraryPostEditPage />} />
+          <Route path="/admin/library/posts/:slug/edit" element={<LibraryPostEditPage />} />
           <Route path="/admin/quota-policy" element={<QuotaPolicyPage />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>

@@ -309,3 +309,50 @@ export const adminUpdateBlogCategory = (slug: string, cat: { name: string; order
 
 export const adminDeleteBlogCategory = (slug: string) =>
   deleteJson(`/admin/blog/categories/${encodeURIComponent(slug)}`);
+
+// ── AI SEO Library APIs (public) ──
+// 모든 응답은 backend/functions/library/handler.js 의 ok() helper 가
+// `{success:true, data}` 래핑하므로 client 는 `data` 만 받음.
+export const getLibraryCovers = () => getJson('/library/covers');
+
+export const getLibraryCover = (slug: string) =>
+  getJson(`/library/covers/${encodeURIComponent(slug)}`);
+
+export const getLibraryPost = (slug: string, coverSlug?: string) => {
+  const qs = coverSlug ? `?cover=${encodeURIComponent(coverSlug)}` : '';
+  return getJson(`/library/posts/${encodeURIComponent(slug)}${qs}`);
+};
+
+// ── AI SEO Library APIs (admin) ──
+export const adminListLibraryCovers = () => getJson('/admin/library/covers');
+
+export const adminGetLibraryCover = (slug: string) =>
+  getJson(`/admin/library/covers/${encodeURIComponent(slug)}`);
+
+export const adminCreateLibraryCover = (cover: Record<string, unknown>) =>
+  postJson('/admin/library/covers', cover);
+
+export const adminUpdateLibraryCover = (slug: string, cover: Record<string, unknown>) =>
+  putJson(`/admin/library/covers/${encodeURIComponent(slug)}`, cover);
+
+export const adminDeleteLibraryCover = (slug: string) =>
+  deleteJson(`/admin/library/covers/${encodeURIComponent(slug)}`);
+
+export const adminReorderLibraryCoverChapters = (
+  coverSlug: string,
+  chapters: string[],
+) => putJson(`/admin/library/covers/${encodeURIComponent(coverSlug)}/chapters`, { chapters });
+
+export const adminListLibraryPosts = () => getJson('/admin/library/posts');
+
+export const adminGetLibraryPost = (slug: string) =>
+  getJson(`/admin/library/posts/${encodeURIComponent(slug)}`);
+
+export const adminCreateLibraryPost = (post: Record<string, unknown>) =>
+  postJson('/admin/library/posts', post);
+
+export const adminUpdateLibraryPost = (slug: string, post: Record<string, unknown>) =>
+  putJson(`/admin/library/posts/${encodeURIComponent(slug)}`, post);
+
+export const adminDeleteLibraryPost = (slug: string) =>
+  deleteJson(`/admin/library/posts/${encodeURIComponent(slug)}`);

@@ -52,7 +52,11 @@ aws s3 cp frontend/public/account.html s3://$BUCKET/account.html --content-type 
 
 # /library/ — apex 라이브러리 페이지 (clean URL 은 CF subdomain-router 가
 # /library, /library/ → /library/index.html 로 rewrite).
-aws s3 sync frontend/public/library/ s3://$BUCKET/library/ --content-type "text/html; charset=utf-8" --profile $PROFILE
+# reader-config.js 는 ASCII-only 라 sed 치환 후 별도 업로드. exclude 해야
+# text/html sync 가 .js 까지 잘못 덮어쓰지 않음.
+aws s3 sync frontend/public/library/ s3://$BUCKET/library/ \
+  --exclude "reader-config.js" \
+  --content-type "text/html; charset=utf-8" --profile $PROFILE
 
 # /login.html + /login-config.js — HTML 은 그대로 복사하고, ASCII-only 인
 # login-config.js 에만 sed 로 Cognito 값 치환. (HTML 에 sed 를 직접 걸면
@@ -67,6 +71,16 @@ sed -e "s|%%COGNITO_REGION%%|${_REGION}|g" \
     frontend/public/login-config.js > /tmp/aiseo-login-config.js
 aws s3 cp /tmp/aiseo-login-config.js s3://$BUCKET/login-config.js --content-type "application/javascript; charset=utf-8" --profile $PROFILE
 rm /tmp/aiseo-login-config.js
+
+# /library/reader-config.js — apex /library/{cover}/{post} reader 가 fetch
+# 하는 Cognito + API base 설정. login-config 와 같은 sed 패턴.
+_API_BASE="${VITE_API_BASE_URL_DEV:-https://api-dev.aiseo.tips}"
+sed -e "s|%%COGNITO_REGION%%|${_REGION}|g" \
+    -e "s|%%COGNITO_CLIENT_ID%%|${_CLIENT_ID}|g" \
+    -e "s|%%API_BASE_URL%%|${_API_BASE}|g" \
+    frontend/public/library/reader-config.js > /tmp/aiseo-reader-config.js
+aws s3 cp /tmp/aiseo-reader-config.js s3://$BUCKET/library/reader-config.js --content-type "application/javascript; charset=utf-8" --profile $PROFILE
+rm /tmp/aiseo-reader-config.js
 
 # 3. B2B 페이지 업로드
 echo "[3/5] Uploading B2B page..."

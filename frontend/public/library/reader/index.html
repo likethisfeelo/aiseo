@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI SEO LIBRARY — AISEO.TIPS</title>
+<meta name="description" content="AI 검색·SEO·AEO·GEO 실전 콘텐츠를 한 곳에서. AISEO 가 운영하는 공개 라이브러리.">
+
+<!-- 인덱싱은 paywalled content 의 lead+meta 만 기반으로 함. 본문은 게이트 뒤. -->
+<meta name="robots" content="index, follow">
+
+<!-- Google tag (gtag.js) — aiseo.tips GA4 property -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M4B8Z8RJPL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-M4B8Z8RJPL');
+</script>
+
+<!-- canonical 은 JS 가 fetch 후 동적으로 설정. SSR placeholder 만 둠. -->
+<link rel="canonical" id="canonical-link" href="">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --accent:#C4A8F5;
+    --accent-light:rgba(196,168,245,0.14);
+    --accent-mid:#9BB8F8;
+    --accent-dark:#8B6FD4;
+    --accent-deep:#6B4FB8;
+    --ink:#0A0614;
+    --ink-soft:#6B7280;
+    --ink-muted:#9CA3AF;
+    --bg:#FFFFFF;
+    --bg-soft:#F9FAFB;
+    --bg-dark:#0A0614;
+    --line:#E5E7EB;
+    --line-soft:#F3F4F6;
+    --radius:16px;
+    --radius-lg:28px;
+    --maxw:1180px;
+    --display:'Plus Jakarta Sans', sans-serif;
+    --body:'Noto Sans KR', sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--body);background:#FAF8F4;color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  button{font-family:inherit}
+
+  /* ============ Floating nav (capsule → docked) ============ */
+  .topnav{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:50;
+    display:flex;align-items:center;gap:14px;
+    background:rgba(255,255,255,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(10,6,20,.08);
+    border-radius:999px;padding:10px 18px;
+    box-shadow:0 12px 32px -16px rgba(10,6,20,.18);
+    transition:top .3s ease, transform .3s ease, border-radius .3s ease, padding .3s ease, max-width .3s ease, left .3s ease, width .3s ease}
+  .topnav.docked{top:0;left:0;right:0;transform:none;border-radius:0;border-left:none;border-right:none;border-top:none;
+    max-width:none;width:100%;padding:10px 22px;justify-content:space-between;background:rgba(255,255,255,.94)}
+  .topnav .method{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink)}
+  .topnav .method .glyph{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-mid));display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink);font-weight:800}
+  .topnav .nav-actions{display:flex;align-items:center;gap:14px}
+  .topnav .nav-link{font-size:13px;color:var(--ink-soft);font-weight:500;transition:color .15s}
+  .topnav .nav-link:hover{color:var(--ink)}
+  .topnav .nav-user-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;color:var(--ink-soft);transition:background .15s,color .15s}
+  .topnav .nav-user-icon:hover{background:rgba(10,6,20,.06);color:var(--ink)}
+  @media (max-width:720px){
+    .topnav{gap:8px;padding:8px 14px}
+    .topnav .nav-actions{gap:8px}
+    .topnav .nav-link{display:none}
+  }
+
+  /* ============ Hero ============ */
+  .reader-hero{padding:124px 24px 36px;text-align:center;max-width:780px;margin:0 auto}
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-soft);margin-bottom:18px;transition:color .15s}
+  .back-link:hover{color:var(--ink)}
+  .tag-chip{display:inline-block;background:var(--accent-light);color:var(--accent-deep);padding:5px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}
+  .reader-hero h1{font-family:var(--display);font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-.02em;line-height:1.2;color:var(--ink)}
+  .byline{margin-top:18px;font-size:13px;color:var(--ink-soft);display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap}
+  .byline .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-muted)}
+  .hero-actions{margin-top:18px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+  .hero-actions button{background:#fff;border:1px solid var(--line);color:var(--ink-soft);font-size:12px;padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:500;transition:border-color .15s,color .15s}
+  .hero-actions button:hover{border-color:var(--ink-soft);color:var(--ink)}
+
+  /* ============ Layout ============ */
+  .reader-layout{display:grid;grid-template-columns:280px 1fr;gap:36px;max-width:var(--maxw);margin:0 auto;padding:0 24px 80px;align-items:flex-start}
+  @media (max-width:900px){
+    .reader-layout{grid-template-columns:1fr;gap:20px}
+    .aside{order:2}
+  }
+
+  /* ── Aside ── */
+  .aside{position:sticky;top:96px;display:flex;flex-direction:column;gap:18px}
+  @media (max-width:900px){.aside{position:static;top:auto}}
+  .bookcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .bookcard .spine{width:88px;height:120px;background:linear-gradient(135deg,var(--accent-dark),var(--accent-deep));border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;text-align:center;padding:10px;box-shadow:0 14px 30px -14px rgba(107,79,184,.6)}
+  .bookcard .ctitle{font-family:var(--display);font-weight:700;font-size:15px;text-align:center;line-height:1.3}
+  .bookcard .csub{font-size:12px;color:var(--ink-soft);text-align:center;line-height:1.5}
+  .chapter-list{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .chapter-list .chl-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);padding:14px 16px 6px}
+  .chapter-list a{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;border-top:1px solid var(--line-soft);font-size:13px;line-height:1.4;color:var(--ink-soft);transition:background .15s, color .15s}
+  .chapter-list a:hover{background:var(--bg-soft);color:var(--ink)}
+  .chapter-list a.current{background:var(--accent-light);color:var(--accent-deep);font-weight:600}
+  .chapter-list .cidx{flex:0 0 18px;font-variant-numeric:tabular-nums;color:var(--ink-muted);font-size:11px;padding-top:1px}
+  .chapter-list a.current .cidx{color:var(--accent-deep)}
+
+  /* ── Paper (article) ── */
+  .paper{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:48px 56px;min-height:520px}
+  @media (max-width:720px){.paper{padding:32px 24px}}
+  .paper-tools{position:absolute;top:-16px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+  .peek-label{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;pointer-events:auto;box-shadow:0 8px 18px -10px rgba(10,6,20,.15)}
+  .tool-row{display:flex;gap:6px;pointer-events:auto}
+  .tool-btn{width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;color:var(--ink-soft);cursor:pointer;font-size:13px;box-shadow:0 8px 18px -10px rgba(10,6,20,.15);transition:color .15s, border-color .15s}
+  .tool-btn:hover{color:var(--ink);border-color:var(--ink-soft)}
+
+  /* Lead — always visible. */
+  .lead{font-size:18px;line-height:1.75;color:var(--ink);font-weight:500;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--line-soft)}
+  @media (max-width:720px){.lead{font-size:16px}}
+
+  /* Body content (sanitized HTML from API) */
+  .body-content{font-size:16px;line-height:1.8;color:#2b2438}
+  .body-content > * + *{margin-top:18px}
+  .body-content h2{font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);margin-top:34px}
+  .body-content h3{font-family:var(--display);font-size:18px;font-weight:700;color:var(--ink);margin-top:28px}
+  .body-content ul, .body-content ol{padding-left:22px}
+  .body-content li + li{margin-top:6px}
+  .body-content code{background:var(--bg-soft);padding:2px 6px;border-radius:4px;font-size:.92em;font-family:'SFMono-Regular',Consolas,monospace}
+  .body-content pre{background:var(--bg-soft);padding:14px 16px;border-radius:8px;overflow:auto;font-size:13px}
+  .body-content blockquote{border-left:3px solid var(--accent-mid);padding-left:14px;color:var(--ink-soft);font-style:italic}
+  .body-content a{color:var(--accent-deep);text-decoration:underline}
+
+  /* Gate — when locked, body is clipped + fades */
+  .body-wrap{position:relative}
+  .paper.locked .body-wrap{max-height:calc(100vh * 2.4);overflow:hidden;mask-image:linear-gradient(180deg,#000 65%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 65%,transparent 100%)}
+  .more-zone{display:none;margin-top:20px;padding:28px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(196,168,245,.12));border:1px dashed var(--accent-mid);border-radius:var(--radius)}
+  .paper.locked .more-zone{display:block}
+  .more-zone .lock-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:8px}
+  .more-zone .lock-title{font-family:var(--display);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:14px}
+  .more-zone .lock-sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px;line-height:1.6}
+  .more-btn{background:var(--accent-dark);color:#fff;border:none;padding:14px 28px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s,box-shadow .15s}
+  .more-btn:hover{background:var(--accent-deep);box-shadow:0 14px 28px -10px rgba(139,111,212,.6)}
+  .lock-note{font-size:12px;color:var(--ink-muted);margin-top:12px}
+  .lock-note a{color:var(--accent-deep);text-decoration:underline}
+
+  /* ============ Modal ============ */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(10,6,20,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .modal-backdrop.open{display:flex}
+  .modal{background:#fff;border-radius:var(--radius);max-width:420px;width:100%;padding:32px;position:relative;box-shadow:0 24px 60px -20px rgba(10,6,20,.4)}
+  .modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:transparent;border:none;color:var(--ink-muted);cursor:pointer;font-size:18px}
+  .modal-close:hover{color:var(--ink);background:var(--bg-soft)}
+  .modal h2{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:6px}
+  .modal .modal-sub{font-size:13px;color:var(--ink-soft);margin-bottom:22px;line-height:1.6}
+  .modal-form{display:flex;flex-direction:column;gap:10px}
+  .modal-form input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .15s}
+  .modal-form input:focus{outline:none;border-color:var(--accent-mid)}
+  .modal-form .submit{background:var(--accent-dark);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s}
+  .modal-form .submit:hover{background:var(--accent-deep)}
+  .modal-form .submit:disabled{opacity:.6;cursor:not-allowed}
+  .modal-msg{display:none;font-size:12px;padding:8px 12px;border-radius:6px}
+  .modal-msg.error{display:block;background:rgba(239,68,68,.08);color:#b91c1c;border:1px solid rgba(239,68,68,.18)}
+  .modal-msg.info{display:block;background:rgba(59,130,246,.08);color:#1d4ed8;border:1px solid rgba(59,130,246,.18)}
+  .modal-toggle{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:14px}
+  .modal-toggle a{color:var(--accent-deep);text-decoration:underline;cursor:pointer;font-weight:600}
+
+  .social-row{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .social-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}
+  .social-btn:hover:not(:disabled){background:var(--bg-soft);border-color:var(--ink-soft)}
+  .social-btn.kakao{background:#FEE500;border-color:#FEE500;color:#3C1E1E}
+  .social-btn.kakao:hover:not(:disabled){background:#FFE600}
+  .social-btn:disabled{opacity:.45;cursor:not-allowed}
+  .social-divider{display:flex;align-items:center;gap:10px;color:var(--ink-muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin:14px 0}
+  .social-divider::before,.social-divider::after{content:'';flex:1;height:1px;background:var(--line)}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;bottom:48px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:13px;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ============ Lower library carousel (linked into main library) ============ */
+  .library-cta{margin-top:60px;padding:60px 24px;background:linear-gradient(180deg,rgba(196,168,245,.06),rgba(196,168,245,0));border-top:1px solid var(--line)}
+  .library-cta .lc-head{max-width:var(--maxw);margin:0 auto 24px;text-align:center}
+  .library-cta h2{font-family:var(--display);font-size:clamp(24px,3vw,32px);font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+  .library-cta .lc-sub{font-size:14px;color:var(--ink-soft)}
+  .lc-grid{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;padding:0 24px}
+  .lc-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .lc-card:hover{transform:translateY(-2px);box-shadow:0 18px 36px -22px rgba(10,6,20,.18);border-color:var(--ink-soft)}
+  .lc-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-deep);margin-bottom:8px}
+  .lc-title{font-family:var(--display);font-size:15px;font-weight:700;line-height:1.4;color:var(--ink);margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .lc-meta{font-size:11px;color:var(--ink-muted)}
+
+  /* Status states */
+  .status-msg{text-align:center;padding:80px 24px;color:var(--ink-soft);font-size:14px}
+  .status-msg.error{color:#b91c1c}
+
+  /* Footer */
+  .footer{text-align:center;padding:30px 24px;color:var(--ink-muted);font-size:12px;border-top:1px solid var(--line-soft)}
+  .footer a{color:var(--ink-soft);margin:0 6px;text-decoration:underline}
+</style>
+</head>
+
+<body>
+
+<!-- Floating nav -->
+<nav class="topnav" id="topnav">
+  <a class="method" href="/library/" aria-label="AI SEO LIBRARY"><span class="glyph">A</span> AI SEO LIBRARY</a>
+  <div class="nav-actions">
+    <a class="nav-link" href="https://b2b.aiseo.tips/" target="_blank" rel="noopener noreferrer">기업서비스 ↗</a>
+    <a class="nav-link" href="https://site.aiseo.tips/" target="_blank" rel="noopener noreferrer">강의 ↗</a>
+    <a class="nav-user-icon" id="nav-user-btn" href="/login.html" aria-label="내 계정">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </a>
+  </div>
+</nav>
+
+<!-- Initial loading state — replaced after fetch -->
+<div id="loading" class="status-msg">콘텐츠를 불러오는 중…</div>
+
+<!-- Reader root — populated by JS -->
+<div id="reader-root" style="display:none">
+  <header class="reader-hero">
+    <a class="back-link" id="back-link" href="/library/">← 라이브러리로</a>
+    <span class="tag-chip" id="tag-chip"></span>
+    <h1 id="post-title"></h1>
+    <div class="byline">
+      <span id="byline-author"></span>
+      <span class="dot"></span>
+      <span id="byline-published"></span>
+      <span class="dot"></span>
+      <span id="byline-read"></span>
+    </div>
+    <div class="hero-actions">
+      <button id="share-btn">공유하기</button>
+      <button id="scrap-btn">스크랩</button>
+    </div>
+  </header>
+
+  <div class="reader-layout">
+    <aside class="aside">
+      <div class="bookcard">
+        <div class="spine" id="cover-spine"></div>
+        <div class="ctitle" id="cover-title"></div>
+        <div class="csub" id="cover-sub"></div>
+      </div>
+      <nav class="chapter-list" id="chapter-list" aria-label="이 표지의 다른 챕터"></nav>
+    </aside>
+
+    <article class="paper" id="paper">
+      <div class="paper-tools">
+        <span class="peek-label" id="peek-label">미리보기</span>
+        <div class="tool-row">
+          <button class="tool-btn" id="paper-share" title="공유" aria-label="공유">↗</button>
+          <button class="tool-btn" id="paper-scrap" title="스크랩" aria-label="스크랩">☆</button>
+        </div>
+      </div>
+
+      <div class="lead" id="post-lead"></div>
+
+      <div class="body-wrap">
+        <div class="body-content" id="post-body"></div>
+      </div>
+
+      <div class="more-zone">
+        <div class="lock-eyebrow">🔒 여기서부터 멤버 전용</div>
+        <div class="lock-title">전체 본문은 무료 가입 후 바로 열려요</div>
+        <div class="lock-sub">이메일 한 줄이면 끝. 한 번 가입으로 라이브러리 전체와 강의 페이지까지 같은 계정으로 이어집니다.</div>
+        <button class="more-btn" id="more-btn">더보기 — 전체 읽기 →</button>
+        <div class="lock-note">이미 가입했다면 <a id="more-login-link" href="#">로그인</a></div>
+      </div>
+    </article>
+  </div>
+
+  <!-- 하단: 메인 라이브러리 캐러셀로 유도 -->
+  <section class="library-cta" id="library-cta">
+    <div class="lc-head">
+      <h2>다른 챕터도 둘러보세요</h2>
+      <p class="lc-sub">AI 검색에 통하는 사이트·콘텐츠·운영 전략 — 모두 무료로 공개됩니다.</p>
+    </div>
+    <div class="lc-grid" id="lc-grid"></div>
+  </section>
+</div>
+
+<!-- Error state (no post / network failure) -->
+<div id="error-state" class="status-msg error" style="display:none">
+  <p id="error-msg">콘텐츠를 불러올 수 없습니다.</p>
+  <p style="margin-top:14px"><a href="/library/" style="color:var(--accent-deep);text-decoration:underline">← 라이브러리로 돌아가기</a></p>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div>© AISEO.TIPS — <a href="/library/">Library</a> · <a href="https://site.aiseo.tips/">강의</a> · <a href="https://b2b.aiseo.tips/">기업서비스</a></div>
+</footer>
+
+<!-- ============ Auth modal ============ -->
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="닫기">×</button>
+    <h2 id="modal-title">이메일 하나로 시작</h2>
+    <p class="modal-sub" id="modal-sub">가입은 30초. 전체 라이브러리와 강의 페이지까지 같은 계정으로 이어집니다.</p>
+
+    <div class="social-row">
+      <button class="social-btn kakao" id="btn-kakao" disabled>
+        <span>카카오로 계속</span>
+      </button>
+    </div>
+    <div class="social-divider">또는</div>
+
+    <form class="modal-form" id="modal-form">
+      <input id="m-email" type="email" placeholder="이메일" autocomplete="email" required>
+      <input id="m-pw" type="password" placeholder="비밀번호 (8자 이상)" autocomplete="new-password" required>
+      <input id="m-code" type="text" inputmode="numeric" placeholder="이메일 인증코드 6자리" autocomplete="one-time-code" style="display:none">
+      <div id="m-msg" class="modal-msg"></div>
+      <button type="submit" class="submit" id="m-submit">가입하고 전체 읽기</button>
+    </form>
+
+    <div class="modal-toggle" id="modal-toggle">
+      이미 가입했나요? <a id="toggle-mode">로그인</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/library/reader-config.js"></script>
+<script>
+'use strict';
+
+// ========================================================================
+// AI SEO LIBRARY reader — runtime
+// ------------------------------------------------------------------------
+// URL: /library/{coverSlug}/{postSlug}/?  → CF subdomain-router 가
+// /library/reader/index.html 로 rewrite. JS 가 location.pathname 에서
+// 두 slug 를 파싱해 API 호출 후 페이지를 채움.
+// ========================================================================
+
+var CFG = window.AISEO_READER_CONFIG || {};
+var REGION    = CFG.region   || '';
+var CLIENT_ID = CFG.clientId || '';
+var API_BASE  = (CFG.apiBase || '').replace(/\/+$/, '');
+
+var COGNITO_ENDPOINT = REGION ? ('https://cognito-idp.' + REGION + '.amazonaws.com/') : '';
+var ID_TOKEN_KEY     = 'aiseo.idToken';
+var ACCESS_TOKEN_KEY = 'aiseo.accessToken';
+
+// ── URL parsing ────────────────────────────────────────────────────────
+function parseSlugs() {
+  // Expect /library/{cover}/{post}/?
+  var parts = window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+  // parts[0] === 'library' guaranteed by the CF rewrite that triggered us.
+  if (parts[0] !== 'library' || parts.length < 3) return null;
+  return { coverSlug: parts[1], postSlug: parts[2] };
+}
+
+// ── Auth state ─────────────────────────────────────────────────────────
+function isLoggedIn() {
+  var t = localStorage.getItem(ID_TOKEN_KEY);
+  if (!t) return false;
+  try {
+    var p = t.split('.');
+    if (p.length < 2) return false;
+    var b64 = p[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    var payload = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    return payload.exp && payload.exp * 1000 > Date.now();
+  } catch (e) { return false; }
+}
+
+// ── Cognito helper (same shape as login.html) ─────────────────────────
+function cognitoRequest(target, body, cb) {
+  if (!CLIENT_ID || CLIENT_ID.indexOf('%%') === 0) {
+    cb(new Error('인증 설정이 누락되었습니다. 관리자에게 문의해 주세요.'));
+    return;
+  }
+  fetch(COGNITO_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSCognitoIdentityProviderService.' + target,
+    },
+    body: JSON.stringify(body),
+  })
+  .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+  .then(function (res) {
+    if (!res.ok || res.d.__type) {
+      cb(new Error(res.d.message || res.d.Message || res.d.__type || '요청에 실패했습니다.'));
+    } else {
+      cb(null, res.d);
+    }
+  })
+  .catch(function (e) { cb(e); });
+}
+
+// ── DOM helpers ────────────────────────────────────────────────────────
+function $(id) { return document.getElementById(id); }
+function setText(id, v) { var e = $(id); if (e) e.textContent = v == null ? '' : String(v); }
+function setHtml(id, v) { var e = $(id); if (e) e.innerHTML = v == null ? '' : String(v); }
+
+var TOAST_TIMER = null;
+function toast(msg) {
+  var t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if (TOAST_TIMER) clearTimeout(TOAST_TIMER);
+  TOAST_TIMER = setTimeout(function () { t.classList.remove('show'); }, 2400);
+}
+
+// ── Docking nav ────────────────────────────────────────────────────────
+function setupDockingNav() {
+  var nav = $('topnav');
+  var apply = function () {
+    if (window.scrollY > 40) nav.classList.add('docked');
+    else nav.classList.remove('docked');
+  };
+  window.addEventListener('scroll', apply, { passive: true });
+  apply();
+}
+
+// ── nav-user redirect (signed-in → /account.html) ─────────────────────
+function applyNavUserState() {
+  var btn = $('nav-user-btn');
+  if (!btn) return;
+  if (isLoggedIn()) {
+    btn.setAttribute('href', '/account.html');
+    btn.setAttribute('aria-label', '내 계정 (로그인됨)');
+  }
+}
+
+// ── Render: hero + bookcard + chapter-list + body ─────────────────────
+var STATE = {
+  post: null,
+  cover: null,
+  siblings: [],
+  isMember: false,
+};
+
+function formatDate(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate();
+}
+
+function render() {
+  var p = STATE.post;
+  var c = STATE.cover;
+
+  document.title = (p.title || 'AI SEO LIBRARY') + ' — AISEO.TIPS';
+
+  // canonical link
+  var canonicalCover = p.canonicalCoverSlug || (c && c.slug) || '';
+  var canonicalUrl = canonicalCover
+    ? (window.location.origin + '/library/' + canonicalCover + '/' + p.slug + '/')
+    : window.location.href;
+  var canonicalEl = $('canonical-link');
+  if (canonicalEl) canonicalEl.setAttribute('href', canonicalUrl);
+
+  // Hero
+  setText('tag-chip', p.tag || (c ? c.tag : '') || 'LIBRARY');
+  setText('post-title', p.title || '');
+  setText('byline-author', p.author || 'AISEO');
+  setText('byline-published', formatDate(p.publishedAt));
+  setText('byline-read', (p.readMinutes ? p.readMinutes + '분 읽기' : ''));
+
+  if (c) {
+    $('back-link').setAttribute('href', '/library/');
+    setText('cover-spine', c.title || '');
+    setText('cover-title', c.title || '');
+    setText('cover-sub', c.description || '');
+  } else {
+    setText('cover-title', '라이브러리');
+    setText('cover-sub', '');
+  }
+
+  // Chapter list (sidebar)
+  var list = $('chapter-list');
+  if (c && STATE.siblings.length > 0) {
+    var inner = '<div class="chl-head">이 표지의 챕터</div>';
+    STATE.siblings.forEach(function (s, i) {
+      var current = s.slug === p.slug;
+      inner += '<a href="/library/' + c.slug + '/' + s.slug + '/" class="' + (current ? 'current' : '') + '">'
+        + '<span class="cidx">' + String(i + 1).padStart(2, '0') + '</span>'
+        + '<span>' + escapeHtml(s.title || s.slug) + '</span></a>';
+    });
+    list.innerHTML = inner;
+  } else {
+    list.style.display = 'none';
+  }
+
+  // Lead + body
+  setText('post-lead', p.lead || '');
+  setHtml('post-body', p.bodyHtml || '');
+
+  // Gate
+  STATE.isMember = isLoggedIn();
+  applyGate();
+
+  // Show root
+  $('loading').style.display = 'none';
+  $('reader-root').style.display = 'block';
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function applyGate() {
+  var paper = $('paper');
+  if (STATE.isMember) {
+    paper.classList.remove('locked');
+    $('peek-label').textContent = '전체 본문';
+  } else {
+    paper.classList.add('locked');
+    $('peek-label').textContent = '미리보기';
+  }
+}
+
+// ── Library CTA grid (bottom carousel-lite) ────────────────────────────
+function renderLibraryCta(allCovers, postsByCover) {
+  // Build a flat list of (cover, post) pairs ordered by cover sortOrder.
+  var cards = [];
+  allCovers.forEach(function (cover) {
+    var siblings = postsByCover[cover.slug] || [];
+    siblings.forEach(function (s) {
+      if (s.slug === STATE.post.slug) return; // skip current
+      cards.push({ cover: cover, post: s });
+    });
+  });
+  cards = cards.slice(0, 8);
+  if (cards.length === 0) {
+    $('library-cta').style.display = 'none';
+    return;
+  }
+  var grid = $('lc-grid');
+  grid.innerHTML = cards.map(function (it) {
+    var href = '/library/' + (it.post.canonicalCoverSlug || it.cover.slug) + '/' + it.post.slug + '/';
+    return '<a href="' + href + '" class="lc-card">'
+      + '<div class="lc-tag">' + escapeHtml(it.cover.tag || it.cover.title || '') + '</div>'
+      + '<div class="lc-title">' + escapeHtml(it.post.title || it.post.slug) + '</div>'
+      + '<div class="lc-meta">' + (it.post.readMinutes ? it.post.readMinutes + '분' : '') + '</div>'
+      + '</a>';
+  }).join('');
+}
+
+// ── Modal state machine ───────────────────────────────────────────────
+var MODAL_MODE = 'signup'; // 'signup' | 'signup-verify' | 'login'
+var _tmpEmail = '';
+var _tmpPassword = '';
+
+function setMsg(html, type) {
+  var e = $('m-msg');
+  e.className = 'modal-msg' + (type ? ' ' + type : '');
+  e.innerHTML = html || '';
+}
+
+function modalRender() {
+  var email   = $('m-email');
+  var pw      = $('m-pw');
+  var code    = $('m-code');
+  var submit  = $('m-submit');
+  var toggle  = $('modal-toggle');
+  setMsg('');
+
+  if (MODAL_MODE === 'signup') {
+    $('modal-title').textContent = '이메일 하나로 시작';
+    $('modal-sub').textContent   = '가입은 30초. 전체 라이브러리와 강의 페이지까지 같은 계정으로 이어집니다.';
+    email.style.display = '';
+    pw.style.display    = '';
+    code.style.display  = 'none';
+    submit.textContent  = '가입하고 전체 읽기';
+    toggle.innerHTML    = '이미 가입했나요? <a id="toggle-mode">로그인</a>';
+  } else if (MODAL_MODE === 'signup-verify') {
+    $('modal-title').textContent = '이메일을 확인해 주세요';
+    $('modal-sub').textContent   = _tmpEmail + ' 로 6자리 인증코드를 발송했습니다.';
+    email.style.display = 'none';
+    pw.style.display    = 'none';
+    code.style.display  = '';
+    code.value          = '';
+    submit.textContent  = '인증 완료';
+    toggle.innerHTML    = '이메일을 다시 입력하시려면 <a id="toggle-mode">처음으로</a>';
+  } else { // login
+    $('modal-title').textContent = '다시 만나서 반가워요';
+    $('modal-sub').textContent   = '이메일과 비밀번호로 로그인 후 전체 본문이 열립니다.';
+    email.style.display = '';
+    pw.style.display    = '';
+    code.style.display  = 'none';
+    submit.textContent  = '로그인하고 계속 읽기';
+    toggle.innerHTML    = '아직 가입 전인가요? <a id="toggle-mode">회원가입</a>';
+  }
+  // Re-bind toggle anchor (innerHTML replaced it).
+  var tlink = $('toggle-mode');
+  if (tlink) tlink.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (MODAL_MODE === 'login') MODAL_MODE = 'signup';
+    else if (MODAL_MODE === 'signup-verify') MODAL_MODE = 'signup';
+    else MODAL_MODE = 'login';
+    modalRender();
+  });
+}
+
+function openModal(initialMode) {
+  MODAL_MODE = initialMode || 'signup';
+  modalRender();
+  $('modal').classList.add('open');
+  // Focus first visible input on next tick (modal display change first).
+  setTimeout(function () {
+    var first = MODAL_MODE === 'signup-verify' ? $('m-code') : $('m-email');
+    if (first) first.focus();
+  }, 50);
+}
+
+function closeModal() {
+  $('modal').classList.remove('open');
+}
+
+function onAuthSuccess(data) {
+  var tokens = (data && data.AuthenticationResult) || {};
+  if (tokens.AccessToken) localStorage.setItem(ACCESS_TOKEN_KEY, tokens.AccessToken);
+  if (tokens.IdToken)     localStorage.setItem(ID_TOKEN_KEY,     tokens.IdToken);
+
+  var savedScroll = window.scrollY;
+  closeModal();
+  STATE.isMember = true;
+  applyGate();
+  applyNavUserState();
+  window.scrollTo({ top: savedScroll, behavior: 'auto' });
+  toast('가입 완료! 전체 본문이 열렸습니다 ✦');
+  try {
+    gtag('event', 'library_unlock', {
+      method: MODAL_MODE === 'login' ? 'login' : 'signup',
+      cover_slug: STATE.cover && STATE.cover.slug,
+      post_slug: STATE.post && STATE.post.slug,
+    });
+  } catch (e) {}
+}
+
+function handleModalSubmit(e) {
+  e.preventDefault();
+  setMsg('');
+  var email = $('m-email').value.trim();
+  var pw    = $('m-pw').value;
+  var code  = $('m-code').value.trim();
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  var submit = $('m-submit');
+  var originalLabel = submit.textContent;
+
+  if (MODAL_MODE === 'signup') {
+    if (!EMAIL_RE.test(email)) { setMsg('유효한 이메일을 입력해 주세요.', 'error'); return; }
+    if (pw.length < 8)         { setMsg('비밀번호는 8자 이상이어야 합니다.', 'error'); return; }
+    _tmpEmail = email;
+    _tmpPassword = pw;
+    submit.disabled = true; submit.textContent = '가입 중…';
+    cognitoRequest('SignUp', {
+      ClientId: CLIENT_ID,
+      Username: _tmpEmail,
+      Password: _tmpPassword,
+      UserAttributes: [{ Name: 'email', Value: _tmpEmail }],
+    }, function (err) {
+      submit.disabled = false; submit.textContent = originalLabel;
+      if (err) {
+        // 이미 가입된 이메일이면 자동으로 로그인 모드로 전환.
+        if (/UsernameExistsException/.test(err.message)) {
+          MODAL_MODE = 'login';
+          modalRender();
+          $('m-pw').value = _tmpPassword;
+          setMsg('이미 가입된 이메일입니다. 비밀번호로 로그인해 주세요.', 'info');
+          return;
+        }
+        setMsg(escapeHtml(err.message), 'error');
+        return;
+      }
+      MODAL_MODE = 'signup-verify';
+      modalRender();
+    });
+  } else if (MODAL_MODE === 'signup-verify') {
+    if (!/^\d{4,8}$/.test(code)) { setMsg('인증코드를 정확히 입력해 주세요.', 'error'); return; }
+    submit.disabled = true; submit.textContent = '확인 중…';
+    cognitoRequest('ConfirmSignUp', {
+      ClientId: CLIENT_ID,
+      Username: _tmpEmail,
+      ConfirmationCode: code,
+    }, function (err) {
+      if (err) {
+        submit.disabled = false; submit.textContent = originalLabel;
+        setMsg(escapeHtml(err.message), 'error');
+        return;
+      }
+      // Auto-login
+      cognitoRequest('InitiateAuth', {
+        AuthFlow: 'USER_PASSWORD_AUTH',
+        ClientId: CLIENT_ID,
+        AuthParameters: { USERNAME: _tmpEmail, PASSWORD: _tmpPassword },
+      }, function (err2, data) {
+        submit.disabled = false; submit.textContent = originalLabel;
+        if (err2) {
+          setMsg(escapeHtml(err2.message), 'error');
+          return;
+        }
+        onAuthSuccess(data);
+      });
+    });
+  } else { // login
+    if (!EMAIL_RE.test(email)) { setMsg('유효한 이메일을 입력해 주세요.', 'error'); return; }
+    if (!pw)                   { setMsg('비밀번호를 입력해 주세요.', 'error'); return; }
+    submit.disabled = true; submit.textContent = '로그인 중…';
+    cognitoRequest('InitiateAuth', {
+      AuthFlow: 'USER_PASSWORD_AUTH',
+      ClientId: CLIENT_ID,
+      AuthParameters: { USERNAME: email, PASSWORD: pw },
+    }, function (err, data) {
+      submit.disabled = false; submit.textContent = originalLabel;
+      if (err) {
+        if (/UserNotFoundException|NotAuthorizedException/.test(err.message)) {
+          setMsg('이메일 또는 비밀번호가 올바르지 않습니다.', 'error');
+        } else {
+          setMsg(escapeHtml(err.message), 'error');
+        }
+        return;
+      }
+      onAuthSuccess(data);
+    });
+  }
+}
+
+// ── Page actions (share, scrap, more) ─────────────────────────────────
+function setupPageActions() {
+  var doShare = function () {
+    var url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: document.title, url: url }).catch(function () {});
+      return;
+    }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function () { toast('링크가 복사되었습니다.'); });
+    } else {
+      toast(url);
+    }
+  };
+  $('share-btn').addEventListener('click', doShare);
+  $('paper-share').addEventListener('click', doShare);
+
+  var doScrap = function () {
+    if (!STATE.isMember) { openModal('signup'); return; }
+    toast('스크랩되었습니다. (베타)');
+  };
+  $('scrap-btn').addEventListener('click', doScrap);
+  $('paper-scrap').addEventListener('click', doScrap);
+
+  $('more-btn').addEventListener('click', function () { openModal('signup'); });
+  $('more-login-link').addEventListener('click', function (e) { e.preventDefault(); openModal('login'); });
+  $('modal-close').addEventListener('click', closeModal);
+  $('modal').addEventListener('click', function (e) { if (e.target === $('modal')) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeModal();
+  });
+  $('modal-form').addEventListener('submit', handleModalSubmit);
+
+  // initial render of modal so toggle anchor is bound.
+  modalRender();
+}
+
+// ── Fetch ──────────────────────────────────────────────────────────────
+function fetchPost(coverSlug, postSlug) {
+  if (!API_BASE) return Promise.reject(new Error('API base 가 설정되지 않았습니다.'));
+  var url = API_BASE + '/library/posts/' + encodeURIComponent(postSlug)
+    + (coverSlug ? ('?cover=' + encodeURIComponent(coverSlug)) : '');
+  return fetch(url).then(function (r) {
+    return r.json().then(function (j) {
+      if (!r.ok || !j || !j.success) {
+        throw new Error((j && j.error) || ('API ' + r.status));
+      }
+      return j.data;
+    });
+  });
+}
+
+function fetchAllCovers() {
+  if (!API_BASE) return Promise.resolve([]);
+  return fetch(API_BASE + '/library/covers').then(function (r) {
+    return r.json().then(function (j) {
+      if (!r.ok || !j || !j.success) return [];
+      return (j.data && j.data.covers) || [];
+    });
+  }).catch(function () { return []; });
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────
+function showError(msg) {
+  $('loading').style.display = 'none';
+  $('reader-root').style.display = 'none';
+  $('error-state').style.display = 'block';
+  if (msg) $('error-msg').textContent = msg;
+}
+
+function boot() {
+  setupDockingNav();
+  applyNavUserState();
+  setupPageActions();
+
+  var slugs = parseSlugs();
+  if (!slugs) {
+    showError('잘못된 URL 입니다. /library/{표지}/{포스트}/ 형식이어야 합니다.');
+    return;
+  }
+
+  fetchPost(slugs.coverSlug, slugs.postSlug).then(function (data) {
+    STATE.post = data.post;
+    STATE.cover = data.cover;
+    STATE.siblings = data.siblings || [];
+    render();
+
+    // 하단 라이브러리 카드 — 별도로 모든 cover 를 받아 임의 챕터 노출.
+    fetchAllCovers().then(function (covers) {
+      var pending = covers.length;
+      if (!pending) return;
+      var bucket = {};
+      covers.forEach(function (cv) {
+        fetch(API_BASE + '/library/covers/' + encodeURIComponent(cv.slug))
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (j && j.success) bucket[cv.slug] = j.data.chapters || [];
+          })
+          .catch(function () { bucket[cv.slug] = []; })
+          .then(function () {
+            pending -= 1;
+            if (pending === 0) renderLibraryCta(covers, bucket);
+          });
+      });
+    });
+
+    try {
+      gtag('event', 'library_view', {
+        cover_slug: STATE.cover && STATE.cover.slug,
+        post_slug: STATE.post && STATE.post.slug,
+        is_member: STATE.isMember,
+      });
+    } catch (e) {}
+  }).catch(function (err) {
+    console.error('reader fetch failed', err);
+    showError(err.message || '콘텐츠를 불러올 수 없습니다.');
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+</script>
+
+</body>
+</html>
