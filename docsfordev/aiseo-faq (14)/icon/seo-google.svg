@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">seo google</title>
+  <desc id="desc">AISEO orbital icon, transparent background, glassmorphic 3D object only.</desc>
+
+  <defs>
+    <filter id="softShadow" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="34" stdDeviation="30" flood-color="#6B4FB8" flood-opacity="0.24"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#75ADC9" flood-opacity="0.18"/>
+    </filter>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="11" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.73  0 0 0 0 0.58  0 0 0 0 1  0 0 0 .42 0" result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="glass" cx="32%" cy="24%" r="76%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".92"/>
+      <stop offset="45%" stop-color="#E7DDFB" stop-opacity=".40"/>
+      <stop offset="100%" stop-color="#75ADC9" stop-opacity=".10"/>
+    </radialGradient>
+    <linearGradient id="violet" x1="20%" y1="4%" x2="78%" y2="96%">
+      <stop offset="0%" stop-color="#F4F7EA"/>
+      <stop offset="34%" stop-color="#CDB9DD"/>
+      <stop offset="68%" stop-color="#9580D4"/>
+      <stop offset="100%" stop-color="#75ADC9"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="12%" y1="18%" x2="88%" y2="84%">
+      <stop offset="0%" stop-color="#F4F7EA"/>
+      <stop offset="46%" stop-color="#75ADC9"/>
+      <stop offset="100%" stop-color="#9580D4"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="13%" y1="10%" x2="82%" y2="91%">
+      <stop offset="0%" stop-color="#F4F7EA"/>
+      <stop offset="38%" stop-color="#E2D9E2"/>
+      <stop offset="68%" stop-color="#D98DD7"/>
+      <stop offset="100%" stop-color="#9580D4"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="5%" y1="0%" x2="95%" y2="100%">
+      <stop offset="0%" stop-color="#9BB8F8"/>
+      <stop offset="58%" stop-color="#2EA7FF"/>
+      <stop offset="100%" stop-color="#6B4FB8"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#65F6A4"/>
+      <stop offset="62%" stop-color="#00C73C"/>
+      <stop offset="100%" stop-color="#087F5B"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="5%" y1="0%" x2="95%" y2="100%">
+      <stop offset="0%" stop-color="#FFC8A7"/>
+      <stop offset="55%" stop-color="#FF7B54"/>
+      <stop offset="100%" stop-color="#D94CFF"/>
+    </linearGradient>
+    <linearGradient id="yellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF7A8"/>
+      <stop offset="50%" stop-color="#FFE500"/>
+      <stop offset="100%" stop-color="#FFB800"/>
+    </linearGradient>
+    <style>
+      .stroke{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:42;}
+      .thin{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:28;}
+      .hi{fill:#fff;opacity:.62}
+      .edge{fill:none;stroke:#fff;stroke-opacity:.52;stroke-width:10}
+      .label{font-family:'Plus Jakarta Sans','Inter','Arial',sans-serif;font-weight:800;letter-spacing:-8px;}
+      .small{font-family:'Plus Jakarta Sans','Inter','Arial',sans-serif;font-weight:800;}
+    </style>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <path d="M729 512c0-25-2-45-7-65H520v122h116c-5 31-30 78-86 110l-.8 8 125 97 8.7.9C734 739 768 636 768 512z" fill="#4285F4"/>
+    <path d="M520 768c73 0 134-24 178-65l-85-66c-23 16-53 27-93 27-71 0-131-48-153-112l-7 .6-130 101-1.7 6.7C272 741 389 768 520 768z" fill="#34A853"/>
+    <path d="M367 552c-6-17-9-35-9-54s3-37 9-54l-.4-7.7-132-102-4.3 2C211 374 200 422 200 498s11 124 30 162z" fill="#FBBC05"/>
+    <path d="M520 332c51 0 85 22 104 40l76-74c-47-44-107-70-180-70-131 0-248 75-290 184l137 106c22-64 82-186 153-186z" fill="#EA4335"/>
+    <circle cx="520" cy="512" r="122" fill="#fff" opacity=".12"/>
+  </g>
+</svg>
