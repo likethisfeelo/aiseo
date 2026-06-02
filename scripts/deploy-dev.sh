@@ -50,16 +50,19 @@ aws s3 cp frontend/public/aiseo-main-sitemap.xml s3://$BUCKET/sitemap.xml --cont
 # noindex 라 sitemap 에는 안 들어감. (docs/membership-260602.md)
 aws s3 cp frontend/public/account.html s3://$BUCKET/account.html --content-type "text/html; charset=utf-8" --profile $PROFILE
 
-# /login.html — Cognito 값을 .env 에서 읽어 %%PLACEHOLDER%% 치환 후 업로드.
-# .env 가 없으면 환경변수 직접 사용. (VITE_COGNITO_USER_POOL_ID, VITE_COGNITO_CLIENT_ID)
+# /login.html + /login-config.js — HTML 은 그대로 복사하고, ASCII-only 인
+# login-config.js 에만 sed 로 Cognito 값 치환. (HTML 에 sed 를 직접 걸면
+# 한국어 인코딩이 일부 환경에서 깨져 mojibake 발생함)
+aws s3 cp frontend/public/login.html s3://$BUCKET/login.html --content-type "text/html; charset=utf-8" --profile $PROFILE
+
 _POOL_ID="${VITE_COGNITO_USER_POOL_ID:-$(grep '^VITE_COGNITO_USER_POOL_ID=' frontend/.env 2>/dev/null | cut -d= -f2-)}"
 _CLIENT_ID="${VITE_COGNITO_CLIENT_ID:-$(grep '^VITE_COGNITO_CLIENT_ID=' frontend/.env 2>/dev/null | cut -d= -f2-)}"
 _REGION="$(echo "$_POOL_ID" | cut -d_ -f1)"
 sed -e "s|%%COGNITO_REGION%%|${_REGION}|g" \
     -e "s|%%COGNITO_CLIENT_ID%%|${_CLIENT_ID}|g" \
-    frontend/public/login.html > /tmp/aiseo-login-injected.html
-aws s3 cp /tmp/aiseo-login-injected.html s3://$BUCKET/login.html --content-type "text/html; charset=utf-8" --profile $PROFILE
-rm /tmp/aiseo-login-injected.html
+    frontend/public/login-config.js > /tmp/aiseo-login-config.js
+aws s3 cp /tmp/aiseo-login-config.js s3://$BUCKET/login-config.js --content-type "application/javascript; charset=utf-8" --profile $PROFILE
+rm /tmp/aiseo-login-config.js
 
 # 3. B2B 페이지 업로드
 echo "[3/5] Uploading B2B page..."
@@ -85,6 +88,7 @@ aws s3 sync frontend/dist/ s3://$BUCKET/site/ \
   --exclude "aiseo-main-sitemap.xml" \
   --exclude "account.html" \
   --exclude "login.html" \
+  --exclude "login-config.js" \
   --exclude "b2b.html" \
   --exclude "hero.mp4" \
   --exclude "icon/*" \

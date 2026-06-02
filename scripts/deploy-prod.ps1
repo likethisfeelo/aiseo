@@ -68,22 +68,28 @@ aws s3 cp frontend/public/aiseo-main-sitemap.xml "s3://$BUCKET/sitemap.xml" --co
 # apex stub /account.html — 로그인 후 진입할 회원 페이지 placeholder (P-7 까지). noindex.
 aws s3 cp frontend/public/account.html "s3://$BUCKET/account.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
 
-# /login.html — Cognito 값을 .env 에서 읽어 %%PLACEHOLDER%% 치환 후 업로드.
+# /login.html + /login-config.js — HTML 은 그대로 복사하고, ASCII-only 인
+# login-config.js 에만 Cognito 값 치환. (PowerShell 의 Get-Content 가
+# 시스템 default 코드페이지로 한국어 HTML 을 읽으면 mojibake 발생함.
+# config 만 .NET I/O 로 UTF-8 BOM 없이 읽고/쓰면 안전.)
+aws s3 cp frontend/public/login.html "s3://$BUCKET/login.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
+
 $envFile = "frontend/.env"
 $poolId   = if ($env:VITE_COGNITO_USER_POOL_ID) { $env:VITE_COGNITO_USER_POOL_ID }
-            elseif (Test-Path $envFile) { (Get-Content $envFile | Where-Object {$_ -match '^VITE_COGNITO_USER_POOL_ID='} | Select-Object -First 1) -replace '^VITE_COGNITO_USER_POOL_ID=','' }
+            elseif (Test-Path $envFile) { (Get-Content $envFile -Encoding utf8 | Where-Object {$_ -match '^VITE_COGNITO_USER_POOL_ID='} | Select-Object -First 1) -replace '^VITE_COGNITO_USER_POOL_ID=','' }
             else { '' }
 $clientId = if ($env:VITE_COGNITO_CLIENT_ID) { $env:VITE_COGNITO_CLIENT_ID }
-            elseif (Test-Path $envFile) { (Get-Content $envFile | Where-Object {$_ -match '^VITE_COGNITO_CLIENT_ID='} | Select-Object -First 1) -replace '^VITE_COGNITO_CLIENT_ID=','' }
+            elseif (Test-Path $envFile) { (Get-Content $envFile -Encoding utf8 | Where-Object {$_ -match '^VITE_COGNITO_CLIENT_ID='} | Select-Object -First 1) -replace '^VITE_COGNITO_CLIENT_ID=','' }
             else { '' }
 $region   = ($poolId -split '_')[0]
-$loginHtml = (Get-Content "frontend/public/login.html" -Raw) `
-  -replace '%%COGNITO_REGION%%', $region `
-  -replace '%%COGNITO_CLIENT_ID%%', $clientId
-$tmpLogin = [System.IO.Path]::GetTempFileName() + ".html"
-[System.IO.File]::WriteAllText($tmpLogin, $loginHtml, [System.Text.Encoding]::UTF8)
-aws s3 cp $tmpLogin "s3://$BUCKET/login.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
-Remove-Item $tmpLogin
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+$cfgText = [System.IO.File]::ReadAllText((Resolve-Path "frontend/public/login-config.js"), $utf8NoBom)
+$cfgText = $cfgText -replace '%%COGNITO_REGION%%', $region
+$cfgText = $cfgText -replace '%%COGNITO_CLIENT_ID%%', $clientId
+$tmpCfg = [System.IO.Path]::GetTempFileName() + ".js"
+[System.IO.File]::WriteAllText($tmpCfg, $cfgText, $utf8NoBom)
+aws s3 cp $tmpCfg "s3://$BUCKET/login-config.js" --content-type "application/javascript; charset=utf-8" --profile $PROFILE
+Remove-Item $tmpCfg
 
 # 3. Upload B2B page
 Write-Host "[3/5] Uploading B2B page..." -ForegroundColor Yellow
@@ -102,6 +108,7 @@ aws s3 sync frontend/dist/ "s3://$BUCKET/site/" `
   --exclude "aiseo-main-sitemap.xml" `
   --exclude "account.html" `
   --exclude "login.html" `
+  --exclude "login-config.js" `
   --exclude "b2b.html" `
   --exclude "hero.mp4" `
   --exclude "icon/*" `
