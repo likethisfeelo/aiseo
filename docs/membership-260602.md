@@ -103,9 +103,9 @@ Cognito 가입 (같은 풀)
 | P-2 | App client callbackUrls 에 apex/b2b 추가 | ✅ 완료 (콘솔) |
 | P-3 | 프론트 `App.tsx` 게이트에 `site-customer` 분기 + `SiteCustomerNoticePage` 추가 | ✅ 이번 커밋 |
 | P-4 | post-confirmation Lambda (`community` 자동 부여) + CDK 배포 | ✅ 이번 커밋 (Cognito 트리거 attach 는 콘솔 수동 — 6번 참고) |
-| P-5 | 쿠키 SSO (HttpOnly Domain=.aiseo.tips) | ⏳ TODO |
-| P-6 | apex 가입 진입점 (`aiseo-main.html` 모달 또는 SPA 리다이렉트) | ⏳ TODO |
-| P-7 | apex 포털 `/account` + 결제 시스템 (PG 통합) + `shop`/`site-customer` 자동 부여 webhook | ⏳ TODO |
+| P-5 | 쿠키 SSO (HttpOnly Domain=.aiseo.tips) | ⏳ TODO. 임시 우회로 site → apex URL hash bridge (`#it=<idToken>`) 사용 중 — `frontend/public/account.html` 의 헤더 주석 참고 |
+| P-6 | apex 가입 진입점 (`aiseo-main.html` 모달 또는 SPA 리다이렉트) + nav "내 계정" 링크 | 부분 완료 (nav 링크 추가됨, `/account.html` stub 동작). 가입 진입점은 P-5 후 진행 |
+| P-7 | apex 포털 `/account` 풀 구현 (현재 stub) + 결제 시스템 (PG 통합) + `shop`/`site-customer` 자동 부여 webhook | ⏳ TODO. 현재 `frontend/public/account.html` 는 디자인 + 로그인 상태 표시까지만 — 카드 4개 (구매·강의·결제·뉴스레터) 모두 "P-7 연결 후 표시" placeholder |
 | P-8 | b2b 리드 폼 + 알림 | ⏳ TODO |
 | P-X1 | admin-users UI 가 community/shop/site-customer 도 grant/revoke 가능하도록 확장 (현재 `paid_member` 만 하드코딩) | ⏳ TODO |
 
