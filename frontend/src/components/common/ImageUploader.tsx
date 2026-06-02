@@ -40,18 +40,36 @@ export function ImageUploader({ siteId, currentUrl, onUploaded, label = '이미�
       // quota. SVGs and already-small images pass through untouched.
       const resized = await resizeImageWithPolicy(file, quota?.policy.imageResize ?? null);
 
-      const data = await createImageUploadUrl({
-        siteId,
-        fileName: file.name,
-        fileType: resized.mimeType,
-        fileSize: resized.resultBytes,
-      });
+      let data;
+      try {
+        data = await createImageUploadUrl({
+          siteId,
+          fileName: file.name,
+          fileType: resized.mimeType,
+          fileSize: resized.resultBytes,
+        });
+      } catch (apiErr) {
+        // 1단계: API Gateway 응답이 잡혔거나 (응답 본문 메시지), fetch
+        // 자체가 TypeError("Failed to fetch") 로 죽었거나. 후자라면
+        // 보통 (a) 옛 siteId 로 deactivated 가드에 막혔는데 캐시된
+        // 응답이거나 (b) API Gateway/Lambda 가 cold-start 에서 죽어
+        // CORS 헤더 없는 5xx 를 돌려준 케이스. 어느 쪽이든 사용자가
+        // 다음 단계로 갈 수 있게 친절한 메시지로.
+        const raw = apiErr instanceof Error ? apiErr.message : String(apiErr);
+        const friendly = raw === 'Failed to fetch' || /TypeError/i.test(raw)
+          ? `이미지 업로드 요청이 네트워크 단계에서 실패했어요 (siteId=${siteId}). 페이지를 새로고침해서 도메인이 최신인지 확인하거나 잠시 후 다시 시도해 주세요.`
+          : raw;
+        throw new Error(friendly);
+      }
 
-      await fetch(data.uploadUrl, {
+      const putRes = await fetch(data.uploadUrl, {
         method: 'PUT',
         headers: { 'Content-Type': resized.mimeType },
         body: resized.blob,
       });
+      if (!putRes.ok) {
+        throw new Error(`S3 업로드 실패 (HTTP ${putRes.status}). 이미지 버킷의 CORS 설정을 확인해 주세요.`);
+      }
 
       onUploaded(data.imageUrl);
       // Refresh quota so usage bars reflect the latest counts.

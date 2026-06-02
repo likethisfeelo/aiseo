@@ -52,6 +52,15 @@ const BASE_URL = (process.env.PRERENDER_BASE_URL || 'https://site.dev.aiseo.tips
 // Naver/Kakao truncate beyond that.
 const ROUTES = [
   {
+    // 루트 / 도 명시적으로 프리렌더해서 Naver Yeti / Kakao 같이
+    // JS 실행하지 않는 크롤러도 사이트 핵심 카피·OG 를 가져갈 수
+    // 있게 한다. 이 항목은 dist/index.html 자체를 덮어쓰며 SPA 의
+    // <div id="root"></div> + 번들 script 는 그대로 유지된다.
+    path: '/',
+    title: 'AISEO — AI 웹사이트, 검색 노출까지 한 번에',
+    description: 'AI 홈페이지 제작 + 12개월 무료 서브도메인·호스팅 + 10년 노하우 SEO 핵심강의를 한 번에. 소상공인·1인 대표·스타트업을 위한 검색 노출 솔루션 AISEO.TIPS.',
+  },
+  {
     path: '/course2026',
     title: '수강안내 2026 | AISEO',
     description: 'AISEO 2026 수강안내. AI 홈페이지 제작 · 도메인 & 호스팅 · SEO 핵심강의 3가지 트랙과 맞춤형 진단을 한 페이지에서 확인하세요.',

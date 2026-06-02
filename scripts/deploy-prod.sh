@@ -54,6 +54,13 @@ cd ..
 echo "[2/5] Uploading landing page to root..."
 aws s3 cp frontend/dist/philo-main.html s3://$BUCKET/index.html \
   --content-type "text/html; charset=utf-8" --profile $PROFILE
+# robots.txt 는 apex(aiseo.tips), b2b(b2b.aiseo.tips), site(site.aiseo.tips)
+# 셋 다 자기 도메인 루트에서 보여야 하므로 세 prefix 모두에 복사한다.
+# site/* 는 4단계 sync 에서 dist 와 함께 처리됨.
+aws s3 cp frontend/public/robots.txt s3://$BUCKET/robots.txt \
+  --content-type "text/plain; charset=utf-8" --profile $PROFILE
+aws s3 cp frontend/public/robots.txt s3://$BUCKET/b2b/robots.txt \
+  --content-type "text/plain; charset=utf-8" --profile $PROFILE
 
 # 3. B2B 페이지 업로드
 echo "[3/5] Uploading B2B page..."

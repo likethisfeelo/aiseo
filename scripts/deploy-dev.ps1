@@ -27,6 +27,9 @@ Pop-Location
 # 2. 랜딩페이지를 S3 루트에 업로드 (dev.aiseo.tips)
 Write-Host "[2/5] Uploading landing page to root..." -ForegroundColor Yellow
 aws s3 cp frontend/dist/philo-main.html "s3://$BUCKET/index.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
+# robots.txt 를 apex + b2b prefix 에 복사 (site/* 는 4단계 sync 에 포함)
+aws s3 cp frontend/public/robots.txt "s3://$BUCKET/robots.txt" --content-type "text/plain; charset=utf-8" --profile $PROFILE
+aws s3 cp frontend/public/robots.txt "s3://$BUCKET/b2b/robots.txt" --content-type "text/plain; charset=utf-8" --profile $PROFILE
 
 # 3. B2B 페이지 업로드
 Write-Host "[3/5] Uploading B2B page..." -ForegroundColor Yellow
