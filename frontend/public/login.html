@@ -234,11 +234,13 @@ a{text-decoration:none;color:inherit}
   </aside>
 </div>
 
+<script src="/login-config.js"></script>
 <script>
-// ── CONFIG — deploy 스크립트가 %%PLACEHOLDER%% 를 실제 값으로 치환.
-// 직접 수정하려면 여기 두 줄만 바꾸면 됨.
-var COGNITO_REGION = '%%COGNITO_REGION%%';
-var COGNITO_CLIENT_ID = '%%COGNITO_CLIENT_ID%%';
+// Cognito 설정은 login-config.js (별도 파일, ASCII-only) 에서 주입.
+// 직접 수정하려면 login-config.js 의 region/clientId 두 줄을 바꾸면 됨.
+var _cfg = window.AISEO_LOGIN_CONFIG || {};
+var COGNITO_REGION = _cfg.region || '';
+var COGNITO_CLIENT_ID = _cfg.clientId || '';
 
 var COGNITO_ENDPOINT = 'https://cognito-idp.' + COGNITO_REGION + '.amazonaws.com/';
 var ID_TOKEN_KEY = 'aiseo.idToken';
@@ -262,7 +264,7 @@ var ACCESS_TOKEN_KEY = 'aiseo.accessToken';
 
 // ── Cognito API helper ─────────────────────────────────────────────
 function cognitoRequest(target, body, cb) {
-  if (!COGNITO_CLIENT_ID || COGNITO_CLIENT_ID === '%%COGNITO_CLIENT_ID%%') {
+  if (!COGNITO_CLIENT_ID || COGNITO_CLIENT_ID.indexOf('%%') === 0) {
     cb(new Error('Cognito 설정이 누락되었습니다. 관리자에게 문의해 주세요.'));
     return;
   }
