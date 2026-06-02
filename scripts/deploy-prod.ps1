@@ -68,6 +68,10 @@ aws s3 cp frontend/public/aiseo-main-sitemap.xml "s3://$BUCKET/sitemap.xml" --co
 # apex stub /account.html — 로그인 후 진입할 회원 페이지 placeholder (P-7 까지). noindex.
 aws s3 cp frontend/public/account.html "s3://$BUCKET/account.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
 
+# /library/ — apex 라이브러리 페이지. CF subdomain-router 가 /library,
+# /library/ clean URL 을 /library/index.html 로 rewrite.
+aws s3 sync frontend/public/library/ "s3://$BUCKET/library/" --content-type "text/html; charset=utf-8" --profile $PROFILE
+
 # /login.html + /login-config.js — HTML 은 그대로 복사하고, ASCII-only 인
 # login-config.js 에만 Cognito 값 치환. (PowerShell 의 Get-Content 가
 # 시스템 default 코드페이지로 한국어 HTML 을 읽으면 mojibake 발생함.
@@ -114,6 +118,7 @@ aws s3 sync frontend/dist/ "s3://$BUCKET/site/" `
   --exclude "icon/*" `
   --exclude "images/*" `
   --exclude "principle-icons/*" `
+  --exclude "library/*" `
   --exclude "_archive/*" `
   --profile $PROFILE
 
