@@ -526,6 +526,30 @@ export class CdkStack extends Stack {
       }));
     }
 
+    // ── Auth post-confirmation Lambda (가입 확정 시 community 그룹 자동 부여) ──
+    // 풀은 ARN import 라 CDK L2 가 자체적으로 트리거를 attach 할 수 없음.
+    // 배포 후 Cognito 콘솔에서 "User pool properties → Lambda triggers →
+    // Post confirmation" 으로 이 함수를 한 번 수동 attach. (docs/membership-260602.md §6)
+    const authPostConfirmationHandler = new lambda.Function(this, 'AuthPostConfirmationFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'auth-post-confirmation/handler.handler',
+      timeout: Duration.seconds(10),
+    });
+    if (userPool) {
+      authPostConfirmationHandler.addToRolePolicy(new iam.PolicyStatement({
+        actions: ['cognito-idp:AdminAddUserToGroup'],
+        resources: [userPool.userPoolArn],
+      }));
+      // Cognito 가 이 Lambda 를 호출할 수 있도록 resource policy 사전 부여.
+      // 콘솔에서 트리거를 붙일 때 자동 부여되기도 하지만 명시적으로 두면
+      // 트리거 재설정·풀 마이그레이션 시에도 안전.
+      authPostConfirmationHandler.addPermission('AllowCognitoInvoke', {
+        principal: new iam.ServicePrincipal('cognito-idp.amazonaws.com'),
+        sourceArn: userPool.userPoolArn,
+      });
+    }
+
     // ── Blog tables + Lambda ──
     const blogPostsTableName = 'aiseo-blog-posts';
     const blogPostsTable = new dynamodb.Table(this, 'BlogPostsTable', {

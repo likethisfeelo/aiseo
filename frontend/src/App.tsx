@@ -25,6 +25,7 @@ import { SiteManagementPage } from './pages/SiteManagementPage';
 import { RoadmapPage } from './pages/RoadmapPage';
 import { ComingSoonPage } from './pages/ComingSoonPage';
 import { MemberWaitingPage } from './pages/MemberWaitingPage';
+import { SiteCustomerNoticePage } from './pages/SiteCustomerNoticePage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { SeoStatusPage } from './pages/SeoStatusPage';
 import { ContentAutomationPage } from './pages/ContentAutomationPage';
@@ -44,10 +45,17 @@ import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 
 const PAID_GROUP = 'paid_member';
 const ADMIN_GROUP = 'admin';
+const SITE_CUSTOMER_GROUP = 'site-customer';
 const hasServiceAccess = (user: UserProfile) =>
   Array.isArray(user.groups) && user.groups.includes(PAID_GROUP);
 const isAdminUser = (user: UserProfile) =>
   Array.isArray(user.groups) && user.groups.includes(ADMIN_GROUP);
+// site-customer 는 apex 결제 완료 등급. site.aiseo.tips 에서는 풀 대시보드가
+// 아니라 SiteCustomerNoticePage (apex 포털로 안내) 를 보여준다.
+// paid_member 와 공존 가능 — 그 경우 paid_member 우선이라 대시보드가 뜸.
+// (docs/membership-260602.md §4 site 도메인 매트릭스)
+const isSiteCustomer = (user: UserProfile) =>
+  Array.isArray(user.groups) && user.groups.includes(SITE_CUSTOMER_GROUP);
 
 const PAGE_TITLES: Record<string, string> = {
   '/brand': '브랜드 관리',
@@ -277,7 +285,11 @@ export default function App() {
   }
 
   // No paid_member group → general member: show waiting page (admin without paid still can access /admin via the shell below)
+  // site-customer 단독 사용자(apex 결제 O, site 풀 권한 X)는 안내 페이지로.
   if (!canAccessService && !canAccessAdmin) {
+    if (isSiteCustomer(user)) {
+      return <SiteCustomerNoticePage user={user} onLogout={logout} />;
+    }
     return <MemberWaitingPage user={user} onLogout={logout} />;
   }
 
