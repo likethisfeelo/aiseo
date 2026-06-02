@@ -213,9 +213,9 @@
       <h2>로그인이 필요합니다</h2>
       <p>
         AISEO 회원 전용 페이지입니다.<br />
-        site.aiseo.tips 에서 로그인 후 다시 방문해 주세요.
+        로그인 또는 회원가입 후 이용해 주세요.
       </p>
-      <a class="btn-primary" href="https://site.aiseo.tips/">site.aiseo.tips 에서 로그인 →</a>
+      <a class="btn-primary" href="/login.html">로그인 / 회원가입 →</a>
     </div>
   </div>
 </section>
@@ -308,7 +308,7 @@
     document.getElementById('btn-logout').addEventListener('click', function(){
       window.localStorage.removeItem(ID_TOKEN_KEY);
       window.localStorage.removeItem(ACCESS_TOKEN_KEY);
-      window.location.href = '/';
+      window.location.href = '/login.html';
     });
   } else {
     // 만료된 토큰이라면 정리.

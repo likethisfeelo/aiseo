@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 — AISEO.TIPS</title>
+<meta name="description" content="AISEO.TIPS 로그인 및 회원가입">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── CONFIG: Cognito values are injected by deploy script ── */
+
+/* ==============================================================
+   Auth pages — Cosmos-style split layout (PC) + stacked (mobile)
+   Mirrors frontend/src/auth-pages.css exactly.
+   ============================================================== */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  min-height:100%;
+  font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  color:#0A0614;background:#fff;
+}
+a{text-decoration:none;color:inherit}
+
+.auth-page{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:#fff;
+}
+.auth-form-pane{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  padding:32px 48px 24px;
+  background:#fff;
+}
+.auth-form-center{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:stretch;
+  width:100%;
+  max-width:380px;
+  margin:0 auto;
+  padding:24px 0;
+}
+
+/* Logo dots */
+.auth-logo{
+  display:inline-flex;
+  align-self:center;
+  align-items:center;
+  gap:4px;
+  padding:6px;
+  text-decoration:none;
+  border-radius:999px;
+}
+.auth-logo:hover{background:#f5f3ff}
+.auth-logo-dot{width:7px;height:7px;border-radius:50%;background:#0A0614;opacity:.85}
+.auth-logo-dot:nth-child(1){background:#C4A8F5}
+.auth-logo-dot:nth-child(2){background:#8B6FD4}
+.auth-logo-dot:nth-child(4){background:#6EBFA5}
+.auth-logo-dot:nth-child(5){background:#6E8EE0}
+.auth-logo-dot:nth-child(6){background:#E08AA0}
+
+.auth-brand-foot{
+  text-align:center;font-weight:800;
+  letter-spacing:.18em;font-size:13px;
+  color:#0A0614;padding-top:24px;
+}
+
+/* Headings */
+.auth-h1{
+  font-size:22px;font-weight:800;color:#0A0614;
+  margin:0 0 8px;text-align:center;
+  line-height:1.4;letter-spacing:-.01em;
+}
+.auth-sub{
+  font-size:13px;color:#5C5660;text-align:center;
+  margin:0 0 28px;line-height:1.6;word-break:keep-all;
+}
+.auth-sub strong{color:#0A0614;font-weight:700}
+
+/* Form */
+.auth-form{display:flex;flex-direction:column;gap:10px}
+.auth-input{
+  width:100%;height:52px;
+  padding:0 18px;
+  border:1px solid #E5E1EC;border-radius:14px;
+  font-size:14px;background:#fff;
+  font-family:inherit;color:#0A0614;
+  transition:border-color .15s,box-shadow .15s;
+}
+.auth-input::placeholder{color:#9C95A8}
+.auth-input:focus{
+  outline:none;border-color:#8B6FD4;
+  box-shadow:0 0 0 3px rgba(139,111,212,.15);
+}
+.auth-input:disabled{background:#F8F7FB;color:#5C5660}
+
+/* Password toggle */
+.auth-pw-wrap{position:relative}
+.auth-pw-wrap .auth-input{padding-right:48px}
+.auth-pw-toggle{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  width:36px;height:36px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:0;background:transparent;cursor:pointer;color:#5C5660;border-radius:8px;
+}
+.auth-pw-toggle:hover{background:#f5f3ff;color:#0A0614}
+
+/* Submit button */
+.auth-btn{
+  width:100%;height:52px;border-radius:14px;border:0;
+  background:#0A0614;color:#fff;
+  font-weight:700;font-size:14px;margin-top:6px;
+  cursor:pointer;font-family:inherit;
+  transition:background .15s,opacity .15s,transform .05s;
+}
+.auth-btn:hover:not(:disabled){background:#1F1530}
+.auth-btn:active:not(:disabled){transform:translateY(1px)}
+.auth-btn:disabled{background:#E5E1EC;color:#9C95A8;cursor:not-allowed}
+
+/* Messages */
+.auth-error{
+  background:#FEF2F2;color:#B91C1C;
+  border:1px solid #FECACA;border-radius:12px;
+  padding:10px 14px;font-size:13px;line-height:1.55;
+}
+.auth-success{
+  background:#ECFDF5;color:#065F46;
+  border:1px solid #A7F3D0;border-radius:12px;
+  padding:10px 14px;font-size:13px;line-height:1.55;
+}
+.auth-hint{
+  font-size:12px;color:#5C5660;text-align:center;
+  margin:0;line-height:1.55;
+}
+.auth-hint a{color:#0A0614;font-weight:600}
+.auth-hint a:hover{text-decoration:underline}
+
+.auth-aux-row{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:12px;font-size:12px;color:#5C5660;
+}
+.auth-aux-row a{
+  color:#5C5660;padding:4px 6px;border-radius:6px;
+}
+.auth-aux-row a:hover{color:#0A0614;text-decoration:underline}
+
+.auth-foot-link{
+  font-size:13px;color:#5C5660;margin-top:28px;text-align:center;
+}
+.auth-foot-link a{color:#0A0614;font-weight:700;margin-left:4px}
+.auth-foot-link a:hover{text-decoration:underline}
+
+.auth-resend{
+  margin:8px 0 0;text-align:center;font-size:12px;color:#5C5660;
+}
+.auth-resend button{
+  background:transparent;border:0;color:#0A0614;
+  font-weight:600;cursor:pointer;font-size:12px;
+  font-family:inherit;padding:4px 6px;border-radius:6px;
+}
+.auth-resend button:hover:not(:disabled){background:#f5f3ff}
+.auth-resend button:disabled{color:#9C95A8;cursor:not-allowed}
+
+/* Right visual pane */
+.auth-visual-pane{position:relative;overflow:hidden}
+.auth-visual-caption{
+  position:absolute;left:24px;bottom:24px;z-index:2;
+  color:rgba(255,255,255,.92);font-size:12px;line-height:1.55;
+  text-shadow:0 1px 2px rgba(0,0,0,.15);max-width:60%;
+}
+.auth-visual-caption strong{
+  display:block;font-size:14px;font-weight:700;margin-bottom:2px;
+}
+.auth-visual-pane::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.22) 1px,transparent 1px);
+  background-size:22px 22px;opacity:.45;pointer-events:none;
+}
+
+/* Step-specific gradients */
+.auth-visual--login     {background:linear-gradient(135deg,#C4A8F5 0%,#8B6FD4 60%,#5E3FB1 100%)}
+.auth-visual--signup-email   {background:linear-gradient(135deg,#FCE7C2 0%,#F5B68A 60%,#E08654 100%)}
+.auth-visual--signup-password{background:linear-gradient(135deg,#BFE3D5 0%,#6EBFA5 60%,#2E8C70 100%)}
+.auth-visual--signup-verify  {background:linear-gradient(135deg,#C9D6FF 0%,#6E8EE0 60%,#3F5BB9 100%)}
+.auth-visual--forgot-request {background:linear-gradient(135deg,#FFD0DC 0%,#E08AA0 60%,#B0556C 100%)}
+.auth-visual--forgot-confirm {background:linear-gradient(135deg,#E5DCFB 0%,#B79DE8 60%,#8B6FD4 100%)}
+
+/* Mobile */
+@media(max-width:768px){
+  .auth-page{grid-template-columns:1fr}
+  .auth-form-pane{order:1;padding:24px 20px;min-height:70vh}
+  .auth-form-center{padding:16px 0}
+  .auth-visual-pane{order:2;min-height:200px;max-height:30vh}
+  .auth-visual-caption{left:20px;bottom:16px;font-size:11px;max-width:70%}
+  .auth-h1{font-size:20px}
+  .auth-sub{font-size:12.5px;margin-bottom:22px}
+  .auth-brand-foot{padding-top:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="auth-page" id="auth-page">
+  <!-- ── Form pane (left) ── -->
+  <div class="auth-form-pane">
+    <a href="/" class="auth-logo" aria-label="AISEO 홈으로">
+      <span class="auth-logo-dot"></span>
+      <span class="auth-logo-dot"></span>
+      <span class="auth-logo-dot"></span>
+      <span class="auth-logo-dot"></span>
+      <span class="auth-logo-dot"></span>
+      <span class="auth-logo-dot"></span>
+    </a>
+    <div class="auth-form-center" id="form-center">
+      <!-- JS 가 여기를 채움 -->
+    </div>
+    <div class="auth-brand-foot">AISEO</div>
+  </div>
+
+  <!-- ── Visual pane (right) ── -->
+  <aside class="auth-visual-pane auth-visual--login" id="visual-pane" aria-hidden="true">
+    <div class="auth-visual-caption" id="visual-caption">
+      <strong>온라인 마케팅을 직접.</strong>
+      <span>AI로 만든 홈페이지로 검색 1위까지.</span>
+    </div>
+  </aside>
+</div>
+
+<script>
+// ── CONFIG — deploy 스크립트가 %%PLACEHOLDER%% 를 실제 값으로 치환.
+// 직접 수정하려면 여기 두 줄만 바꾸면 됨.
+var COGNITO_REGION = '%%COGNITO_REGION%%';
+var COGNITO_CLIENT_ID = '%%COGNITO_CLIENT_ID%%';
+
+var COGNITO_ENDPOINT = 'https://cognito-idp.' + COGNITO_REGION + '.amazonaws.com/';
+var ID_TOKEN_KEY = 'aiseo.idToken';
+var ACCESS_TOKEN_KEY = 'aiseo.accessToken';
+
+// ── 이미 로그인된 상태면 바로 account.html 로 ──────────────────────
+(function(){
+  var token = localStorage.getItem(ID_TOKEN_KEY);
+  if (!token) return;
+  try {
+    var parts = token.split('.');
+    if (parts.length < 2) return;
+    var b64 = parts[1].replace(/-/g,'+').replace(/_/g,'/');
+    while (b64.length % 4) b64 += '=';
+    var payload = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    if (payload.exp && payload.exp * 1000 > Date.now()) {
+      window.location.replace('/account.html');
+    }
+  } catch(e) {}
+})();
+
+// ── Cognito API helper ─────────────────────────────────────────────
+function cognitoRequest(target, body, cb) {
+  if (!COGNITO_CLIENT_ID || COGNITO_CLIENT_ID === '%%COGNITO_CLIENT_ID%%') {
+    cb(new Error('Cognito 설정이 누락되었습니다. 관리자에게 문의해 주세요.'));
+    return;
+  }
+  fetch(COGNITO_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSCognitoIdentityProviderService.' + target,
+    },
+    body: JSON.stringify(body),
+  })
+  .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+  .then(function(res){
+    if (!res.ok || res.d.__type) {
+      cb(new Error(res.d.message || res.d.Message || res.d.__type || '요청에 실패했습니다.'));
+    } else {
+      cb(null, res.d);
+    }
+  })
+  .catch(function(e){ cb(e); });
+}
+
+// ── 유틸 ──────────────────────────────────────────────────────────
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function el(id){ return document.getElementById(id); }
+
+// visualPane + caption 을 step key 에 맞게 업데이트
+var VISUAL = {
+  'login':           ['auth-visual--login',          '온라인 마케팅을 직접.', 'AI로 만든 홈페이지로 검색 1위까지.'],
+  'signup-email':    ['auth-visual--signup-email',   '이메일 하나로 시작.', '가입은 30초, 검색 노출은 평생.'],
+  'signup-password': ['auth-visual--signup-password','보안이 튼튼한 계정.', '소중한 마케팅 데이터를 안전하게.'],
+  'signup-verify':   ['auth-visual--signup-verify',  '거의 다 왔어요.', '이메일의 인증번호를 입력해 주세요.'],
+  'forgot-request':  ['auth-visual--forgot-request', '비밀번호를 잊으셨나요?', '이메일로 재설정 코드를 보내드려요.'],
+  'forgot-confirm':  ['auth-visual--forgot-confirm', '새 비밀번호 설정.', '안전한 새 비밀번호로 다시 시작하세요.'],
+};
+var GRADIENT_CLASSES = [
+  'auth-visual--login','auth-visual--signup-email','auth-visual--signup-password',
+  'auth-visual--signup-verify','auth-visual--forgot-request','auth-visual--forgot-confirm',
+];
+function setVisual(key) {
+  var pane = el('visual-pane');
+  var cap  = el('visual-caption');
+  GRADIENT_CLASSES.forEach(function(c){ pane.classList.remove(c); });
+  var v = VISUAL[key] || VISUAL['login'];
+  pane.classList.add(v[0]);
+  cap.innerHTML = '<strong>' + v[1] + '</strong><span>' + v[2] + '</span>';
+}
+
+// 비밀번호 toggle 버튼 HTML
+var EYE_OPEN  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+var EYE_CLOSE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+function pwToggleHtml(inputId, btnId) {
+  return '<div class="auth-pw-wrap">'
+    + '<input id="' + inputId + '" type="password" class="auth-input" placeholder="비밀번호" autocomplete="current-password">'
+    + '<button type="button" class="auth-pw-toggle" id="' + btnId + '" aria-label="비밀번호 보기">' + EYE_OPEN + '</button>'
+    + '</div>';
+}
+function initPwToggle(inputId, btnId) {
+  var inp = el(inputId); var btn = el(btnId);
+  btn.addEventListener('click', function(){
+    var show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.innerHTML = show ? EYE_CLOSE : EYE_OPEN;
+    btn.setAttribute('aria-label', show ? '비밀번호 숨기기' : '비밀번호 보기');
+  });
+}
+
+// 에러/성공 메시지 helper
+function setMsg(id, html, type) {
+  var e = el(id);
+  if (!e) return;
+  e.className = type === 'success' ? 'auth-success' : 'auth-error';
+  e.innerHTML = html;
+  e.style.display = html ? 'block' : 'none';
+}
+
+// ── 로그인 성공 후 처리 ────────────────────────────────────────────
+function onLoginSuccess(data) {
+  var tokens = data.AuthenticationResult || {};
+  if (tokens.AccessToken) localStorage.setItem(ACCESS_TOKEN_KEY, tokens.AccessToken);
+  if (tokens.IdToken)     localStorage.setItem(ID_TOKEN_KEY, tokens.IdToken);
+  var next = new URLSearchParams(window.location.search).get('next') || '/account.html';
+  window.location.replace(next);
+}
+
+// ── STATE MACHINE ─────────────────────────────────────────────────
+// 공유 상태 (signup 3단계에서 email/password 유지)
+var _email = '';
+var _password = '';
+
+function render(step) {
+  setVisual(step);
+  var fc = el('form-center');
+
+  if (step === 'login') {
+    fc.innerHTML = ''
+      + '<h1 class="auth-h1">다시 만나서 반가워요</h1>'
+      + '<p class="auth-sub">이메일과 비밀번호를 입력해 주세요</p>'
+      + '<form class="auth-form" id="login-form">'
+      +   '<input id="l-email" type="email" class="auth-input" placeholder="이메일" autocomplete="email" autofocus>'
+      +   pwToggleHtml('l-pw', 'l-pw-btn')
+      +   '<div id="l-msg" class="auth-error" style="display:none"></div>'
+      +   '<button type="submit" class="auth-btn" id="l-submit">로그인</button>'
+      +   '<div class="auth-aux-row">'
+      +     '<a href="#" id="go-forgot">비밀번호 찾기</a>'
+      +     '<a href="#" id="go-signup">회원가입 →</a>'
+      +   '</div>'
+      + '</form>'
+      + '<div class="auth-foot-link">AISEO가 처음이신가요?<a href="#" id="go-signup2">회원가입</a></div>';
+
+    initPwToggle('l-pw', 'l-pw-btn');
+    el('login-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var email    = el('l-email').value.trim();
+      var password = el('l-pw').value;
+      if (!EMAIL_RE.test(email)) { setMsg('l-msg','유효한 이메일을 입력해 주세요.'); return; }
+      if (!password) { setMsg('l-msg','비밀번호를 입력해 주세요.'); return; }
+      var btn = el('l-submit'); btn.disabled = true; btn.textContent = '로그인 중…';
+      setMsg('l-msg','');
+      cognitoRequest('InitiateAuth', {
+        AuthFlow: 'USER_PASSWORD_AUTH',
+        ClientId: COGNITO_CLIENT_ID,
+        AuthParameters: { USERNAME: email, PASSWORD: password },
+      }, function(err, data){
+        btn.disabled = false; btn.textContent = '로그인';
+        if (err) { setMsg('l-msg', err.message); }
+        else     { onLoginSuccess(data); }
+      });
+    });
+    el('go-forgot').addEventListener('click',  function(e){ e.preventDefault(); render('forgot-request'); });
+    el('go-signup').addEventListener('click',  function(e){ e.preventDefault(); render('signup-email'); });
+    el('go-signup2').addEventListener('click', function(e){ e.preventDefault(); render('signup-email'); });
+  }
+
+  else if (step === 'signup-email') {
+    fc.innerHTML = ''
+      + '<h1 class="auth-h1">이메일로 시작하기</h1>'
+      + '<p class="auth-sub">AISEO를 시작할 이메일 주소를 입력해 주세요</p>'
+      + '<form class="auth-form" id="se-form">'
+      +   '<input id="se-email" type="email" class="auth-input" placeholder="you@example.com" autocomplete="email" autofocus>'
+      +   '<div id="se-msg" class="auth-error" style="display:none"></div>'
+      +   '<button type="submit" class="auth-btn" id="se-submit">다음</button>'
+      + '</form>'
+      + '<div class="auth-foot-link">이미 계정이 있으신가요?<a href="#" id="go-login">로그인</a></div>';
+
+    el('se-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var email = el('se-email').value.trim();
+      if (!EMAIL_RE.test(email)) { setMsg('se-msg','유효한 이메일 주소를 입력해 주세요.'); return; }
+      _email = email;
+      setMsg('se-msg','');
+      render('signup-password');
+    });
+    el('go-login').addEventListener('click', function(e){ e.preventDefault(); render('login'); });
+  }
+
+  else if (step === 'signup-password') {
+    fc.innerHTML = ''
+      + '<h1 class="auth-h1">비밀번호 설정</h1>'
+      + '<p class="auth-sub"><strong>' + _email + '</strong><br>사용할 비밀번호를 입력해 주세요 (8자 이상)</p>'
+      + '<form class="auth-form" id="sp-form">'
+      +   pwToggleHtml('sp-pw', 'sp-pw-btn')
+      +   '<div id="sp-msg" class="auth-error" style="display:none"></div>'
+      +   '<button type="submit" class="auth-btn" id="sp-submit">가입하기</button>'
+      + '</form>'
+      + '<div class="auth-foot-link">이미 계정이 있으신가요?<a href="#" id="go-login">로그인</a></div>';
+
+    initPwToggle('sp-pw', 'sp-pw-btn');
+    el('sp-pw').setAttribute('autocomplete','new-password');
+    el('sp-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var password = el('sp-pw').value;
+      if (password.length < 8) { setMsg('sp-msg','비밀번호는 8자 이상이어야 합니다.'); return; }
+      _password = password;
+      var btn = el('sp-submit'); btn.disabled = true; btn.textContent = '가입 중…';
+      setMsg('sp-msg','');
+      cognitoRequest('SignUp', {
+        ClientId: COGNITO_CLIENT_ID,
+        Username: _email,
+        Password: _password,
+        UserAttributes: [{ Name: 'email', Value: _email }],
+      }, function(err){
+        btn.disabled = false; btn.textContent = '가입하기';
+        if (err) { setMsg('sp-msg', err.message); }
+        else     { render('signup-verify'); }
+      });
+    });
+    el('go-login').addEventListener('click', function(e){ e.preventDefault(); render('login'); });
+  }
+
+  else if (step === 'signup-verify') {
+    fc.innerHTML = ''
+      + '<h1 class="auth-h1">이메일을 확인해 주세요</h1>'
+      + '<p class="auth-sub"><strong>' + _email + '</strong><br>로 발송된 6자리 인증번호를 입력해 주세요</p>'
+      + '<form class="auth-form" id="sv-form">'
+      +   '<input id="sv-code" type="text" inputmode="numeric" class="auth-input" placeholder="인증번호 6자리" autocomplete="one-time-code" autofocus>'
+      +   '<div id="sv-msg" class="auth-error" style="display:none"></div>'
+      +   '<button type="submit" class="auth-btn" id="sv-submit">인증 완료</button>'
+      + '</form>'
+      + '<div class="auth-resend"><span>메일이 안 보이나요? </span>'
+      +   '<button type="button" id="sv-resend">인증번호 재발송</button>'
+      + '</div>'
+      + '<div class="auth-foot-link">이미 계정이 있으신가요?<a href="#" id="go-login">로그인</a></div>';
+
+    el('sv-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var code = el('sv-code').value.trim();
+      if (!/^\d{4,8}$/.test(code)) { setMsg('sv-msg','이메일로 받은 인증번호를 정확히 입력해 주세요.'); return; }
+      var btn = el('sv-submit'); btn.disabled = true; btn.textContent = '확인 중…';
+      setMsg('sv-msg','');
+      cognitoRequest('ConfirmSignUp', {
+        ClientId: COGNITO_CLIENT_ID,
+        Username: _email,
+        ConfirmationCode: code,
+      }, function(err){
+        if (err) { btn.disabled = false; btn.textContent = '인증 완료'; setMsg('sv-msg', err.message); return; }
+        // 인증 성공 → 자동 로그인 시도
+        cognitoRequest('InitiateAuth', {
+          AuthFlow: 'USER_PASSWORD_AUTH',
+          ClientId: COGNITO_CLIENT_ID,
+          AuthParameters: { USERNAME: _email, PASSWORD: _password },
+        }, function(err2, data){
+          if (err2) { render('login'); }
+          else      { onLoginSuccess(data); }
+        });
+      });
+    });
+    el('sv-resend').addEventListener('click', function(){
+      var btn = el('sv-resend'); btn.disabled = true; btn.textContent = '발송 중…';
+      cognitoRequest('ResendConfirmationCode', {
+        ClientId: COGNITO_CLIENT_ID,
+        Username: _email,
+      }, function(err){
+        if (err) {
+          btn.disabled = false; btn.textContent = '인증번호 재발송';
+          setMsg('sv-msg', err.message);
+        } else {
+          btn.textContent = '발송됨 ✓';
+          setTimeout(function(){ btn.disabled = false; btn.textContent = '인증번호 재발송'; }, 30000);
+        }
+      });
+    });
+    el('go-login').addEventListener('click', function(e){ e.preventDefault(); render('login'); });
+  }
+
+  else if (step === 'forgot-request') {
+    fc.innerHTML = ''
+      + '<h1 class="auth-h1">비밀번호를 잊으셨나요?</h1>'
+      + '<p class="auth-sub">가입하신 이메일 주소를 입력하시면<br>재설정 코드를 보내드려요</p>'
+      + '<form class="auth-form" id="fr-form">'
+      +   '<input id="fr-email" type="email" class="auth-input" placeholder="이메일" autocomplete="email" autofocus>'
+      +   '<div id="fr-msg" class="auth-error" style="display:none"></div>'
+      +   '<button type="submit" class="auth-btn" id="fr-submit">재설정 코드 받기</button>'
+      + '</form>'
+      + '<div class="auth-foot-link">비밀번호가 기억나셨나요?<a href="#" id="go-login">로그인</a></div>';
+
+    if (_email) el('fr-email').value = _email;
+    el('fr-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var email = el('fr-email').value.trim();
+      if (!EMAIL_RE.test(email)) { setMsg('fr-msg','유효한 이메일을 입력해 주세요.'); return; }
+      _email = email;
+      var btn = el('fr-submit'); btn.disabled = true; btn.textContent = '전송 중…';
+      setMsg('fr-msg','');
+      cognitoRequest('ForgotPassword', {
+        ClientId: COGNITO_CLIENT_ID,
+        Username: _email,
+      }, function(err){
+        btn.disabled = false; btn.textContent = '재설정 코드 받기';
+        if (err) { setMsg('fr-msg', err.message); }
+        else     { render('forgot-confirm'); }
+      });
+    });
+    el('go-login').addEventListener('click', function(e){ e.preventDefault(); render('login'); });
+  }
+
+  else if (step === 'forgot-confirm') {
+    fc.innerHTML = ''
+      + '<h1 class="auth-h1">새 비밀번호 설정</h1>'
+      + '<p class="auth-sub"><strong>' + _email + '</strong><br>로 발송된 코드와 새 비밀번호를 입력해 주세요</p>'
+      + '<form class="auth-form" id="fc-form">'
+      +   '<input id="fc-code" type="text" inputmode="numeric" class="auth-input" placeholder="인증코드" autocomplete="one-time-code" autofocus>'
+      +   pwToggleHtml('fc-pw', 'fc-pw-btn')
+      +   '<div id="fc-msg" class="auth-error" style="display:none"></div>'
+      +   '<button type="submit" class="auth-btn" id="fc-submit">비밀번호 변경</button>'
+      + '</form>'
+      + '<div class="auth-foot-link">비밀번호가 기억나셨나요?<a href="#" id="go-login">로그인</a></div>';
+
+    initPwToggle('fc-pw', 'fc-pw-btn');
+    el('fc-pw').setAttribute('autocomplete','new-password');
+    el('fc-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var code = el('fc-code').value.trim();
+      var pw   = el('fc-pw').value;
+      if (!code) { setMsg('fc-msg','인증코드를 입력해 주세요.'); return; }
+      if (pw.length < 8) { setMsg('fc-msg','비밀번호는 8자 이상이어야 합니다.'); return; }
+      var btn = el('fc-submit'); btn.disabled = true; btn.textContent = '변경 중…';
+      setMsg('fc-msg','');
+      cognitoRequest('ConfirmForgotPassword', {
+        ClientId: COGNITO_CLIENT_ID,
+        Username: _email,
+        ConfirmationCode: code,
+        Password: pw,
+      }, function(err){
+        btn.disabled = false; btn.textContent = '비밀번호 변경';
+        if (err) { setMsg('fc-msg', err.message); }
+        else {
+          setMsg('fc-msg','비밀번호가 변경되었습니다. 로그인해 주세요.', 'success');
+          _password = pw;
+          setTimeout(function(){ render('login'); }, 1500);
+        }
+      });
+    });
+    el('go-login').addEventListener('click', function(e){ e.preventDefault(); render('login'); });
+  }
+
+  // 새로 렌더된 후 autofocus 실행 (innerHTML 교체로 소실되므로)
+  var focused = fc.querySelector('[autofocus]');
+  if (focused) setTimeout(function(){ focused.focus(); }, 0);
+}
+
+// ── 초기 step 결정 (URL hash 기반) ───────────────────────────────
+var initStep = 'login';
+var h = window.location.hash;
+if (h === '#signup')  initStep = 'signup-email';
+if (h === '#forgot')  initStep = 'forgot-request';
+
+render(initStep);
+</script>
+</body>
+</html>

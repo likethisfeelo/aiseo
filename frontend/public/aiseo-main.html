@@ -78,6 +78,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   a:hover .ext-icon{opacity:1}
   .nav .waitlist{background:var(--accent);color:var(--ink);padding:13px 22px;border-radius:999px;font-weight:700;font-size:15px;display:inline-flex;gap:8px;align-items:center;transition:padding-right .2s}
   .nav .waitlist:hover{padding-right:28px}
+  .nav-user-icon{display:inline-flex;align-items:center;justify-content:center;
+    width:36px;height:36px;border-radius:50%;
+    color:rgba(255,255,255,.88);
+    transition:background .15s,color .15s,opacity .15s}
+  .nav-user-icon:hover{background:rgba(255,255,255,.15);color:#fff}
 
   /* centered hero content */
   .hero-content{position:relative;z-index:20;text-align:center;max-width:820px;margin:0 auto;
@@ -1113,10 +1118,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <span class="method"><span class="glyph">A</span> AI SEO LIBRARY</span>
     <a class="link" href="https://b2b.aiseo.tips/" target="_blank" rel="noopener noreferrer" aria-label="기업서비스 (새 창에서 열림)">기업서비스<span class="ext-icon" aria-hidden="true">↗</span></a>
     <a class="link" href="https://site.aiseo.tips/" target="_blank" rel="noopener noreferrer" aria-label="강의 (새 창에서 열림)">강의<span class="ext-icon" aria-hidden="true">↗</span></a>
-    <!-- /account.html 은 단일 파일 stub (test). 로그인 안 했어도 페이지 자체는
-         "로그인 필요" UI 로 안내하니까 항상 노출 OK. P-7 결제·포털 본 구현
-         시점에 의미 있는 페이지로 교체. (docs/membership-260602.md) -->
-    <a class="link" href="/account.html" aria-label="내 계정">내 계정</a>
+    <!-- 사람 아이콘: 로그인 → /account.html, 비로그인 → /login.html (JS 로 분기) -->
+    <a class="nav-user-icon" id="nav-user-btn" href="/login.html" aria-label="내 계정">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </a>
     <a class="waitlist" href="#cta">상담 문의 →</a>
   </nav>
 
@@ -1773,6 +1781,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       submitBtn.textContent = originalText;
     });
   });
+})();
+</script>
+
+<!-- 사람 아이콘 로그인 상태 분기: 로그인 → /account.html, 비로그인 → /login.html -->
+<script>
+(function(){
+  var btn = document.getElementById('nav-user-btn');
+  if (!btn) return;
+  var token = localStorage.getItem('aiseo.idToken');
+  if (!token) return; // 기본 href="/login.html" 유지
+  try {
+    var parts = token.split('.');
+    if (parts.length < 2) return;
+    var b64 = parts[1].replace(/-/g,'+').replace(/_/g,'/');
+    while (b64.length % 4) b64 += '=';
+    var payload = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    if (payload.exp && payload.exp * 1000 > Date.now()) {
+      btn.setAttribute('href', '/account.html');
+      btn.setAttribute('aria-label', '내 계정 (로그인됨)');
+    }
+  } catch(e) {}
 })();
 </script>
 </body>
