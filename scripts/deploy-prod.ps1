@@ -65,6 +65,8 @@ aws s3 cp frontend/public/robots.txt "s3://$BUCKET/robots.txt" --content-type "t
 aws s3 cp frontend/public/robots.txt "s3://$BUCKET/b2b/robots.txt" --content-type "text/plain; charset=utf-8" --profile $PROFILE
 # aiseo.tips (apex) 전용 sitemap. b2b./site. 는 각각 별도 sitemap 을 관리 (광고계정·서치콘솔 분리).
 aws s3 cp frontend/public/aiseo-main-sitemap.xml "s3://$BUCKET/sitemap.xml" --content-type "application/xml; charset=utf-8" --profile $PROFILE
+# apex stub /account.html — 로그인 후 진입할 회원 페이지 placeholder (P-7 까지). noindex.
+aws s3 cp frontend/public/account.html "s3://$BUCKET/account.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
 
 # 3. Upload B2B page
 Write-Host "[3/5] Uploading B2B page..." -ForegroundColor Yellow
@@ -81,6 +83,7 @@ Write-Host "[4/5] Uploading SPA + prerendered HTML to /site/..." -ForegroundColo
 aws s3 sync frontend/dist/ "s3://$BUCKET/site/" `
   --exclude "aiseo-main.html" `
   --exclude "aiseo-main-sitemap.xml" `
+  --exclude "account.html" `
   --exclude "b2b.html" `
   --exclude "hero.mp4" `
   --exclude "icon/*" `

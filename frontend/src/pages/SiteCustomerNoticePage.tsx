@@ -1,6 +1,7 @@
 import type { UserProfile } from '../types';
 import { KAKAO_CHAT_URL } from '../constants/contact';
 import { APP_ENV } from '../config.js';
+import { tokenStore } from '../auth.js';
 
 interface Props {
   user: UserProfile;
@@ -13,7 +14,17 @@ interface Props {
 // (docs/membership-260602.md §4 의 사이트 도메인 권한 매트릭스)
 export function SiteCustomerNoticePage({ user, onLogout }: Props) {
   const apexUrl = APP_ENV === 'prod' ? 'https://aiseo.tips' : 'https://dev.aiseo.tips';
-  const portalUrl = `${apexUrl}/account`;
+  // ⚠️ TEMP: site → apex 토큰 hash bridge.
+  // localStorage 는 origin 분리라 site.aiseo.tips 의 idToken 이 apex 에선
+  // 안 보임. P-5 (HttpOnly Domain=.aiseo.tips 쿠키) 가 들어오기 전까지는
+  // CTA 클릭 시 URL hash 로 토큰을 한 번 동봉해 apex /account.html 이
+  // 자기 origin localStorage 로 옮겨 담도록 함. hash 는 서버 로그엔 안 남지만
+  // 브라우저 히스토리에 노출되므로 운영 전 반드시 제거 → 쿠키 SSO 로 대체.
+  const idToken = tokenStore.getIdToken();
+  const accessToken = tokenStore.getAccessToken();
+  const portalUrl = idToken
+    ? `${apexUrl}/account.html#it=${encodeURIComponent(idToken)}${accessToken ? `&at=${encodeURIComponent(accessToken)}` : ''}`
+    : `${apexUrl}/account.html`;
 
   return (
     <div className="scn-page">
