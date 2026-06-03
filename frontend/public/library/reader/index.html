@@ -426,8 +426,10 @@ function toast(msg) {
 // ── Docking nav ────────────────────────────────────────────────────────
 function setupDockingNav() {
   var nav = $('topnav');
+  // Threshold = 200px — capsule 상태가 충분히 유지되다가 본문 진입 즈음에
+  // docked. 너무 일찍(40px) 바뀌면 도킹이 부산스럽게 느껴짐.
   var apply = function () {
-    if (window.scrollY > 40) nav.classList.add('docked');
+    if (window.scrollY > 200) nav.classList.add('docked');
     else nav.classList.remove('docked');
   };
   window.addEventListener('scroll', apply, { passive: true });
