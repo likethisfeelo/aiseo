@@ -81,7 +81,8 @@ const incrementUsage = async (
 
   // Blog asset → skip per-user counter bump entirely. Callers may still
   // want to track global blog usage separately via a different table/row.
-  if (siteId === 'blog') return { skipped: true };
+  // Admin 자원 (blog/library) → usage 카운터 증가 안 함.
+  if (siteId === 'blog' || siteId === 'library') return { skipped: true };
 
   const bucket = currentMonthBucket(now);
   const nowIso = now.toISOString();

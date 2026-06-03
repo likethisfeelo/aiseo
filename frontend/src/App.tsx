@@ -42,6 +42,7 @@ import { LibraryCoversAdminPage } from './pages/admin/LibraryCoversAdminPage';
 import { LibraryCoverEditPage } from './pages/admin/LibraryCoverEditPage';
 import { LibraryPostsAdminPage } from './pages/admin/LibraryPostsAdminPage';
 import { LibraryPostEditPage } from './pages/admin/LibraryPostEditPage';
+import { LibraryAuditPage } from './pages/admin/LibraryAuditPage';
 import { QuotaPolicyPage } from './pages/admin/QuotaPolicyPage';
 import { BlogListPage } from './pages/public/BlogListPage';
 import { BlogPostPage } from './pages/public/BlogPostPage';
@@ -80,6 +81,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/blog/categories': '블로그 카테고리',
   '/admin/library/covers': '라이브러리 표지 관리',
   '/admin/library/posts': '라이브러리 포스트 관리',
+  '/admin/library/audit': '라이브러리 감사 로그',
   '/admin/quota-policy': '쿼터 정책 관리',
   '/admin/event-signups': '이벤트 신청 관리',
 };
@@ -393,6 +395,12 @@ function AuthenticatedShell({
     return <Navigate to="/admin" replace />;
   }
 
+  // 비-admin 사용자가 /admin/* 직접 URL 진입 시 차단. API 가 403 으로
+  // 막아주긴 하지만 admin 레이아웃이 잠깐 노출되는 게 어색해서 프론트에서도 차단.
+  if (onAdminPath && !isAdminUser(user)) {
+    return <Navigate to="/" replace />;
+  }
+
   if (onAdminPath) {
     return (
       <AdminLayout user={user} onLogout={logout}>
@@ -413,6 +421,7 @@ function AuthenticatedShell({
           <Route path="/admin/library/posts" element={<LibraryPostsAdminPage />} />
           <Route path="/admin/library/posts/new" element={<LibraryPostEditPage />} />
           <Route path="/admin/library/posts/:slug/edit" element={<LibraryPostEditPage />} />
+          <Route path="/admin/library/audit" element={<LibraryAuditPage />} />
           <Route path="/admin/quota-policy" element={<QuotaPolicyPage />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>

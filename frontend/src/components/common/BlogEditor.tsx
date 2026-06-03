@@ -27,9 +27,13 @@ interface Props {
   value: string;
   onChange: (html: string) => void;
   placeholder?: string;
+  // 이미지 업로드 시 사용할 siteId. 백엔드의 image-upload-handler 가
+  // 'blog' / 'library' 등 admin 자원 siteId 를 특별 케이스로 처리하므로
+  // 라이브러리 본문 에디터에서는 'library' 를 넘긴다. 기본값 'blog'.
+  siteId?: string;
 }
 
-export function BlogEditor({ value, onChange, placeholder }: Props) {
+export function BlogEditor({ value, onChange, placeholder, siteId = 'blog' }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Admin-only editor, but we still fetch quota so we can apply the
   // policy-driven resize settings before uploading blog images.
@@ -102,7 +106,7 @@ export function BlogEditor({ value, onChange, placeholder }: Props) {
         const resized = await resizeImageWithPolicy(file, quota?.policy.imageResize ?? null);
 
         const data = (await createImageUploadUrl({
-          siteId: 'blog',
+          siteId,
           fileName: file.name,
           fileType: resized.mimeType,
           fileSize: resized.resultBytes,
@@ -119,7 +123,7 @@ export function BlogEditor({ value, onChange, placeholder }: Props) {
         alert(err instanceof Error ? err.message : '이미지 업로드 실패');
       }
     },
-    [editor, quota],
+    [editor, quota, siteId],
   );
 
   const handleLinkButton = useCallback(() => {

@@ -60,9 +60,12 @@
     border:1px solid rgba(10,6,20,.08);
     border-radius:999px;padding:10px 18px;
     box-shadow:0 12px 32px -16px rgba(10,6,20,.18);
-    transition:top .3s ease, transform .3s ease, border-radius .3s ease, padding .3s ease, max-width .3s ease, left .3s ease, width .3s ease}
+    /* 위치/너비는 즉시 전환 (중간 좁아짐 깜빡임 방지), 시각 효과만 페이드.
+       docked 토글이 일찍 트리거되므로 사용자는 한 번의 전환만 인지함. */
+    transition:border-radius .18s ease, background .18s ease, box-shadow .18s ease, padding .18s ease}
   .topnav.docked{top:0;left:0;right:0;transform:none;border-radius:0;border-left:none;border-right:none;border-top:none;
-    max-width:none;width:100%;padding:10px 22px;justify-content:space-between;background:rgba(255,255,255,.94)}
+    max-width:none;width:100%;padding:12px 24px;justify-content:space-between;background:rgba(255,255,255,.94);
+    box-shadow:0 8px 22px -14px rgba(10,6,20,.16)}
   .topnav .method{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink)}
   .topnav .method .glyph{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-mid));display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink);font-weight:800}
   /* 좌측 AISEO.TIPS 는 캡슐(버블) 없이 텍스트 로고만 — 캐릭터·padding·border 다 제거 */
@@ -107,10 +110,9 @@
   /* ── Aside ── */
   .aside{position:sticky;top:96px;display:flex;flex-direction:column;gap:18px}
   @media (max-width:900px){.aside{position:static;top:auto}}
-  .bookcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;align-items:center;gap:14px}
-  .bookcard .spine{width:88px;height:120px;background:linear-gradient(135deg,var(--accent-dark),var(--accent-deep));border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;text-align:center;padding:10px;box-shadow:0 14px 30px -14px rgba(107,79,184,.6)}
-  .bookcard .ctitle{font-family:var(--display);font-weight:700;font-size:15px;text-align:center;line-height:1.3}
-  .bookcard .csub{font-size:12px;color:var(--ink-soft);text-align:center;line-height:1.5}
+  .bookcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .bookcard .ccategory{font-size:11px;font-weight:700;color:var(--accent-deep);letter-spacing:.05em;background:var(--accent-light);padding:5px 14px;border-radius:999px}
+  .bookcard .spine{width:120px;height:160px;background:linear-gradient(135deg,var(--accent-dark),var(--accent-deep));border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;text-align:center;padding:14px;line-height:1.32;box-shadow:0 14px 30px -14px rgba(107,79,184,.6)}
   .chapter-list{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
   .chapter-list .chl-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);padding:14px 16px 6px}
   .chapter-list a{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;border-top:1px solid var(--line-soft);font-size:13px;line-height:1.4;color:var(--ink-soft);transition:background .15s, color .15s}
@@ -147,15 +149,29 @@
   /* Gate — when locked, body is clipped + fades */
   .body-wrap{position:relative}
   .paper.locked .body-wrap{max-height:calc(100vh * 2.4);overflow:hidden;mask-image:linear-gradient(180deg,#000 65%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 65%,transparent 100%)}
-  .more-zone{display:none;margin-top:20px;padding:28px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(196,168,245,.12));border:1px dashed var(--accent-mid);border-radius:var(--radius)}
+  .more-zone{display:none;margin-top:20px;padding:36px 28px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(196,168,245,.12));border:1px dashed var(--accent-mid);border-radius:var(--radius)}
   .paper.locked .more-zone{display:block}
-  .more-zone .lock-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:8px}
-  .more-zone .lock-title{font-family:var(--display);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:14px}
-  .more-zone .lock-sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px;line-height:1.6}
   .more-btn{background:var(--accent-dark);color:#fff;border:none;padding:14px 28px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s,box-shadow .15s}
   .more-btn:hover{background:var(--accent-deep);box-shadow:0 14px 28px -10px rgba(139,111,212,.6)}
   .lock-note{font-size:12px;color:var(--ink-muted);margin-top:12px}
   .lock-note a{color:var(--accent-deep);text-decoration:underline}
+
+  /* 본문 아래 출처 한 줄 — 본문보다 작은 글씨, 회색. */
+  .post-source{display:none;margin-top:30px;padding-top:16px;border-top:1px solid var(--line-soft);
+    font-size:12.5px;color:var(--ink-muted);line-height:1.6}
+  .post-source.show{display:block}
+  .post-source .source-label{font-weight:700;color:var(--ink-soft);margin-right:8px}
+
+  /* 유용한 링크 — 외부 페이지로 새 창 오픈. 제목 + 간단한 설명 카드. */
+  .useful-links{display:none;margin-top:36px;padding-top:24px;border-top:1px solid var(--line)}
+  .useful-links.show{display:block}
+  .useful-links .ul-head{font-family:var(--display);font-size:16px;font-weight:700;color:var(--ink);margin-bottom:14px}
+  .useful-links .ul-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+  .useful-links .ul-list li{border:1px solid var(--line);border-radius:10px;transition:border-color .15s,background .15s,transform .15s}
+  .useful-links .ul-list li:hover{border-color:var(--accent-mid);background:var(--bg-soft)}
+  .useful-links .ul-list a{display:block;padding:13px 16px;text-decoration:none;color:var(--ink)}
+  .useful-links .ul-list .ul-title{font-size:14px;font-weight:700;color:var(--accent-deep);display:flex;align-items:center;gap:6px}
+  .useful-links .ul-list .ul-desc{font-size:12.5px;color:var(--ink-soft);margin-top:4px;line-height:1.55}
 
   /* ============ Modal ============ */
   .modal-backdrop{position:fixed;inset:0;background:rgba(10,6,20,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
@@ -177,14 +193,17 @@
   .modal-toggle{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:14px}
   .modal-toggle a{color:var(--accent-deep);text-decoration:underline;cursor:pointer;font-weight:600}
 
-  .social-row{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
   .social-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}
   .social-btn:hover:not(:disabled){background:var(--bg-soft);border-color:var(--ink-soft)}
   .social-btn.kakao{background:#FEE500;border-color:#FEE500;color:#3C1E1E}
   .social-btn.kakao:hover:not(:disabled){background:#FFE600}
   .social-btn:disabled{opacity:.45;cursor:not-allowed}
-  .social-divider{display:flex;align-items:center;gap:10px;color:var(--ink-muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin:14px 0}
-  .social-divider::before,.social-divider::after{content:'';flex:1;height:1px;background:var(--line)}
+  /* 가입 옵션 섹션 — 로그인 모드에서 폼 아래에 노출. */
+  .signup-section{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+  .signup-section .signup-eyebrow{font-size:12px;font-weight:600;color:var(--ink-soft);text-align:center;margin-bottom:12px}
+  .signup-section .signup-email-link{text-align:center;margin-top:12px}
+  .signup-section .signup-email-link a{font-size:12px;color:var(--ink-muted);text-decoration:underline;cursor:pointer}
+  .signup-section .signup-email-link a:hover{color:var(--ink-soft)}
 
   /* Toast */
   .toast{position:fixed;left:50%;bottom:48px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:13px;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
@@ -237,6 +256,16 @@
 
 <!-- Reader root — populated by JS -->
 <div id="reader-root" style="display:none">
+  <!-- admin 전용 — 드래프트 미리보기 상태일 때 상단 노란 배너 -->
+  <div id="admin-draft-banner" style="display:none;background:#fef3c7;color:#92400e;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;border-bottom:1px solid #fde68a;position:sticky;top:0;z-index:60">
+    🔒 비공개 (드래프트) 포스트를 미리보기 중입니다. 일반 사용자에겐 보이지 않습니다.
+  </div>
+
+  <!-- admin 전용 — 어디서든 편집 페이지로 빠르게 점프 -->
+  <a id="admin-edit-link" href="#" style="display:none;position:fixed;right:20px;bottom:20px;z-index:65;background:#1f2937;color:#fff;padding:12px 18px;border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 14px 32px -10px rgba(0,0,0,.35);transition:transform .15s,background .15s">
+    ✎ 이 포스트 편집 ↗
+  </a>
+
   <header class="reader-hero">
     <a class="back-link" id="back-link" href="/library/">← 라이브러리로</a>
     <span class="tag-chip" id="tag-chip"></span>
@@ -257,9 +286,8 @@
   <div class="reader-layout">
     <aside class="aside">
       <div class="bookcard">
+        <div class="ccategory" id="cover-category"></div>
         <div class="spine" id="cover-spine"></div>
-        <div class="ctitle" id="cover-title"></div>
-        <div class="csub" id="cover-sub"></div>
       </div>
       <nav class="chapter-list" id="chapter-list" aria-label="이 표지의 다른 챕터"></nav>
     </aside>
@@ -280,11 +308,19 @@
       </div>
 
       <div class="more-zone">
-        <div class="lock-eyebrow">🔒 여기서부터 멤버 전용</div>
-        <div class="lock-title">전체 본문은 무료 가입 후 바로 열려요</div>
-        <div class="lock-sub">이메일 한 줄이면 끝. 한 번 가입으로 라이브러리 전체와 강의 페이지까지 같은 계정으로 이어집니다.</div>
         <button class="more-btn" id="more-btn">더보기 — 전체 읽기 →</button>
-        <div class="lock-note">이미 가입했다면 <a id="more-login-link" href="#">로그인</a></div>
+      </div>
+
+      <!-- 본문 아래 출처 (admin 에서 입력 시 표시). 게이트와 무관하게 항상 노출. -->
+      <div class="post-source" id="post-source-wrap">
+        <span class="source-label">출처</span>
+        <span id="post-source"></span>
+      </div>
+
+      <!-- 유용한 링크 (admin 에서 입력 시 표시). 외부 페이지 새 창 오픈. -->
+      <div class="useful-links" id="useful-links-wrap">
+        <h3 class="ul-head">유용한 링크</h3>
+        <ul class="ul-list" id="useful-links-list"></ul>
       </div>
     </article>
   </div>
@@ -311,28 +347,35 @@
 </footer>
 
 <!-- ============ Auth modal ============ -->
+<!-- 기본 진입 = 로그인. 폼 위에 "여기서부터 멤버 전용" 헤더,
+     폼 아래에 가입 옵션(카카오 + 이메일 회원가입 링크) 노출. -->
 <div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal">
     <button class="modal-close" id="modal-close" aria-label="닫기">×</button>
-    <h2 id="modal-title">이메일 하나로 시작</h2>
-    <p class="modal-sub" id="modal-sub">가입은 30초. 전체 라이브러리와 강의 페이지까지 같은 계정으로 이어집니다.</p>
-
-    <div class="social-row">
-      <button class="social-btn kakao" id="btn-kakao" disabled>
-        <span>카카오로 계속</span>
-      </button>
-    </div>
-    <div class="social-divider">또는</div>
+    <h2 id="modal-title">여기서부터 멤버 전용</h2>
+    <p class="modal-sub" id="modal-sub" style="display:none"></p>
 
     <form class="modal-form" id="modal-form">
       <input id="m-email" type="email" placeholder="이메일" autocomplete="email" required>
-      <input id="m-pw" type="password" placeholder="비밀번호 (8자 이상)" autocomplete="new-password" required>
+      <input id="m-pw" type="password" placeholder="비밀번호" autocomplete="current-password" required>
       <input id="m-code" type="text" inputmode="numeric" placeholder="이메일 인증코드 6자리" autocomplete="one-time-code" style="display:none">
       <div id="m-msg" class="modal-msg"></div>
-      <button type="submit" class="submit" id="m-submit">가입하고 전체 읽기</button>
+      <button type="submit" class="submit" id="m-submit">로그인</button>
     </form>
 
-    <div class="modal-toggle" id="modal-toggle">
+    <!-- 가입 옵션: 로그인 모드일 때만 노출. signup/verify 모드에선 숨김. -->
+    <div class="signup-section" id="signup-section">
+      <div class="signup-eyebrow">전체본문은 무료 가입 후 바로 열려요</div>
+      <button class="social-btn kakao" id="btn-kakao" disabled>
+        <span>카카오로 시작하기</span>
+      </button>
+      <div class="signup-email-link">
+        <a id="go-signup" href="#">이메일로 회원가입하기</a>
+      </div>
+    </div>
+
+    <!-- signup/verify 모드 토글: 로그인으로 돌아가기. -->
+    <div class="modal-toggle" id="modal-toggle" style="display:none">
       이미 가입했나요? <a id="toggle-mode">로그인</a>
     </div>
   </div>
@@ -426,35 +469,16 @@ function toast(msg) {
 // ── Docking nav ────────────────────────────────────────────────────────
 function setupDockingNav() {
   var nav = $('topnav');
-  // Threshold = .reader-hero 바닥 - 80px 버퍼. hero 가 거의 화면 밖으로
-  // 빠지고 본문(.paper) 으로 진입할 때 docked. hero 가 길든 짧든 자동 적응.
-  // hero 요소는 boot() → render() 후에 등장하므로 lazy 측정.
-  var FALLBACK = 600;
-  var threshold = FALLBACK;
-  var heroEl = null;
-  var refreshThreshold = function () {
-    heroEl = heroEl || document.querySelector('.reader-hero');
-    if (heroEl) {
-      var rect = heroEl.getBoundingClientRect();
-      threshold = (window.scrollY || 0) + rect.bottom - 80;
-    }
-  };
-  refreshThreshold();
-  // render() 가 비동기라 페이지 첫 로드 직후엔 hero 가 없을 수 있음.
-  // 0.5s 후 한 번 더 측정해 늦게 들어온 hero 까지 잡음.
-  setTimeout(refreshThreshold, 500);
-
+  // 스크롤이 거의 시작되자마자 docked 로 전환. 이전: hero 바닥 (≈400-500px)
+  // 까지 floating 유지 → CSS transition 의 중간 상태가 좁아 보이는 깜빡임
+  // 발생. 60px 로 낮춰 첫 스크롤에 즉시 깔끔하게 docked 됨.
+  var DOCK_AT = 60;
   var apply = function () {
-    if (window.scrollY > threshold) nav.classList.add('docked');
+    if (window.scrollY > DOCK_AT) nav.classList.add('docked');
     else nav.classList.remove('docked');
   };
-  window.addEventListener('scroll', apply, { passive: true });
-  window.addEventListener('resize', function () {
-    heroEl = null;       // 폰트·이미지 로드 등으로 높이가 바뀌면 다시 측정
-    refreshThreshold();
-    apply();
-  });
   apply();
+  window.addEventListener('scroll', apply, { passive: true });
 }
 
 // ── nav-user redirect (signed-in → /account.html) ─────────────────────
@@ -506,11 +530,10 @@ function render() {
   if (c) {
     $('back-link').setAttribute('href', '/library/');
     setText('cover-spine', c.title || '');
-    setText('cover-title', c.title || '');
-    setText('cover-sub', c.description || '');
+    setText('cover-category', c.tag || 'LIBRARY');
   } else {
-    setText('cover-title', '라이브러리');
-    setText('cover-sub', '');
+    setText('cover-spine', '라이브러리');
+    setText('cover-category', '');
   }
 
   // Chapter list (sidebar)
@@ -532,9 +555,56 @@ function render() {
   setText('post-lead', p.lead || '');
   setHtml('post-body', p.bodyHtml || '');
 
+  // 출처 (있을 때만 표시). 본문보다 작은 글씨로 본문 바로 아래 한 줄.
+  var sourceText = (p.source || '').trim();
+  var sourceWrap = $('post-source-wrap');
+  if (sourceText) {
+    setText('post-source', sourceText);
+    sourceWrap.classList.add('show');
+  } else {
+    sourceWrap.classList.remove('show');
+  }
+
+  // 유용한 링크 (있을 때만 섹션 표시). target="_blank" + rel noopener.
+  var links = Array.isArray(p.usefulLinks) ? p.usefulLinks : [];
+  var ulWrap = $('useful-links-wrap');
+  var ulList = $('useful-links-list');
+  if (links.length) {
+    ulList.innerHTML = links.map(function (l) {
+      var url = String((l && l.url) || '');
+      // 안전성: handler 가 http(s) 만 통과시키지만 한 번 더 방어.
+      if (!/^https?:\/\//i.test(url)) return '';
+      var title = String((l && l.title) || url);
+      var desc = String((l && l.description) || '');
+      return '<li><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">'
+        + '<div class="ul-title">' + escapeHtml(title) + ' <span aria-hidden="true">↗</span></div>'
+        + (desc ? '<div class="ul-desc">' + escapeHtml(desc) + '</div>' : '')
+        + '</a></li>';
+    }).join('');
+    ulWrap.classList.add('show');
+  } else {
+    ulList.innerHTML = '';
+    ulWrap.classList.remove('show');
+  }
+
   // Gate
   STATE.isMember = isLoggedIn();
   applyGate();
+
+  // admin UI — "이 포스트 편집 ↗" floating + 드래프트 배너
+  if (isAdminClient() && p.slug) {
+    var editLink = $('admin-edit-link');
+    var siteHost = window.location.hostname === 'dev.aiseo.tips'
+      ? 'site.dev.aiseo.tips'
+      : 'site.aiseo.tips';
+    editLink.href = 'https://' + siteHost + '/admin/library/posts/'
+      + encodeURIComponent(p.slug) + '/edit';
+    editLink.style.display = 'inline-block';
+    // draft 미리보기 모드 표시
+    if (STATE.isDraftPreview) {
+      $('admin-draft-banner').style.display = 'block';
+    }
+  }
 
   // Show root
   $('loading').style.display = 'none';
@@ -586,7 +656,7 @@ function renderLibraryCta(allCovers, postsByCover) {
 }
 
 // ── Modal state machine ───────────────────────────────────────────────
-var MODAL_MODE = 'signup'; // 'signup' | 'signup-verify' | 'login'
+var MODAL_MODE = 'login'; // 'login' (default) | 'signup' | 'signup-verify'
 var _tmpEmail = '';
 var _tmpPassword = '';
 
@@ -601,48 +671,60 @@ function modalRender() {
   var pw      = $('m-pw');
   var code    = $('m-code');
   var submit  = $('m-submit');
+  var sub     = $('modal-sub');
+  var signupSection = $('signup-section');
   var toggle  = $('modal-toggle');
   setMsg('');
 
-  if (MODAL_MODE === 'signup') {
-    $('modal-title').textContent = '이메일 하나로 시작';
-    $('modal-sub').textContent   = '가입은 30초. 전체 라이브러리와 강의 페이지까지 같은 계정으로 이어집니다.';
+  if (MODAL_MODE === 'login') {
+    // 기본 진입 — 폼 위 헤더 + 로그인 폼 + 아래 가입 옵션 패널.
+    $('modal-title').textContent = '여기서부터 멤버 전용';
+    sub.style.display   = 'none';
     email.style.display = '';
     pw.style.display    = '';
+    pw.setAttribute('autocomplete', 'current-password');
+    pw.placeholder      = '비밀번호';
+    code.style.display  = 'none';
+    submit.textContent  = '로그인';
+    signupSection.style.display = '';
+    toggle.style.display = 'none';
+  } else if (MODAL_MODE === 'signup') {
+    $('modal-title').textContent = '이메일로 회원가입';
+    sub.style.display   = '';
+    sub.textContent     = '가입은 30초. 전체 라이브러리와 강의 페이지까지 같은 계정으로 이어집니다.';
+    email.style.display = '';
+    pw.style.display    = '';
+    pw.setAttribute('autocomplete', 'new-password');
+    pw.placeholder      = '비밀번호 (8자 이상)';
     code.style.display  = 'none';
     submit.textContent  = '가입하고 전체 읽기';
+    signupSection.style.display = 'none';
+    toggle.style.display = '';
     toggle.innerHTML    = '이미 가입했나요? <a id="toggle-mode">로그인</a>';
-  } else if (MODAL_MODE === 'signup-verify') {
+  } else { // signup-verify
     $('modal-title').textContent = '이메일을 확인해 주세요';
-    $('modal-sub').textContent   = _tmpEmail + ' 로 6자리 인증코드를 발송했습니다.';
+    sub.style.display   = '';
+    sub.textContent     = _tmpEmail + ' 로 6자리 인증코드를 발송했습니다.';
     email.style.display = 'none';
     pw.style.display    = 'none';
     code.style.display  = '';
     code.value          = '';
     submit.textContent  = '인증 완료';
+    signupSection.style.display = 'none';
+    toggle.style.display = '';
     toggle.innerHTML    = '이메일을 다시 입력하시려면 <a id="toggle-mode">처음으로</a>';
-  } else { // login
-    $('modal-title').textContent = '다시 만나서 반가워요';
-    $('modal-sub').textContent   = '이메일과 비밀번호로 로그인 후 전체 본문이 열립니다.';
-    email.style.display = '';
-    pw.style.display    = '';
-    code.style.display  = 'none';
-    submit.textContent  = '로그인하고 계속 읽기';
-    toggle.innerHTML    = '아직 가입 전인가요? <a id="toggle-mode">회원가입</a>';
   }
-  // Re-bind toggle anchor (innerHTML replaced it).
+  // 모드 전환 anchor 재바인딩 (innerHTML 로 새 요소로 교체됨).
   var tlink = $('toggle-mode');
   if (tlink) tlink.addEventListener('click', function (e) {
     e.preventDefault();
-    if (MODAL_MODE === 'login') MODAL_MODE = 'signup';
-    else if (MODAL_MODE === 'signup-verify') MODAL_MODE = 'signup';
-    else MODAL_MODE = 'login';
+    MODAL_MODE = 'login';
     modalRender();
   });
 }
 
 function openModal(initialMode) {
-  MODAL_MODE = initialMode || 'signup';
+  MODAL_MODE = initialMode || 'login';
   modalRender();
   $('modal').classList.add('open');
   // Focus first visible input on next tick (modal display change first).
@@ -784,14 +866,21 @@ function setupPageActions() {
   $('paper-share').addEventListener('click', doShare);
 
   var doScrap = function () {
-    if (!STATE.isMember) { openModal('signup'); return; }
+    if (!STATE.isMember) { openModal('login'); return; }
     toast('스크랩되었습니다. (베타)');
   };
   $('scrap-btn').addEventListener('click', doScrap);
   $('paper-scrap').addEventListener('click', doScrap);
 
-  $('more-btn').addEventListener('click', function () { openModal('signup'); });
-  $('more-login-link').addEventListener('click', function (e) { e.preventDefault(); openModal('login'); });
+  // 더보기 → 모달은 항상 login 모드로 시작. signup 은 모달 내부의
+  // "이메일로 회원가입하기" 링크로 전환.
+  $('more-btn').addEventListener('click', function () { openModal('login'); });
+  $('go-signup').addEventListener('click', function (e) {
+    e.preventDefault();
+    MODAL_MODE = 'signup';
+    modalRender();
+    setTimeout(function () { $('m-email').focus(); }, 30);
+  });
   $('modal-close').addEventListener('click', closeModal);
   $('modal').addEventListener('click', function (e) { if (e.target === $('modal')) closeModal(); });
   document.addEventListener('keydown', function (e) {
@@ -804,14 +893,49 @@ function setupPageActions() {
 }
 
 // ── Fetch ──────────────────────────────────────────────────────────────
+// admin token 이 있는지 판단 (cognito:groups claim 에 admin 있나).
+// JWT payload 만 보고 결정 — 서명 검증은 백엔드가 함.
+function isAdminClient() {
+  try {
+    var token = localStorage.getItem(ID_TOKEN_KEY);
+    if (!token) return false;
+    var parts = token.split('.');
+    if (parts.length !== 3) return false;
+    var payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    var groups = payload['cognito:groups'];
+    if (Array.isArray(groups)) return groups.indexOf('admin') !== -1;
+    if (typeof groups === 'string') return /\badmin\b/.test(groups);
+    return false;
+  } catch (e) { return false; }
+}
+
 function fetchPost(coverSlug, postSlug) {
   if (!API_BASE) return Promise.reject(new Error('API base 가 설정되지 않았습니다.'));
-  var url = API_BASE + '/library/posts/' + encodeURIComponent(postSlug)
+  var publicUrl = API_BASE + '/library/posts/' + encodeURIComponent(postSlug)
     + (coverSlug ? ('?cover=' + encodeURIComponent(coverSlug)) : '');
-  return fetch(url).then(function (r) {
+  return fetch(publicUrl).then(function (r) {
+    return r.json().then(function (j) {
+      if (r.ok && j && j.success) return j.data;
+      // 비공개/없음 → admin 이면 preview 시도. 일반 사용자는 그대로 에러.
+      if (isAdminClient()) {
+        return fetchAdminPreview(coverSlug, postSlug).then(function (data) {
+          data.__isAdminPreview = true;
+          return data;
+        });
+      }
+      throw new Error((j && j.error) || ('API ' + r.status));
+    });
+  });
+}
+
+function fetchAdminPreview(coverSlug, postSlug) {
+  var token = localStorage.getItem(ID_TOKEN_KEY);
+  var url = API_BASE + '/admin/library/preview/' + encodeURIComponent(postSlug)
+    + (coverSlug ? ('?cover=' + encodeURIComponent(coverSlug)) : '');
+  return fetch(url, { headers: { Authorization: 'Bearer ' + token } }).then(function (r) {
     return r.json().then(function (j) {
       if (!r.ok || !j || !j.success) {
-        throw new Error((j && j.error) || ('API ' + r.status));
+        throw new Error((j && j.error) || ('Preview API ' + r.status));
       }
       return j.data;
     });
@@ -851,6 +975,7 @@ function boot() {
     STATE.post = data.post;
     STATE.cover = data.cover;
     STATE.siblings = data.siblings || [];
+    STATE.isDraftPreview = !!data.__isAdminPreview;
     render();
 
     // 하단 라이브러리 카드 — 별도로 모든 cover 를 받아 임의 챕터 노출.

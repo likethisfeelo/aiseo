@@ -41,6 +41,13 @@ const ADMIN_MENU: MenuCard[] = [
     color: 'var(--accent-mid, #6366f1)',
   },
   {
+    to: '/admin/library/audit',
+    icon: '🪵',
+    title: '라이브러리 감사 로그',
+    description: '누가 언제 어떤 표지/포스트를 바꿨는지 시간 역순 추적',
+    color: 'var(--accent-deep, #6b4fb8)',
+  },
+  {
     to: '/admin/course-inquiries',
     icon: '📞',
     title: '수강 문의',

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   adminGetLibraryPost,
@@ -6,11 +6,19 @@ import {
   adminUpdateLibraryPost,
   adminListLibraryCovers,
 } from '../../api';
+import { BlogEditor } from '../../components/common/BlogEditor';
+import { ImageUploader } from '../../components/common/ImageUploader';
 
 interface CoverRow {
   slug: string;
   title?: string;
   isPublished?: boolean;
+}
+
+interface UsefulLink {
+  url: string;
+  title: string;
+  description: string;
 }
 
 interface PostFull {
@@ -22,6 +30,8 @@ interface PostFull {
   readMinutes?: number;
   lead?: string;
   bodyHtml?: string;
+  source?: string;
+  usefulLinks?: UsefulLink[];
   canonicalCoverSlug?: string;
   seoMeta?: {
     description?: string;
@@ -61,6 +71,8 @@ export function LibraryPostEditPage() {
   const [publishedAtLocal, setPublishedAtLocal] = useState('');
   const [lead, setLead] = useState('');
   const [bodyHtml, setBodyHtml] = useState('');
+  const [source, setSource] = useState('');
+  const [usefulLinks, setUsefulLinks] = useState<UsefulLink[]>([]);
   const [isPublished, setIsPublished] = useState(false);
 
   const [seoDescription, setSeoDescription] = useState('');
@@ -99,6 +111,16 @@ export function LibraryPostEditPage() {
           setPublishedAtLocal(isoToLocal(p.publishedAt || ''));
           setLead(p.lead || '');
           setBodyHtml(p.bodyHtml || '');
+          setSource(p.source || '');
+          setUsefulLinks(
+            Array.isArray(p.usefulLinks)
+              ? p.usefulLinks.map((l) => ({
+                  url: l.url || '',
+                  title: l.title || '',
+                  description: l.description || '',
+                }))
+              : [],
+          );
           setIsPublished(!!p.isPublished);
           const m = p.seoMeta || {};
           setSeoDescription(m.description || '');
@@ -121,6 +143,43 @@ export function LibraryPostEditPage() {
   const handleTitleChange = (v: string) => {
     setTitle(v);
     if (!isEditMode && !slugTouched) setSlug(slugify(v));
+  };
+
+  const addUsefulLink = () => setUsefulLinks((ls) => [...ls, { url: '', title: '', description: '' }]);
+  const removeUsefulLink = (idx: number) => setUsefulLinks((ls) => ls.filter((_, i) => i !== idx));
+  const updateUsefulLink = (idx: number, patch: Partial<UsefulLink>) =>
+    setUsefulLinks((ls) => ls.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
+  const moveUsefulLink = (idx: number, dir: -1 | 1) =>
+    setUsefulLinks((ls) => {
+      const next = [...ls];
+      const target = idx + dir;
+      if (target < 0 || target >= next.length) return ls;
+      [next[idx], next[target]] = [next[target], next[idx]];
+      return next;
+    });
+
+  // ── 유용한 링크 HTML5 드래그 정렬 ──
+  const linkDragIdx = useRef<number | null>(null);
+  const onLinkDragStart = (i: number) => { linkDragIdx.current = i; };
+  const onLinkDragOver = (e: React.DragEvent) => e.preventDefault();
+  const onLinkDrop = (i: number) => {
+    const from = linkDragIdx.current;
+    linkDragIdx.current = null;
+    if (from === null || from === i) return;
+    setUsefulLinks((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(i, 0, moved);
+      return next;
+    });
+  };
+
+  // URL 유효성 — 비어있으면 중립(저장 시 drop), 채워졌는데 http(s) 가
+  // 아니면 인라인 에러 노출.
+  const isValidLinkUrl = (url: string): boolean => {
+    const v = url.trim();
+    if (!v) return true; // 빈 URL = 신호 없음 (저장 시 제외)
+    return /^https?:\/\/[^\s]+$/i.test(v);
   };
 
   const toggleCover = (cs: string) => {
@@ -156,6 +215,10 @@ export function LibraryPostEditPage() {
       publishedAt: publishedAtLocal ? new Date(publishedAtLocal).toISOString() : '',
       lead,
       bodyHtml,
+      source,
+      usefulLinks: usefulLinks
+        .map((l) => ({ url: l.url.trim(), title: l.title.trim(), description: l.description.trim() }))
+        .filter((l) => /^https?:\/\//i.test(l.url)),
       canonicalCoverSlug,
       seoMeta: {
         description: seoDescription,
@@ -216,8 +279,12 @@ export function LibraryPostEditPage() {
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 200px' }}>
-            <label style={styles.label}>태그</label>
-            <input value={tag} onChange={(e) => setTag(e.target.value)} style={styles.input} placeholder="성공사례 / SEO전략" />
+            <label style={styles.label}>카테고리</label>
+            <select value={tag} onChange={(e) => setTag(e.target.value)} style={styles.input}>
+              <option value="">— 선택 —</option>
+              <option value="성공사례">성공사례</option>
+              <option value="SEO전략">SEO전략</option>
+            </select>
           </div>
           <div style={{ flex: '1 1 160px' }}>
             <label style={styles.label}>저자</label>
@@ -237,17 +304,91 @@ export function LibraryPostEditPage() {
       </div>
 
       <div style={styles.section}>
-        <div style={styles.sectionTitle}>본문 HTML — 게이트 대상</div>
+        <div style={styles.sectionTitle}>본문 — 게이트 대상 (WYSIWYG)</div>
         <p style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>
-          허용 태그: p, h1-6, ul/ol/li, blockquote, code/pre, a, img, table, figure 등. 저장 시 sanitize 됩니다.
+          툴바로 서식·이미지·링크 편집. 이미지는 자동으로 S3 에 업로드(siteId="library")됩니다. 저장 시 서버에서 sanitize.
+        </p>
+        <BlogEditor
+          value={bodyHtml}
+          onChange={setBodyHtml}
+          placeholder="본문을 입력하세요..."
+          siteId="library"
+        />
+      </div>
+
+      <div style={styles.section}>
+        <div style={styles.sectionTitle}>출처</div>
+        <p style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>
+          본문 아래에 본문보다 작은 글씨로 한 줄 노출됩니다. 비워두면 표시되지 않습니다.
         </p>
         <textarea
-          value={bodyHtml}
-          onChange={(e) => setBodyHtml(e.target.value)}
-          rows={20}
-          style={{ ...styles.input, resize: 'vertical', fontFamily: 'monospace', fontSize: 12 }}
-          placeholder="<p>...</p><h2>...</h2>"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          rows={2}
+          style={{ ...styles.input, resize: 'vertical' }}
+          placeholder="예: AISEO 내부 사례 / Google Search Central / 네이버 서치어드바이저"
         />
+      </div>
+
+      <div style={styles.section}>
+        <div style={styles.sectionTitle}>유용한 링크 (새 창에서 열림)</div>
+        <p style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
+          본문 맨 아래 "유용한 링크" 섹션에 카드 형태로 노출. URL 은 http(s) 만 허용되며, 빈 URL 행은 저장 시 제외됩니다. 최대 20개.
+        </p>
+        {usefulLinks.map((link, idx) => {
+          const urlValid = isValidLinkUrl(link.url);
+          return (
+          <div
+            key={idx}
+            draggable
+            onDragStart={() => onLinkDragStart(idx)}
+            onDragOver={onLinkDragOver}
+            onDrop={() => onLinkDrop(idx)}
+            style={{ ...styles.linkRow, cursor: 'grab' }}
+          >
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'monospace' }} title="드래그하여 순서 변경">⋮⋮ #{idx + 1}</span>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+                <button type="button" onClick={() => moveUsefulLink(idx, -1)} disabled={idx === 0} style={styles.smallBtn}>↑</button>
+                <button type="button" onClick={() => moveUsefulLink(idx, 1)} disabled={idx === usefulLinks.length - 1} style={styles.smallBtn}>↓</button>
+                <button type="button" onClick={() => removeUsefulLink(idx)} style={{ ...styles.smallBtn, color: 'var(--danger)' }}>삭제</button>
+              </div>
+            </div>
+            <input
+              value={link.url}
+              onChange={(e) => updateUsefulLink(idx, { url: e.target.value })}
+              placeholder="https://..."
+              style={{
+                ...styles.input,
+                fontFamily: 'monospace',
+                fontSize: 12,
+                marginBottom: urlValid ? 6 : 2,
+                borderColor: urlValid ? undefined : 'var(--danger, #dc2626)',
+              }}
+            />
+            {!urlValid && (
+              <div style={{ fontSize: 11, color: 'var(--danger, #dc2626)', marginBottom: 6 }}>
+                http:// 또는 https:// 로 시작해야 합니다. 빈 URL 은 저장 시 제외됨.
+              </div>
+            )}
+            <input
+              value={link.title}
+              onChange={(e) => updateUsefulLink(idx, { title: e.target.value })}
+              placeholder="링크 제목 (예: Google Search Central)"
+              style={{ ...styles.input, marginBottom: 6 }}
+            />
+            <input
+              value={link.description}
+              onChange={(e) => updateUsefulLink(idx, { description: e.target.value })}
+              placeholder="간단한 설명 (선택, 약 1줄)"
+              style={{ ...styles.input, marginBottom: 0 }}
+            />
+          </div>
+          );
+        })}
+        <button type="button" onClick={addUsefulLink} style={{ ...styles.secondaryBtn, width: '100%' }}>
+          + 링크 추가
+        </button>
       </div>
 
       <div style={styles.section}>
@@ -298,8 +439,22 @@ export function LibraryPostEditPage() {
         <label style={styles.label}>OG Description</label>
         <textarea value={seoOgDescription} onChange={(e) => setSeoOgDescription(e.target.value)} rows={2} style={{ ...styles.input, resize: 'vertical' }} />
 
-        <label style={styles.label}>OG Image URL</label>
-        <input value={seoOgImage} onChange={(e) => setSeoOgImage(e.target.value)} style={{ ...styles.input, fontFamily: 'monospace', fontSize: 12 }} placeholder="https://..." />
+        <label style={styles.label}>OG Image</label>
+        <ImageUploader
+          siteId="library"
+          currentUrl={seoOgImage}
+          onUploaded={setSeoOgImage}
+          label="OG 이미지 업로드"
+        />
+        <p style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+          또는 직접 URL 입력:
+        </p>
+        <input
+          value={seoOgImage}
+          onChange={(e) => setSeoOgImage(e.target.value)}
+          style={{ ...styles.input, fontFamily: 'monospace', fontSize: 12 }}
+          placeholder="https://..."
+        />
       </div>
 
       <div style={styles.section}>
@@ -338,4 +493,6 @@ const styles: Record<string, React.CSSProperties> = {
   secondaryBtn: { padding: '9px 18px', border: '1px solid var(--border-strong)', background: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', cursor: 'pointer' },
   coverGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 8 },
   coverCard: { display: 'flex', alignItems: 'center', gap: 10, padding: 12, border: '2px solid var(--border)', borderRadius: 8, cursor: 'pointer', background: '#fff', fontSize: 13 },
+  linkRow: { background: 'var(--bg-soft, #f8f9fa)', border: '1px solid var(--border)', borderRadius: 8, padding: 12, marginBottom: 10 },
+  smallBtn: { padding: '4px 10px', border: '1px solid var(--border-strong)', background: '#fff', borderRadius: 4, fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' },
 };
