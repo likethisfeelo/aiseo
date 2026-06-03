@@ -224,8 +224,15 @@ export function LibraryCoverEditPage() {
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 200px' }}>
-            <label style={styles.label}>태그 라벨</label>
-            <input value={tag} onChange={(e) => setTag(e.target.value)} style={styles.input} placeholder="Playbooks / Case Studies" />
+            <label style={styles.label}>카테고리</label>
+            <select value={tag} onChange={(e) => setTag(e.target.value)} style={styles.input}>
+              <option value="">— 선택 —</option>
+              <option value="성공사례">성공사례</option>
+              <option value="SEO전략">SEO전략</option>
+            </select>
+            <p style={{ fontSize: 11, color: '#888', marginTop: -8, marginBottom: 12 }}>
+              카탈로그 페이지의 탭 필터가 이 값으로 매칭됩니다.
+            </p>
           </div>
           <div style={{ flex: '0 0 120px' }}>
             <label style={styles.label}>표시 순서</label>

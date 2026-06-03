@@ -64,6 +64,24 @@ const boolOf = (v) => v === true || v === 'true';
 
 const numOf = (v, def = 0) => (Number.isFinite(Number(v)) ? Number(v) : def);
 
+// 유용한 링크 검증: 배열, 최대 20개. 각 항목은 {url,title,description}.
+// url 은 http(s) 만 허용 (외부 페이지 새창 오픈 용도).
+const validateUsefulLinks = (input) => {
+  if (!Array.isArray(input)) return [];
+  const out = [];
+  for (const raw of input.slice(0, 20)) {
+    if (!raw || typeof raw !== 'object') continue;
+    const url = str(raw.url, 500);
+    if (!url || !/^https?:\/\//i.test(url)) continue;
+    out.push({
+      url,
+      title: str(raw.title, 200),
+      description: str(raw.description, 300),
+    });
+  }
+  return out;
+};
+
 const isSlug = (s) => typeof s === 'string' && s.length > 0 && s.length <= 100 && SLUG_RE.test(s);
 
 const pad4 = (n) => String(Math.max(0, Math.min(9999, Math.floor(n)))).padStart(4, '0');
@@ -361,6 +379,10 @@ const buildPostItem = (body, base = {}) => {
     readMinutes: Number.isFinite(body.readMinutes) ? Math.max(0, Math.floor(body.readMinutes)) : numOf(body.readMinutes, 4),
     lead: str(body.lead, 800),
     bodyHtml: sanitized,
+    // 본문 아래에 작게 노출되는 출처 한 줄 (예: "AISEO 내부 사례 / Google Search Central").
+    source: str(body.source, 800),
+    // 본문 맨 아래 "유용한 링크" 섹션 — 외부 페이지 새창 오픈.
+    usefulLinks: validateUsefulLinks(body.usefulLinks),
     canonicalCoverSlug: str(body.canonicalCoverSlug, 100),
     seoMeta,
     isPublished: boolOf(body.isPublished),
