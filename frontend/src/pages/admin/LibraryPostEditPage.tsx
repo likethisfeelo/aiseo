@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   adminGetLibraryPost,
@@ -156,6 +156,30 @@ export function LibraryPostEditPage() {
       return next;
     });
 
+  // ── 유용한 링크 HTML5 드래그 정렬 ──
+  const linkDragIdx = useRef<number | null>(null);
+  const onLinkDragStart = (i: number) => { linkDragIdx.current = i; };
+  const onLinkDragOver = (e: React.DragEvent) => e.preventDefault();
+  const onLinkDrop = (i: number) => {
+    const from = linkDragIdx.current;
+    linkDragIdx.current = null;
+    if (from === null || from === i) return;
+    setUsefulLinks((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(i, 0, moved);
+      return next;
+    });
+  };
+
+  // URL 유효성 — 비어있으면 중립(저장 시 drop), 채워졌는데 http(s) 가
+  // 아니면 인라인 에러 노출.
+  const isValidLinkUrl = (url: string): boolean => {
+    const v = url.trim();
+    if (!v) return true; // 빈 URL = 신호 없음 (저장 시 제외)
+    return /^https?:\/\/[^\s]+$/i.test(v);
+  };
+
   const toggleCover = (cs: string) => {
     setAssignedCovers((prev) => {
       const has = prev.includes(cs);
@@ -310,10 +334,19 @@ export function LibraryPostEditPage() {
         <p style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
           본문 맨 아래 "유용한 링크" 섹션에 카드 형태로 노출. URL 은 http(s) 만 허용되며, 빈 URL 행은 저장 시 제외됩니다. 최대 20개.
         </p>
-        {usefulLinks.map((link, idx) => (
-          <div key={idx} style={styles.linkRow}>
+        {usefulLinks.map((link, idx) => {
+          const urlValid = isValidLinkUrl(link.url);
+          return (
+          <div
+            key={idx}
+            draggable
+            onDragStart={() => onLinkDragStart(idx)}
+            onDragOver={onLinkDragOver}
+            onDrop={() => onLinkDrop(idx)}
+            style={{ ...styles.linkRow, cursor: 'grab' }}
+          >
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'monospace' }}>#{idx + 1}</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'monospace' }} title="드래그하여 순서 변경">⋮⋮ #{idx + 1}</span>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
                 <button type="button" onClick={() => moveUsefulLink(idx, -1)} disabled={idx === 0} style={styles.smallBtn}>↑</button>
                 <button type="button" onClick={() => moveUsefulLink(idx, 1)} disabled={idx === usefulLinks.length - 1} style={styles.smallBtn}>↓</button>
@@ -324,8 +357,19 @@ export function LibraryPostEditPage() {
               value={link.url}
               onChange={(e) => updateUsefulLink(idx, { url: e.target.value })}
               placeholder="https://..."
-              style={{ ...styles.input, fontFamily: 'monospace', fontSize: 12, marginBottom: 6 }}
+              style={{
+                ...styles.input,
+                fontFamily: 'monospace',
+                fontSize: 12,
+                marginBottom: urlValid ? 6 : 2,
+                borderColor: urlValid ? undefined : 'var(--danger, #dc2626)',
+              }}
             />
+            {!urlValid && (
+              <div style={{ fontSize: 11, color: 'var(--danger, #dc2626)', marginBottom: 6 }}>
+                http:// 또는 https:// 로 시작해야 합니다. 빈 URL 은 저장 시 제외됨.
+              </div>
+            )}
             <input
               value={link.title}
               onChange={(e) => updateUsefulLink(idx, { title: e.target.value })}
@@ -339,7 +383,8 @@ export function LibraryPostEditPage() {
               style={{ ...styles.input, marginBottom: 0 }}
             />
           </div>
-        ))}
+          );
+        })}
         <button type="button" onClick={addUsefulLink} style={{ ...styles.secondaryBtn, width: '100%' }}>
           + 링크 추가
         </button>
