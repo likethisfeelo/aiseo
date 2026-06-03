@@ -110,9 +110,26 @@
   /* ── Aside ── */
   .aside{position:sticky;top:96px;display:flex;flex-direction:column;gap:18px}
   @media (max-width:900px){.aside{position:static;top:auto}}
-  .bookcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:14px}
-  .bookcard .ccategory{font-size:11px;font-weight:700;color:var(--accent-deep);letter-spacing:.05em;background:var(--accent-light);padding:5px 14px;border-radius:999px}
-  .bookcard .spine{width:120px;height:160px;background:linear-gradient(135deg,var(--accent-dark),var(--accent-deep));border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;text-align:center;padding:14px;line-height:1.32;box-shadow:0 14px 30px -14px rgba(107,79,184,.6)}
+  /* 책 표지 카드 — 카탈로그의 책 한 권과 유사한 느낌.
+     카테고리 chip 은 좌측 정렬, 표지(spine)는 카드 폭 전체로 크게.
+     안쪽 좌측에 세로 라인을 그어 "책등" 느낌 + 그라데이션 + drop shadow. */
+  .bookcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;align-items:stretch;gap:14px}
+  .bookcard .ccategory{align-self:flex-start;font-size:11px;font-weight:700;color:var(--accent-deep);letter-spacing:.05em;background:var(--accent-light);padding:5px 14px;border-radius:999px}
+  .bookcard .spine{position:relative;width:100%;aspect-ratio:3/4;
+    background:linear-gradient(135deg,#A88AE2 0%,#8B6FD4 35%,#6B4FB8 100%);
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:15px;text-align:center;
+    padding:24px 22px 24px 28px;line-height:1.34;letter-spacing:-.01em;
+    box-shadow:inset 6px 0 14px -8px rgba(0,0,0,.28),
+               inset -3px 0 8px -6px rgba(255,255,255,.18),
+               0 18px 38px -16px rgba(75,33,184,.55),
+               0 6px 14px -8px rgba(75,33,184,.35);
+    word-break:keep-all}
+  /* 책 표지 좌측 세로 "책등" 라인 — 카탈로그의 .book .spine 느낌 살림. */
+  .bookcard .spine::before{content:'';position:absolute;left:10px;top:14px;bottom:14px;width:2px;
+    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.28) 50%,rgba(255,255,255,.06));
+    border-radius:2px}
   .chapter-list{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
   .chapter-list .chl-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);padding:14px 16px 6px}
   .chapter-list a{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;border-top:1px solid var(--line-soft);font-size:13px;line-height:1.4;color:var(--ink-soft);transition:background .15s, color .15s}
