@@ -640,6 +640,17 @@ export class CdkStack extends Stack {
       projectionType: dynamodb.ProjectionType.ALL,
     });
 
+    // 감사 로그 — admin 의 모든 표지/포스트 mutation 기록.
+    // PK='audit' 고정 (단일 partition, 라이브러리 규모상 hot 되지 않음).
+    // SK=`{nowIso}#{uuid}` 로 시간 역순 조회 쉬움.
+    const libraryAuditTableName = 'aiseo-library-audit';
+    const libraryAuditTable = new dynamodb.Table(this, 'LibraryAuditTable', {
+      tableName: libraryAuditTableName,
+      partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
     const libraryHandler = new lambda.Function(this, 'LibraryFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset(functionsRoot),
@@ -649,11 +660,13 @@ export class CdkStack extends Stack {
         LIBRARY_COVERS_TABLE: libraryCoversTableName,
         LIBRARY_POSTS_TABLE: libraryPostsTableName,
         LIBRARY_COVER_POSTS_TABLE: libraryCoverPostsTableName,
+        LIBRARY_AUDIT_TABLE: libraryAuditTableName,
       },
     });
     libraryCoversTable.grantReadWriteData(libraryHandler);
     libraryPostsTable.grantReadWriteData(libraryHandler);
     libraryCoverPostsTable.grantReadWriteData(libraryHandler);
+    libraryAuditTable.grantReadWriteData(libraryHandler);
 
     // ── Comments table + Lambda handlers ──
     const commentsTableName = this.node.tryGetContext('commentsTableName') ?? 'aiseo-comments';
@@ -855,6 +868,10 @@ export class CdkStack extends Stack {
     const adminLibraryPreviewResource = adminLibraryResource.addResource('preview');
     const adminLibraryPreviewSlugResource = adminLibraryPreviewResource.addResource('{slug}');
     addGet(adminLibraryPreviewSlugResource, libraryIntegration);
+
+    // admin 감사 로그 조회 — 최근 mutation 시간 역순.
+    const adminLibraryAuditResource = adminLibraryResource.addResource('audit');
+    addGet(adminLibraryAuditResource, libraryIntegration);
 
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,

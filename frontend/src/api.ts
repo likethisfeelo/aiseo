@@ -356,3 +356,6 @@ export const adminUpdateLibraryPost = (slug: string, post: Record<string, unknow
 
 export const adminDeleteLibraryPost = (slug: string) =>
   deleteJson(`/admin/library/posts/${encodeURIComponent(slug)}`);
+
+export const adminListLibraryAudit = (limit = 100) =>
+  getJson(`/admin/library/audit?limit=${limit}`);

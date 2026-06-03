@@ -42,7 +42,7 @@ const {
   BatchWriteCommand,
 } = require('@aws-sdk/lib-dynamodb');
 const { ok, badRequest, serverError, conflict } = require('../shared/response');
-const { requireAdmin } = require('../shared/auth');
+const { requireAdmin, getUserContext } = require('../shared/auth');
 const { sanitizeLibraryHtml } = require('./sanitize');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -63,6 +63,48 @@ const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const boolOf = (v) => v === true || v === 'true';
 
 const numOf = (v, def = 0) => (Number.isFinite(Number(v)) ? Number(v) : def);
+
+// 감사 로그 기록 — admin mutation 마다 호출. 실패해도 본 작업은 진행되도록
+// try/catch 로 감싸 사용 (감사 로그 unavailable 이 운영 막으면 안됨).
+// PK 단일('audit') + SK 시간 역순. 라이브러리 admin 활동 빈도가 낮아 hot
+// partition 우려 없음.
+const writeAudit = async (T, { user, action, target, summary, beforeSnapshot, afterSnapshot }) => {
+  if (!T.audit) return;
+  try {
+    const ts = new Date().toISOString();
+    const rand = Math.random().toString(36).slice(2, 10);
+    await ddb.send(new PutCommand({
+      TableName: T.audit,
+      Item: {
+        pk: 'audit',
+        sk: `${ts}#${rand}`,
+        ts,
+        actor: user?.sub || 'unknown',
+        actorEmail: user?.email || '',
+        action,                                          // e.g. cover.create, post.update, post.delete
+        target: target || '',                            // 대상 slug
+        summary: str(summary, 500),
+        before: beforeSnapshot ? JSON.stringify(beforeSnapshot).slice(0, 2000) : '',
+        after: afterSnapshot ? JSON.stringify(afterSnapshot).slice(0, 2000) : '',
+      },
+    }));
+  } catch (e) {
+    console.warn('audit write failed:', e?.message || e);
+  }
+};
+
+// 비교용으로 mutation 결과의 핵심 필드만 추출 (전체 bodyHtml 등 빼면 로그 부담↓).
+const auditSnapshot = (item) => {
+  if (!item) return null;
+  return {
+    slug: item.slug,
+    title: item.title,
+    tag: item.tag,
+    isPublished: item.isPublished,
+    sortOrder: item.sortOrder,
+    canonicalCoverSlug: item.canonicalCoverSlug,
+  };
+};
 
 // 유용한 링크 검증: 배열, 최대 20개. 각 항목은 {url,title,description}.
 // url 은 http(s) 만 허용 (외부 페이지 새창 오픈 용도).
@@ -137,6 +179,7 @@ const tables = (env) => ({
   covers: env.LIBRARY_COVERS_TABLE,
   posts: env.LIBRARY_POSTS_TABLE,
   joins: env.LIBRARY_COVER_POSTS_TABLE,
+  audit: env.LIBRARY_AUDIT_TABLE,
 });
 
 const ensureTables = (T, event) => {
@@ -285,6 +328,7 @@ const adminGetCover = async (event, T) => {
 };
 
 const adminCreateCover = async (event, T) => {
+  const user = getUserContext(event);
   const body = parseBody(event);
   const slug = str(body.slug, 100);
   if (!isSlug(slug)) return badRequest('Invalid slug (영문 소문자·숫자·하이픈)', event);
@@ -296,10 +340,16 @@ const adminCreateCover = async (event, T) => {
   const nowIso = new Date().toISOString();
   const item = buildCoverItem(body, { slug, createdAt: nowIso });
   await ddb.send(new PutCommand({ TableName: T.covers, Item: item }));
+  await writeAudit(T, {
+    user, action: 'cover.create', target: slug,
+    summary: `표지 생성: ${item.title}`,
+    afterSnapshot: auditSnapshot(item),
+  });
   return ok({ cover: item }, event);
 };
 
 const adminUpdateCover = async (event, T) => {
+  const user = getUserContext(event);
   const slug = str(event.pathParameters?.slug, 100);
   if (!isSlug(slug)) return badRequest('Invalid slug', event);
 
@@ -314,25 +364,38 @@ const adminUpdateCover = async (event, T) => {
     createdAt: current.Item.createdAt || new Date().toISOString(),
   });
   await ddb.send(new PutCommand({ TableName: T.covers, Item: item }));
+  await writeAudit(T, {
+    user, action: 'cover.update', target: slug,
+    summary: `표지 수정: ${item.title}`,
+    beforeSnapshot: auditSnapshot(current.Item),
+    afterSnapshot: auditSnapshot(item),
+  });
   return ok({ cover: item }, event);
 };
 
 const adminDeleteCover = async (event, T) => {
+  const user = getUserContext(event);
   const slug = str(event.pathParameters?.slug, 100);
   if (!isSlug(slug)) return badRequest('Invalid slug', event);
 
+  const before = await ddb.send(new GetCommand({ TableName: T.covers, Key: { slug } }));
   await deleteAllChaptersOfCover(T, slug);
   await ddb.send(new DeleteCommand({ TableName: T.covers, Key: { slug } }));
+  await writeAudit(T, {
+    user, action: 'cover.delete', target: slug,
+    summary: `표지 삭제: ${before.Item?.title || slug}`,
+    beforeSnapshot: auditSnapshot(before.Item),
+  });
   return ok({ slug, deleted: true }, event);
 };
 
 const adminReorderChapters = async (event, T) => {
+  const user = getUserContext(event);
   const coverSlug = str(event.pathParameters?.slug, 100);
   if (!isSlug(coverSlug)) return badRequest('Invalid slug', event);
 
   const body = parseBody(event);
   const rawChapters = Array.isArray(body.chapters) ? body.chapters : [];
-  // Accept either ["slug-a", "slug-b"] or [{postSlug:"slug-a"}, …].
   const postSlugs = [];
   const seen = new Set();
   for (const c of rawChapters) {
@@ -343,12 +406,15 @@ const adminReorderChapters = async (event, T) => {
     }
   }
 
-  // Make sure the cover exists before nuking + rewriting the join.
   const coverRes = await ddb.send(new GetCommand({ TableName: T.covers, Key: { slug: coverSlug } }));
   if (!coverRes.Item) return badRequest('Cover not found', event);
 
   await deleteAllChaptersOfCover(T, coverSlug);
   await writeChapters(T, coverSlug, postSlugs);
+  await writeAudit(T, {
+    user, action: 'cover.reorder', target: coverSlug,
+    summary: `챕터 순서 변경 (${postSlugs.length}개): ${postSlugs.slice(0, 3).join(', ')}${postSlugs.length > 3 ? '…' : ''}`,
+  });
 
   return ok({ coverSlug, chapters: postSlugs.map((postSlug, idx) => ({ postSlug, sortOrder: idx + 1 })) }, event);
 };
@@ -511,6 +577,7 @@ const syncPostCovers = async (T, postSlug, nextCoverSlugs) => {
 };
 
 const adminCreatePost = async (event, T) => {
+  const user = getUserContext(event);
   const body = parseBody(event);
   const slug = str(body.slug, 100);
   if (!isSlug(slug)) return badRequest('Invalid slug (영문 소문자·숫자·하이픈)', event);
@@ -527,10 +594,16 @@ const adminCreatePost = async (event, T) => {
   await syncPostCovers(T, slug, coverSlugs);
 
   const post = await hydratePostWithCovers(T, item);
+  await writeAudit(T, {
+    user, action: 'post.create', target: slug,
+    summary: `포스트 생성: ${item.title} (표지 ${coverSlugs.length}개)`,
+    afterSnapshot: auditSnapshot(item),
+  });
   return ok({ post }, event);
 };
 
 const adminUpdatePost = async (event, T) => {
+  const user = getUserContext(event);
   const slug = str(event.pathParameters?.slug, 100);
   if (!isSlug(slug)) return badRequest('Invalid slug', event);
 
@@ -551,16 +624,43 @@ const adminUpdatePost = async (event, T) => {
   }
 
   const post = await hydratePostWithCovers(T, item);
+  await writeAudit(T, {
+    user, action: 'post.update', target: slug,
+    summary: `포스트 수정: ${item.title}`,
+    beforeSnapshot: auditSnapshot(current.Item),
+    afterSnapshot: auditSnapshot(item),
+  });
   return ok({ post }, event);
 };
 
 const adminDeletePost = async (event, T) => {
+  const user = getUserContext(event);
   const slug = str(event.pathParameters?.slug, 100);
   if (!isSlug(slug)) return badRequest('Invalid slug', event);
 
+  const before = await ddb.send(new GetCommand({ TableName: T.posts, Key: { slug } }));
   await deleteAllJoinsOfPost(T, slug);
   await ddb.send(new DeleteCommand({ TableName: T.posts, Key: { slug } }));
+  await writeAudit(T, {
+    user, action: 'post.delete', target: slug,
+    summary: `포스트 삭제: ${before.Item?.title || slug}`,
+    beforeSnapshot: auditSnapshot(before.Item),
+  });
   return ok({ slug, deleted: true }, event);
+};
+
+// admin 감사 로그 조회 — 최근 100건, 시간 역순.
+const adminListAudit = async (event, T) => {
+  if (!T.audit) return ok({ entries: [], count: 0 }, event);
+  const limit = Math.min(Math.max(numOf((event.queryStringParameters || {}).limit, 100), 1), 500);
+  const result = await ddb.send(new QueryCommand({
+    TableName: T.audit,
+    KeyConditionExpression: 'pk = :p',
+    ExpressionAttributeValues: { ':p': 'audit' },
+    ScanIndexForward: false, // 최신 우선
+    Limit: limit,
+  }));
+  return ok({ entries: result.Items || [], count: (result.Items || []).length }, event);
 };
 
 // ── Dispatcher ─────────────────────────────────────────────────────────────
@@ -620,6 +720,8 @@ exports.handler = async (event) => {
         case 'GET /admin/library/preview/{slug}':
           // 드래프트 미리보기 — 비공개 포스트도 reader 컨텍스트로 반환.
           return adminPreviewPost(event, T);
+        case 'GET /admin/library/audit':
+          return adminListAudit(event, T);
         default:
           break;
       }
