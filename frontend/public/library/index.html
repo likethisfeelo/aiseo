@@ -1130,38 +1130,66 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </head>
 <body class="lib-page">
 <style>
-  /* /library 페이지 전용 오버라이드 — hero 가 없으니 nav 를 dark header 바에
-     고정하고 library 섹션은 padding-top 을 조금 줄여 위로 붙임. */
+  /* /library 페이지 전용 오버라이드 — reader 와 동일한 floating capsule +
+     docking 패턴 적용. 초기엔 가운데 floating, 스크롤 200px 후 docked. */
   body.lib-page{background:#150F28;color:#fff}
-  .lib-header{
-    position:sticky;top:0;z-index:50;
-    background:rgba(10,6,20,.92);backdrop-filter:blur(14px);
-    border-bottom:1px solid rgba(255,255,255,.06);
+  /* lib-header 는 의미적 컨테이너만, 스타일은 자식 .nav 가 직접 띄움 */
+  .lib-header{display:contents}
+
+  /* Floating capsule (초기) — reader .topnav 와 동일 */
+  .lib-page .nav{
+    position:fixed!important;top:18px!important;left:50%!important;right:auto!important;
+    transform:translateX(-50%);
+    z-index:50!important;
+    display:flex;align-items:center;gap:14px;
+    background:rgba(255,255,255,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(10,6,20,.08);
+    border-radius:999px;
+    padding:10px 18px!important;
+    box-shadow:0 12px 32px -16px rgba(10,6,20,.18);
+    transition:top .3s ease, transform .3s ease, border-radius .3s ease, padding .3s ease, max-width .3s ease, left .3s ease, width .3s ease, background .3s ease;
+    width:auto;max-width:none;
+    justify-content:flex-start!important
   }
-  .lib-page .nav{position:relative!important;top:auto!important;z-index:auto!important;padding:14px 32px!important;
-    /* 좌측 AISEO.TIPS 와 우측 메뉴 그룹을 양 끝으로 분산.
-       aiseo-main 의 .nav 는 flex-end 인데 라이브러리 페이지는 부모
-       브랜드를 좌측에 두는 패턴이라 여기서만 override. */
-    justify-content:space-between!important}
-  .lib-page .nav-right{display:flex;align-items:center;gap:28px}
-  .lib-page .nav .method{cursor:pointer;text-decoration:none}
-  .lib-page .nav .method:hover{background:rgba(255,255,255,.18)!important}
-  /* 좌측 AISEO.TIPS 는 캡슐(버블) 없이 텍스트 로고만 — 부모 브랜드는
-     섹션 브랜드(우측 AI SEO LIBRARY 캡슐) 보다 시각적으로 단순하게. */
-  .lib-page .nav .method-tips{background:transparent!important;border:none!important;
-    padding:8px 4px!important;font-family:var(--display);font-weight:800;letter-spacing:-.01em;
-    font-size:16px;color:#fff;backdrop-filter:none!important}
-  .lib-page .nav .method-tips:hover{background:transparent!important;opacity:.7}
-  .lib-page .library{padding:48px 0 96px}
-  /* 라이브러리 페이지에선 "전체 보기" 버튼이 의미 없으므로 숨김
-     (메인에서 여기로 오는 진입점이라 이 페이지가 곧 "전체") */
+  /* Docked (스크롤 후) — 양 끝 분산 + 풀폭 바 */
+  .lib-page .nav.docked{
+    top:0!important;left:0!important;right:0!important;transform:none;
+    border-radius:0!important;border-left:none!important;border-right:none!important;border-top:none!important;
+    max-width:none;width:100%!important;
+    padding:10px 22px!important;
+    justify-content:space-between!important;
+    background:rgba(255,255,255,.94)
+  }
+  /* 캡슐 내부 텍스트·아이콘 색을 ink 계열로 (페이지 배경 다크라 더 강조됨) */
+  .lib-page .nav .method{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink);
+    cursor:pointer;text-decoration:none;background:transparent!important;border:none!important;padding:0!important;backdrop-filter:none!important}
+  .lib-page .nav .method .glyph{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-mid));
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink);font-weight:800}
+  .lib-page .nav .method:hover{opacity:.75;background:transparent!important}
+  .lib-page .nav .link{color:var(--ink-soft)!important;font-size:13px;font-weight:500;text-shadow:none;transition:color .15s}
+  .lib-page .nav .link:hover{color:var(--ink)!important;opacity:1}
+  .lib-page .nav .nav-user-icon{color:var(--ink-soft);width:32px;height:32px;border:none;background:transparent;transition:background .15s,color .15s}
+  .lib-page .nav .nav-user-icon:hover{background:rgba(10,6,20,.06);color:var(--ink)}
+  .lib-page .nav .waitlist{background:var(--ink);color:#fff;padding:8px 16px;font-size:13px;border-radius:999px;font-weight:700;text-shadow:none}
+  .lib-page .nav .waitlist:hover{background:var(--accent-deep)}
+  .lib-page .nav-right{display:flex;align-items:center;gap:18px}
+
+  /* 좌측 AISEO.TIPS 는 캡슐 없이 텍스트 로고만 + floating 상태선 숨김 */
+  .lib-page .nav .method-tips{font-family:var(--display);font-weight:800;letter-spacing:-.01em;font-size:15px;color:var(--ink);padding:0!important}
+  .lib-page .nav .method-tips:hover{opacity:.65}
+  .lib-page .nav:not(.docked) .method-tips{display:none}
+
+  .lib-page .library{padding:120px 0 96px}
+  /* 라이브러리 페이지에선 "전체 보기" 버튼이 의미 없으므로 숨김 */
   .lib-page .lib-viewall{display:none}
+
   @media(max-width:760px){
-    .lib-page .nav{padding:10px 16px!important}
-    .lib-page .library{padding:24px 0 72px}
-    .lib-page .nav-right{gap:14px}
-    /* 모바일에선 좌측 AISEO.TIPS 만 노출, 우측 AI SEO LIBRARY 캡슐은 숨김 */
+    .lib-page .nav{padding:8px 14px!important;gap:8px}
+    .lib-page .nav-right{gap:10px}
+    .lib-page .library{padding:96px 0 72px}
+    /* 모바일에선 우측 AI SEO LIBRARY 캡슐, 상담문의 버튼 숨김 (좁은 공간 확보) */
     .lib-page .nav .method-library{display:none}
+    .lib-page .nav .waitlist{display:none}
   }
 </style>
 
@@ -1517,6 +1545,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   setupArrows();
   boot();
   window.addEventListener('resize', function(){ centerOpen(false); });
+
+  /* Floating nav docking — reader 와 같은 패턴.
+     scrollY > 200px 이면 .docked 클래스 부여 → 양 끝 분산 풀폭 바로 전환. */
+  (function setupDockingNav(){
+    var navEl = document.querySelector('.lib-page .nav');
+    if (!navEl) return;
+    var apply = function(){
+      if (window.scrollY > 200) navEl.classList.add('docked');
+      else navEl.classList.remove('docked');
+    };
+    window.addEventListener('scroll', apply, { passive: true });
+    apply();
+  })();
 
   /* reveal animation 트리거 (aiseo-main 에선 IntersectionObserver 가 .reveal 을
      다른 곳에서 활성화하지만, 이 페이지엔 그게 없으니 즉시 visible 처리). */
