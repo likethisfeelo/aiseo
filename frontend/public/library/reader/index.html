@@ -149,11 +149,8 @@
   /* Gate — when locked, body is clipped + fades */
   .body-wrap{position:relative}
   .paper.locked .body-wrap{max-height:calc(100vh * 2.4);overflow:hidden;mask-image:linear-gradient(180deg,#000 65%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 65%,transparent 100%)}
-  .more-zone{display:none;margin-top:20px;padding:28px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(196,168,245,.12));border:1px dashed var(--accent-mid);border-radius:var(--radius)}
+  .more-zone{display:none;margin-top:20px;padding:36px 28px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(196,168,245,.12));border:1px dashed var(--accent-mid);border-radius:var(--radius)}
   .paper.locked .more-zone{display:block}
-  .more-zone .lock-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:8px}
-  .more-zone .lock-title{font-family:var(--display);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:14px}
-  .more-zone .lock-sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px;line-height:1.6}
   .more-btn{background:var(--accent-dark);color:#fff;border:none;padding:14px 28px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s,box-shadow .15s}
   .more-btn:hover{background:var(--accent-deep);box-shadow:0 14px 28px -10px rgba(139,111,212,.6)}
   .lock-note{font-size:12px;color:var(--ink-muted);margin-top:12px}
@@ -179,14 +176,17 @@
   .modal-toggle{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:14px}
   .modal-toggle a{color:var(--accent-deep);text-decoration:underline;cursor:pointer;font-weight:600}
 
-  .social-row{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
   .social-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}
   .social-btn:hover:not(:disabled){background:var(--bg-soft);border-color:var(--ink-soft)}
   .social-btn.kakao{background:#FEE500;border-color:#FEE500;color:#3C1E1E}
   .social-btn.kakao:hover:not(:disabled){background:#FFE600}
   .social-btn:disabled{opacity:.45;cursor:not-allowed}
-  .social-divider{display:flex;align-items:center;gap:10px;color:var(--ink-muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin:14px 0}
-  .social-divider::before,.social-divider::after{content:'';flex:1;height:1px;background:var(--line)}
+  /* 가입 옵션 섹션 — 로그인 모드에서 폼 아래에 노출. */
+  .signup-section{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+  .signup-section .signup-eyebrow{font-size:12px;font-weight:600;color:var(--ink-soft);text-align:center;margin-bottom:12px}
+  .signup-section .signup-email-link{text-align:center;margin-top:12px}
+  .signup-section .signup-email-link a{font-size:12px;color:var(--ink-muted);text-decoration:underline;cursor:pointer}
+  .signup-section .signup-email-link a:hover{color:var(--ink-soft)}
 
   /* Toast */
   .toast{position:fixed;left:50%;bottom:48px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:13px;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
@@ -281,11 +281,7 @@
       </div>
 
       <div class="more-zone">
-        <div class="lock-eyebrow">🔒 여기서부터 멤버 전용</div>
-        <div class="lock-title">전체 본문은 무료 가입 후 바로 열려요</div>
-        <div class="lock-sub">이메일 한 줄이면 끝. 한 번 가입으로 라이브러리 전체와 강의 페이지까지 같은 계정으로 이어집니다.</div>
         <button class="more-btn" id="more-btn">더보기 — 전체 읽기 →</button>
-        <div class="lock-note">이미 가입했다면 <a id="more-login-link" href="#">로그인</a></div>
       </div>
     </article>
   </div>
@@ -312,28 +308,35 @@
 </footer>
 
 <!-- ============ Auth modal ============ -->
+<!-- 기본 진입 = 로그인. 폼 위에 "여기서부터 멤버 전용" 헤더,
+     폼 아래에 가입 옵션(카카오 + 이메일 회원가입 링크) 노출. -->
 <div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal">
     <button class="modal-close" id="modal-close" aria-label="닫기">×</button>
-    <h2 id="modal-title">이메일 하나로 시작</h2>
-    <p class="modal-sub" id="modal-sub">가입은 30초. 전체 라이브러리와 강의 페이지까지 같은 계정으로 이어집니다.</p>
-
-    <div class="social-row">
-      <button class="social-btn kakao" id="btn-kakao" disabled>
-        <span>카카오로 계속</span>
-      </button>
-    </div>
-    <div class="social-divider">또는</div>
+    <h2 id="modal-title">여기서부터 멤버 전용</h2>
+    <p class="modal-sub" id="modal-sub" style="display:none"></p>
 
     <form class="modal-form" id="modal-form">
       <input id="m-email" type="email" placeholder="이메일" autocomplete="email" required>
-      <input id="m-pw" type="password" placeholder="비밀번호 (8자 이상)" autocomplete="new-password" required>
+      <input id="m-pw" type="password" placeholder="비밀번호" autocomplete="current-password" required>
       <input id="m-code" type="text" inputmode="numeric" placeholder="이메일 인증코드 6자리" autocomplete="one-time-code" style="display:none">
       <div id="m-msg" class="modal-msg"></div>
-      <button type="submit" class="submit" id="m-submit">가입하고 전체 읽기</button>
+      <button type="submit" class="submit" id="m-submit">로그인</button>
     </form>
 
-    <div class="modal-toggle" id="modal-toggle">
+    <!-- 가입 옵션: 로그인 모드일 때만 노출. signup/verify 모드에선 숨김. -->
+    <div class="signup-section" id="signup-section">
+      <div class="signup-eyebrow">전체본문은 무료 가입 후 바로 열려요</div>
+      <button class="social-btn kakao" id="btn-kakao" disabled>
+        <span>카카오로 시작하기</span>
+      </button>
+      <div class="signup-email-link">
+        <a id="go-signup" href="#">이메일로 회원가입하기</a>
+      </div>
+    </div>
+
+    <!-- signup/verify 모드 토글: 로그인으로 돌아가기. -->
+    <div class="modal-toggle" id="modal-toggle" style="display:none">
       이미 가입했나요? <a id="toggle-mode">로그인</a>
     </div>
   </div>
@@ -567,7 +570,7 @@ function renderLibraryCta(allCovers, postsByCover) {
 }
 
 // ── Modal state machine ───────────────────────────────────────────────
-var MODAL_MODE = 'signup'; // 'signup' | 'signup-verify' | 'login'
+var MODAL_MODE = 'login'; // 'login' (default) | 'signup' | 'signup-verify'
 var _tmpEmail = '';
 var _tmpPassword = '';
 
@@ -582,48 +585,60 @@ function modalRender() {
   var pw      = $('m-pw');
   var code    = $('m-code');
   var submit  = $('m-submit');
+  var sub     = $('modal-sub');
+  var signupSection = $('signup-section');
   var toggle  = $('modal-toggle');
   setMsg('');
 
-  if (MODAL_MODE === 'signup') {
-    $('modal-title').textContent = '이메일 하나로 시작';
-    $('modal-sub').textContent   = '가입은 30초. 전체 라이브러리와 강의 페이지까지 같은 계정으로 이어집니다.';
+  if (MODAL_MODE === 'login') {
+    // 기본 진입 — 폼 위 헤더 + 로그인 폼 + 아래 가입 옵션 패널.
+    $('modal-title').textContent = '여기서부터 멤버 전용';
+    sub.style.display   = 'none';
     email.style.display = '';
     pw.style.display    = '';
+    pw.setAttribute('autocomplete', 'current-password');
+    pw.placeholder      = '비밀번호';
+    code.style.display  = 'none';
+    submit.textContent  = '로그인';
+    signupSection.style.display = '';
+    toggle.style.display = 'none';
+  } else if (MODAL_MODE === 'signup') {
+    $('modal-title').textContent = '이메일로 회원가입';
+    sub.style.display   = '';
+    sub.textContent     = '가입은 30초. 전체 라이브러리와 강의 페이지까지 같은 계정으로 이어집니다.';
+    email.style.display = '';
+    pw.style.display    = '';
+    pw.setAttribute('autocomplete', 'new-password');
+    pw.placeholder      = '비밀번호 (8자 이상)';
     code.style.display  = 'none';
     submit.textContent  = '가입하고 전체 읽기';
+    signupSection.style.display = 'none';
+    toggle.style.display = '';
     toggle.innerHTML    = '이미 가입했나요? <a id="toggle-mode">로그인</a>';
-  } else if (MODAL_MODE === 'signup-verify') {
+  } else { // signup-verify
     $('modal-title').textContent = '이메일을 확인해 주세요';
-    $('modal-sub').textContent   = _tmpEmail + ' 로 6자리 인증코드를 발송했습니다.';
+    sub.style.display   = '';
+    sub.textContent     = _tmpEmail + ' 로 6자리 인증코드를 발송했습니다.';
     email.style.display = 'none';
     pw.style.display    = 'none';
     code.style.display  = '';
     code.value          = '';
     submit.textContent  = '인증 완료';
+    signupSection.style.display = 'none';
+    toggle.style.display = '';
     toggle.innerHTML    = '이메일을 다시 입력하시려면 <a id="toggle-mode">처음으로</a>';
-  } else { // login
-    $('modal-title').textContent = '다시 만나서 반가워요';
-    $('modal-sub').textContent   = '이메일과 비밀번호로 로그인 후 전체 본문이 열립니다.';
-    email.style.display = '';
-    pw.style.display    = '';
-    code.style.display  = 'none';
-    submit.textContent  = '로그인하고 계속 읽기';
-    toggle.innerHTML    = '아직 가입 전인가요? <a id="toggle-mode">회원가입</a>';
   }
-  // Re-bind toggle anchor (innerHTML replaced it).
+  // 모드 전환 anchor 재바인딩 (innerHTML 로 새 요소로 교체됨).
   var tlink = $('toggle-mode');
   if (tlink) tlink.addEventListener('click', function (e) {
     e.preventDefault();
-    if (MODAL_MODE === 'login') MODAL_MODE = 'signup';
-    else if (MODAL_MODE === 'signup-verify') MODAL_MODE = 'signup';
-    else MODAL_MODE = 'login';
+    MODAL_MODE = 'login';
     modalRender();
   });
 }
 
 function openModal(initialMode) {
-  MODAL_MODE = initialMode || 'signup';
+  MODAL_MODE = initialMode || 'login';
   modalRender();
   $('modal').classList.add('open');
   // Focus first visible input on next tick (modal display change first).
@@ -765,14 +780,21 @@ function setupPageActions() {
   $('paper-share').addEventListener('click', doShare);
 
   var doScrap = function () {
-    if (!STATE.isMember) { openModal('signup'); return; }
+    if (!STATE.isMember) { openModal('login'); return; }
     toast('스크랩되었습니다. (베타)');
   };
   $('scrap-btn').addEventListener('click', doScrap);
   $('paper-scrap').addEventListener('click', doScrap);
 
-  $('more-btn').addEventListener('click', function () { openModal('signup'); });
-  $('more-login-link').addEventListener('click', function (e) { e.preventDefault(); openModal('login'); });
+  // 더보기 → 모달은 항상 login 모드로 시작. signup 은 모달 내부의
+  // "이메일로 회원가입하기" 링크로 전환.
+  $('more-btn').addEventListener('click', function () { openModal('login'); });
+  $('go-signup').addEventListener('click', function (e) {
+    e.preventDefault();
+    MODAL_MODE = 'signup';
+    modalRender();
+    setTimeout(function () { $('m-email').focus(); }, 30);
+  });
   $('modal-close').addEventListener('click', closeModal);
   $('modal').addEventListener('click', function (e) { if (e.target === $('modal')) closeModal(); });
   document.addEventListener('keydown', function (e) {
