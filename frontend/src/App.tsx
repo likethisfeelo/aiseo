@@ -393,6 +393,12 @@ function AuthenticatedShell({
     return <Navigate to="/admin" replace />;
   }
 
+  // 비-admin 사용자가 /admin/* 직접 URL 진입 시 차단. API 가 403 으로
+  // 막아주긴 하지만 admin 레이아웃이 잠깐 노출되는 게 어색해서 프론트에서도 차단.
+  if (onAdminPath && !isAdminUser(user)) {
+    return <Navigate to="/" replace />;
+  }
+
   if (onAdminPath) {
     return (
       <AdminLayout user={user} onLogout={logout}>

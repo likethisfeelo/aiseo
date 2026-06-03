@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminListLibraryCovers, adminDeleteLibraryCover } from '../../api';
 
+// 공개 카탈로그/리더는 apex 도메인. site.aiseo.tips 어드민에서 새 창으로 띄움.
+// dev / prod 자동 분기: site.dev.aiseo.tips → dev.aiseo.tips, 그 외 → aiseo.tips.
+const PUBLIC_LIBRARY_BASE =
+  typeof window !== 'undefined' && window.location.hostname.startsWith('site.dev.')
+    ? 'https://dev.aiseo.tips'
+    : 'https://aiseo.tips';
+
 interface CoverRow {
   slug: string;
   title: string;
@@ -104,6 +111,15 @@ export function LibraryCoversAdminPage() {
                     {c.description ? c.description.slice(0, 90) + (c.description.length > 90 ? '…' : '') : '—'}
                   </td>
                   <td style={{ ...styles.td, textAlign: 'right', whiteSpace: 'nowrap' as const }}>
+                    {c.isPublished && (
+                      <a
+                        href={`${PUBLIC_LIBRARY_BASE}/library/#${encodeURIComponent(c.slug)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ ...styles.smallBtn, textDecoration: 'none', display: 'inline-block' }}
+                        title="공개 카탈로그에서 보기 (새 창)"
+                      >보기 ↗</a>
+                    )}
                     <button
                       onClick={() => navigate(`/admin/library/covers/${encodeURIComponent(c.slug)}/edit`)}
                       style={styles.smallBtn}

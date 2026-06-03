@@ -2,6 +2,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminListLibraryPosts, adminDeleteLibraryPost } from '../../api';
 
+// 공개 reader 는 apex 도메인. dev / prod 분기.
+const PUBLIC_LIBRARY_BASE =
+  typeof window !== 'undefined' && window.location.hostname.startsWith('site.dev.')
+    ? 'https://dev.aiseo.tips'
+    : 'https://aiseo.tips';
+
 interface PostRow {
   slug: string;
   title?: string;
@@ -128,6 +134,15 @@ export function LibraryPostsAdminPage() {
                   </td>
                   <td style={styles.td}>{formatDate(p.updatedAt || p.createdAt)}</td>
                   <td style={{ ...styles.td, textAlign: 'right', whiteSpace: 'nowrap' as const }}>
+                    {p.isPublished && p.canonicalCoverSlug && (
+                      <a
+                        href={`${PUBLIC_LIBRARY_BASE}/library/${encodeURIComponent(p.canonicalCoverSlug)}/${encodeURIComponent(p.slug)}/`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ ...styles.smallBtn, textDecoration: 'none', display: 'inline-block' }}
+                        title="공개 리더 페이지에서 보기 (새 창)"
+                      >보기 ↗</a>
+                    )}
                     <button onClick={() => navigate(`/admin/library/posts/${encodeURIComponent(p.slug)}/edit`)} style={styles.smallBtn}>편집</button>
                     <button onClick={() => handleDelete(p.slug, p.title || p.slug)} style={{ ...styles.smallBtn, color: 'var(--danger)', borderColor: 'var(--danger-soft)' }}>삭제</button>
                   </td>
