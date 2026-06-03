@@ -851,6 +851,11 @@ export class CdkStack extends Stack {
     addPut(adminLibraryPostSlugResource, libraryIntegration);
     addDelete(adminLibraryPostSlugResource, libraryIntegration);
 
+    // admin 드래프트 미리보기 — reader 페이지가 비공개 post 도 볼 수 있게.
+    const adminLibraryPreviewResource = adminLibraryResource.addResource('preview');
+    const adminLibraryPreviewSlugResource = adminLibraryPreviewResource.addResource('{slug}');
+    addGet(adminLibraryPreviewSlugResource, libraryIntegration);
+
     api.addGatewayResponse('Default4xx', {
       type: apigateway.ResponseType.DEFAULT_4XX,
       responseHeaders: {

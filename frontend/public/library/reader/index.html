@@ -256,6 +256,16 @@
 
 <!-- Reader root — populated by JS -->
 <div id="reader-root" style="display:none">
+  <!-- admin 전용 — 드래프트 미리보기 상태일 때 상단 노란 배너 -->
+  <div id="admin-draft-banner" style="display:none;background:#fef3c7;color:#92400e;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;border-bottom:1px solid #fde68a;position:sticky;top:0;z-index:60">
+    🔒 비공개 (드래프트) 포스트를 미리보기 중입니다. 일반 사용자에겐 보이지 않습니다.
+  </div>
+
+  <!-- admin 전용 — 어디서든 편집 페이지로 빠르게 점프 -->
+  <a id="admin-edit-link" href="#" style="display:none;position:fixed;right:20px;bottom:20px;z-index:65;background:#1f2937;color:#fff;padding:12px 18px;border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 14px 32px -10px rgba(0,0,0,.35);transition:transform .15s,background .15s">
+    ✎ 이 포스트 편집 ↗
+  </a>
+
   <header class="reader-hero">
     <a class="back-link" id="back-link" href="/library/">← 라이브러리로</a>
     <span class="tag-chip" id="tag-chip"></span>
@@ -581,6 +591,21 @@ function render() {
   STATE.isMember = isLoggedIn();
   applyGate();
 
+  // admin UI — "이 포스트 편집 ↗" floating + 드래프트 배너
+  if (isAdminClient() && p.slug) {
+    var editLink = $('admin-edit-link');
+    var siteHost = window.location.hostname === 'dev.aiseo.tips'
+      ? 'site.dev.aiseo.tips'
+      : 'site.aiseo.tips';
+    editLink.href = 'https://' + siteHost + '/admin/library/posts/'
+      + encodeURIComponent(p.slug) + '/edit';
+    editLink.style.display = 'inline-block';
+    // draft 미리보기 모드 표시
+    if (STATE.isDraftPreview) {
+      $('admin-draft-banner').style.display = 'block';
+    }
+  }
+
   // Show root
   $('loading').style.display = 'none';
   $('reader-root').style.display = 'block';
@@ -868,14 +893,49 @@ function setupPageActions() {
 }
 
 // ── Fetch ──────────────────────────────────────────────────────────────
+// admin token 이 있는지 판단 (cognito:groups claim 에 admin 있나).
+// JWT payload 만 보고 결정 — 서명 검증은 백엔드가 함.
+function isAdminClient() {
+  try {
+    var token = localStorage.getItem(ID_TOKEN_KEY);
+    if (!token) return false;
+    var parts = token.split('.');
+    if (parts.length !== 3) return false;
+    var payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    var groups = payload['cognito:groups'];
+    if (Array.isArray(groups)) return groups.indexOf('admin') !== -1;
+    if (typeof groups === 'string') return /\badmin\b/.test(groups);
+    return false;
+  } catch (e) { return false; }
+}
+
 function fetchPost(coverSlug, postSlug) {
   if (!API_BASE) return Promise.reject(new Error('API base 가 설정되지 않았습니다.'));
-  var url = API_BASE + '/library/posts/' + encodeURIComponent(postSlug)
+  var publicUrl = API_BASE + '/library/posts/' + encodeURIComponent(postSlug)
     + (coverSlug ? ('?cover=' + encodeURIComponent(coverSlug)) : '');
-  return fetch(url).then(function (r) {
+  return fetch(publicUrl).then(function (r) {
+    return r.json().then(function (j) {
+      if (r.ok && j && j.success) return j.data;
+      // 비공개/없음 → admin 이면 preview 시도. 일반 사용자는 그대로 에러.
+      if (isAdminClient()) {
+        return fetchAdminPreview(coverSlug, postSlug).then(function (data) {
+          data.__isAdminPreview = true;
+          return data;
+        });
+      }
+      throw new Error((j && j.error) || ('API ' + r.status));
+    });
+  });
+}
+
+function fetchAdminPreview(coverSlug, postSlug) {
+  var token = localStorage.getItem(ID_TOKEN_KEY);
+  var url = API_BASE + '/admin/library/preview/' + encodeURIComponent(postSlug)
+    + (coverSlug ? ('?cover=' + encodeURIComponent(coverSlug)) : '');
+  return fetch(url, { headers: { Authorization: 'Bearer ' + token } }).then(function (r) {
     return r.json().then(function (j) {
       if (!r.ok || !j || !j.success) {
-        throw new Error((j && j.error) || ('API ' + r.status));
+        throw new Error((j && j.error) || ('Preview API ' + r.status));
       }
       return j.data;
     });
@@ -915,6 +975,7 @@ function boot() {
     STATE.post = data.post;
     STATE.cover = data.cover;
     STATE.siblings = data.siblings || [];
+    STATE.isDraftPreview = !!data.__isAdminPreview;
     render();
 
     // 하단 라이브러리 카드 — 별도로 모든 cover 를 받아 임의 챕터 노출.

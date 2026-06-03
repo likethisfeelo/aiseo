@@ -389,16 +389,17 @@ const buildPostItem = (body, base = {}) => {
   };
 };
 
-const publicGetPost = async (event, T) => {
-  const slug = str(event.pathParameters?.slug, 100);
+// Reader 용 post 조회 핵심 로직. allowDraft=true 면 isPublished=false 라도
+// 반환 (admin preview 용). 같은 cover 의 sibling 포스트도 draft 포함 여부를
+// 같은 플래그로 통제.
+const fetchPostWithReaderContext = async (event, T, slug, allowDraft) => {
   if (!isSlug(slug)) return badRequest('Invalid slug', event);
 
   const pr = await ddb.send(new GetCommand({ TableName: T.posts, Key: { slug } }));
   const post = pr.Item;
-  if (!post || post.isPublished === false) return badRequest('Post not found', event);
+  if (!post) return badRequest('Post not found', event);
+  if (!allowDraft && post.isPublished === false) return badRequest('Post not found', event);
 
-  // Cover context — caller passes ?cover=... so we know which
-  // sidebar/canonical to render. Falls back to canonicalCoverSlug.
   const qs = event.queryStringParameters || {};
   const requestedCover = isSlug(str(qs.cover, 100)) ? qs.cover : '';
   const canonicalCoverSlug = isSlug(post.canonicalCoverSlug || '') ? post.canonicalCoverSlug : '';
@@ -408,24 +409,30 @@ const publicGetPost = async (event, T) => {
   let siblings = [];
   if (activeCover) {
     const cr = await ddb.send(new GetCommand({ TableName: T.covers, Key: { slug: activeCover } }));
-    if (cr.Item && cr.Item.isPublished) {
+    if (cr.Item && (allowDraft || cr.Item.isPublished)) {
       cover = cr.Item;
       const joins = await listChapters(T, activeCover);
       for (const j of joins) {
         const sp = await ddb.send(new GetCommand({ TableName: T.posts, Key: { slug: j.postSlug } }));
-        if (sp.Item && sp.Item.isPublished !== false) {
+        if (sp.Item && (allowDraft || sp.Item.isPublished !== false)) {
           siblings.push({ ...stripPostFull(sp.Item), sortOrder: j.sortOrder });
         }
       }
     }
   }
 
-  return ok({
-    post,
-    cover,
-    siblings,
-    canonicalCoverSlug,
-  }, event);
+  return ok({ post, cover, siblings, canonicalCoverSlug, isDraft: post.isPublished === false }, event);
+};
+
+const publicGetPost = async (event, T) => {
+  const slug = str(event.pathParameters?.slug, 100);
+  return fetchPostWithReaderContext(event, T, slug, false);
+};
+
+// admin 전용 — 드래프트 (isPublished=false) 포스트 미리보기. 같은 응답 shape.
+const adminPreviewPost = async (event, T) => {
+  const slug = str(event.pathParameters?.slug, 100);
+  return fetchPostWithReaderContext(event, T, slug, true);
 };
 
 const adminListPosts = async (event, T) => {
@@ -610,6 +617,9 @@ exports.handler = async (event) => {
           return adminUpdatePost(event, T);
         case 'DELETE /admin/library/posts/{slug}':
           return adminDeletePost(event, T);
+        case 'GET /admin/library/preview/{slug}':
+          // 드래프트 미리보기 — 비공개 포스트도 reader 컨텍스트로 반환.
+          return adminPreviewPost(event, T);
         default:
           break;
       }
