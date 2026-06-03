@@ -426,13 +426,34 @@ function toast(msg) {
 // ── Docking nav ────────────────────────────────────────────────────────
 function setupDockingNav() {
   var nav = $('topnav');
-  // Threshold = 200px — capsule 상태가 충분히 유지되다가 본문 진입 즈음에
-  // docked. 너무 일찍(40px) 바뀌면 도킹이 부산스럽게 느껴짐.
+  // Threshold = .reader-hero 바닥 - 80px 버퍼. hero 가 거의 화면 밖으로
+  // 빠지고 본문(.paper) 으로 진입할 때 docked. hero 가 길든 짧든 자동 적응.
+  // hero 요소는 boot() → render() 후에 등장하므로 lazy 측정.
+  var FALLBACK = 600;
+  var threshold = FALLBACK;
+  var heroEl = null;
+  var refreshThreshold = function () {
+    heroEl = heroEl || document.querySelector('.reader-hero');
+    if (heroEl) {
+      var rect = heroEl.getBoundingClientRect();
+      threshold = (window.scrollY || 0) + rect.bottom - 80;
+    }
+  };
+  refreshThreshold();
+  // render() 가 비동기라 페이지 첫 로드 직후엔 hero 가 없을 수 있음.
+  // 0.5s 후 한 번 더 측정해 늦게 들어온 hero 까지 잡음.
+  setTimeout(refreshThreshold, 500);
+
   var apply = function () {
-    if (window.scrollY > 200) nav.classList.add('docked');
+    if (window.scrollY > threshold) nav.classList.add('docked');
     else nav.classList.remove('docked');
   };
   window.addEventListener('scroll', apply, { passive: true });
+  window.addEventListener('resize', function () {
+    heroEl = null;       // 폰트·이미지 로드 등으로 높이가 바뀌면 다시 측정
+    refreshThreshold();
+    apply();
+  });
   apply();
 }
 
