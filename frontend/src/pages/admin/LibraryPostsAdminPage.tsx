@@ -14,6 +14,7 @@ interface PostRow {
   tag?: string;
   readMinutes?: number;
   canonicalCoverSlug?: string;
+  coverSlugs?: string[];
   isPublished?: boolean;
   publishedAt?: string;
   createdAt?: string;
@@ -103,7 +104,7 @@ export function LibraryPostsAdminPage() {
               <tr>
                 <th style={styles.th}>제목</th>
                 <th style={styles.th}>태그</th>
-                <th style={styles.th}>대표 표지</th>
+                <th style={styles.th}>표지 (대표 굵게)</th>
                 <th style={styles.th}>읽기 시간</th>
                 <th style={styles.th}>상태</th>
                 <th style={styles.th}>수정일</th>
@@ -119,7 +120,35 @@ export function LibraryPostsAdminPage() {
                   </td>
                   <td style={styles.td}>{p.tag || '-'}</td>
                   <td style={styles.td}>
-                    {p.canonicalCoverSlug ? <span style={{ fontFamily: 'monospace', fontSize: 12 }}>{p.canonicalCoverSlug}</span> : <span style={{ color: 'var(--text-muted)' }}>—</span>}
+                    {(() => {
+                      const all = (p.coverSlugs || []).filter(Boolean);
+                      const canon = p.canonicalCoverSlug || '';
+                      // canonical 을 맨 앞으로 정렬 + 굵게 표시. 나머지는 옅게.
+                      const ordered = canon ? [canon, ...all.filter((s) => s !== canon)] : all;
+                      if (ordered.length === 0) return <span style={{ color: 'var(--text-muted)' }}>—</span>;
+                      return (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxWidth: 280 }}>
+                          {ordered.map((s) => (
+                            <span
+                              key={s}
+                              title={s === canon ? `${s} (대표 표지)` : s}
+                              style={{
+                                fontFamily: 'monospace',
+                                fontSize: 11,
+                                padding: '2px 7px',
+                                borderRadius: 4,
+                                background: s === canon ? 'var(--primary-soft, #e8eaff)' : 'var(--bg-soft, #f8f9fa)',
+                                color: s === canon ? 'var(--primary, #4338ca)' : 'var(--text-secondary, #666)',
+                                fontWeight: s === canon ? 600 : 400,
+                                border: '1px solid var(--border)',
+                              }}
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td style={styles.td}>{p.readMinutes ? `${p.readMinutes}분` : '-'}</td>
                   <td style={styles.td}>

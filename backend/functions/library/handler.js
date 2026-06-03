@@ -219,7 +219,6 @@ const buildCoverItem = (body, base = {}) => {
     ...base,
     title: str(body.title, 300),
     description: str(body.description, 1000),
-    thumbnail: str(body.thumbnail, 1000),
     tag: str(body.tag, 60),
     sortOrder: Number.isFinite(body.sortOrder) ? Math.floor(body.sortOrder) : 9999,
     isPublished: boolOf(body.isPublished),
@@ -431,7 +430,20 @@ const publicGetPost = async (event, T) => {
 
 const adminListPosts = async (event, T) => {
   const all = await scanAll(T.posts);
-  const posts = all.map(stripPostBody).sort((a, b) =>
+  // cover-posts 테이블을 한 번만 scan 해서 postSlug → coverSlugs[] 맵을
+  // 만듦. 포스트별 GSI 쿼리 N번 (N=포스트 수) 보다 훨씬 저렴 — 라이브러리
+  // 규모(~100 항목) 에서 1 scan vs 100 queries 가 비교 안 됨.
+  const joins = await scanAll(T.joins);
+  const coversByPost = new Map();
+  for (const j of joins) {
+    const arr = coversByPost.get(j.postSlug) || [];
+    arr.push(j.coverSlug);
+    coversByPost.set(j.postSlug, arr);
+  }
+  const posts = all.map((p) => ({
+    ...stripPostBody(p),
+    coverSlugs: coversByPost.get(p.slug) || [],
+  })).sort((a, b) =>
     (b.updatedAt || b.createdAt || '').localeCompare(a.updatedAt || a.createdAt || ''),
   );
   return ok({ posts, count: posts.length }, event);

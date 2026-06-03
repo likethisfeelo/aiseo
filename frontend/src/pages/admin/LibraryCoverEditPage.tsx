@@ -5,6 +5,7 @@ import {
   adminCreateLibraryCover,
   adminUpdateLibraryCover,
   adminReorderLibraryCoverChapters,
+  adminListLibraryCovers,
   adminListLibraryPosts,
 } from '../../api';
 
@@ -21,7 +22,6 @@ interface CoverFull {
   slug: string;
   title?: string;
   description?: string;
-  thumbnail?: string;
   tag?: string;
   sortOrder?: number;
   isPublished?: boolean;
@@ -46,7 +46,6 @@ export function LibraryCoverEditPage() {
   const [slugTouched, setSlugTouched] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [thumbnail, setThumbnail] = useState('');
   const [tag, setTag] = useState('');
   const [sortOrder, setSortOrder] = useState('9999');
   const [isPublished, setIsPublished] = useState(false);
@@ -78,11 +77,25 @@ export function LibraryCoverEditPage() {
           setSlugTouched(true);
           setTitle(c.title || '');
           setDescription(c.description || '');
-          setThumbnail(c.thumbnail || '');
           setTag(c.tag || '');
           setSortOrder(String(c.sortOrder ?? 9999));
           setIsPublished(!!c.isPublished);
           setChapters(data.chapters || []);
+        } else {
+          // 새 표지 — 기존 표지의 max sortOrder + 1 로 기본값. 카탈로그
+          // 정렬에서 자연스럽게 맨 끝으로 들어가게 함 (이전엔 9999 라
+          // 직관 안 됨).
+          try {
+            const coversRes = (await adminListLibraryCovers()) as { covers: Array<{ sortOrder?: number }> };
+            const list = coversRes.covers || [];
+            const maxOrder = list.reduce((m, c) => {
+              const n = Number(c.sortOrder);
+              return Number.isFinite(n) && n < 9999 && n > m ? n : m;
+            }, 0);
+            if (!cancelled) setSortOrder(String(maxOrder + 1));
+          } catch {
+            // 실패해도 9999 기본값 유지 — 막힘 없이 폼은 열림.
+          }
         }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : '로드 실패');
@@ -106,7 +119,6 @@ export function LibraryCoverEditPage() {
       slug,
       title,
       description,
-      thumbnail,
       tag,
       sortOrder: Number(sortOrder) || 9999,
       isPublished,
@@ -239,9 +251,6 @@ export function LibraryCoverEditPage() {
             <input type="number" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} style={styles.input} />
           </div>
         </div>
-
-        <label style={styles.label}>썸네일 URL (선택)</label>
-        <input value={thumbnail} onChange={(e) => setThumbnail(e.target.value)} style={{ ...styles.input, fontFamily: 'monospace', fontSize: 12 }} placeholder="https://..." />
 
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-primary)', marginTop: 8 }}>
           <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
