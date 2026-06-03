@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminListLibraryAudit } from '../../api';
 
@@ -90,8 +90,8 @@ export function LibraryAuditPage() {
                 const meta = ACTION_LABEL[e.action] || { ko: e.action, color: '#666' };
                 const expanded = expandedIdx === i;
                 return (
-                  <>
-                    <tr key={`${e.ts}-${i}`} style={styles.tr}>
+                  <Fragment key={`${e.ts}-${i}`}>
+                    <tr style={styles.tr}>
                       <td style={{ ...styles.td, whiteSpace: 'nowrap', fontFamily: 'monospace', fontSize: 11 }}>{formatTs(e.ts)}</td>
                       <td style={styles.td}>
                         <span style={{
@@ -113,7 +113,7 @@ export function LibraryAuditPage() {
                       </td>
                     </tr>
                     {expanded && (
-                      <tr key={`${e.ts}-${i}-detail`}>
+                      <tr>
                         <td colSpan={6} style={{ ...styles.td, background: 'var(--bg-soft, #f8f9fa)', borderTop: '1px solid var(--border)' }}>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, fontSize: 11, fontFamily: 'monospace' }}>
                             <div>
@@ -128,7 +128,7 @@ export function LibraryAuditPage() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
