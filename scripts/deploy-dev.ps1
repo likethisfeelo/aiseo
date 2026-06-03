@@ -74,7 +74,10 @@ Remove-Item $tmpCfg
 
 # /library/reader-config.js — apex /library/{cover}/{post} reader 설정.
 # Cognito region/client + API base URL 을 같은 sed 패턴으로 치환.
-$apiBase = if ($env:VITE_API_BASE_URL_DEV) { $env:VITE_API_BASE_URL_DEV } else { 'https://api-dev.aiseo.tips' }
+# API base default 는 API GW 직접 URL — api-dev.aiseo.tips 커스텀 도메인이
+# 아직 API GW 에 연결돼 있지 않음. 커스텀 도메인 셋업 후엔 VITE_API_BASE_URL_DEV
+# 환경변수로 override.
+$apiBase = if ($env:VITE_API_BASE_URL_DEV) { $env:VITE_API_BASE_URL_DEV } else { 'https://1ni4szkrqh.execute-api.ap-northeast-2.amazonaws.com/dev' }
 $readerCfg = [System.IO.File]::ReadAllText((Resolve-Path "frontend/public/library/reader-config.js"), $utf8NoBom)
 $readerCfg = $readerCfg -replace '%%COGNITO_REGION%%', $region
 $readerCfg = $readerCfg -replace '%%COGNITO_CLIENT_ID%%', $clientId
