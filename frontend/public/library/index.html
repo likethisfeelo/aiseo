@@ -1547,15 +1547,33 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   window.addEventListener('resize', function(){ centerOpen(false); });
 
   /* Floating nav docking — reader 와 같은 패턴.
-     scrollY > 200px 이면 .docked 클래스 부여 → 양 끝 분산 풀폭 바로 전환. */
+     .lib-bar (탭 + 검색) 바닥 통과 시 docked. 본문(책장) 인터랙션 영역에
+     진입할 때 메뉴가 위로 붙음. 콘텐츠 높이에 자동 적응. */
   (function setupDockingNav(){
     var navEl = document.querySelector('.lib-page .nav');
     if (!navEl) return;
+    var FALLBACK = 400;
+    var threshold = FALLBACK;
+    var anchorEl = null;
+    var refreshThreshold = function(){
+      anchorEl = anchorEl || document.querySelector('.lib-page .lib-bar');
+      if (anchorEl) {
+        var rect = anchorEl.getBoundingClientRect();
+        threshold = (window.scrollY || 0) + rect.bottom - 40;
+      }
+    };
+    refreshThreshold();
+    setTimeout(refreshThreshold, 300);
     var apply = function(){
-      if (window.scrollY > 200) navEl.classList.add('docked');
+      if (window.scrollY > threshold) navEl.classList.add('docked');
       else navEl.classList.remove('docked');
     };
     window.addEventListener('scroll', apply, { passive: true });
+    window.addEventListener('resize', function(){
+      anchorEl = null;
+      refreshThreshold();
+      apply();
+    });
     apply();
   })();
 
