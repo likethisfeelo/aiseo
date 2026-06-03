@@ -69,6 +69,9 @@
   .topnav .method-tips{background:transparent;border:none;padding:0;font-family:var(--display);
     font-weight:800;letter-spacing:-.01em;font-size:15px;color:var(--ink)}
   .topnav .method-tips:hover{opacity:.65}
+  /* floating capsule 상태에선 AISEO.TIPS 숨김 — 좁은 가운데 캡슐이 깔끔하게
+     보이도록. 스크롤 다운으로 docked 되면 좌측에 다시 노출. */
+  .topnav:not(.docked) .method-tips{display:none}
   .topnav .nav-actions{display:flex;align-items:center;gap:14px}
   .topnav .nav-link{font-size:13px;color:var(--ink-soft);font-weight:500;transition:color .15s}
   .topnav .nav-link:hover{color:var(--ink)}
