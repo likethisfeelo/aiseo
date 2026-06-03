@@ -1148,14 +1148,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   @media(max-width:760px){
     .lib-page .nav{padding:10px 16px!important}
     .lib-page .library{padding:24px 0 72px}
+    /* 모바일에선 좌측 AISEO.TIPS 만 노출, 우측 AI SEO LIBRARY 캡슐은 숨김 */
+    .lib-page .nav .method-library{display:none}
   }
 </style>
 
 <header class="lib-header">
   <nav class="nav">
-    <a class="method" href="/library/" aria-label="AISEO 라이브러리"><span class="glyph">A</span> AI SEO LIBRARY</a>
+    <!-- 좌측: 부모 브랜드 — AISEO.TIPS 메인으로 -->
+    <a class="method" href="/" aria-label="AISEO.TIPS 메인"><span class="glyph">A</span> AISEO.TIPS</a>
     <a class="link" href="https://b2b.aiseo.tips/" target="_blank" rel="noopener noreferrer" aria-label="기업서비스 (새 창에서 열림)">기업서비스<span class="ext-icon" aria-hidden="true">↗</span></a>
     <a class="link" href="https://site.aiseo.tips/" target="_blank" rel="noopener noreferrer" aria-label="강의 (새 창에서 열림)">강의<span class="ext-icon" aria-hidden="true">↗</span></a>
+    <!-- 우측: 현재 섹션 브랜드 — AI SEO LIBRARY (자기 자신) -->
+    <a class="method method-library" href="/library/" aria-label="AI SEO LIBRARY"><span class="glyph">A</span> AI SEO LIBRARY</a>
     <a class="nav-user-icon" id="nav-user-btn" href="/login.html" aria-label="내 계정">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
