@@ -282,24 +282,16 @@ const POSTS = [
   },
 ];
 
-const COVERS = [
-  {
-    slug: 'case-studies',
-    title: '성공사례',
-    description: '실제 브랜드들이 AI 검색 노출을 만든 과정 — 무엇을 바꿨고, 어디서 성과가 나왔는지.',
-    tag: 'Case Studies',
-    sortOrder: 1,
-  },
-  {
-    slug: 'playbooks',
-    title: 'SEO·AEO·GEO 플레이북',
-    description: 'AI 검색 시대에 통하는 사이트·콘텐츠·운영 전략. 바로 따라 쓸 수 있는 단계별 가이드.',
-    tag: 'Playbooks',
-    sortOrder: 2,
-  },
-];
+// 카테고리 매핑: POSTS 의 c 값 → 책장 탭/필터에서 사용하는 카테고리 라벨.
+// cover.tag 필드에 이 라벨이 저장되고, 카탈로그 필터가 substring 매칭함.
+const CATEGORY_LABEL = { case: '성공사례', play: 'SEO전략' };
 
-const CATEGORY_TO_COVER = { case: 'case-studies', play: 'playbooks' };
+// 표지 카드의 description 으로 쓸 lead 의 짧은 요약 (첫 80자 정도).
+const shortDescription = (lead) => {
+  const s = String(lead || '').trim();
+  if (s.length <= 90) return s;
+  return s.slice(0, 88).replace(/[,\s]+$/, '') + '…';
+};
 
 const nowIso = new Date().toISOString();
 
@@ -319,36 +311,41 @@ const upsertIfMissing = async (TableName, Key, Item, label) => {
 const seed = async () => {
   console.log(`\n=== AI SEO Library seed (region=${REGION}, force=${FORCE}) ===\n`);
 
-  console.log('[1/3] 표지(Cover) 작성');
-  for (const c of COVERS) {
-    const item = {
-      slug: c.slug,
-      title: c.title,
-      description: c.description,
+  // 위계: 카테고리(성공사례 / SEO전략) > 표지(14개 토픽) > 포스트(각 표지의 챕터).
+  // 시드는 POSTS 14개 각각이 → 표지 1개 + 챕터(post) 1개를 생성.
+  // 포스트 slug 는 ${coverSlug}-overview 접미사로 URL 위계가 명확하게 보이게 함.
+
+  console.log('[1/3] 표지(Cover) 작성 — 14권');
+  POSTS.forEach((p, i) => p.__sortOrder = i + 1);
+  for (const p of POSTS) {
+    const coverItem = {
+      slug: p.slug,                              // 표지 slug = 원래의 post slug
+      title: p.title,                            // 표지 title = 원래의 post title (책 한 권의 주제)
+      description: shortDescription(p.lead),     // 표지 카드 부제 = lead 요약
       thumbnail: '',
-      tag: c.tag,
-      sortOrder: c.sortOrder,
+      tag: CATEGORY_LABEL[p.c] || 'SEO전략',     // 카테고리 라벨 — 탭 필터가 이 값을 매칭
+      sortOrder: p.__sortOrder,
       isPublished: true,
       createdAt: nowIso,
       updatedAt: nowIso,
     };
-    await upsertIfMissing(T_COVERS, { slug: c.slug }, item, `cover/${c.slug}`);
+    await upsertIfMissing(T_COVERS, { slug: p.slug }, coverItem, `cover/${p.slug}`);
   }
 
-  console.log('\n[2/3] 포스트(Post) 작성');
+  console.log('\n[2/3] 포스트(Post) 작성 — 14개 (-overview)');
   for (const p of POSTS) {
-    const canonicalCoverSlug = CATEGORY_TO_COVER[p.c] || 'playbooks';
+    const postSlug = `${p.slug}-overview`;
     const item = {
-      slug: p.slug,
+      slug: postSlug,
       title: p.title,
-      tag: p.c === 'case' ? '성공사례' : 'SEO전략',
+      tag: CATEGORY_LABEL[p.c] || 'SEO전략',
       author: 'AISEO',
       source: p.source,
       publishedAt: nowIso,
       readMinutes: p.readMinutes,
       lead: p.lead,
       bodyHtml: p.bodyHtml,
-      canonicalCoverSlug,
+      canonicalCoverSlug: p.slug,                // canonical = 본인 표지
       seoMeta: {
         description: p.lead.slice(0, 160),
         keywords: p.keywords || 'AI SEO,AEO,GEO',
@@ -360,30 +357,29 @@ const seed = async () => {
       createdAt: nowIso,
       updatedAt: nowIso,
     };
-    await upsertIfMissing(T_POSTS, { slug: p.slug }, item, `post/${p.slug}`);
+    await upsertIfMissing(T_POSTS, { slug: postSlug }, item, `post/${postSlug}`);
   }
 
-  console.log('\n[3/3] 표지↔포스트 매핑');
-  const counters = { 'case-studies': 0, playbooks: 0 };
+  console.log('\n[3/3] 표지↔포스트 매핑 — 1:1 (각 표지에 첫 챕터)');
   for (const p of POSTS) {
-    const coverSlug = CATEGORY_TO_COVER[p.c];
-    if (!coverSlug) continue;
-    counters[coverSlug] += 1;
-    const sortOrder = counters[coverSlug];
-    const sortKey = `${pad4(sortOrder)}#${p.slug}`;
-    const item = { coverSlug, sortKey, postSlug: p.slug, sortOrder };
+    const coverSlug = p.slug;
+    const postSlug = `${p.slug}-overview`;
+    const sortOrder = 1;
+    const sortKey = `${pad4(sortOrder)}#${postSlug}`;
+    const item = { coverSlug, sortKey, postSlug, sortOrder };
     await upsertIfMissing(
       T_JOINS,
       { coverSlug, sortKey },
       item,
-      `${coverSlug} #${sortOrder} → ${p.slug}`,
+      `${coverSlug} #${sortOrder} → ${postSlug}`,
     );
   }
 
   console.log('\n=== seed complete ===');
-  console.log(`  Covers: ${COVERS.length}`);
+  console.log(`  Covers: ${POSTS.length}`);
   console.log(`  Posts : ${POSTS.length}`);
-  console.log(`  Joins : ${POSTS.length} (1 cover per post)\n`);
+  console.log(`  Joins : ${POSTS.length} (1 post per cover)\n`);
+  console.log('Note: 기존 표지(case-studies, playbooks) 및 옛 slug 포스트 14개는 어드민 UI 에서 수동 삭제 필요.');
 };
 
 seed().catch((e) => {

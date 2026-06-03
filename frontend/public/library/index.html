@@ -1474,9 +1474,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
 
   // ── Category tab buttons ─────────────────────────────────────
-  // 시드 데이터의 tag: 'Case Studies' (case-studies), 'Playbooks' (playbooks).
+  // 시드 데이터의 cover.tag: '성공사례' / 'SEO전략' (한국어 카테고리).
   // 기존 탭 (전체/성공사례/SEO전략) 의 data-c 값 'case'/'play' 를 tag 매칭용으로 매핑.
-  var TAB_TAG_MAP = { 'all': 'all', 'case': 'case studies', 'play': 'playbooks' };
+  var TAB_TAG_MAP = { 'all': 'all', 'case': '성공사례', 'play': 'SEO전략' };
   function setupTabs(){
     if (!libTabs) return;
     var tabBtns = libTabs.querySelectorAll('button');
