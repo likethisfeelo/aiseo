@@ -6,6 +6,8 @@ import {
   adminUpdateLibraryPost,
   adminListLibraryCovers,
 } from '../../api';
+import { BlogEditor } from '../../components/common/BlogEditor';
+import { ImageUploader } from '../../components/common/ImageUploader';
 
 interface CoverRow {
   slug: string;
@@ -302,16 +304,15 @@ export function LibraryPostEditPage() {
       </div>
 
       <div style={styles.section}>
-        <div style={styles.sectionTitle}>본문 HTML — 게이트 대상</div>
+        <div style={styles.sectionTitle}>본문 — 게이트 대상 (WYSIWYG)</div>
         <p style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>
-          허용 태그: p, h1-6, ul/ol/li, blockquote, code/pre, a, img, table, figure 등. 저장 시 sanitize 됩니다.
+          툴바로 서식·이미지·링크 편집. 이미지는 자동으로 S3 에 업로드(siteId="library")됩니다. 저장 시 서버에서 sanitize.
         </p>
-        <textarea
+        <BlogEditor
           value={bodyHtml}
-          onChange={(e) => setBodyHtml(e.target.value)}
-          rows={20}
-          style={{ ...styles.input, resize: 'vertical', fontFamily: 'monospace', fontSize: 12 }}
-          placeholder="<p>...</p><h2>...</h2>"
+          onChange={setBodyHtml}
+          placeholder="본문을 입력하세요..."
+          siteId="library"
         />
       </div>
 
@@ -438,8 +439,22 @@ export function LibraryPostEditPage() {
         <label style={styles.label}>OG Description</label>
         <textarea value={seoOgDescription} onChange={(e) => setSeoOgDescription(e.target.value)} rows={2} style={{ ...styles.input, resize: 'vertical' }} />
 
-        <label style={styles.label}>OG Image URL</label>
-        <input value={seoOgImage} onChange={(e) => setSeoOgImage(e.target.value)} style={{ ...styles.input, fontFamily: 'monospace', fontSize: 12 }} placeholder="https://..." />
+        <label style={styles.label}>OG Image</label>
+        <ImageUploader
+          siteId="library"
+          currentUrl={seoOgImage}
+          onUploaded={setSeoOgImage}
+          label="OG 이미지 업로드"
+        />
+        <p style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+          또는 직접 URL 입력:
+        </p>
+        <input
+          value={seoOgImage}
+          onChange={(e) => setSeoOgImage(e.target.value)}
+          style={{ ...styles.input, fontFamily: 'monospace', fontSize: 12 }}
+          placeholder="https://..."
+        />
       </div>
 
       <div style={styles.section}>

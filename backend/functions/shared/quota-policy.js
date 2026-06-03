@@ -175,7 +175,8 @@ const validateUpload = ({
   effective, // output of resolveEffectivePolicy
 }) => {
   const policy = effective.policy;
-  const isBlog = siteId === 'blog';
+  // Admin 자원 siteId — blog/library 는 per-user quota 면제 (hard cap 만).
+  const isBlog = siteId === 'blog' || siteId === 'library';
 
   if (kind === 'image') {
     if (fileSize && fileSize > HARD_CAP_IMAGE_MB * MB) {

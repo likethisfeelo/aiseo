@@ -1,8 +1,12 @@
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { ok, badRequest, serverError, payloadTooLarge, tooManyRequests } = require('../shared/response');
-const { requireUser } = require('../shared/auth');
+const { ok, badRequest, forbidden, serverError, payloadTooLarge, tooManyRequests } = require('../shared/response');
+const { requireUser, isAdmin } = require('../shared/auth');
 const { ensureSiteOwnership } = require('../shared/site-access');
+
+// 'blog' / 'library' 는 admin 운영 자원 — Sites 테이블에 owner 레코드가
+// 없어도 admin 그룹 사용자면 업로드 허용. 카탈로그/리더 콘텐츠 운영용.
+const ADMIN_ASSET_SITE_IDS = new Set(['blog', 'library']);
 const { getAppConfig, resolveEffectivePolicy, validateUpload, MB } = require('../shared/quota-policy');
 const { getUsage, incrementUsage } = require('../shared/usage-tracker');
 const crypto = require('crypto');
@@ -42,13 +46,22 @@ exports.handler = async (event) => {
       return badRequest('Unsupported file type. Allowed: JPEG, PNG, WebP, SVG', event);
     }
 
-    const { ok: isOwner, response: ownerErr } = await ensureSiteOwnership({
-      siteId,
-      userSub: user.sub,
-      tableName: sitesTable,
-      event,
-    });
-    if (!isOwner) return ownerErr;
+    // admin 운영 siteId 면 Sites 테이블의 ownerSub 검증을 건너뛰고
+    // cognito 'admin' 그룹 멤버십만 확인. 그 외 일반 siteId 는 기존
+    // 흐름대로 Sites 테이블 record 의 ownerSub 매칭.
+    if (ADMIN_ASSET_SITE_IDS.has(siteId)) {
+      if (!isAdmin(event)) {
+        return forbidden(`siteId="${siteId}" 는 admin 전용입니다.`, event);
+      }
+    } else {
+      const { ok: isOwner, response: ownerErr } = await ensureSiteOwnership({
+        siteId,
+        userSub: user.sub,
+        tableName: sitesTable,
+        event,
+      });
+      if (!isOwner) return ownerErr;
+    }
 
     // ── Quota policy check ──
     // Blog images (siteId === 'blog') are admin operating resources and
@@ -62,7 +75,7 @@ exports.handler = async (event) => {
       ? new Date(iat * 1000).toISOString()
       : undefined;
     const effective = resolveEffectivePolicy(appConfig, { userCreatedAt });
-    const usage = siteId === 'blog' ? null : await getUsage(user.sub);
+    const usage = ADMIN_ASSET_SITE_IDS.has(siteId) ? null : await getUsage(user.sub);
 
     const sizeNumber = fileSize ? Number(fileSize) : 0;
     const verdict = validateUpload({
@@ -99,7 +112,7 @@ exports.handler = async (event) => {
     // at presign time because the client PUTs directly to S3 without our
     // Lambda in the loop. Tracking the signed-URL issuance is the only
     // hook we have; slight over-counting on abandoned uploads is OK.
-    if (siteId !== 'blog') {
+    if (!ADMIN_ASSET_SITE_IDS.has(siteId)) {
       try {
         await incrementUsage(user.sub, {
           siteId,
