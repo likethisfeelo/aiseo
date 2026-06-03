@@ -74,10 +74,9 @@ rm /tmp/aiseo-login-config.js
 
 # /library/reader-config.js — apex /library/{cover}/{post} reader 가 fetch
 # 하는 Cognito + API base 설정. login-config 와 같은 sed 패턴.
-# API base 는 API GW 직접 URL 을 default 로 사용 — api-dev.aiseo.tips 커스텀
-# 도메인이 API GW 에 연결돼 있지 않아 SPA fallback 으로 빠지기 때문.
-# (custom domain 셋업 후엔 VITE_API_BASE_URL_DEV 로 override)
-_API_BASE="${VITE_API_BASE_URL_DEV:-https://1ni4szkrqh.execute-api.ap-northeast-2.amazonaws.com/dev}"
+# api-dev.aiseo.tips 는 API Gateway custom domain 으로 연결됨 (Route53 + ACM).
+# 환경별 override 가 필요하면 VITE_API_BASE_URL_DEV 환경변수 설정.
+_API_BASE="${VITE_API_BASE_URL_DEV:-https://api-dev.aiseo.tips}"
 sed -e "s|%%COGNITO_REGION%%|${_REGION}|g" \
     -e "s|%%COGNITO_CLIENT_ID%%|${_CLIENT_ID}|g" \
     -e "s|%%API_BASE_URL%%|${_API_BASE}|g" \
