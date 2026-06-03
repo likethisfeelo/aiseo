@@ -1146,6 +1146,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .lib-page .nav-right{display:flex;align-items:center;gap:28px}
   .lib-page .nav .method{cursor:pointer;text-decoration:none}
   .lib-page .nav .method:hover{background:rgba(255,255,255,.18)!important}
+  /* 좌측 AISEO.TIPS 는 캡슐(버블) 없이 텍스트 로고만 — 부모 브랜드는
+     섹션 브랜드(우측 AI SEO LIBRARY 캡슐) 보다 시각적으로 단순하게. */
+  .lib-page .nav .method-tips{background:transparent!important;border:none!important;
+    padding:8px 4px!important;font-family:var(--display);font-weight:800;letter-spacing:-.01em;
+    font-size:16px;color:#fff;backdrop-filter:none!important}
+  .lib-page .nav .method-tips:hover{background:transparent!important;opacity:.7}
   .lib-page .library{padding:48px 0 96px}
   /* 라이브러리 페이지에선 "전체 보기" 버튼이 의미 없으므로 숨김
      (메인에서 여기로 오는 진입점이라 이 페이지가 곧 "전체") */
@@ -1161,14 +1167,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <header class="lib-header">
   <nav class="nav">
-    <!-- 좌측: 부모 브랜드 — AISEO.TIPS 메인으로. nav 의 첫 자식이라
+    <!-- 좌측: 부모 브랜드 — AISEO.TIPS 메인으로. glyph 없이 텍스트만.
          justify-content:space-between 에 의해 자동으로 far-left 정렬. -->
-    <a class="method" href="/" aria-label="AISEO.TIPS 메인"><span class="glyph">A</span> AISEO.TIPS</a>
-    <!-- 우측 그룹: 나머지 메뉴 + AI SEO LIBRARY 캡슐 + 계정/상담문의 -->
+    <a class="method method-tips" href="/" aria-label="AISEO.TIPS 메인">AISEO.TIPS</a>
+    <!-- 우측 그룹: AI SEO LIBRARY → 기업서비스 → 강의 → 계정 → 상담문의 순서 -->
     <div class="nav-right">
+      <a class="method method-library" href="/library/" aria-label="AI SEO LIBRARY"><span class="glyph">A</span> AI SEO LIBRARY</a>
       <a class="link" href="https://b2b.aiseo.tips/" target="_blank" rel="noopener noreferrer" aria-label="기업서비스 (새 창에서 열림)">기업서비스<span class="ext-icon" aria-hidden="true">↗</span></a>
       <a class="link" href="https://site.aiseo.tips/" target="_blank" rel="noopener noreferrer" aria-label="강의 (새 창에서 열림)">강의<span class="ext-icon" aria-hidden="true">↗</span></a>
-      <a class="method method-library" href="/library/" aria-label="AI SEO LIBRARY"><span class="glyph">A</span> AI SEO LIBRARY</a>
       <a class="nav-user-icon" id="nav-user-btn" href="/login.html" aria-label="내 계정">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
