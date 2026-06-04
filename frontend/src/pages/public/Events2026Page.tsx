@@ -975,6 +975,44 @@ export function Events2026Page() {
                 </span>
               </div>
             </a>
+
+            {/* EVENT 04 — 풀패키지 (첫완성) */}
+            <a href="/events2026/first" className="event-card">
+              <div className="event-card-head">
+                <span className="event-card-status">진행 중</span>
+                <span className="event-card-date">2026.04.30 OPEN</span>
+              </div>
+
+              <div className="event-card-tag-row">
+                <span className="event-card-num">EVENT 04</span>
+                <span className="event-card-tag">PAID · 풀패키지</span>
+              </div>
+
+              <h3 className="event-card-h">
+                검색·기획·배포,<br />전 과정을 한 번에 제대로
+              </h3>
+              <p className="event-card-sub">
+                001·002·CORE1 세 과정을 모두 포함합니다. 사전상담으로 원하는 디자인 방향을
+                먼저 잡고, 검색 노출까지 빠짐없이 완성합니다.
+              </p>
+
+              <ul className="event-card-meta">
+                <li>정가 50만원 → <strong>35만원</strong> (3종 전 과정)</li>
+                <li>사전상담 1시간 추가 · 총 4회 (사전상담 1 + 본세션 3)</li>
+                <li>디자인 방향 확정 후 제대로 완성</li>
+              </ul>
+
+              <div className="event-card-foot">
+                <div className="event-card-tags">
+                  <span>#풀패키지</span>
+                  <span>#사전상담포함</span>
+                  <span>#한번에완성</span>
+                </div>
+                <span className="event-card-cta">
+                  자세히 보기 <span className="event-card-cta-arrow">→</span>
+                </span>
+              </div>
+            </a>
           </div>
         </section>
 

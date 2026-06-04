@@ -32,10 +32,17 @@ const EVENT_LABELS: Record<EventCode, string> = {
   EVENT_01_FREE: 'EVENT 01 · 무료 런칭 파트너',
   EVENT_02_PAID: 'EVENT 02 · 검색 전략 + 배포',
   EVENT_03_PAID: 'EVENT 03 · 콘텐츠 기획 + 배포',
+  EVENT_04_PAID: 'EVENT 04 · 풀패키지 (첫완성)',
 };
 
-const isPaidEvent = (code: EventCode) =>
-  code === 'EVENT_02_PAID' || code === 'EVENT_03_PAID';
+// 유료 이벤트별 입금 금액 — 완료 화면 안내 문구에 사용.
+const PAID_AMOUNTS: Partial<Record<EventCode, string>> = {
+  EVENT_02_PAID: '10만원',
+  EVENT_03_PAID: '10만원',
+  EVENT_04_PAID: '35만원',
+};
+
+const isPaidEvent = (code: EventCode) => code in PAID_AMOUNTS;
 
 export function EventSignupModal({ open, onClose, eventCode, source }: Props) {
   const [step, setStep] = useState(1);
@@ -105,7 +112,7 @@ export function EventSignupModal({ open, onClose, eventCode, source }: Props) {
   const renderStep = () => {
     if (done) {
       const paidNote = isPaidEvent(eventCode)
-        ? '입금 안내(10만원)도 함께 보내드립니다.'
+        ? `입금 안내(${PAID_AMOUNTS[eventCode]})도 함께 보내드립니다.`
         : '선착순 3팀 자격 검토 후 안내드립니다.';
       return (
         <div style={styles.doneWrap}>

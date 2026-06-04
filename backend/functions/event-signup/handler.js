@@ -6,11 +6,12 @@ const { randomUUID } = require('crypto');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-const EVENT_CODES = ['EVENT_01_FREE', 'EVENT_02_PAID', 'EVENT_03_PAID'];
+const EVENT_CODES = ['EVENT_01_FREE', 'EVENT_02_PAID', 'EVENT_03_PAID', 'EVENT_04_PAID'];
 const EVENT_LABELS = {
   EVENT_01_FREE: 'EVENT 01 · 무료 런칭 파트너',
   EVENT_02_PAID: 'EVENT 02 · 검색 전략 + 배포',
   EVENT_03_PAID: 'EVENT 03 · 콘텐츠 기획 + 배포',
+  EVENT_04_PAID: 'EVENT 04 · 풀패키지 (첫완성)',
 };
 const HAS_SITE_VALUES = ['yes', 'no', 'wip'];
 

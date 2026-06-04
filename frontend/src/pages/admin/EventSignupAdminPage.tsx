@@ -22,6 +22,7 @@ const EVENT_LABELS: Record<EventCode, string> = {
   EVENT_01_FREE: 'EVENT 01 · 무료',
   EVENT_02_PAID: 'EVENT 02 · 검색 전략',
   EVENT_03_PAID: 'EVENT 03 · 콘텐츠 기획',
+  EVENT_04_PAID: 'EVENT 04 · 풀패키지',
 };
 
 const HAS_SITE_LABEL: Record<string, string> = {
@@ -84,6 +85,7 @@ export function EventSignupAdminPage() {
             <option value="EVENT_01_FREE">{EVENT_LABELS.EVENT_01_FREE}</option>
             <option value="EVENT_02_PAID">{EVENT_LABELS.EVENT_02_PAID}</option>
             <option value="EVENT_03_PAID">{EVENT_LABELS.EVENT_03_PAID}</option>
+            <option value="EVENT_04_PAID">{EVENT_LABELS.EVENT_04_PAID}</option>
           </select>
         </label>
         <label style={styles.filterLabel}>
