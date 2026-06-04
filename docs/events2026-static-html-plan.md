@@ -1,5 +1,21 @@
 # events2026 페이지 정적 HTML 변환 — 실행 계획서
 
+> ## ⚠️ SUPERSEDED — 이 계획(손수 vanilla 전사)은 채택되지 않았습니다
+> Phase 0 분석 결과 landing.css 에 159KB 단일 base64 라인 + 변환 대상 ~6100 라인이라
+> 손수 vanilla 전사는 분량이 크고 픽셀 drift 위험이 높아, **진짜 SSG 방식으로 전환**했습니다.
+>
+> **실제 구현 (완료):** React 페이지를 그대로 두고, 빌드 시
+> `frontend/src/entry-server.tsx` 가 3개 events 페이지를 `renderToString` 으로 렌더 →
+> `frontend/scripts/prerender.mjs` 가 `<div id="root">` 안에 본문을 주입.
+> 클라이언트 번들은 `createRoot().render()` 로 그 위에 그대로 마운트(=React 가 교체 렌더,
+> hydration 아님)하므로 모든 인터랙션·픽셀이 React 원본과 100% 동일.
+> events-shared.css/js·events-config.js·모달 재작성·deploy 변경·App.tsx 수정 **모두 불필요**.
+> CloudFront `PRERENDERED_FIXED` 의 기존 `/events2026*` 라우팅 + 기존 `s3 sync dist/` 로 그대로 배포됨.
+>
+> 아래 원문은 채택되지 않은 대안의 기록으로만 보존합니다.
+
+---
+
 > **Status**: 계획 수립 완료, 미실행
 > **Branch suggestion**: `claude/events2026-static-html`
 > **예상 commit 수**: 6 개 (Phase 1~6)

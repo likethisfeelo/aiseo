@@ -33,14 +33,23 @@
 // the backend blog Lambda when an admin creates/updates a post
 // (see `backend/functions/blog/prerender.js`), because the
 // content lives in DynamoDB rather than in the repo.
+//
+// SSG (full-body) routes:
+//   Routes flagged `ssg: true` additionally get their <body>
+//   rendered to static HTML via src/entry-server.tsx (loaded
+//   through Vite's SSR pipeline) and injected into the empty
+//   `<div id="root"></div>`. This makes the page copy crawlable
+//   by JS-less bots while the client bundle still mounts on top.
+//   See src/entry-server.tsx for the rationale.
 // ============================================================
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = resolve(__dirname, '..', 'dist');
+const ROOT_DIR = resolve(__dirname, '..');
 const TEMPLATE_PATH = resolve(DIST_DIR, 'index.html');
 
 // Absolute origin used for canonical / og:url. Override with
@@ -74,16 +83,20 @@ const ROUTES = [
     path: '/events2026',
     title: 'AISEO 2026 이벤트 — 광고가 아닌 검색될 구조를 만드는',
     description: 'AISEO 2026 런칭 이벤트. 일회성 광고가 아닌, 검색될 구조를 만듭니다. 무료 런칭 파트너 / 10만원 실전 패키지 / 검색 네트워크 등록 — 첫 사례를 함께 만들 분을 찾습니다.',
+    image: '/events/hero-pc.jpg',
+    ssg: true,
   },
   {
     path: '/events2026/free',
     title: 'AISEO 2026 런칭 이벤트 — 먼저 만나고, 함께 만들고, 한 발 앞서',
     description: 'AISEO 2026 무료 런칭 파트너 이벤트. AI 홈페이지 제작 + 도메인·호스팅 + SEO 핵심강의 — 정가 30만원 → 0원. 선착순 3팀, 자격 검토 후 1:1 코칭.',
+    ssg: true,
   },
   {
     path: '/events2026/paid',
     title: 'AISEO 2026 런칭 이벤트 — 두 가지 패키지 중 내게 맞는 한 가지를',
     description: 'AISEO 2026 EVENT 02 검색 전략 / EVENT 03 콘텐츠 기획 — 각각 CORE 1 즉시 배포 포함, 정가 30만원 → 10만원. 자격 검토 없이 누구나 신청 가능, 각 7팀 한정.',
+    ssg: true,
   },
   {
     path: '/blog',
@@ -100,11 +113,11 @@ const escapeHtml = (str) =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-const buildHeadBlock = ({ title, description, url }) => {
+const buildHeadBlock = ({ title, description, url, image }) => {
   const t = escapeHtml(title);
   const d = escapeHtml(description);
   const u = escapeHtml(url);
-  return [
+  const tags = [
     `<title>${t}</title>`,
     `<meta name="description" content="${d}" />`,
     `<link rel="canonical" href="${u}" />`,
@@ -116,8 +129,29 @@ const buildHeadBlock = ({ title, description, url }) => {
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${t}" />`,
     `<meta name="twitter:description" content="${d}" />`,
-  ].join('\n    ');
+  ];
+  if (image) {
+    // Resolve relative image paths against the absolute origin so
+    // social cards work in the raw (crawler-visible) HTML.
+    const abs = /^https?:\/\//i.test(image) ? image : `${BASE_URL}${image}`;
+    const i = escapeHtml(abs);
+    tags.push(`<meta property="og:image" content="${i}" />`);
+    tags.push(`<meta name="twitter:image" content="${i}" />`);
+  }
+  return tags.join('\n    ');
 };
+
+// The SSG page components render their own React-19 document
+// metadata (<title>/<meta>/<link rel=canonical>) inside the tree.
+// We already emit canonical head tags above with absolute URLs, so
+// strip the body-level duplicates (which carry relative URLs) to
+// avoid conflicting canonical/og tags in the crawled HTML. Inline
+// <style> blocks the components render are intentionally kept.
+const stripBodyMeta = (html) =>
+  html
+    .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+    .replace(/<meta\b[^>]*>/gi, '')
+    .replace(/<link\b[^>]*\brel="canonical"[^>]*>/gi, '');
 
 // Strip the template's existing <title> + og/twitter/description
 // tags so we don't end up with duplicates. The viewport and
@@ -132,12 +166,15 @@ const stripExistingHead = (html) => {
     .replace(/<meta\s+name="twitter:[^"]*"[^>]*>\s*/gi, '');
 };
 
-const prerenderRoute = (template, route) => {
+// `renderBody` is an optional (path) => htmlString function provided
+// by the Vite SSR pipeline; only used for routes flagged `ssg: true`.
+const prerenderRoute = (template, route, renderBody) => {
   const url = `${BASE_URL}${route.path}`;
   const headBlock = buildHeadBlock({
     title: route.title,
     description: route.description,
     url,
+    image: route.image,
   });
 
   const stripped = stripExistingHead(template);
@@ -154,13 +191,58 @@ const prerenderRoute = (template, route) => {
     injected = stripped.replace(/<\/head>/i, `    ${headBlock}\n  </head>`);
   }
 
+  // For SSG routes, render the page body and drop it inside the
+  // (otherwise empty) root div so JS-less crawlers see the copy.
+  if (route.ssg && renderBody) {
+    const body = stripBodyMeta(renderBody(route.path));
+    // Function replacer so `$` sequences in the rendered HTML aren't
+    // treated as String.replace special patterns ($&, $1, …).
+    injected = injected.replace(
+      /<div id="root">\s*<\/div>/i,
+      () => `<div id="root">${body}</div>`,
+    );
+  }
+
   const outPath = resolve(DIST_DIR, route.path.replace(/^\//, ''), 'index.html');
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, injected, 'utf8');
   return outPath;
 };
 
-const main = () => {
+// Build src/entry-server.tsx into a Node-loadable SSR bundle with
+// Vite/Rollup, then import it to render the React page components to
+// HTML. We use a real SSR build (not the dev module-runner) because
+// Rollup resolves react-router-dom's CommonJS named exports cleanly,
+// whereas ssrLoadModule chokes on them. The bundle goes to a temp
+// dir outside dist/ so it never gets synced to S3. If anything fails
+// we surface the error — a broken SSG build must not silently ship
+// empty bodies.
+const SSR_OUT_DIR = resolve(ROOT_DIR, 'node_modules', '.cache', 'aiseo-ssr');
+
+const createRenderer = async () => {
+  const { build } = await import('vite');
+  await build({
+    root: ROOT_DIR,
+    logLevel: 'error',
+    build: {
+      ssr: resolve(ROOT_DIR, 'src', 'entry-server.tsx'),
+      outDir: SSR_OUT_DIR,
+      emptyOutDir: true,
+      rollupOptions: { output: { entryFileNames: 'entry-server.mjs' } },
+    },
+    // Inline react-router so its CJS named exports are bundled in.
+    ssr: { noExternal: ['react-router-dom', 'react-router'] },
+  });
+  const mod = await import(pathToFileURL(resolve(SSR_OUT_DIR, 'entry-server.mjs')).href);
+  return {
+    render: (path) => mod.render(path),
+    close: async () => {
+      try { rmSync(SSR_OUT_DIR, { recursive: true, force: true }); } catch {}
+    },
+  };
+};
+
+const main = async () => {
   let template;
   try {
     template = readFileSync(TEMPLATE_PATH, 'utf8');
@@ -170,11 +252,27 @@ const main = () => {
   }
 
   console.log(`[prerender] BASE_URL = ${BASE_URL}`);
-  for (const route of ROUTES) {
-    const out = prerenderRoute(template, route);
-    console.log(`[prerender]  ✓ ${route.path.padEnd(14)} → ${out.replace(DIST_DIR, 'dist')}`);
+
+  const needsSsg = ROUTES.some((r) => r.ssg);
+  let renderer = null;
+  if (needsSsg) {
+    renderer = await createRenderer();
+    console.log('[prerender] SSG renderer ready (src/entry-server.tsx)');
+  }
+
+  try {
+    for (const route of ROUTES) {
+      const out = prerenderRoute(template, route, renderer?.render);
+      const tag = route.ssg ? ' [ssg]' : '';
+      console.log(`[prerender]  ✓ ${route.path.padEnd(16)} → ${out.replace(DIST_DIR, 'dist')}${tag}`);
+    }
+  } finally {
+    if (renderer) await renderer.close();
   }
   console.log(`[prerender] done (${ROUTES.length} routes)`);
 };
 
-main();
+main().catch((err) => {
+  console.error('[prerender] failed:', err);
+  process.exit(1);
+});
