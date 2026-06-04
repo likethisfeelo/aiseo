@@ -14,6 +14,11 @@
 
 $ErrorActionPreference = "Stop"
 
+# 콘솔 출력 인코딩을 UTF-8 로 고정. Windows PowerShell 5.1 + 한국어 로케일
+# (CP949) 에서 한글 Write-Host 가 mojibake 되는 문제 방지. PowerShell 7+
+# 는 default 가 UTF-8 이지만 5.1 호환을 위해 명시.
+try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new() } catch {}
+
 $BUCKET = "aiseo-sites-bucket"
 $PROFILE = "aiseo"
 $DISTRIBUTION_ID = "EZSNEM80TUP6K"

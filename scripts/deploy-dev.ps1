@@ -12,6 +12,11 @@
 # 사용법: .\scripts\deploy-dev.ps1
 # ============================================================
 
+# 콘솔 출력 인코딩을 UTF-8 로 고정. Windows PowerShell 5.1 + 한국어 로케일
+# (CP949) 에서 한글 Write-Host 가 mojibake (?뜻귈... 등) 가 되는 문제 방지.
+# PowerShell 7+ 는 default 가 UTF-8 이지만 5.1 호환을 위해 명시.
+try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new() } catch {}
+
 $BUCKET = "aiseo-sites-dev-bucket"
 $PROFILE = "aiseo"
 $DISTRIBUTION_ID = "E2SBJ84WHHWIJM"
@@ -120,6 +125,6 @@ aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/
 
 Write-Host ""
 Write-Host "=== Deploy complete ===" -ForegroundColor Green
-Write-Host "  dev.aiseo.tips          -> 회사 소개 랜딩"
-Write-Host "  b2b.dev.aiseo.tips      -> B2B 서비스"
-Write-Host "  site.dev.aiseo.tips     -> B2C 대시보드"
+Write-Host "  dev.aiseo.tips          -> Landing"
+Write-Host "  b2b.dev.aiseo.tips      -> B2B"
+Write-Host "  site.dev.aiseo.tips     -> B2C Dashboard"
