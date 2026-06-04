@@ -82,6 +82,7 @@ function handler(event) {
         '/events2026': '/site/events2026/index.html',
         '/events2026/free': '/site/events2026/free/index.html',
         '/events2026/paid': '/site/events2026/paid/index.html',
+        '/events2026/first': '/site/events2026/first/index.html',
         '/blog': '/site/blog/index.html',
       };
 
