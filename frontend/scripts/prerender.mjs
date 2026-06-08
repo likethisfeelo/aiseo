@@ -99,6 +99,13 @@ const ROUTES = [
     ssg: true,
   },
   {
+    path: '/events2026/first',
+    title: 'AISEO 2026 런칭 이벤트 — 첫완성패키지(풀패키지)로 한 번에 제대로',
+    description: 'AISEO 2026 EVENT 04 첫완성패키지. 001 검색노출전략 + 002 콘텐츠 기획·설계 + CORE 1 즉시 배포 전 과정에 사전상담 1시간까지 — 정가 50만원 → 35만원, 사전상담 1 + 본세션 3 총 4회로 디자인 방향까지 잡고 제대로 완성합니다.',
+    image: '/events/hero-pc.jpg',
+    ssg: true,
+  },
+  {
     path: '/blog',
     title: '블로그 | AISEO',
     description: 'AISEO 블로그. AI 웹사이트 제작, SEO, 마케팅에 대한 최신 인사이트를 공유합니다.',

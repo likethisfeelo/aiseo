@@ -28,6 +28,7 @@ import { StaticRouter } from 'react-router-dom';
 import { Events2026Page } from './pages/public/Events2026Page';
 import { Events2026FreePage } from './pages/public/Events2026FreePage';
 import { Events2026PaidPage } from './pages/public/Events2026PaidPage';
+import { Events2026FirstPage } from './pages/public/Events2026FirstPage';
 
 // Routes we statically render the body for. Keep in sync with the
 // `ssg: true` entries in scripts/prerender.mjs.
@@ -35,6 +36,7 @@ const PAGES: Record<string, ComponentType> = {
   '/events2026': Events2026Page,
   '/events2026/free': Events2026FreePage,
   '/events2026/paid': Events2026PaidPage,
+  '/events2026/first': Events2026FirstPage,
 };
 
 export function render(path: string): string {

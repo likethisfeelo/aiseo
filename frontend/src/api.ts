@@ -193,7 +193,7 @@ export const submitCourseInquiry = async (input: {
 export const adminGetCourseInquiries = () => getJson('/admin/course-inquiries');
 
 // ── Event signup APIs (events 2026: free / paid) ──
-export type EventCode = 'EVENT_01_FREE' | 'EVENT_02_PAID' | 'EVENT_03_PAID';
+export type EventCode = 'EVENT_01_FREE' | 'EVENT_02_PAID' | 'EVENT_03_PAID' | 'EVENT_04_PAID';
 export type EventHasSite = 'yes' | 'no' | 'wip';
 
 export interface EventSignupPayload {
