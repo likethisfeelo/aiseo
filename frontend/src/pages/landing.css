@@ -960,7 +960,9 @@
     box-shadow: 0 20px 80px rgba(0,0,0,0.14), 0 4px 20px rgba(0,0,0,0.08);
     position: relative;
     aspect-ratio: 16/9;
-    background: #0A0614;
+    /* Prism artwork shows behind the player as the poster/fallback
+       (initial, stopped via ESC, or if the iframe fails to load). */
+    background: #0A0614 url("/events/hero-pc.jpg") center/cover no-repeat;
     cursor: pointer;
   }
   .video-frame-wrap iframe {
@@ -969,6 +971,19 @@
     pointer-events: none;
   }
   .video-frame-wrap.playing iframe { pointer-events: auto; }
+
+  /* Mute toggle — only visible while the video is playing. */
+  .video-mute-btn {
+    position: absolute; top: 14px; right: 14px; z-index: 6;
+    width: 42px; height: 42px; border-radius: 50%;
+    border: none; cursor: pointer;
+    background: rgba(10,6,20,0.6); color: #fff; font-size: 18px; line-height: 1;
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    transition: background .2s, transform .15s;
+  }
+  .video-frame-wrap.playing .video-mute-btn { display: flex; }
+  .video-mute-btn:hover { background: rgba(10,6,20,0.85); transform: scale(1.06); }
 
   /* Thumbnail overlay */
   #videoThumbnail {
@@ -981,7 +996,9 @@
   }
   .vt-placeholder {
     width: 100%; height: 100%;
-    background: linear-gradient(135deg, #0A0614 0%, #1a0a2e 50%, #2d1b5e 100%);
+    background:
+      linear-gradient(135deg, rgba(10,6,20,0.34) 0%, rgba(10,6,20,0.22) 100%),
+      url("/events/hero-pc.jpg") center/cover no-repeat;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 18px;
   }
