@@ -4,7 +4,8 @@ import './landing.css';
 import { ConsultationWidget } from '../components/ConsultationWidget';
 import { LandingBlogSection } from './landing/LandingBlogSection';
 import { subscribeNewsletter, type NewsletterPersona } from '../api';
-import { KAKAO_CHANNEL_URL, KAKAO_CHAT_URL } from '../constants/contact';
+import { SiteFooter } from '../components/SiteFooter';
+import { ytCommand } from '../lib/ytControl';
 
 const PERSONA_LABEL: Record<NewsletterPersona, string> = {
   'small-business': '소상공인',
@@ -371,7 +372,9 @@ export function LandingPage({ authError }: Props) {
     const ytPlayer = document.getElementById('ytPlayer') as HTMLIFrameElement | null;
     const vidProgressBar = document.getElementById('videoProgressBar');
     const vidThumbnail = document.getElementById('videoThumbnail');
+    const vidMuteBtn = document.getElementById('videoMuteBtn');
     let videoStarted = false;
+    let vidMuted = false;
     let vidRaf: number;
     function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
     function lerpV(a: number, b: number, t: number) { return a + (b - a) * t; }
@@ -449,8 +452,34 @@ export function LandingPage({ authError }: Props) {
       vidVisObs.observe(vidWrap);
     }
 
+    // Mute toggle — postMessage to the YouTube player (enablejsapi=1).
+    const onVidMute = () => {
+      vidMuted = !vidMuted;
+      ytCommand(ytPlayer, vidMuted ? 'mute' : 'unMute');
+      if (vidMuteBtn) vidMuteBtn.textContent = vidMuted ? '🔇' : '🔊';
+    };
+    if (vidMuteBtn) vidMuteBtn.addEventListener('click', onVidMute);
+
+    // ESC stops the video (and its audio) and restores the prism poster.
+    const onVidEsc = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || !videoStarted || !ytPlayer) return;
+      ytPlayer.src = 'https://www.youtube.com/embed/HMV6PMtG720?enablejsapi=1&rel=0&modestbranding=1&color=white';
+      ytPlayer.style.pointerEvents = 'none';
+      vidWrap?.classList.remove('playing');
+      videoStarted = false;
+      vidMuted = false;
+      if (vidMuteBtn) vidMuteBtn.textContent = '🔊';
+      if (vidThumbnail) {
+        vidThumbnail.style.opacity = '1';
+        vidThumbnail.style.pointerEvents = 'auto';
+      }
+    };
+    window.addEventListener('keydown', onVidEsc);
+
     // ── Cleanup ──
     return () => {
+      if (vidMuteBtn) vidMuteBtn.removeEventListener('click', onVidMute);
+      window.removeEventListener('keydown', onVidEsc);
       clearInterval(mpAutoTimer);
       clearInterval(psTimer);
       clearInterval(tAuto);
@@ -485,6 +514,7 @@ export function LandingPage({ authError }: Props) {
               <div className="nav-submenu" role="menu">
                 <a href="/events2026/free" role="menuitem">무료이벤트</a>
                 <a href="/events2026/paid" role="menuitem">할인이벤트</a>
+                <a href="/events2026/first" role="menuitem">첫완성패키지</a>
               </div>
             </div>
             <a href="/blog">블로그</a>
@@ -507,6 +537,7 @@ export function LandingPage({ authError }: Props) {
           <a href="/events2026" className="nmm-link">이벤트</a>
           <a href="/events2026/free" className="nmm-link nmm-sublink">└ 무료이벤트</a>
           <a href="/events2026/paid" className="nmm-link nmm-sublink">└ 할인이벤트</a>
+          <a href="/events2026/first" className="nmm-link nmm-sublink">└ 첫완성패키지</a>
           <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
@@ -565,6 +596,7 @@ export function LandingPage({ authError }: Props) {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
+            <button type="button" id="videoMuteBtn" className="video-mute-btn" aria-label="음소거 토글">🔊</button>
             <div className="video-progress-bar" id="videoProgressBar"></div>
           </div>
           <div className="video-scroll-hint" id="videoScrollHint">
@@ -1218,105 +1250,7 @@ export function LandingPage({ authError }: Props) {
       <LandingBlogSection />
 
       {/* FOOTER */}
-      <footer>
-        <div className="hero-bg" style={{position:'absolute',inset:0,zIndex:0}}></div>
-        <div className="footer-inner">
-          <div className="footer-cta">
-            <div className="footer-cta-label">지금 시작하세요</div>
-            <h2>온라인마케팅의 시작<br/><span>AISEO.TIPS</span></h2>
-            <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
-              <a href="/course2026#diagnosis" className="btn-primary-lg" style={{fontSize:16,padding:'16px 36px'}}>서비스 신청하기 →</a>
-              <a
-                href={KAKAO_CHAT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{fontSize:15,fontWeight:600,color:'rgba(255,255,255,0.75)',textDecoration:'none',padding:'16px 28px',border:'1.5px solid rgba(255,255,255,0.2)',borderRadius:12,backdropFilter:'blur(8px)'}}
-              >
-                1:1 상담문의
-              </a>
-            </div>
-          </div>
-          <div className="footer-top">
-            <div className="footer-brand">
-              <div className="footer-logo">AISEO</div>
-              <p>시작부터 분석까지 AISEO에서 모두 함께 시작하세요.</p>
-            </div>
-            <div className="footer-col">
-              <h5>제품</h5>
-              <a href="#">AI 웹빌더</a>
-              <a href="#">SEO 자동화</a>
-              <a href="#">콘텐츠 생성</a>
-              <a href="#">성과 분석</a>
-              <a href="#">요금제</a>
-            </div>
-            <div className="footer-col">
-              <h5>리소스</h5>
-              <a href="#">블로그</a>
-              <a href="#">가이드</a>
-              <a href="#">성공 사례</a>
-              <a href="#">도움말</a>
-              <a href="#">API</a>
-            </div>
-            <div className="footer-col">
-              <h5>회사</h5>
-              <a href="#">소개</a>
-              <a href="#">채용</a>
-              <a href="#">파트너</a>
-              <a href="#">문의</a>
-            </div>
-          </div>
-          <div className="footer-mobile">
-            <div className="footer-logo" style={{marginBottom:4}}>AISEO</div>
-            <p className="footer-mobile-desc">AI로 만들고, 검색에서 찾히는 비즈니스.</p>
-            <details className="footer-acc">
-              <summary>제품</summary>
-              <div className="footer-acc-links">
-                <a href="#">AI 웹빌더</a><a href="#">SEO 자동화</a>
-                <a href="#">콘텐츠 생성</a><a href="#">요금제</a>
-              </div>
-            </details>
-            <details className="footer-acc">
-              <summary>리소스</summary>
-              <div className="footer-acc-links">
-                <a href="#">블로그</a><a href="#">가이드</a>
-                <a href="#">성공 사례</a><a href="#">도움말</a>
-              </div>
-            </details>
-            <details className="footer-acc">
-              <summary>회사</summary>
-              <div className="footer-acc-links">
-                <a href="#">소개</a><a href="#">채용</a>
-                <a href="#">파트너</a><a href="#">문의</a>
-              </div>
-            </details>
-          </div>
-          <div className="footer-sns">
-            <a
-              href={KAKAO_CHANNEL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-sns-link footer-sns-kakao"
-              aria-label="카카오톡 채널"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.74 5.16 4.4 6.62l-1.06 3.92c-.1.36.27.65.59.46l4.62-2.78c.47.06.94.1 1.45.1 5.52 0 10-3.58 10-8 0-4.42-4.48-8-10-8z"/>
-              </svg>
-              <span>카카오톡 채널</span>
-            </a>
-          </div>
-          <div className="footer-bottom">
-            <span>&copy; 2026 AISEO. All rights reserved.</span>
-            <div style={{display:'flex',gap:24}}>
-              <a href="#">개인정보처리방침</a>
-              <a href="#">이용약관</a>
-              <a href="#">쿠키 정책</a>
-            </div>
-          </div>
-          <div className="footer-legal">
-            크리다 · 사업자등록번호 231-88-03647 · 충청남도 천안시 서북구 월봉로 126, 9층 901호 C27(쌍용동, 대림프라자) · 개인정보책임자 김경진 <a href="mailto:jin@k-rida.com">jin@k-rida.com</a>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <ConsultationWidget open={consultOpen} onClose={() => setConsultOpen(false)} />
 

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import '../landing.css';
 import { useSubPageNav } from './useSubPageNav';
 import { EventSignupModal } from '../../components/EventSignupModal';
+import { HeroVideoBox } from '../../components/HeroVideoBox';
+import { SiteFooter } from '../../components/SiteFooter';
 import type { EventCode } from '../../api';
 
 /**
@@ -77,7 +79,7 @@ export function Events2026PaidPage() {
       minutes: cdEl.querySelector<HTMLElement>('[data-cd="minutes"]'),
       seconds: cdEl.querySelector<HTMLElement>('[data-cd="seconds"]'),
     };
-    const target = new Date('2026-04-30T00:00:00+09:00').getTime();
+    const target = new Date('2026-06-08T00:00:00+09:00').getTime();
     const pad = (n: number) => String(n).padStart(2, '0');
 
     const tick = () => {
@@ -141,20 +143,6 @@ export function Events2026PaidPage() {
     targets.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
-
-  // Hero video stub — quick scale feedback on click.
-  useEffect(() => {
-    const btn = document.querySelector<HTMLButtonElement>('.evtpaid .hero-video-play');
-    if (!btn) return;
-    const onClick = () => {
-      btn.style.transform = 'translate(-50%, -50%) scale(0.92)';
-      window.setTimeout(() => {
-        btn.style.transform = 'translate(-50%, -50%) scale(1)';
-      }, 150);
-    };
-    btn.addEventListener('click', onClick);
-    return () => btn.removeEventListener('click', onClick);
   }, []);
 
   // CSR-only app, so `window` is always defined at render time.
@@ -1614,6 +1602,7 @@ export function Events2026PaidPage() {
               <div className="nav-submenu" role="menu">
                 <a href="/events2026/free" role="menuitem">무료이벤트</a>
                 <a href="/events2026/paid" className="active" role="menuitem">할인이벤트</a>
+                <a href="/events2026/first" role="menuitem">첫완성패키지</a>
               </div>
             </div>
             <a href="/blog">블로그</a>
@@ -1636,6 +1625,7 @@ export function Events2026PaidPage() {
           <a href="/events2026" className="nmm-link">이벤트</a>
           <a href="/events2026/free" className="nmm-link nmm-sublink">└ 무료이벤트</a>
           <a href="/events2026/paid" className="nmm-link nmm-sublink">└ 할인이벤트</a>
+          <a href="/events2026/first" className="nmm-link nmm-sublink">└ 첫완성패키지</a>
           <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
@@ -1693,14 +1683,7 @@ export function Events2026PaidPage() {
               </svg>
             </div>
 
-            <div className="hero-video">
-              <button type="button" className="hero-video-play" aria-label="이벤트 영상 재생">
-                <svg viewBox="0 0 24 24" fill="#0A0614" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
-              <div className="hero-video-label">AISEO.TIPS 이벤트 영상 · 1분</div>
-            </div>
+            <HeroVideoBox />
           </div>
         </section>
 
@@ -2409,7 +2392,7 @@ export function Events2026PaidPage() {
               신청 가능합니다
             </h2>
             <p className="launch-cta-sub">
-              2026년 4월 30일 정식 오픈 — <strong>EVENT 02와 EVENT 03 각각 7팀 한정</strong>으로<br />
+              2026년 6월 8일 정식 오픈 — <strong>EVENT 02와 EVENT 03 각각 7팀 한정</strong>으로<br />
               진행됩니다. 자리가 마감되는 즉시 신청이 종료됩니다.
             </p>
 
@@ -2513,18 +2496,7 @@ export function Events2026PaidPage() {
           </div>
         </section>
 
-        {/* Footer placeholder so the page closes cleanly between phases. */}
-        <footer style={{ minHeight: 'auto', padding: '48px 40px', background: 'var(--bg-dark)', color: 'rgba(255,255,255,0.6)' }}>
-          <div className="footer-inner">
-            <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>
-              <span>&copy; 2026 AISEO. All rights reserved.</span>
-              <div style={{ display: 'flex', gap: 24 }}>
-                <a href="#">개인정보처리방침</a>
-                <a href="#">이용약관</a>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
 
       <EventSignupModal

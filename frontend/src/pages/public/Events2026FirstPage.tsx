@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import '../landing.css';
 import { useSubPageNav } from './useSubPageNav';
 import { EventSignupModal } from '../../components/EventSignupModal';
+import { HeroVideoBox } from '../../components/HeroVideoBox';
+import { SiteFooter } from '../../components/SiteFooter';
 import type { EventCode } from '../../api';
 
 /**
@@ -72,7 +74,7 @@ export function Events2026FirstPage() {
       minutes: cdEl.querySelector<HTMLElement>('[data-cd="minutes"]'),
       seconds: cdEl.querySelector<HTMLElement>('[data-cd="seconds"]'),
     };
-    const target = new Date('2026-04-30T00:00:00+09:00').getTime();
+    const target = new Date('2026-06-08T00:00:00+09:00').getTime();
     const pad = (n: number) => String(n).padStart(2, '0');
 
     const tick = () => {
@@ -136,20 +138,6 @@ export function Events2026FirstPage() {
     targets.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
-
-  // Hero video stub — quick scale feedback on click.
-  useEffect(() => {
-    const btn = document.querySelector<HTMLButtonElement>('.evtfirst .hero-video-play');
-    if (!btn) return;
-    const onClick = () => {
-      btn.style.transform = 'translate(-50%, -50%) scale(0.92)';
-      window.setTimeout(() => {
-        btn.style.transform = 'translate(-50%, -50%) scale(1)';
-      }, 150);
-    };
-    btn.addEventListener('click', onClick);
-    return () => btn.removeEventListener('click', onClick);
   }, []);
 
   // CSR-only app, so `window` is always defined at render time.
@@ -1691,14 +1679,7 @@ export function Events2026FirstPage() {
               </svg>
             </div>
 
-            <div className="hero-video">
-              <button type="button" className="hero-video-play" aria-label="이벤트 영상 재생">
-                <svg viewBox="0 0 24 24" fill="#0A0614" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
-              <div className="hero-video-label">AISEO.TIPS 이벤트 영상 · 1분</div>
-            </div>
+            <HeroVideoBox />
           </div>
         </section>
 
@@ -2345,7 +2326,7 @@ export function Events2026FirstPage() {
               신청 가능합니다
             </h2>
             <p className="launch-cta-sub">
-              2026년 4월 30일 정식 오픈 — <strong>EVENT 04 풀패키지 5팀 한정</strong>으로<br />
+              2026년 6월 8일 정식 오픈 — <strong>EVENT 04 풀패키지 5팀 한정</strong>으로<br />
               진행됩니다. 자리가 마감되는 즉시 신청이 종료됩니다.
             </p>
 
@@ -2433,18 +2414,7 @@ export function Events2026FirstPage() {
           </div>
         </section>
 
-        {/* Footer placeholder so the page closes cleanly between phases. */}
-        <footer style={{ minHeight: 'auto', padding: '48px 40px', background: 'var(--bg-dark)', color: 'rgba(255,255,255,0.6)' }}>
-          <div className="footer-inner">
-            <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>
-              <span>&copy; 2026 AISEO. All rights reserved.</span>
-              <div style={{ display: 'flex', gap: 24 }}>
-                <a href="#">개인정보처리방침</a>
-                <a href="#">이용약관</a>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
 
       <EventSignupModal

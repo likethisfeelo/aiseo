@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import '../landing.css';
 import { useSubPageNav } from './useSubPageNav';
 import { KAKAO_CHAT_URL } from '../../constants/contact';
+import { SiteFooter } from '../../components/SiteFooter';
+import { YT_VIDEO_ID, ytSrc, ytCommand } from '../../lib/ytControl';
 
 /**
  * 이벤트 2026 — `/events2026`
@@ -34,7 +36,9 @@ export function Events2026Page() {
     const ytPlayer = document.getElementById('ytPlayer') as HTMLIFrameElement | null;
     const vidProgressBar = document.getElementById('videoProgressBar');
     const vidThumbnail = document.getElementById('videoThumbnail');
+    const muteBtn = document.getElementById('videoMuteBtn');
     let videoStarted = false;
+    let muted = false;
     let vidRaf = 0;
 
     const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -91,8 +95,7 @@ export function Events2026Page() {
       vidThumbnail.style.pointerEvents = 'none';
       if (!videoStarted && ytPlayer) {
         videoStarted = true;
-        ytPlayer.src =
-          'https://www.youtube.com/embed/mXlMAkHhgYs?autoplay=1&rel=0&modestbranding=1&color=white&enablejsapi=1';
+        ytPlayer.src = ytSrc(YT_VIDEO_ID, { autoplay: true });
         ytPlayer.style.pointerEvents = 'auto';
         vidWrap?.classList.add('playing');
       }
@@ -105,11 +108,12 @@ export function Events2026Page() {
         (entries) => {
           entries.forEach((e) => {
             if (!e.isIntersecting && videoStarted) {
-              ytPlayer.src =
-                'https://www.youtube.com/embed/mXlMAkHhgYs?enablejsapi=1&rel=0&modestbranding=1&color=white';
+              ytPlayer.src = ytSrc(YT_VIDEO_ID);
               ytPlayer.style.pointerEvents = 'none';
               vidWrap.classList.remove('playing');
               videoStarted = false;
+              muted = false;
+              if (muteBtn) muteBtn.textContent = '🔊';
               if (vidThumbnail) {
                 vidThumbnail.style.opacity = '1';
                 vidThumbnail.style.pointerEvents = 'auto';
@@ -122,11 +126,38 @@ export function Events2026Page() {
       vidVisObs.observe(vidWrap);
     }
 
+    // Mute toggle — postMessage to the YouTube player (enablejsapi=1).
+    const onMute = () => {
+      muted = !muted;
+      ytCommand(ytPlayer, muted ? 'mute' : 'unMute');
+      if (muteBtn) muteBtn.textContent = muted ? '🔇' : '🔊';
+    };
+    if (muteBtn) muteBtn.addEventListener('click', onMute);
+
+    // ESC stops the video (and its audio) and restores the prism poster.
+    const stopVideo = () => {
+      if (!videoStarted || !ytPlayer) return;
+      ytPlayer.src = ytSrc(YT_VIDEO_ID);
+      ytPlayer.style.pointerEvents = 'none';
+      vidWrap?.classList.remove('playing');
+      videoStarted = false;
+      muted = false;
+      if (muteBtn) muteBtn.textContent = '🔊';
+      if (vidThumbnail) {
+        vidThumbnail.style.opacity = '1';
+        vidThumbnail.style.pointerEvents = 'auto';
+      }
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') stopVideo(); };
+    window.addEventListener('keydown', onKey);
+
     return () => {
       cancelAnimationFrame(vidRaf);
       vidObs?.disconnect();
       vidVisObs?.disconnect();
       if (vidThumbnail) vidThumbnail.removeEventListener('click', thumbClick);
+      if (muteBtn) muteBtn.removeEventListener('click', onMute);
+      window.removeEventListener('keydown', onKey);
     };
   }, []);
 
@@ -762,6 +793,7 @@ export function Events2026Page() {
               <div className="nav-submenu" role="menu">
                 <a href="/events2026/free" role="menuitem">무료이벤트</a>
                 <a href="/events2026/paid" role="menuitem">할인이벤트</a>
+                <a href="/events2026/first" role="menuitem">첫완성패키지</a>
               </div>
             </div>
             <a href="/blog">블로그</a>
@@ -784,6 +816,7 @@ export function Events2026Page() {
           <a href="/events2026" className="nmm-link">이벤트</a>
           <a href="/events2026/free" className="nmm-link nmm-sublink">└ 무료이벤트</a>
           <a href="/events2026/paid" className="nmm-link nmm-sublink">└ 할인이벤트</a>
+          <a href="/events2026/first" className="nmm-link nmm-sublink">└ 첫완성패키지</a>
           <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
@@ -845,10 +878,11 @@ export function Events2026Page() {
             <div className="video-play-overlay" id="videoPlayOverlay"></div>
             <iframe
               id="ytPlayer"
-              src="https://www.youtube.com/embed/mXlMAkHhgYs?enablejsapi=1&rel=0&modestbranding=1&color=white"
+              src="https://www.youtube.com/embed/HMV6PMtG720?enablejsapi=1&rel=0&modestbranding=1&color=white"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
+            <button type="button" id="videoMuteBtn" className="video-mute-btn" aria-label="음소거 토글">🔊</button>
             <div className="video-progress-bar" id="videoProgressBar"></div>
           </div>
           <div className="video-scroll-hint" id="videoScrollHint">
@@ -904,7 +938,7 @@ export function Events2026Page() {
             <a href="/events2026/free" className="event-card">
               <div className="event-card-head">
                 <span className="event-card-status">진행 중</span>
-                <span className="event-card-date">2026.04.30 OPEN</span>
+                <span className="event-card-date">2026.06.16 마감</span>
               </div>
 
               <div className="event-card-tag-row">
@@ -942,7 +976,7 @@ export function Events2026Page() {
             <a href="/events2026/paid" className="event-card">
               <div className="event-card-head">
                 <span className="event-card-status">진행 중</span>
-                <span className="event-card-date">2026.04.30 OPEN</span>
+                <span className="event-card-date">2026.06.08 OPEN</span>
               </div>
 
               <div className="event-card-tag-row">
@@ -980,7 +1014,7 @@ export function Events2026Page() {
             <a href="/events2026/first" className="event-card">
               <div className="event-card-head">
                 <span className="event-card-status">진행 중</span>
-                <span className="event-card-date">2026.04.30 OPEN</span>
+                <span className="event-card-date">2026.06.08 OPEN</span>
               </div>
 
               <div className="event-card-tag-row">
@@ -1166,18 +1200,7 @@ export function Events2026Page() {
       </main>
 
       {/* Footer */}
-      <footer style={{ minHeight: 'auto', padding: '48px 40px' }}>
-        <div className="hero-bg" style={{ position: 'absolute', inset: 0, zIndex: 0 }}></div>
-        <div className="footer-inner">
-          <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>
-            <span>&copy; 2026 AISEO. All rights reserved.</span>
-            <div style={{ display: 'flex', gap: 24 }}>
-              <a href="#">개인정보처리방침</a>
-              <a href="#">이용약관</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

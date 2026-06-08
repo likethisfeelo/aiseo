@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import '../landing.css';
 import { useSubPageNav } from './useSubPageNav';
 import { EventSignupModal } from '../../components/EventSignupModal';
+import { HeroVideoBox } from '../../components/HeroVideoBox';
+import { SiteFooter } from '../../components/SiteFooter';
 
 /**
  * 무료 이벤트 — `/events2026/free`
@@ -249,24 +251,6 @@ export function Events2026FreePage() {
     targets.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
-
-  // ──────────────────────────────────────────────────────────────
-  //  Hero video stub — quick scale feedback on click. The real
-  //  player wiring lands in a later phase / is intentionally out
-  //  of scope for this layout port.
-  // ──────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const btn = document.querySelector<HTMLButtonElement>('.evtfree .hero-video-play');
-    if (!btn) return;
-    const onClick = () => {
-      btn.style.transform = 'translate(-50%, -50%) scale(0.92)';
-      window.setTimeout(() => {
-        btn.style.transform = 'translate(-50%, -50%) scale(1)';
-      }, 150);
-    };
-    btn.addEventListener('click', onClick);
-    return () => btn.removeEventListener('click', onClick);
   }, []);
 
   // CSR-only app, so `window` is always defined at render time.
@@ -1799,6 +1783,7 @@ export function Events2026FreePage() {
               <div className="nav-submenu" role="menu">
                 <a href="/events2026/free" className="active" role="menuitem">무료이벤트</a>
                 <a href="/events2026/paid" role="menuitem">할인이벤트</a>
+                <a href="/events2026/first" role="menuitem">첫완성패키지</a>
               </div>
             </div>
             <a href="/blog">블로그</a>
@@ -1821,6 +1806,7 @@ export function Events2026FreePage() {
           <a href="/events2026" className="nmm-link">이벤트</a>
           <a href="/events2026/free" className="nmm-link nmm-sublink">└ 무료이벤트</a>
           <a href="/events2026/paid" className="nmm-link nmm-sublink">└ 할인이벤트</a>
+          <a href="/events2026/first" className="nmm-link nmm-sublink">└ 첫완성패키지</a>
           <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
@@ -1878,14 +1864,7 @@ export function Events2026FreePage() {
               </svg>
             </div>
 
-            <div className="hero-video">
-              <button type="button" className="hero-video-play" aria-label="이벤트 영상 재생">
-                <svg viewBox="0 0 24 24" fill="#0A0614" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
-              <div className="hero-video-label">AISEO.TIPS 이벤트 영상 · 1분</div>
-            </div>
+            <HeroVideoBox />
           </div>
         </section>
 
@@ -2401,19 +2380,7 @@ export function Events2026FreePage() {
         </section>
 
 
-        {/* Footer — matches the other 2026 pages so the page closes cleanly
-            even at the partial-port stage. */}
-        <footer style={{ minHeight: 'auto', padding: '48px 40px', background: 'var(--bg-dark)', color: 'rgba(255,255,255,0.6)' }}>
-          <div className="footer-inner">
-            <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>
-              <span>&copy; 2026 AISEO. All rights reserved.</span>
-              <div style={{ display: 'flex', gap: 24 }}>
-                <a href="#">개인정보처리방침</a>
-                <a href="#">이용약관</a>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
 
       <EventSignupModal
