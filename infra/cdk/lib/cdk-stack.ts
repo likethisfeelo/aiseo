@@ -437,6 +437,27 @@ export class CdkStack extends Stack {
     });
     consultationsTable.grantReadWriteData(consultationHandler);
 
+    // ── B2B consultations table + Lambda ──
+    const b2bConsultationsTableName = 'aiseo-b2b-consultations';
+    const b2bConsultationsTable = new dynamodb.Table(this, 'B2BConsultationsTable', {
+      tableName: b2bConsultationsTableName,
+      partitionKey: { name: 'b2bConsultationId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const b2bConsultationHandler = new lambda.Function(this, 'B2BConsultationFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'b2b-consultation/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        B2B_CONSULTATIONS_TABLE: b2bConsultationsTableName,
+        SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL ?? '',
+      },
+    });
+    b2bConsultationsTable.grantReadWriteData(b2bConsultationHandler);
+
     // ── Course inquiries table + Lambda ──
     const courseInquiriesTableName = 'aiseo-course-inquiries';
     const courseInquiriesTable = new dynamodb.Table(this, 'CourseInquiriesTable', {
@@ -735,6 +756,21 @@ export class CdkStack extends Stack {
     });
     const adminConsultationsResource = adminResource.addResource('consultations');
     addGet(adminConsultationsResource, consultationIntegration);
+
+    // B2B consultation routes
+    const b2bConsultationIntegration = new apigateway.LambdaIntegration(b2bConsultationHandler);
+    const b2bConsultationResource = api.root.addResource('b2b-consultation', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: [devOrigin, prodOrigin, siteDevOrigin, siteProdOrigin, b2bDevOrigin, b2bProdOrigin],
+        allowMethods: ['GET', 'POST', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+      },
+    });
+    b2bConsultationResource.addMethod('POST', b2bConsultationIntegration, {
+      authorizationType: apigateway.AuthorizationType.NONE,
+    });
+    const adminB2BConsultationsResource = adminResource.addResource('b2b-consultations');
+    addGet(adminB2BConsultationsResource, b2bConsultationIntegration);
 
     // Admin quota policy — /admin/quota-policy (GET+PUT)
     const adminQuotaPolicyResource = adminResource.addResource('quota-policy');

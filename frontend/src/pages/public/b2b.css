@@ -1,0 +1,344 @@
+/* ============================================================
+   b2b.css — B2B 성과 기반 인바운드 마케팅 페이지 (/b2b)
+   ------------------------------------------------------------
+   Ported from the standalone public/b2b.html. Every selector is
+   scoped under `.b2bpage` because this stylesheet ships in the
+   same global bundle as landing.css — the dark tokens and section
+   styles must not leak onto the light marketing pages.
+
+   The page chrome (nav + footer) comes from landing.css /
+   SiteFooter, so the original nav/footer rules are intentionally
+   dropped. Buttons are namespaced (.b2b-btn-*) so they don't
+   inherit landing.css's global .btn-primary/.btn-ghost.
+   ============================================================ */
+
+.b2bpage {
+  /* Dark surface tokens (not in design-tokens.css; values match
+     the original b2b.html). Accent tokens reuse the global brand. */
+  --void: #0a0614;
+  --deep: #0d0818;
+  --surface: #14102a;
+  --surface2: #1b1438;
+  --rim: rgba(196, 168, 245, 0.12);
+  --rim2: rgba(196, 168, 245, 0.22);
+
+  --accent: #C4A8F5;
+  --accent-dark: #8B6FD4;
+  --accent-mid: #9BB8F8;
+  --accent-soft: rgba(196, 168, 245, 0.14);
+  --accent-dim: rgba(196, 168, 245, 0.08);
+
+  --paper: #ffffff;
+  --paper-dim: rgba(255, 255, 255, 0.78);
+  --paper-faint: rgba(255, 255, 255, 0.48);
+
+  --danger: #ff7a8a;
+  --danger-soft: rgba(255, 122, 138, 0.10);
+
+  --nav-h: 64px;
+  --b2b-max: 1160px;
+  --b2b-radius-sm: 8px;
+  --b2b-radius-md: 12px;
+  --b2b-radius-lg: 18px;
+
+  font-family: var(--font-ko);
+  background: var(--void);
+  color: var(--paper);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+.b2bpage *, .b2bpage *::before, .b2bpage *::after { box-sizing: border-box; }
+
+/* ── COMMON ─────────────────────────────────────── */
+.b2bpage .eyebrow {
+  font-family: var(--font-en); font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 18px; display: inline-flex; align-items: center; gap: 12px;
+}
+.b2bpage .eyebrow::before {
+  content: ''; width: 24px; height: 1px; background: var(--accent); display: block;
+}
+.b2bpage .b2b-btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 28px; background: var(--accent); color: var(--void);
+  border: none; border-radius: var(--b2b-radius-md);
+  font-size: 14px; font-weight: 800; cursor: pointer; font-family: var(--font-ko);
+  transition: all .2s; text-decoration: none;
+  box-shadow: 0 6px 20px rgba(196, 168, 245, 0.25);
+}
+.b2bpage .b2b-btn-primary:hover { background: #d6c1ff; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(196, 168, 245, 0.4); }
+.b2bpage .b2b-btn-ghost {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 13px 26px; background: rgba(255, 255, 255, 0.06);
+  color: var(--paper); border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--b2b-radius-md);
+  font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-ko);
+  transition: all .2s; text-decoration: none; backdrop-filter: blur(8px);
+}
+.b2bpage .b2b-btn-ghost:hover { border-color: rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.1); }
+
+/* ── HERO ───────────────────────────────────────── */
+.b2bpage .b2b-hero {
+  min-height: 100vh; display: flex; align-items: center;
+  padding-top: var(--nav-h); background: var(--void);
+  overflow: hidden; position: relative;
+}
+.b2bpage .hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 50% 60% at 80% 40%, rgba(196, 168, 245, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(155, 184, 248, 0.10) 0%, transparent 60%);
+}
+.b2bpage .hero-grid-line {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(196, 168, 245, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(196, 168, 245, 0.06) 1px, transparent 1px);
+  background-size: 80px 80px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+.b2bpage .b2b-hero-inner {
+  display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center;
+  padding: 120px 40px 80px; max-width: var(--b2b-max); margin: 0 auto;
+  width: 100%; position: relative;
+}
+.b2bpage .hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent-soft); border: 1px solid var(--rim2);
+  border-radius: 100px; padding: 6px 16px;
+  font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 24px;
+}
+.b2bpage .hero-tag::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+  box-shadow: 0 0 0 4px rgba(196, 168, 245, 0.18);
+}
+.b2bpage .b2b-hero h1 {
+  font-family: var(--font-ko); font-size: clamp(44px, 5.6vw, 68px);
+  font-weight: 800; line-height: 1.12; letter-spacing: -2px;
+  color: var(--paper); margin-bottom: 20px;
+}
+.b2bpage .b2b-hero h1 em {
+  font-style: normal; color: var(--accent);
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dark) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.b2bpage .b2b-hero-sub {
+  font-size: 17px; color: var(--paper-dim); line-height: 1.8;
+  margin-bottom: 32px; font-weight: 400; max-width: 540px;
+}
+.b2bpage .b2b-hero-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; }
+.b2bpage .b2b-hero-feat {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--paper-dim); line-height: 1.6;
+}
+.b2bpage .b2b-hero-feat::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0; margin-top: 8px;
+}
+.b2bpage .hero-cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.b2bpage .hero-art {
+  position: relative; aspect-ratio: 1.2 / 1; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.b2bpage .hero-art img {
+  width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 30px 80px rgba(196, 168, 245, 0.25));
+  animation: b2bHeroFloat 6s ease-in-out infinite;
+}
+@keyframes b2bHeroFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ── OFFER SECTION ──────────────────────────────── */
+.b2bpage .offer-section { padding: 100px 40px; background: var(--deep); border-top: 1px solid var(--rim); border-bottom: 1px solid var(--rim); }
+.b2bpage .offer-section-inner { max-width: 720px; margin: 0 auto; }
+.b2bpage .offer-section-header { margin-bottom: 36px; text-align: center; }
+.b2bpage .offer-section-header .eyebrow { justify-content: center; }
+.b2bpage .offer-section-title {
+  font-family: var(--font-ko); font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 800; color: var(--paper); letter-spacing: -1px; line-height: 1.25;
+}
+.b2bpage .offer-box {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface2) 100%);
+  border: 1px solid var(--rim); border-radius: var(--b2b-radius-lg);
+  padding: 36px 32px; position: relative; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+.b2bpage .offer-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-mid), transparent);
+}
+.b2bpage .offer-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 0; border-bottom: 1px solid var(--rim);
+}
+.b2bpage .offer-row:last-of-type { border-bottom: none; }
+.b2bpage .offer-label { font-size: 14px; color: var(--paper-dim); }
+.b2bpage .offer-value {
+  font-family: var(--font-en); font-size: 26px; font-weight: 800; color: var(--accent);
+}
+.b2bpage .offer-value.small { font-size: 18px; color: var(--paper); }
+.b2bpage .offer-note {
+  font-size: 12px; color: var(--paper-faint); line-height: 1.8;
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rim);
+}
+.b2bpage .offer-cta { margin-top: 24px; width: 100%; text-align: center; justify-content: center; }
+
+/* ── WHY ────────────────────────────────────────── */
+.b2bpage .b2b-why { padding: 120px 40px; background: var(--void); }
+.b2bpage .b2b-why-inner { max-width: var(--b2b-max); margin: 0 auto; }
+.b2bpage .b2b-why-header { margin-bottom: 56px; }
+.b2bpage .b2b-why-title {
+  font-family: var(--font-ko); font-size: clamp(32px, 4vw, 42px);
+  font-weight: 800; color: var(--paper); letter-spacing: -1.5px; line-height: 1.2;
+}
+.b2bpage .why-cards {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.b2bpage .why-card {
+  background: var(--surface); border: 1px solid var(--rim);
+  border-radius: var(--b2b-radius-lg); padding: 36px 32px;
+  transition: border-color .3s, transform .3s, background .3s;
+}
+.b2bpage .why-card:hover { border-color: var(--rim2); background: var(--surface2); transform: translateY(-4px); }
+.b2bpage .why-card-num {
+  font-family: var(--font-en); font-size: 48px; font-weight: 800;
+  color: var(--accent); line-height: 1; margin-bottom: 18px; letter-spacing: -1.5px;
+  opacity: 0.9;
+}
+.b2bpage .why-card-title {
+  font-family: var(--font-ko); font-size: 20px; font-weight: 700;
+  color: var(--paper); margin-bottom: 12px; line-height: 1.3;
+}
+.b2bpage .why-card-desc { font-size: 14px; color: var(--paper-dim); line-height: 1.85; }
+
+/* ── STRUCTURE ──────────────────────────────────── */
+.b2bpage .b2b-structure { padding: 120px 40px; background: var(--deep); border-top: 1px solid var(--rim); border-bottom: 1px solid var(--rim); }
+.b2bpage .b2b-structure-inner { max-width: var(--b2b-max); margin: 0 auto; }
+.b2bpage .b2b-structure-header { margin-bottom: 56px; }
+.b2bpage .b2b-structure-title {
+  font-family: var(--font-ko); font-size: clamp(32px, 4vw, 42px);
+  font-weight: 800; color: var(--paper); letter-spacing: -1.5px; line-height: 1.2;
+}
+.b2bpage .flow-steps {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 48px;
+}
+.b2bpage .flow-step {
+  background: var(--surface); border: 1px solid var(--rim);
+  border-radius: var(--b2b-radius-lg); padding: 36px 28px;
+  text-align: center; position: relative; transition: border-color .3s, transform .3s;
+}
+.b2bpage .flow-step:hover { border-color: var(--rim2); transform: translateY(-4px); }
+.b2bpage .flow-step-num {
+  font-family: var(--font-en); font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 18px;
+}
+.b2bpage .flow-step-title {
+  font-family: var(--font-ko); font-size: 20px; font-weight: 700;
+  color: var(--paper); margin-bottom: 10px; line-height: 1.3;
+}
+.b2bpage .flow-step-amount {
+  font-family: var(--font-en); font-size: 36px; font-weight: 800;
+  color: var(--accent); margin-bottom: 16px; letter-spacing: -1px;
+}
+.b2bpage .flow-step-desc { font-size: 13px; color: var(--paper-dim); line-height: 1.8; }
+
+/* ── RISK BOX ───────────────────────────────────── */
+.b2bpage .risk-box {
+  background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(155, 184, 248, 0.06) 100%);
+  border: 1px solid var(--rim2);
+  border-radius: var(--b2b-radius-lg); padding: 36px 40px;
+  display: flex; align-items: center; gap: 28px;
+}
+.b2bpage .risk-icon { font-size: 44px; flex-shrink: 0; }
+.b2bpage .risk-content { flex: 1; }
+.b2bpage .risk-title {
+  font-family: var(--font-ko); font-size: 20px; font-weight: 700;
+  color: var(--accent); margin-bottom: 8px;
+}
+.b2bpage .risk-desc { font-size: 15px; color: var(--paper-dim); line-height: 1.8; }
+.b2bpage .risk-desc strong { color: var(--paper); font-weight: 700; }
+
+/* ── ELIGIBILITY ────────────────────────────────── */
+.b2bpage .b2b-eligibility { padding: 120px 40px; background: var(--void); }
+.b2bpage .b2b-eligibility-inner { max-width: var(--b2b-max); margin: 0 auto; }
+.b2bpage .b2b-eligibility-header { margin-bottom: 56px; }
+.b2bpage .b2b-eligibility-title {
+  font-family: var(--font-ko); font-size: clamp(32px, 4vw, 42px);
+  font-weight: 800; color: var(--paper); letter-spacing: -1.5px; line-height: 1.2;
+}
+.b2bpage .elig-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.b2bpage .elig-card {
+  background: var(--surface); border: 1px solid var(--rim);
+  border-radius: var(--b2b-radius-lg); padding: 36px 32px;
+}
+.b2bpage .elig-card.yes { border-color: var(--rim2); }
+.b2bpage .elig-card-label {
+  font-family: var(--font-en); font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 20px; display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 14px; border-radius: 100px;
+}
+.b2bpage .elig-card-label.yes { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--rim2); }
+.b2bpage .elig-card-label.no { background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(255, 122, 138, 0.2); }
+.b2bpage .elig-card-title {
+  font-family: var(--font-ko); font-size: 20px; font-weight: 700;
+  color: var(--paper); margin-bottom: 20px; line-height: 1.3;
+}
+.b2bpage .elig-list { display: flex; flex-direction: column; gap: 12px; }
+.b2bpage .elig-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--paper-dim); line-height: 1.7;
+}
+.b2bpage .elig-item::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 8px;
+}
+.b2bpage .elig-card.yes .elig-item::before { background: var(--accent); }
+.b2bpage .elig-card.no .elig-item::before { background: var(--danger); }
+
+/* ── FINAL CTA ──────────────────────────────────── */
+.b2bpage .b2b-final-cta {
+  padding: 140px 40px; background: var(--void);
+  text-align: center; position: relative; overflow: hidden;
+}
+.b2bpage .b2b-final-cta-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196, 168, 245, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 50% at 80% 80%, rgba(155, 184, 248, 0.08) 0%, transparent 60%);
+}
+.b2bpage .b2b-final-cta-inner { position: relative; max-width: 720px; margin: 0 auto; }
+.b2bpage .b2b-final-cta h2 {
+  font-family: var(--font-ko); font-size: clamp(34px, 4.4vw, 48px);
+  font-weight: 800; color: var(--paper); margin-bottom: 20px;
+  letter-spacing: -1.5px; line-height: 1.2;
+}
+.b2bpage .b2b-final-cta p {
+  font-size: 16px; color: var(--paper-dim);
+  margin-bottom: 36px; line-height: 1.8;
+}
+.b2bpage .cta-btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ── HERO FADE-UP (entrance) ────────────────────── */
+@keyframes b2bFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.b2bpage .b2b-hero-inner > * { animation: b2bFadeUp .7s ease both; }
+.b2bpage .b2b-hero-inner > *:nth-child(1) { animation-delay: .1s; }
+.b2bpage .b2b-hero-inner > *:nth-child(2) { animation-delay: .3s; }
+
+/* ── RESPONSIVE ─────────────────────────────────── */
+@media (max-width: 900px) {
+  .b2bpage .b2b-hero-inner { grid-template-columns: 1fr; gap: 32px; padding: 96px 20px 60px; }
+  .b2bpage .hero-art { order: -1; max-width: 360px; margin: 0 auto; }
+  .b2bpage .why-cards, .b2bpage .elig-cards { grid-template-columns: 1fr; }
+  .b2bpage .flow-steps { grid-template-columns: 1fr; }
+  .b2bpage .risk-box { flex-direction: column; text-align: center; padding: 28px 22px; }
+  .b2bpage .b2b-why, .b2bpage .b2b-structure, .b2bpage .b2b-eligibility, .b2bpage .b2b-final-cta, .b2bpage .offer-section { padding: 72px 20px; }
+}

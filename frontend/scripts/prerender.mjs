@@ -106,6 +106,13 @@ const ROUTES = [
     ssg: true,
   },
   {
+    path: '/b2b',
+    title: 'B2B 성과 기반 인바운드 마케팅 | AISEO',
+    description: '성과가 나야 잔금을 냅니다. 현황 진단·SEO·분석 세팅까지 구축하고 2년 내 인바운드 매출이 발생하면 잔금을 정산하는 B2B 풀서비스. 업종 소분류 기준 50개 슬롯 한정.',
+    image: '/images/principle-5-hand.png',
+    ssg: true,
+  },
+  {
     path: '/blog',
     title: '블로그 | AISEO',
     description: 'AISEO 블로그. AI 웹사이트 제작, SEO, 마케팅에 대한 최신 인사이트를 공유합니다.',
