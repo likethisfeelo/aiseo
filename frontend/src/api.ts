@@ -161,6 +161,29 @@ export const submitConsultation = async (input: {
 
 export const adminGetConsultations = () => getJson('/admin/consultations');
 
+// ── B2B Consultation APIs ──
+export const submitB2BConsultation = async (input: {
+  company: string;
+  contactName: string;
+  phone: string;
+  industry: string;
+  marketingStatus: string;
+  memo: string;
+  consent: boolean;
+}) => {
+  const { API_BASE_URL } = await import('./config.js');
+  const res = await fetch(`${API_BASE_URL}/b2b-consultation`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  const payload = await res.json();
+  if (!res.ok || !payload.success) throw new Error(payload.error || 'Submission failed');
+  return payload.data;
+};
+
+export const adminGetB2BConsultations = () => getJson('/admin/b2b-consultations');
+
 // ── Course inquiry APIs ──
 export const submitCourseInquiry = async (input: {
   name: string;

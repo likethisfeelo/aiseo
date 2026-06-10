@@ -83,6 +83,7 @@ function handler(event) {
         '/events2026/free': '/site/events2026/free/index.html',
         '/events2026/paid': '/site/events2026/paid/index.html',
         '/events2026/first': '/site/events2026/first/index.html',
+        '/b2b': '/site/b2b/index.html',
         '/blog': '/site/blog/index.html',
       };
 
@@ -108,6 +109,20 @@ function handler(event) {
       // Default SPA fallback — everything else (unknown
       // routes, /admin/*, /?auth=login, …) gets the shell.
       request.uri = '/site/index.html';
+      return request;
+    }
+
+    // ── b2b subdomain (B2B landing; reuses the site bundle) ──
+    // b2b.aiseo.tips serves the same SPA build as the `site`
+    // subdomain, but every non-asset route resolves to the
+    // prerendered /b2b snapshot. Static assets are pulled from
+    // the shared /site/ prefix so we don't deploy a second copy.
+    if (siteId === 'b2b') {
+      if (uri.match(/\.\w+$/)) {
+        request.uri = '/site' + uri;
+        return request;
+      }
+      request.uri = '/site/b2b/index.html';
       return request;
     }
 

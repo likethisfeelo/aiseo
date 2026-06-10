@@ -15,6 +15,7 @@ import { Events2026Page } from './pages/public/Events2026Page';
 import { Events2026FreePage } from './pages/public/Events2026FreePage';
 import { Events2026PaidPage } from './pages/public/Events2026PaidPage';
 import { Events2026FirstPage } from './pages/public/Events2026FirstPage';
+import { B2BPage } from './pages/public/B2BPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { AdminLayout } from './components/layout/AdminLayout';
 import { EducationDrawer } from './components/education/EducationDrawer';
@@ -279,6 +280,11 @@ export default function App() {
   // Legacy `#course`, `#support`, `#events` hash routes are no longer
   // supported; users land on the homepage instead.
   if (!user) {
+    // The b2b.* subdomain serves the B2B landing at its root. CloudFront
+    // rewrites b2b.aiseo.tips/ → the prerendered /b2b snapshot, so on the
+    // client we render B2BPage for any path on that host.
+    const isB2BHost =
+      typeof window !== 'undefined' && window.location.hostname.startsWith('b2b.');
     return (
       <Routes>
         <Route path="/course2026" element={<Course2026Page />} />
@@ -287,9 +293,10 @@ export default function App() {
         <Route path="/events2026/free" element={<Events2026FreePage />} />
         <Route path="/events2026/paid" element={<Events2026PaidPage />} />
         <Route path="/events2026/first" element={<Events2026FirstPage />} />
+        <Route path="/b2b" element={<B2BPage />} />
         <Route path="/blog" element={<BlogListPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
-        <Route path="*" element={<LandingPage authError={authError} />} />
+        <Route path="*" element={isB2BHost ? <B2BPage /> : <LandingPage authError={authError} />} />
       </Routes>
     );
   }

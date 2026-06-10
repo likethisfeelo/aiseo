@@ -106,6 +106,16 @@ const ROUTES = [
     ssg: true,
   },
   {
+    path: '/b2b',
+    title: 'B2B 성과 기반 인바운드 마케팅 | AISEO',
+    description: '성과가 나야 잔금을 냅니다. 현황 진단·SEO·분석 세팅까지 구축하고 2년 내 인바운드 매출이 발생하면 잔금을 정산하는 B2B 풀서비스. 업종 소분류 기준 50개 슬롯 한정.',
+    image: '/images/principle-5-hand.png',
+    // Google Search Console — b2b.aiseo.tips 는 aiseo.tips / site.aiseo.tips
+    // 와 별도 속성으로 등록하므로 이 verification 태그는 /b2b 출력에만 주입한다.
+    verification: 'z1D299YdYeNRIXCQpdq9bB4cN57LRP-AbmM8E1mhmlE',
+    ssg: true,
+  },
+  {
     path: '/blog',
     title: '블로그 | AISEO',
     description: 'AISEO 블로그. AI 웹사이트 제작, SEO, 마케팅에 대한 최신 인사이트를 공유합니다.',
@@ -120,7 +130,7 @@ const escapeHtml = (str) =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-const buildHeadBlock = ({ title, description, url, image }) => {
+const buildHeadBlock = ({ title, description, url, image, verification }) => {
   const t = escapeHtml(title);
   const d = escapeHtml(description);
   const u = escapeHtml(url);
@@ -144,6 +154,11 @@ const buildHeadBlock = ({ title, description, url, image }) => {
     const i = escapeHtml(abs);
     tags.push(`<meta property="og:image" content="${i}" />`);
     tags.push(`<meta name="twitter:image" content="${i}" />`);
+  }
+  if (verification) {
+    // Per-route only (not the shared template) so each subdomain can be
+    // registered as a separate Search Console property.
+    tags.push(`<meta name="google-site-verification" content="${escapeHtml(verification)}" />`);
   }
   return tags.join('\n    ');
 };
@@ -182,6 +197,7 @@ const prerenderRoute = (template, route, renderBody) => {
     description: route.description,
     url,
     image: route.image,
+    verification: route.verification,
   });
 
   const stripped = stripExistingHead(template);
