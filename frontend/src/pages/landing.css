@@ -1276,10 +1276,10 @@
   .sf-img-placeholder span { font-size: 13px; font-weight: 500; color: var(--text-muted); }
 
   /* Card illustration photo (dark/neon themed). Fills the right
-     half of the card; lets the card's gradient bg1/bg2 show through
-     as a subtle outer halo since these PNGs are typically on black. */
+     half of the card edge-to-edge; `cover` crops any overflow
+     (top/bottom) instead of letterboxing, so no empty gaps show. */
   .sf-card-photo {
-    width: 100%; height: 100%; object-fit: contain;
+    width: 100%; height: 100%; object-fit: cover; object-position: center;
     display: block; user-select: none; -webkit-user-drag: none;
   }
 
