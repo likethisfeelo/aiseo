@@ -105,16 +105,10 @@ const ROUTES = [
     image: '/events/hero-pc.jpg',
     ssg: true,
   },
-  {
-    path: '/b2b',
-    title: 'B2B 성과 기반 인바운드 마케팅 | AISEO',
-    description: '성과가 나야 잔금을 냅니다. 현황 진단·SEO·분석 세팅까지 구축하고 2년 내 인바운드 매출이 발생하면 잔금을 정산하는 B2B 풀서비스. 업종 소분류 기준 50개 슬롯 한정.',
-    image: '/images/principle-5-hand.png',
-    // Google Search Console — b2b.aiseo.tips 는 aiseo.tips / site.aiseo.tips
-    // 와 별도 속성으로 등록하므로 이 verification 태그는 /b2b 출력에만 주입한다.
-    verification: 'z1D299YdYeNRIXCQpdq9bB4cN57LRP-AbmM8E1mhmlE',
-    ssg: true,
-  },
+  // NOTE: `/b2b` 는 더 이상 React 프리렌더로 생성하지 않는다. b2b.aiseo.tips 는
+  // 별도 정적 랜딩(`frontend/public/b2b/index.html`)으로 서빙되며, Vite 가 이를
+  // dist/b2b/index.html 로 복사 → deploy 가 /site/b2b/index.html 로 업로드한다.
+  // Google Search Console 인증 메타는 그 정적 HTML 의 <head> 가 직접 보유한다.
   {
     path: '/blog',
     title: '블로그 | AISEO',
