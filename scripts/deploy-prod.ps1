@@ -117,12 +117,14 @@ $tmpReaderCfg = [System.IO.Path]::GetTempFileName() + ".js"
 aws s3 cp $tmpReaderCfg "s3://$BUCKET/library/reader-config.js" --content-type "application/javascript; charset=utf-8" --profile $PROFILE
 Remove-Item $tmpReaderCfg
 
-# 3. Upload B2B page
-Write-Host "[3/5] Uploading B2B page..." -ForegroundColor Yellow
-aws s3 cp frontend/dist/b2b.html "s3://$BUCKET/b2b.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
-aws s3 cp frontend/dist/b2b.html "s3://$BUCKET/b2b/index.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
-# b2b.aiseo.tips 가 /landing/* 을 /b2b/landing/* 로 리라이트하므로 hero 이미지도 같이 복사
-aws s3 sync frontend/public/landing/ "s3://$BUCKET/b2b/landing/" --exclude "*.md" --profile $PROFILE
+# 3. Upload B2B page aliases
+# b2b.aiseo.tips 는 CF subdomain-router 가 모든 비-자산 경로를 /site/b2b/index.html
+# 로 보낸다. 그 객체는 4단계 dist/->/site/ sync 가 frontend/public/b2b/index.html
+# (자급식 정적 랜딩, Vite 가 dist/b2b/index.html 로 복사)을 업로드하면서 채운다.
+# 아래 두 줄은 apex 단축링크(aiseo.tips/b2b.html)와 레거시 /b2b/index.html alias 유지용.
+Write-Host "[3/5] Uploading B2B page aliases..." -ForegroundColor Yellow
+aws s3 cp frontend/dist/b2b/index.html "s3://$BUCKET/b2b.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
+aws s3 cp frontend/dist/b2b/index.html "s3://$BUCKET/b2b/index.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
 
 # 4. Upload SPA dashboard + prerendered HTML to /site/ (site.aiseo.tips)
 #    - index.html (SPA shell) + assets/ + prerendered subdirectories
