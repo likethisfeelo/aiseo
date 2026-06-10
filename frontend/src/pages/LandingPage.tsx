@@ -801,7 +801,7 @@ export function LandingPage({ authError }: Props) {
                   </ul>
                 </div>
                 <div className="sf-card-img" style={{'--card-bg1':'#0B0414','--card-bg2':'#1A0F2E'} as React.CSSProperties}>
-                  <img src="/landing/sf-card-0.webp" alt="AI 홈페이지 제작 — 프롬프트로 사이트 생성" className="sf-card-photo" loading="lazy" />
+                  <img src="/landing/sf-card-0.jpg" alt="AI 홈페이지 제작 — 프롬프트로 사이트 생성" className="sf-card-photo" loading="lazy" />
                 </div>
               </div>
             </div>
@@ -825,7 +825,7 @@ export function LandingPage({ authError }: Props) {
                   </ul>
                 </div>
                 <div className="sf-card-img" style={{'--card-bg1':'#021510','--card-bg2':'#062B22'} as React.CSSProperties}>
-                  <img src="/landing/sf-card-1.webp" alt="도메인 & 호스팅 — 서브도메인 + 1G 무료 호스팅" className="sf-card-photo" loading="lazy" />
+                  <img src="/landing/sf-card-1.jpg" alt="도메인 & 호스팅 — 서브도메인 + 1G 무료 호스팅" className="sf-card-photo" loading="lazy" />
                 </div>
               </div>
             </div>
@@ -849,7 +849,7 @@ export function LandingPage({ authError }: Props) {
                   </ul>
                 </div>
                 <div className="sf-card-img" style={{'--card-bg1':'#1A0F03','--card-bg2':'#2A1A05'} as React.CSSProperties}>
-                  <img src="/landing/sf-card-2.webp" alt="SEO 핵심강의 — 검색 노출 핵심 자료" className="sf-card-photo" loading="lazy" />
+                  <img src="/landing/sf-card-2.jpg" alt="SEO 핵심강의 — 검색 노출 핵심 자료" className="sf-card-photo" loading="lazy" />
                 </div>
               </div>
             </div>
@@ -873,7 +873,7 @@ export function LandingPage({ authError }: Props) {
                   </ul>
                 </div>
                 <div className="sf-card-img" style={{'--card-bg1':'#1A0A03','--card-bg2':'#2A1505'} as React.CSSProperties}>
-                  <img src="/landing/sf-card-3.webp" alt="성과 분석 & 마케팅 자동화 — 채널 연동 자동화" className="sf-card-photo" loading="lazy" />
+                  <img src="/landing/sf-card-3.jpg" alt="성과 분석 & 마케팅 자동화 — 채널 연동 자동화" className="sf-card-photo" loading="lazy" />
                 </div>
               </div>
             </div>

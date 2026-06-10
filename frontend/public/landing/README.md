@@ -12,10 +12,10 @@ in `LandingPage.tsx` resolve:
 
 | File                  | Card | Theme color | Subject                                              |
 |-----------------------|------|-------------|------------------------------------------------------|
-| `sf-card-0.webp`      | 0    | Violet      | 프롬프트 → 사이트 빌더 dashboard (AI 홈페이지 제작)  |
-| `sf-card-1.webp`      | 1    | Green       | 글로브 + 웹사이트 + 클라우드 (도메인 & 호스팅)       |
-| `sf-card-2.webp`      | 2    | Amber       | 적층 문서 + 분석 차트 (SEO 핵심강의)                 |
-| `sf-card-3.webp`      | 3    | Orange      | 봇 + IG/Google/X (성과 분석 & 마케팅 자동화)         |
+| `sf-card-0.jpg`      | 0    | Violet      | 프롬프트 → 사이트 빌더 dashboard (AI 홈페이지 제작)  |
+| `sf-card-1.jpg`      | 1    | Green       | 글로브 + 웹사이트 + 클라우드 (도메인 & 호스팅)       |
+| `sf-card-2.jpg`      | 2    | Amber       | 적층 문서 + 분석 차트 (SEO 핵심강의)                 |
+| `sf-card-3.jpg`      | 3    | Orange      | 봇 + IG/Google/X (성과 분석 & 마케팅 자동화)         |
 | `b2b-hero.webp`       | —    | Iridescent  | 홀로그래픽 두 손 + 프리즘 (b2b.html 메인 hero)       |
 
 ## Format notes
