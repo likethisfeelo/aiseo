@@ -1160,8 +1160,9 @@
 <script>
   // ── 기업 문의 위젯 ──
   // b2b-consultation 람다로 전송 (성공 시 서버에서 Slack 알림).
-  // dev 테스트 시 아래 상수를 https://api-dev.aiseo.tips/dev/b2b-consultation 로 교체.
-  var B2B_API = 'https://api.aiseo.tips/prod/b2b-consultation';
+  // api.aiseo.tips 커스텀 도메인은 prod 스테이지를 루트에 매핑하므로 경로에 /prod 를 붙이지 않는다
+  // (frontend config.js 의 PROD 기본값과 동일). dev 테스트 시 https://api-dev.aiseo.tips/b2b-consultation.
+  var B2B_API = 'https://api.aiseo.tips/b2b-consultation';
   var B2B_TOTAL = 4;
   var b2b = { step: 1, company: '', contactName: '', phone: '', memo: '', consent: false, submitting: false, done: false };
 
