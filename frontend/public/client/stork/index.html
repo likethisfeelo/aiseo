@@ -370,6 +370,43 @@
   .cr-toast.cr-show{ opacity:1; transform:translateX(-50%); pointer-events:auto; }
   .cr-toast button{ background:none; border:none; color:var(--cr-accent2); font-weight:700; cursor:pointer; font-size:13px; }
   @media (prefers-reduced-motion: reduce){ .cr-pin.cr-paste,.cr-pin.cr-flash{ animation:none; } .cr-panel{ transition:none; } }
+
+  /* ── 스티커 보관함(팔레트) ── */
+  .cr-palette{ position:fixed; top:50%; right:0; transform:translateY(-50%); z-index:9400; background:#fff; border:1px solid #e8e6f0; border-right:none; border-radius:14px 0 0 14px; box-shadow:-6px 0 24px rgba(20,12,40,.12); padding:12px 12px 12px 10px; display:flex; flex-direction:column; gap:8px; transition:transform .26s ease; font-family:'Noto Sans KR',sans-serif; }
+  .cr-palette.cr-hidden{ display:none; }
+  .cr-palette.cr-collapsed{ transform:translateY(-50%) translateX(calc(100% - 30px)); }
+  .cr-pal-handle{ position:absolute; left:-1px; top:50%; transform:translate(-100%,-50%); background:#6B4FB8; color:#fff; border:none; border-radius:10px 0 0 10px; width:28px; padding:14px 0; cursor:pointer; writing-mode:vertical-rl; font-size:12px; font-weight:700; letter-spacing:2px; box-shadow:-4px 0 14px rgba(20,12,40,.18); }
+  .cr-pal-hint{ font-size:11px; color:#888; max-width:124px; line-height:1.45; margin-bottom:2px; }
+  .cr-palette.cr-collapsed .cr-pal-hint, .cr-palette.cr-collapsed .cr-pal-item span{ display:none; }
+  .cr-pal-item{ display:flex; align-items:center; gap:8px; padding:7px 8px; border:1px solid #efedf6; border-radius:10px; cursor:grab; touch-action:none; user-select:none; background:#fff; transition:border-color .15s, background .15s; }
+  .cr-pal-item:hover{ border-color:var(--cr-accent2); background:#faf8ff; }
+  .cr-pal-item.cr-armed{ border-color:var(--cr-accent); background:#f3eefc; box-shadow:0 0 0 2px rgba(139,111,212,.2); }
+  .cr-pal-item img{ width:34px; height:34px; flex-shrink:0; pointer-events:none; }
+  .cr-pal-item span{ font-size:12px; font-weight:600; color:#333; white-space:nowrap; }
+  .cr-drag-ghost{ position:fixed; z-index:99998; width:46px; height:46px; margin:-23px 0 0 -23px; pointer-events:none; filter:drop-shadow(0 6px 14px rgba(20,12,40,.35)); }
+  body.cr-arming [data-cr-item]{ outline:2px dashed rgba(139,111,212,.5); outline-offset:2px; }
+  [data-cr-item].cr-drop-hover{ outline:3px solid var(--cr-accent) !important; background:rgba(196,168,245,.10); }
+  .cr-arm-banner{ position:fixed; top:52px; left:50%; transform:translateX(-50%); z-index:9600; background:#6B4FB8; color:#fff; padding:9px 14px; border-radius:999px; font-size:13px; font-family:'Noto Sans KR',sans-serif; display:none; align-items:center; gap:12px; box-shadow:0 6px 20px rgba(107,79,184,.4); }
+  .cr-arm-banner.cr-show{ display:flex; }
+  .cr-arm-banner button{ background:rgba(255,255,255,.2); border:none; color:#fff; border-radius:999px; padding:3px 10px; font-size:12px; cursor:pointer; }
+  /* tutorial */
+  .cr-tut{ position:fixed; inset:0; z-index:99995; background:rgba(10,6,20,.55); display:none; align-items:center; justify-content:center; padding:20px; font-family:'Noto Sans KR',sans-serif; }
+  .cr-tut.cr-show{ display:flex; }
+  .cr-tut-card{ background:#fff; border-radius:16px; max-width:360px; width:100%; padding:24px; text-align:center; }
+  .cr-tut-card h3{ margin:0 0 6px; font-size:18px; color:var(--cr-ink); }
+  .cr-tut-card p{ font-size:13px; color:#777; margin:0 0 16px; }
+  .cr-tut-steps{ text-align:left; display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+  .cr-tut-step{ display:flex; gap:10px; align-items:flex-start; font-size:13.5px; color:#333; line-height:1.5; }
+  .cr-tut-num{ flex-shrink:0; width:22px; height:22px; border-radius:50%; background:var(--cr-accent); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  @media (max-width:720px){
+    .cr-palette{ top:auto; bottom:0; right:0; left:0; transform:none; flex-direction:row; align-items:center; border-radius:14px 14px 0 0; border:1px solid #e8e6f0; border-bottom:none; padding:10px; gap:8px; overflow-x:auto; }
+    .cr-palette.cr-collapsed{ transform:translateY(calc(100% - 30px)); }
+    .cr-pal-handle{ left:50%; top:-1px; transform:translate(-50%,-100%); writing-mode:horizontal-tb; width:auto; padding:6px 18px; border-radius:10px 10px 0 0; }
+    .cr-pal-hint{ display:none; }
+    .cr-pal-item{ flex-direction:column; gap:3px; padding:6px 8px; }
+    .cr-pal-item span{ font-size:10px; }
+    .cr-fab{ bottom:96px; }
+  }
 </style>
 
 </head>
@@ -403,6 +440,27 @@
   <div class="cr-panel-hd"><h3>요청 목록</h3><button class="cr-iconbtn" id="crPanelClose">✕</button></div>
   <div class="cr-filters" id="crFilters"></div>
   <div class="cr-list" id="crList"></div>
+</div>
+
+<div class="cr-palette cr-hidden" id="crPalette">
+  <button class="cr-pal-handle" id="crPalHandle" type="button" aria-label="스티커 보관함 열기/닫기">스티커</button>
+  <div class="cr-pal-hint">스티커를 탭한 뒤 문서를 누르거나, 끌어다 놓으세요</div>
+  <div id="crPalItems"></div>
+</div>
+
+<div class="cr-arm-banner" id="crArmBanner"><span id="crArmMsg"></span><button id="crArmCancel" type="button">취소</button></div>
+
+<div class="cr-tut" id="crTut">
+  <div class="cr-tut-card">
+    <h3>의견 남기기 안내</h3>
+    <p>읽다가 의견이 있으면 이렇게 남겨요</p>
+    <div class="cr-tut-steps">
+      <div class="cr-tut-step"><span class="cr-tut-num">1</span><span>오른쪽 <b>스티커 보관함</b>에서 원하는 스티커를 고르세요.</span></div>
+      <div class="cr-tut-step"><span class="cr-tut-num">2</span><span>문서의 <b>항목을 탭</b>하면 의견이 붙어요. (끌어다 놓아도 돼요)</span></div>
+      <div class="cr-tut-step"><span class="cr-tut-num">3</span><span>남긴 의견은 <b>요청 보기</b>에서 모아 볼 수 있어요.</span></div>
+    </div>
+    <button class="cr-btn" id="crTutStart" type="button">시작하기</button>
+  </div>
 </div>
 
 <div class="cr-modal" id="crModal">
@@ -2264,7 +2322,7 @@
   var TYPE_ORDER = ['explanation', 'adjust', 'date-change', 'discussion'];
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var state = { token: null, name: '', clientId: '', sound: true, urlKey: '', stickers: [], filter: 'all', undo: null, toastTimer: null };
+  var state = { token: null, name: '', clientId: '', sound: true, urlKey: '', stickers: [], filter: 'all', undo: null, toastTimer: null, armedType: null };
   var ITEMS = {};
 
   function $(id) { return document.getElementById(id); }
@@ -2335,8 +2393,11 @@
     document.body.classList.add('cr-active');
     $('crBar').classList.remove('cr-hidden');
     $('crFab').classList.remove('cr-hidden');
+    $('crPalette').classList.remove('cr-hidden');
     $('crWho').textContent = state.name ? (state.name + ' 님') : '';
+    buildPalette();
     initDoc();
+    showTutorial();
   }
   function authRequest(pw, name, onErr) {
     return api('/auth', { method: 'POST', json: { projectId: PROJECT, password: pw } }).then(function (res) {
@@ -2536,6 +2597,135 @@
       if (res.status === 401) { showGate('세션이 만료되었습니다. 다시 입장해주세요.'); return; }
       state.stickers = (res.ok && res.j && res.j.success) ? (res.j.data.stickers || []) : [];
       render();
+    });
+  }
+
+  // ── 스티커 보관함(팔레트) + 탭/드래그 배치 ──
+  var DRAG_THRESH = 8;
+  function buildPalette() {
+    var box = $('crPalItems');
+    if (box.childNodes.length) return;
+    box.innerHTML = TYPE_ORDER.map(function (k) {
+      return '<div class="cr-pal-item" data-k="' + k + '" role="button" tabindex="0" title="' + esc(TYPES[k].label) + '"><img src="' + TYPES[k].svg + '" alt=""><span>' + esc(TYPES[k].label) + '</span></div>';
+    }).join('');
+    try { if (localStorage.getItem('cr.stork.palette') === 'collapsed') $('crPalette').classList.add('cr-collapsed'); } catch (e) {}
+    $('crPalHandle').addEventListener('click', function () {
+      var p = $('crPalette'); p.classList.toggle('cr-collapsed');
+      try { localStorage.setItem('cr.stork.palette', p.classList.contains('cr-collapsed') ? 'collapsed' : 'open'); } catch (e) {}
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('.cr-pal-item'), function (item) {
+      item.addEventListener('pointerdown', onPalPointerDown);
+      item.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); armType(item.getAttribute('data-k'), item); } });
+    });
+  }
+
+  function itemUnder(x, y) { var el = document.elementFromPoint(x, y); return el ? el.closest('[data-cr-item]') : null; }
+  function clearDropHover() { var p = document.querySelector('[data-cr-item].cr-drop-hover'); if (p) p.classList.remove('cr-drop-hover'); }
+
+  function onPalPointerDown(e) {
+    var item = this, type = item.getAttribute('data-k');
+    var sx = e.clientX, sy = e.clientY, dragging = false, ghost = null;
+    function move(ev) {
+      if (!dragging) {
+        if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < DRAG_THRESH) return;
+        dragging = true;
+        document.body.classList.add('cr-arming');
+        ghost = document.createElement('img');
+        ghost.src = TYPES[type].svg; ghost.className = 'cr-drag-ghost';
+        document.body.appendChild(ghost);
+      }
+      ghost.style.left = ev.clientX + 'px'; ghost.style.top = ev.clientY + 'px';
+      clearDropHover();
+      var t = itemUnder(ev.clientX, ev.clientY); if (t) t.classList.add('cr-drop-hover');
+    }
+    function up(ev) {
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      if (dragging) {
+        if (ghost) ghost.remove();
+        document.body.classList.remove('cr-arming');
+        var t = itemUnder(ev.clientX, ev.clientY);
+        clearDropHover();
+        if (t) placeFromPalette(t.getAttribute('data-cr-item'), type);
+      } else {
+        armType(type, item);
+      }
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  }
+
+  var _armClick = null;
+  function armType(type, item) {
+    disarm();
+    state.armedType = type;
+    document.body.classList.add('cr-arming');
+    if (item) item.classList.add('cr-armed');
+    $('crArmMsg').textContent = (TYPES[type] ? TYPES[type].label : '') + ' — 붙일 곳을 누르세요';
+    $('crArmBanner').classList.add('cr-show');
+    setTimeout(function () {
+      _armClick = function (ev) {
+        if (ev.target.closest('.cr-palette') || ev.target.closest('.cr-arm-banner')) return;
+        var t = ev.target.closest('[data-cr-item]');
+        if (t) { ev.preventDefault(); ev.stopPropagation(); var ty = state.armedType, id = t.getAttribute('data-cr-item'); disarm(); placeFromPalette(id, ty); }
+      };
+      document.addEventListener('click', _armClick, true);
+    }, 0);
+  }
+  function disarm() {
+    state.armedType = null;
+    document.body.classList.remove('cr-arming');
+    $('crArmBanner').classList.remove('cr-show');
+    clearDropHover();
+    Array.prototype.forEach.call(document.querySelectorAll('.cr-pal-item.cr-armed'), function (x) { x.classList.remove('cr-armed'); });
+    if (_armClick) { document.removeEventListener('click', _armClick, true); _armClick = null; }
+  }
+  if ($('crArmCancel')) $('crArmCancel').addEventListener('click', disarm);
+
+  function placeFromPalette(itemId, type) { if (itemId && type) openPlaceSheet(itemId, type); }
+
+  function openPlaceSheet(itemId, type) {
+    var label = (ITEMS[itemId] && ITEMS[itemId].label) || '선택한 항목';
+    var dateBlock = type === 'date-change'
+      ? '<div id="crDateWrap" class="cr-datewrap"><div style="font-size:13px;color:#555;margin:4px 0 6px;">희망 날짜가 있나요?</div>'
+        + '<span class="cr-chip cr-on" data-d="no">없음, 회의에서 협의</span><span class="cr-chip" data-d="yes">있음</span>'
+        + '<input class="cr-input" id="crDate" placeholder="희망 날짜 또는 메모" style="display:none;margin-top:8px;"></div>'
+      : '';
+    modalOpen(
+      '<button class="cr-close" id="crSheetClose">&times;</button>'
+      + '<h3>' + esc(TYPES[type].label) + ' · <span style="color:#8B6FD4">' + esc(label) + '</span></h3>'
+      + dateBlock
+      + '<textarea class="cr-textarea" id="crMemo" placeholder="메모 (선택)" style="margin-top:6px;"></textarea>'
+      + '<button class="cr-btn" id="crPlace">붙이기</button>'
+    );
+    $('crSheetClose').addEventListener('click', modalClose);
+    if (type === 'date-change') {
+      var chips = $('crSheet').querySelectorAll('.cr-chip');
+      Array.prototype.forEach.call(chips, function (ch) {
+        ch.addEventListener('click', function () {
+          Array.prototype.forEach.call(chips, function (x) { x.classList.remove('cr-on'); });
+          ch.classList.add('cr-on');
+          $('crDate').style.display = ch.getAttribute('data-d') === 'yes' ? 'block' : 'none';
+        });
+      });
+    }
+    $('crPlace').addEventListener('click', function () {
+      var memo = $('crMemo').value.trim();
+      var desiredDate = '';
+      var di = $('crDate');
+      if (type === 'date-change' && di && di.style.display !== 'none') desiredDate = di.value.trim();
+      createSticker(itemId, type, memo, desiredDate);
+    });
+  }
+
+  // ── 첫 방문 튜토리얼 (1회) ──
+  function showTutorial() {
+    try { if (localStorage.getItem('cr.stork.tut')) return; } catch (e) {}
+    var t = $('crTut'); if (!t) return;
+    t.classList.add('cr-show');
+    $('crTutStart').addEventListener('click', function () {
+      t.classList.remove('cr-show');
+      try { localStorage.setItem('cr.stork.tut', '1'); } catch (e) {}
     });
   }
 
