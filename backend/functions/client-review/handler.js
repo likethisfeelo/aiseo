@@ -20,10 +20,10 @@ const {
   GetCommand,
   PutCommand,
   QueryCommand,
+  ScanCommand,
   DeleteCommand,
   UpdateCommand,
 } = require('@aws-sdk/lib-dynamodb');
-const { CognitoJwtVerifier } = require('aws-jwt-verify');
 const { ok, badRequest, unauthorized, forbidden, serverError } = require('../shared/response');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -99,29 +99,49 @@ const requireReviewToken = (event, projectId) => {
 };
 
 // ── admin (Cognito JWT) ──────────────────────────────────
-let _verifier;
-const getVerifier = () => {
-  if (_verifier) return _verifier;
-  if (!process.env.USER_POOL_ID) return null;
-  _verifier = CognitoJwtVerifier.create({
-    userPoolId: process.env.USER_POOL_ID,
-    tokenUse: 'id',
-    clientId: process.env.COGNITO_CLIENT_ID || null,
-  });
-  return _verifier;
+// Node 내장 crypto 로 RS256 + JWKS 검증 (외부 라이브러리 미사용 → 번들 누락 502 방지)
+const poolRegion = () => String(process.env.USER_POOL_ID || '').split('_')[0] || '';
+let _jwks = null, _jwksAt = 0;
+const getJwks = async () => {
+  if (_jwks && Date.now() - _jwksAt < 3600000) return _jwks;
+  const url = `https://cognito-idp.${poolRegion()}.amazonaws.com/${process.env.USER_POOL_ID}/.well-known/jwks.json`;
+  const res = await fetch(url);
+  const j = await res.json();
+  _jwks = j.keys || [];
+  _jwksAt = Date.now();
+  return _jwks;
+};
+const b64urlJson = (s) => JSON.parse(Buffer.from(s, 'base64url').toString('utf8'));
+
+const verifyCognitoJwt = async (token) => {
+  const parts = String(token).split('.');
+  if (parts.length !== 3) throw new Error('malformed');
+  const header = b64urlJson(parts[0]);
+  const payload = b64urlJson(parts[1]);
+  if (!payload.exp || payload.exp * 1000 < Date.now()) throw new Error('expired');
+  const iss = `https://cognito-idp.${poolRegion()}.amazonaws.com/${process.env.USER_POOL_ID}`;
+  if (payload.iss !== iss) throw new Error('iss');
+  const keys = await getJwks();
+  const jwk = keys.find((k) => k.kid === header.kid);
+  if (!jwk) throw new Error('kid');
+  const pub = crypto.createPublicKey({ key: jwk, format: 'jwk' });
+  const signed = Buffer.from(parts[0] + '.' + parts[1]);
+  const sig = Buffer.from(parts[2], 'base64url');
+  if (!crypto.verify('RSA-SHA256', signed, pub, sig)) throw new Error('signature');
+  return payload;
 };
 
 const requireAdmin = async (event) => {
-  const v = getVerifier();
-  if (!v) return false;
+  if (!process.env.USER_POOL_ID) return false;
   const tok = bearer(event);
   if (!tok) return false;
   try {
-    const payload = await v.verify(tok);
+    const payload = await verifyCognitoJwt(tok);
     const raw = payload['cognito:groups'] || [];
     const groups = Array.isArray(raw) ? raw : String(raw).split(/[\s,]+/);
     return groups.includes('admin');
-  } catch {
+  } catch (e) {
+    console.error('admin jwt verify failed:', e && e.message);
     return false;
   }
 };
@@ -266,6 +286,19 @@ const handleAdminUpsertProject = async (event) => {
   return ok({ projectId }, event);
 };
 
+const handleAdminListProjects = async (event) => {
+  if (!(await requireAdmin(event))) return forbidden('관리자 권한이 필요합니다.', event);
+  // 단일 테이블에서 META 항목만 모은다(프로젝트 = 검토 문서). 비밀번호 해시는 제외.
+  const res = await ddb.send(new ScanCommand({
+    TableName: TABLE,
+    FilterExpression: 'sk = :meta',
+    ExpressionAttributeValues: { ':meta': 'META' },
+    ProjectionExpression: 'projectId, projectName, createdAt',
+  }));
+  const projects = (res.Items || []).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  return ok({ projects, count: projects.length }, event);
+};
+
 // ── router ───────────────────────────────────────────────
 exports.handler = async (event) => {
   try {
@@ -288,7 +321,10 @@ exports.handler = async (event) => {
         if (method === 'GET' && !segs[2]) return handleAdminListStickers(event);
         if (method === 'POST' && segs[2] && segs[3] === 'check') return handleAdminCheck(event, decodeURIComponent(segs[2]));
       }
-      if (segs[1] === 'projects' && method === 'POST') return handleAdminUpsertProject(event);
+      if (segs[1] === 'projects') {
+        if (method === 'GET') return handleAdminListProjects(event);
+        if (method === 'POST') return handleAdminUpsertProject(event);
+      }
     }
 
     return badRequest(`Unsupported route: ${method} /${segs.join('/')}`, event);
