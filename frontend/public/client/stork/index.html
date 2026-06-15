@@ -334,6 +334,8 @@
   .cr-types{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .cr-type{ border:1px solid #e8e6f0; border-radius:12px; padding:14px 10px; text-align:center; cursor:pointer; transition:border-color .15s, background .15s; }
   .cr-type:hover{ border-color:var(--cr-accent2); background:#faf8ff; }
+  .cr-type.cr-on{ border-color:var(--cr-accent); background:#f3eefc; box-shadow:0 0 0 2px rgba(139,111,212,.18); }
+  #crPlace{ margin-top:14px; }
   .cr-type img{ width:54px; height:54px; display:block; margin:0 auto 8px; }
   .cr-type span{ font-size:12.5px; font-weight:600; color:#333; }
   .cr-confirm-txt{ font-size:14px; color:#333; line-height:1.7; background:#f7f5fc; border-radius:10px; padding:13px 14px; margin-bottom:12px; }
@@ -2262,8 +2264,8 @@
   var TYPE_ORDER = ['explanation', 'adjust', 'date-change', 'discussion'];
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var state = { token: null, name: '', clientId: '', sound: true, stickers: [], filter: 'all', undo: null, undoTimer: null };
-  var ITEMS = {}; // id -> {el, label}
+  var state = { token: null, name: '', clientId: '', sound: true, urlKey: '', stickers: [], filter: 'all', undo: null, toastTimer: null };
+  var ITEMS = {};
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -2303,12 +2305,29 @@
     });
   }
 
+  // ── toast (공용: 메시지 + 선택적 액션) ──
+  function showToast(msg, actionLabel, actionFn, dur) {
+    var t = $('crToast'); $('crToastMsg').textContent = msg;
+    var btn = $('crToastUndo');
+    if (actionLabel) { btn.style.display = ''; btn.textContent = actionLabel; btn.onclick = function () { t.classList.remove('cr-show'); if (state.toastTimer) clearTimeout(state.toastTimer); if (actionFn) actionFn(); }; }
+    else { btn.style.display = 'none'; btn.onclick = null; }
+    t.classList.add('cr-show');
+    if (state.toastTimer) clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(function () { t.classList.remove('cr-show'); }, dur || 2500);
+  }
+
   // ── gate ──
   function showGate(msg) {
     $('crGate').classList.remove('cr-hidden');
     document.body.classList.add('cr-locked');
+    if (state.urlKey) {
+      $('crPw').style.display = 'none';
+      $('crGateTitle').textContent = '이름을 입력해주세요';
+      $('crGateDesc').textContent = '이름만 입력하면 바로 문서를 확인하고 의견을 남길 수 있습니다.';
+    }
+    if (state.name) $('crName').value = state.name;
     if (msg) $('crGateErr').textContent = msg;
-    if (state.name) { var n = $('crName'); if (n) n.value = state.name; }
+    setTimeout(function () { var f = state.urlKey ? $('crName') : $('crPw'); if (f) f.focus(); }, 50);
   }
   function unlock() {
     $('crGate').classList.add('cr-hidden');
@@ -2319,17 +2338,23 @@
     $('crWho').textContent = state.name ? (state.name + ' 님') : '';
     initDoc();
   }
+  function authRequest(pw, name, onErr) {
+    return api('/auth', { method: 'POST', json: { projectId: PROJECT, password: pw } }).then(function (res) {
+      if (!res.ok || !res.j || !res.j.success) { if (onErr) onErr(); return false; }
+      state.token = res.j.data.token; if (name) state.name = name; save(); return true;
+    }).catch(function () { if (onErr) onErr(); return false; });
+  }
   function doAuth() {
-    var pw = $('crPw').value, name = $('crName').value.trim();
+    var pw = state.urlKey || $('crPw').value, name = $('crName').value.trim();
     if (!pw) { $('crGateErr').textContent = '비밀번호를 입력해주세요.'; return; }
     if (!name) { $('crGateErr').textContent = '이름을 입력해주세요.'; return; }
     var btn = $('crEnter'); btn.disabled = true; btn.textContent = '확인 중...';
-    api('/auth', { method: 'POST', json: { projectId: PROJECT, password: pw } }).then(function (res) {
-      btn.disabled = false; btn.textContent = '입장하기';
-      if (!res.ok || !res.j || !res.j.success) { $('crGateErr').textContent = '비밀번호가 올바르지 않습니다.'; return; }
-      state.token = res.j.data.token; state.name = name; save();
-      unlock();
-    }).catch(function () { btn.disabled = false; btn.textContent = '입장하기'; $('crGateErr').textContent = '접속 중 오류가 발생했습니다.'; });
+    authRequest(pw, name, function () { $('crGateErr').textContent = state.urlKey ? '링크가 올바르지 않습니다. 담당자에게 문의해주세요.' : '비밀번호가 올바르지 않습니다.'; })
+      .then(function (okv) { btn.disabled = false; btn.textContent = '입장하기'; if (okv) unlock(); });
+  }
+  // 링크 키 + 저장된 이름이 있으면 비번/이름 입력 없이 바로 입장
+  function silentAuth() {
+    authRequest(state.urlKey, state.name).then(function (okv) { if (okv) unlock(); else showGate(); });
   }
 
   // ── anchors / + buttons ──
@@ -2360,60 +2385,58 @@
     });
   }
 
-  // ── sticker picker / confirm modal ──
+  // ── 등록: 단일 모달(종류 선택 → 선택적 메모/날짜 → 붙이기) ──
   function modalOpen(html) { $('crSheet').innerHTML = html; $('crModal').classList.add('cr-open'); }
   function modalClose() { $('crModal').classList.remove('cr-open'); }
   $('crModal') && $('crModal').addEventListener('click', function (e) { if (e.target === this) modalClose(); });
 
   function openPicker(itemId) {
+    var label = (ITEMS[itemId] && ITEMS[itemId].label) || '선택한 항목';
     var cards = TYPE_ORDER.map(function (k) {
       return '<div class="cr-type" data-k="' + k + '"><img src="' + TYPES[k].svg + '" alt=""><span>' + esc(TYPES[k].label) + '</span></div>';
     }).join('');
-    modalOpen('<button class="cr-close" id="crSheetClose">&times;</button><h3>어떤 요청을 남길까요?</h3><div class="cr-types">' + cards + '</div>');
-    $('crSheetClose').addEventListener('click', modalClose);
-    Array.prototype.forEach.call($('crSheet').querySelectorAll('.cr-type'), function (c) {
-      c.addEventListener('click', function () { openConfirm(itemId, c.getAttribute('data-k')); });
-    });
-  }
-
-  function openConfirm(itemId, type) {
-    var label = (ITEMS[itemId] && ITEMS[itemId].label) || '선택한 항목';
-    var dateBlock = type === 'date-change'
-      ? '<div class="cr-datewrap"><div style="font-size:13px;color:#555;margin-bottom:6px;">희망 날짜가 있나요?</div>'
-        + '<span class="cr-chip cr-on" data-d="no">없음, 회의에서 협의</span><span class="cr-chip" data-d="yes">있음</span>'
-        + '<input class="cr-input" id="crDate" placeholder="희망 날짜 또는 메모" style="display:none;margin-top:8px;"></div>'
-      : '';
     modalOpen(
       '<button class="cr-close" id="crSheetClose">&times;</button>'
-      + '<h3>' + esc(TYPES[type].label) + '</h3>'
-      + '<div class="cr-confirm-txt"><b>' + esc(label) + '</b> 부분에 <b>' + esc(TYPES[type].label) + '</b> 요청을 남기시는 게 맞습니까?</div>'
-      + dateBlock
-      + '<textarea class="cr-textarea" id="crMemo" placeholder="메모 (선택)"></textarea>'
-      + '<div class="cr-row"><button class="cr-btn cr-btn-sec" id="crCancel">아니요</button><button class="cr-btn" id="crOk">네, 붙일게요</button></div>'
+      + '<h3>의견 남기기 · <span style="color:#8B6FD4">' + esc(label) + '</span></h3>'
+      + '<div class="cr-types">' + cards + '</div>'
+      + '<div id="crDateWrap" class="cr-datewrap" style="display:none;"><div style="font-size:13px;color:#555;margin:12px 0 6px;">희망 날짜가 있나요?</div>'
+      + '<span class="cr-chip cr-on" data-d="no">없음, 회의에서 협의</span><span class="cr-chip" data-d="yes">있음</span>'
+      + '<input class="cr-input" id="crDate" placeholder="희망 날짜 또는 메모" style="display:none;margin-top:8px;"></div>'
+      + '<textarea class="cr-textarea" id="crMemo" placeholder="메모 (선택)" style="margin-top:12px;"></textarea>'
+      + '<button class="cr-btn" id="crPlace" disabled>붙이기</button>'
     );
     $('crSheetClose').addEventListener('click', modalClose);
-    $('crCancel').addEventListener('click', modalClose);
-    if (type === 'date-change') {
-      var chips = $('crSheet').querySelectorAll('.cr-chip');
-      Array.prototype.forEach.call(chips, function (ch) {
-        ch.addEventListener('click', function () {
-          Array.prototype.forEach.call(chips, function (x) { x.classList.remove('cr-on'); });
-          ch.classList.add('cr-on');
-          $('crDate').style.display = ch.getAttribute('data-d') === 'yes' ? 'block' : 'none';
-        });
+    var chosen = null;
+    var typeEls = $('crSheet').querySelectorAll('.cr-type');
+    Array.prototype.forEach.call(typeEls, function (c) {
+      c.addEventListener('click', function () {
+        chosen = c.getAttribute('data-k');
+        Array.prototype.forEach.call(typeEls, function (x) { x.classList.toggle('cr-on', x === c); });
+        $('crDateWrap').style.display = chosen === 'date-change' ? 'block' : 'none';
+        $('crPlace').disabled = false;
       });
-    }
-    $('crOk').addEventListener('click', function () {
+    });
+    // 날짜 칩
+    var chips = $('crSheet').querySelectorAll('#crDateWrap .cr-chip');
+    Array.prototype.forEach.call(chips, function (ch) {
+      ch.addEventListener('click', function () {
+        Array.prototype.forEach.call(chips, function (x) { x.classList.remove('cr-on'); });
+        ch.classList.add('cr-on');
+        $('crDate').style.display = ch.getAttribute('data-d') === 'yes' ? 'block' : 'none';
+      });
+    });
+    $('crPlace').addEventListener('click', function () {
+      if (!chosen) return;
       var memo = $('crMemo').value.trim();
       var desiredDate = '';
       var di = $('crDate');
-      if (type === 'date-change' && di && di.style.display !== 'none') desiredDate = di.value.trim();
-      createSticker(itemId, type, memo, desiredDate);
+      if (chosen === 'date-change' && di && di.style.display !== 'none') desiredDate = di.value.trim();
+      createSticker(itemId, chosen, memo, desiredDate);
     });
   }
 
   function createSticker(itemId, type, memo, desiredDate) {
-    var ok = $('crOk'); if (ok) { ok.disabled = true; ok.textContent = '등록 중...'; }
+    var btn = $('crPlace'); if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
     api('/stickers', { method: 'POST', json: {
       projectId: PROJECT, docId: DOC, itemId: itemId,
       itemLabel: (ITEMS[itemId] && ITEMS[itemId].label) || '',
@@ -2421,12 +2444,14 @@
       authorName: state.name, authorId: state.clientId
     } }).then(function (res) {
       if (!res.ok || !res.j || !res.j.success) {
-        if (res.status === 401) { showGate('세션이 만료되었습니다. 다시 입장해주세요.'); modalClose(); return; }
-        alert('등록 중 오류가 발생했습니다.'); if (ok) { ok.disabled = false; ok.textContent = '네, 붙일게요'; } return;
+        if (res.status === 401) { modalClose(); showGate('세션이 만료되었습니다. 다시 입장해주세요.'); return; }
+        if (btn) { btn.disabled = false; btn.textContent = '붙이기'; }
+        showToast('등록 중 오류가 발생했습니다.'); return;
       }
       state.stickers.push(res.j.data.sticker);
       modalClose(); render(); beep('pop'); flashPin(res.j.data.sticker.stickerId, 'cr-paste');
-    }).catch(function () { alert('등록 중 오류가 발생했습니다.'); if (ok) { ok.disabled = false; ok.textContent = '네, 붙일게요'; } });
+      showToast('저장되었습니다 ✓');
+    }).catch(function () { if (btn) { btn.disabled = false; btn.textContent = '붙이기'; } showToast('등록 중 오류가 발생했습니다.'); });
   }
 
   // ── delete + undo ──
@@ -2435,31 +2460,24 @@
     state.stickers = state.stickers.filter(function (x) { return x.stickerId !== s.stickerId; });
     render(); beep('remove');
     api('/stickers/' + encodeURIComponent(s.stickerId) + '?projectId=' + encodeURIComponent(PROJECT) + '&authorId=' + encodeURIComponent(state.clientId), { method: 'DELETE' })
-      .then(function (res) { if (!res.ok) { state.stickers = prev; render(); alert('삭제하지 못했습니다.'); } else { showUndo(s); } });
+      .then(function (res) {
+        if (!res.ok) { state.stickers = prev; render(); showToast('삭제하지 못했습니다.'); return; }
+        showToast('스티커를 삭제했습니다.', '되돌리기', function () { undoDelete(s); }, 4000);
+      });
   }
-  function showUndo(s) {
-    var t = $('crToast'); $('crToastMsg').textContent = '스티커를 삭제했습니다.';
-    t.classList.add('cr-show');
-    if (state.undoTimer) clearTimeout(state.undoTimer);
-    state.undo = s;
-    state.undoTimer = setTimeout(function () { t.classList.remove('cr-show'); state.undo = null; }, 4000);
-  }
-  $('crToastUndo') && $('crToastUndo').addEventListener('click', function () {
-    var s = state.undo; if (!s) return;
-    $('crToast').classList.remove('cr-show');
+  function undoDelete(s) {
     api('/stickers', { method: 'POST', json: {
       projectId: PROJECT, docId: s.docId || DOC, itemId: s.itemId, itemLabel: s.itemLabel,
       type: s.type, memo: s.memo, desiredDate: s.desiredDate, authorName: s.authorName, authorId: s.authorId
     } }).then(function (res) { if (res.ok && res.j && res.j.success) { state.stickers.push(res.j.data.sticker); render(); } });
-  });
+  }
 
-  // ── render pins + list ──
+  // ── render ──
   function flashPin(id, cls) {
     var p = document.querySelector('[data-cr-pin="' + id + '"]');
     if (p && !reduce) { p.classList.add(cls); setTimeout(function () { p.classList.remove(cls); }, 900); }
   }
   function render() {
-    // pins
     Array.prototype.forEach.call(document.querySelectorAll('[data-cr-pins]'), function (c) { c.innerHTML = ''; });
     state.stickers.forEach(function (s) {
       var c = document.querySelector('[data-cr-pins="' + s.itemId + '"]');
@@ -2473,7 +2491,6 @@
       if (mine) pin.querySelector('.cr-x').addEventListener('click', function (e) { e.stopPropagation(); deleteSticker(s); });
       c.appendChild(pin);
     });
-    // count + list
     $('crFabCount').textContent = String(state.stickers.length);
     renderFilters(); renderList();
   }
@@ -2502,19 +2519,17 @@
     Array.prototype.forEach.call(list.querySelectorAll('.cr-card'), function (card) {
       card.addEventListener('click', function () {
         var it = ITEMS[card.getAttribute('data-go')];
-        if (it && it.el) { it.el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); }
+        if (it && it.el) it.el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
         flashPin(card.getAttribute('data-pin'), 'cr-flash');
-        if (window.innerWidth < 720) togglePanel(false);
+        if (window.innerWidth < 720) $('crPanel').classList.remove('cr-open');
       });
     });
   }
 
-  // ── panel ──
-  function togglePanel(open) { $('crPanel').classList.toggle('cr-open', open == null ? undefined : open); }
   $('crFab') && $('crFab').addEventListener('click', function () { $('crPanel').classList.add('cr-open'); });
   $('crPanelClose') && $('crPanelClose').addEventListener('click', function () { $('crPanel').classList.remove('cr-open'); });
 
-  // ── doc init (after unlock) ──
+  // ── doc init ──
   function initDoc() {
     assignAnchors();
     api('/stickers?projectId=' + encodeURIComponent(PROJECT)).then(function (res) {
@@ -2527,13 +2542,15 @@
   // ── boot ──
   function boot() {
     load();
+    try { var k = new URLSearchParams(location.search).get('k'); if (k) { state.urlKey = k; history.replaceState(null, '', location.pathname + location.hash); } } catch (e) {}
     $('crEnter').addEventListener('click', doAuth);
     $('crPw').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('crName').focus(); });
     $('crName').addEventListener('keydown', function (e) { if (e.key === 'Enter') doAuth(); });
     $('crSound').textContent = state.sound ? '🔊' : '🔇';
     $('crSound').addEventListener('click', function () { state.sound = !state.sound; $('crSound').textContent = state.sound ? '🔊' : '🔇'; save(); });
-    // 토큰이 있으면 바로 입장 시도(목록 호출이 401이면 게이트로 폴백)
-    if (state.token && state.name) { unlock(); } else { showGate(); }
+    if (state.token && state.name) unlock();
+    else if (state.urlKey && state.name) silentAuth();
+    else showGate();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
