@@ -422,3 +422,12 @@ export const adminUpsertClientProject = (input: {
   projectName?: string;
   password: string;
 }) => postJson('/client-review/admin/projects', input);
+
+export interface ClientProject {
+  projectId: string;
+  projectName?: string;
+  createdAt?: string;
+}
+
+export const adminListClientProjects = () =>
+  getJson('/client-review/admin/projects') as Promise<{ projects: ClientProject[]; count: number }>;

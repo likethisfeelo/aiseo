@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { adminListClientStickers, adminToggleClientStickerCheck, adminUpsertClientProject } from '../../api';
-import type { ClientSticker, ClientStickerType } from '../../api';
+import { adminListClientStickers, adminToggleClientStickerCheck, adminUpsertClientProject, adminListClientProjects } from '../../api';
+import type { ClientSticker, ClientStickerType, ClientProject } from '../../api';
 
 const TYPE_LABELS: Record<ClientStickerType, string> = {
   explanation: '설명 요청',
@@ -20,6 +20,23 @@ export function ClientReviewAdminPage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('');
   const [checkFilter, setCheckFilter] = useState<CheckFilter>('');
 
+  // 검토 페이지(프로젝트) 목록
+  const [projects, setProjects] = useState<ClientProject[]>([]);
+  const [copied, setCopied] = useState('');
+
+  const clientLink = (id: string) => `${location.origin}/client/${id}`;
+  const loadProjects = () => {
+    adminListClientProjects()
+      .then((d) => setProjects(d.projects || []))
+      .catch(() => { /* 권한/네트워크 오류는 목록만 비움 */ });
+  };
+  const copyLink = (id: string) => {
+    const link = clientLink(id);
+    if (navigator.clipboard) navigator.clipboard.writeText(link).catch(() => {});
+    setCopied(id);
+    setTimeout(() => setCopied(''), 1500);
+  };
+
   // 프로젝트 생성/비밀번호 설정 폼
   const [pwOpen, setPwOpen] = useState(false);
   const [pwProjectId, setPwProjectId] = useState('stork');
@@ -36,6 +53,7 @@ export function ClientReviewAdminPage() {
       await adminUpsertClientProject({ projectId: pwProjectId.trim(), projectName: pwName.trim(), password: pwValue });
       setPwMsg(`저장 완료 — "${pwProjectId.trim()}" 프로젝트 비밀번호가 설정되었습니다.`);
       setPwValue('');
+      loadProjects();
     } catch (e) {
       setPwMsg('저장 실패: ' + (e as Error).message);
     } finally {
@@ -54,6 +72,7 @@ export function ClientReviewAdminPage() {
 
   useEffect(() => {
     reload(projectId);
+    loadProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -109,6 +128,21 @@ export function ClientReviewAdminPage() {
             {pwMsg && <p style={{ ...styles.pwHelp, color: pwMsg.startsWith('저장 완료') ? 'var(--accent-deep, #6b4fb8)' : 'var(--danger)' }}>{pwMsg}</p>}
           </div>
         )}
+      </div>
+
+      <div style={styles.projBox}>
+        <div style={styles.projHd}>검토 페이지 목록 ({projects.length})</div>
+        {projects.length === 0 && <div style={styles.projEmpty}>아직 등록된 프로젝트가 없습니다. 위에서 비밀번호를 설정하면 생성됩니다.</div>}
+        {projects.map((p) => (
+          <div key={p.projectId} style={styles.projRow}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={styles.projName}>{p.projectName || p.projectId} <span style={styles.projId}>({p.projectId})</span></div>
+              <a href={clientLink(p.projectId)} target="_blank" rel="noopener noreferrer" style={styles.projLink}>{clientLink(p.projectId)}</a>
+            </div>
+            <button onClick={() => copyLink(p.projectId)} style={styles.btnSm}>{copied === p.projectId ? '복사됨 ✓' : '링크 복사'}</button>
+            <button onClick={() => { setProjectId(p.projectId); reload(p.projectId); }} style={styles.btnSm}>요청 보기</button>
+          </div>
+        ))}
       </div>
 
       <div style={styles.filterRow}>
@@ -199,6 +233,14 @@ const styles: Record<string, React.CSSProperties> = {
   pwInner: { padding: '0 16px 16px' },
   pwHelp: { fontSize: 12, color: '#777', lineHeight: 1.6, margin: '0 0 10px' },
   pwRow: { display: 'flex', gap: 8, flexWrap: 'wrap' as const, alignItems: 'center' },
+  projBox: { border: '1px solid var(--border)', borderRadius: 10, padding: '12px 16px', marginBottom: 20 },
+  projHd: { fontSize: 13, fontWeight: 600, color: '#444', marginBottom: 10 },
+  projEmpty: { fontSize: 12, color: '#999' },
+  projRow: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderTop: '1px solid var(--border-soft)' },
+  projName: { fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' },
+  projId: { fontSize: 12, color: '#aaa', fontWeight: 400 },
+  projLink: { fontSize: 12, color: 'var(--accent-deep, #6b4fb8)', textDecoration: 'none', wordBreak: 'break-all' as const },
+  btnSm: { padding: '6px 12px', border: '1px solid var(--border)', borderRadius: 6, background: '#fff', fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap' as const },
   filterRow: { display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 20, alignItems: 'flex-end' },
   filterLabel: { display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: '#666' },
   select: { padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 13, background: '#fff', minWidth: 140 },
