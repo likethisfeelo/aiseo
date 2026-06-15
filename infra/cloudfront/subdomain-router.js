@@ -85,6 +85,8 @@ function handler(event) {
         '/events2026/first': '/site/events2026/first/index.html',
         '/b2b': '/site/b2b/index.html',
         '/blog': '/site/blog/index.html',
+        // 클라이언트 검토 페이지(정적). 프로젝트별로 한 줄씩 추가.
+        '/client/stork': '/site/client/stork/index.html',
       };
 
       if (PRERENDERED_FIXED[routeKey]) {
