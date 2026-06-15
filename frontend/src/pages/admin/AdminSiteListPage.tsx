@@ -62,6 +62,13 @@ const ADMIN_MENU: MenuCard[] = [
     color: 'var(--accent-dark)',
   },
   {
+    to: '/admin/client-review',
+    icon: '🔖',
+    title: '클라이언트 검토 요청',
+    description: 'PRISM 스티커로 남긴 클라이언트 요청 확인·내부 체크',
+    color: 'var(--accent-deep, #6b4fb8)',
+  },
+  {
     to: '/mktadmin',
     icon: '📊',
     title: '마케팅 어드민',

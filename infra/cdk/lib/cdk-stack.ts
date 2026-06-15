@@ -458,6 +458,34 @@ export class CdkStack extends Stack {
     });
     b2bConsultationsTable.grantReadWriteData(b2bConsultationHandler);
 
+    // ── Client review (PRISM 스티커) 단일 테이블 + Lambda ──
+    // 단일 테이블 설계: pk=PROJECT#<id>, sk=META | STICKER#<id>.
+    // 단일 {proxy+} 라우트 하나로 클라이언트+어드민 작업을 모두 처리한다.
+    // (어드민은 Lambda 내부에서 Cognito JWT 로 검증 → 신규 CFN 리소스 최소화)
+    const clientReviewTableName = 'aiseo-client-review';
+    const clientReviewTable = new dynamodb.Table(this, 'ClientReviewTable', {
+      tableName: clientReviewTableName,
+      partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    const clientReviewHandler = new lambda.Function(this, 'ClientReviewFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset(functionsRoot),
+      handler: 'client-review/handler.handler',
+      timeout: Duration.seconds(10),
+      environment: {
+        CLIENT_REVIEW_TABLE: clientReviewTableName,
+        // aws-jwt-verify (어드민 토큰 검증)용. clientId 가 비면 검증 시 client 체크 생략.
+        USER_POOL_ID: userPool ? userPool.userPoolId : '',
+        COGNITO_CLIENT_ID: process.env.COGNITO_CLIENT_ID ?? process.env.VITE_COGNITO_CLIENT_ID ?? '',
+        // 클라이언트 비밀번호 토큰(HMAC) 서명용. 미설정 시 핸들러가 안정적 폴백 사용.
+        REVIEW_TOKEN_SECRET: process.env.REVIEW_TOKEN_SECRET ?? '',
+      },
+    });
+    clientReviewTable.grantReadWriteData(clientReviewHandler);
+
     // ── Course inquiries table + Lambda ──
     const courseInquiriesTableName = 'aiseo-course-inquiries';
     const courseInquiriesTable = new dynamodb.Table(this, 'CourseInquiriesTable', {
@@ -771,6 +799,22 @@ export class CdkStack extends Stack {
     });
     const adminB2BConsultationsResource = adminResource.addResource('b2b-consultations');
     addGet(adminB2BConsultationsResource, b2bConsultationIntegration);
+
+    // Client review (PRISM 스티커) — 단일 {proxy+} 라우트로 client+admin 전부 처리.
+    // 어드민 경로(/client-review/admin/*)는 Lambda 내부에서 Cognito JWT 로 검증하므로
+    // 라우트 인가는 NONE. CORS preflight 는 {proxy+} 에만 둬 리소스를 아낀다.
+    const clientReviewIntegration = new apigateway.LambdaIntegration(clientReviewHandler);
+    const clientReviewResource = api.root.addResource('client-review');
+    const clientReviewProxy = clientReviewResource.addResource('{proxy+}', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: [devOrigin, prodOrigin, siteDevOrigin, siteProdOrigin, b2bDevOrigin, b2bProdOrigin],
+        allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+      },
+    });
+    clientReviewProxy.addMethod('ANY', clientReviewIntegration, {
+      authorizationType: apigateway.AuthorizationType.NONE,
+    });
 
     // Admin quota policy — /admin/quota-policy (GET+PUT)
     const adminQuotaPolicyResource = adminResource.addResource('quota-policy');
