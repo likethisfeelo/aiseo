@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { adminListClientStickers, adminToggleClientStickerCheck } from '../../api';
+import { adminListClientStickers, adminToggleClientStickerCheck, adminUpsertClientProject } from '../../api';
 import type { ClientSticker, ClientStickerType } from '../../api';
 
 const TYPE_LABELS: Record<ClientStickerType, string> = {
@@ -19,6 +19,29 @@ export function ClientReviewAdminPage() {
   const [error, setError] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('');
   const [checkFilter, setCheckFilter] = useState<CheckFilter>('');
+
+  // 프로젝트 생성/비밀번호 설정 폼
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwProjectId, setPwProjectId] = useState('stork');
+  const [pwName, setPwName] = useState('STORK 작업 일정');
+  const [pwValue, setPwValue] = useState('');
+  const [pwMsg, setPwMsg] = useState('');
+  const [pwSaving, setPwSaving] = useState(false);
+
+  const savePassword = async () => {
+    if (!pwProjectId.trim() || !pwValue) { setPwMsg('프로젝트 ID와 비밀번호를 입력해주세요.'); return; }
+    setPwSaving(true);
+    setPwMsg('');
+    try {
+      await adminUpsertClientProject({ projectId: pwProjectId.trim(), projectName: pwName.trim(), password: pwValue });
+      setPwMsg(`저장 완료 — "${pwProjectId.trim()}" 프로젝트 비밀번호가 설정되었습니다.`);
+      setPwValue('');
+    } catch (e) {
+      setPwMsg('저장 실패: ' + (e as Error).message);
+    } finally {
+      setPwSaving(false);
+    }
+  };
 
   const reload = (pid: string) => {
     setLoading(true);
@@ -66,6 +89,27 @@ export function ClientReviewAdminPage() {
       <p style={styles.subtitle}>
         총 {items.length}건 · 필터 {filtered.length}건 · 미확인 {items.filter((i) => !i.adminChecked).length}건
       </p>
+
+      <div style={styles.pwBox}>
+        <button onClick={() => setPwOpen((v) => !v)} style={styles.pwToggle}>
+          {pwOpen ? '▼' : '▶'} 프로젝트 비밀번호 설정
+        </button>
+        {pwOpen && (
+          <div style={styles.pwInner}>
+            <p style={styles.pwHelp}>
+              클라이언트 전용 링크(<code>site.aiseo.tips/client/&lt;프로젝트ID&gt;</code>) 접속 비밀번호를
+              설정/변경합니다. 같은 프로젝트 ID로 다시 저장하면 비밀번호가 교체됩니다.
+            </p>
+            <div style={styles.pwRow}>
+              <input value={pwProjectId} onChange={(e) => setPwProjectId(e.target.value)} placeholder="프로젝트 ID (예: stork)" style={styles.select} />
+              <input value={pwName} onChange={(e) => setPwName(e.target.value)} placeholder="프로젝트 이름" style={styles.select} />
+              <input value={pwValue} onChange={(e) => setPwValue(e.target.value)} type="text" placeholder="새 비밀번호" style={styles.select} />
+              <button onClick={savePassword} disabled={pwSaving} style={styles.btn}>{pwSaving ? '저장 중...' : '저장'}</button>
+            </div>
+            {pwMsg && <p style={{ ...styles.pwHelp, color: pwMsg.startsWith('저장 완료') ? 'var(--accent-deep, #6b4fb8)' : 'var(--danger)' }}>{pwMsg}</p>}
+          </div>
+        )}
+      </div>
 
       <div style={styles.filterRow}>
         <label style={styles.filterLabel}>
@@ -149,7 +193,12 @@ export function ClientReviewAdminPage() {
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 1400, margin: '0 auto', padding: '40px 24px', fontFamily: 'var(--font-ko)' },
   title: { fontSize: 22, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 },
-  subtitle: { fontSize: 13, color: '#888', marginBottom: 24 },
+  subtitle: { fontSize: 13, color: '#888', marginBottom: 16 },
+  pwBox: { border: '1px solid var(--border)', borderRadius: 10, marginBottom: 20, background: 'var(--bg-soft)' },
+  pwToggle: { width: '100%', textAlign: 'left' as const, padding: '12px 16px', border: 'none', background: 'none', fontSize: 13, fontWeight: 600, color: '#444', cursor: 'pointer', fontFamily: 'var(--font-ko)' },
+  pwInner: { padding: '0 16px 16px' },
+  pwHelp: { fontSize: 12, color: '#777', lineHeight: 1.6, margin: '0 0 10px' },
+  pwRow: { display: 'flex', gap: 8, flexWrap: 'wrap' as const, alignItems: 'center' },
   filterRow: { display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 20, alignItems: 'flex-end' },
   filterLabel: { display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: '#666' },
   select: { padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 13, background: '#fff', minWidth: 140 },
