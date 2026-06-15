@@ -416,3 +416,9 @@ export const adminToggleClientStickerCheck = (input: {
     projectId: input.projectId,
     checked: input.checked,
   });
+
+export const adminUpsertClientProject = (input: {
+  projectId: string;
+  projectName?: string;
+  password: string;
+}) => postJson('/client-review/admin/projects', input);
