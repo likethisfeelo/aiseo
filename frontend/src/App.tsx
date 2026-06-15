@@ -37,6 +37,7 @@ import { AdminSiteDetailPage } from './pages/admin/AdminSiteDetailPage';
 import { MktAdminPage } from './pages/admin/MktAdminPage';
 import { CourseInquiryAdminPage } from './pages/admin/CourseInquiryAdminPage';
 import { EventSignupAdminPage } from './pages/admin/EventSignupAdminPage';
+import { ClientReviewAdminPage } from './pages/admin/ClientReviewAdminPage';
 import { BlogCategoriesAdminPage } from './pages/admin/BlogCategoriesAdminPage';
 import { BlogPostsAdminPage } from './pages/admin/BlogPostsAdminPage';
 import { BlogPostEditPage } from './pages/admin/BlogPostEditPage';
@@ -86,6 +87,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/library/audit': '라이브러리 감사 로그',
   '/admin/quota-policy': '쿼터 정책 관리',
   '/admin/event-signups': '이벤트 신청 관리',
+  '/admin/client-review': '클라이언트 검토 요청 관리',
 };
 
 function PageTitleProvider({ children, setPageTitle }: { children: React.ReactNode; setPageTitle: (t: string) => void }) {
@@ -419,6 +421,7 @@ function AuthenticatedShell({
           <Route path="/mktadmin" element={<MktAdminPage />} />
           <Route path="/admin/course-inquiries" element={<CourseInquiryAdminPage />} />
           <Route path="/admin/event-signups" element={<EventSignupAdminPage />} />
+          <Route path="/admin/client-review" element={<ClientReviewAdminPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/blog/posts" element={<BlogPostsAdminPage />} />
           <Route path="/admin/blog/posts/new" element={<BlogPostEditPage />} />

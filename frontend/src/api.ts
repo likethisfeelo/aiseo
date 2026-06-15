@@ -382,3 +382,37 @@ export const adminDeleteLibraryPost = (slug: string) =>
 
 export const adminListLibraryAudit = (limit = 100) =>
   getJson(`/admin/library/audit?limit=${limit}`);
+
+// ── Client review (PRISM 스티커) admin ──
+export type ClientStickerType = 'explanation' | 'adjust' | 'date-change' | 'discussion';
+
+export interface ClientSticker {
+  stickerId: string;
+  projectId: string;
+  docId?: string;
+  itemId: string;
+  itemLabel?: string;
+  type: ClientStickerType;
+  memo?: string;
+  desiredDate?: string;
+  authorName?: string;
+  authorId?: string;
+  createdAt: string;
+  adminChecked?: boolean;
+}
+
+export const adminListClientStickers = (projectId: string) =>
+  getJson(`/client-review/admin/stickers?projectId=${encodeURIComponent(projectId)}`) as Promise<{
+    stickers: ClientSticker[];
+    count: number;
+  }>;
+
+export const adminToggleClientStickerCheck = (input: {
+  projectId: string;
+  stickerId: string;
+  checked: boolean;
+}) =>
+  postJson(`/client-review/admin/stickers/${encodeURIComponent(input.stickerId)}/check`, {
+    projectId: input.projectId,
+    checked: input.checked,
+  });
