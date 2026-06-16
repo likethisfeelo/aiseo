@@ -216,6 +216,9 @@ export function Course2026Page() {
           overflow: visible;
           transition: none;
         }
+        /* 이미지 영역에 floor 부여 — 세로 이미지가 너무 납작하게 크롭되지 않도록.
+           .sf-card-photo 는 object-fit:cover 라 비율 왜곡 없이 채움. */
+        .cp2026-features-stack .sf-card-img { min-height: 340px; }
         @media (max-width: 900px) {
           .cp2026-features { padding: 56px 20px 40px; }
           .cp2026-features-head .sf-title { font-size: 26px; }
@@ -365,10 +368,7 @@ export function Course2026Page() {
                 </ul>
               </div>
               <div className="sf-card-img" style={{ '--card-bg1': '#F0EBFF', '--card-bg2': '#EBE4FF' } as React.CSSProperties}>
-                <div className="sf-img-placeholder">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C4A8F5" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M8 12h8M8 8h4" /><circle cx="17" cy="17" r="3" /><path d="M19.5 19.5L22 22" /></svg>
-                  <span>이미지 영역</span>
-                </div>
+                <img src="/landing/sf-card-0.jpg" alt="AI 홈페이지 제작 — 프롬프트로 사이트 생성" className="sf-card-photo" loading="lazy" />
               </div>
             </div>
           </div>
@@ -392,10 +392,7 @@ export function Course2026Page() {
                 </ul>
               </div>
               <div className="sf-card-img" style={{ '--card-bg1': '#D1FAE5', '--card-bg2': '#A7F3D0' } as React.CSSProperties}>
-                <div className="sf-img-placeholder">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="1.5"><circle cx="12" cy="12" r="9" /><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" /></svg>
-                  <span>이미지 영역</span>
-                </div>
+                <img src="/landing/sf-card-1.jpg" alt="도메인 & 호스팅 — 서브도메인 + 1G 무료 호스팅" className="sf-card-photo" loading="lazy" />
               </div>
             </div>
           </div>
@@ -419,10 +416,7 @@ export function Course2026Page() {
                 </ul>
               </div>
               <div className="sf-card-img" style={{ '--card-bg1': '#FEF3C7', '--card-bg2': '#FDE68A' } as React.CSSProperties}>
-                <div className="sf-img-placeholder">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="1.5"><path d="M12 3L2 9l10 6 10-6-10-6z" /><path d="M2 15l10 6 10-6" /><path d="M2 12l10 6 10-6" /></svg>
-                  <span>이미지 영역</span>
-                </div>
+                <img src="/landing/sf-card-2.jpg" alt="SEO 핵심강의 — 검색 노출 핵심 자료" className="sf-card-photo" loading="lazy" />
               </div>
             </div>
           </div>
