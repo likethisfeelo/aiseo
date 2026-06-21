@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STORK 작업 일정 V3 — 6/16 계약 기준</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<title>STORK 작업 일정 V3 — 6/23 착수 기준</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { font-family: 'Noto Sans KR', 'Inter', sans-serif; color: #1a1a1a; background: #fff; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  html, body { font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; color: #1a1a1a; background: #fff; line-height: 1.75; -webkit-font-smoothing: antialiased; }
   ul, ol { list-style: none; }
   :root {
     --accent: #FFD600; --accent-soft: #FFF5CC; --black: #111111;
@@ -25,11 +24,11 @@
   .page { max-width: 1140px; margin: 0 auto; padding: 56px 40px 80px; }
 
   .doc-header { border-bottom: 3px solid var(--black); padding-bottom: 28px; margin-bottom: 44px; }
-  .doc-eyebrow { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); background: var(--black); padding: 6px 12px; letter-spacing: 2.5px; font-family: 'Inter', sans-serif; margin-bottom: 18px; }
+  .doc-eyebrow { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); background: var(--black); padding: 6px 12px; letter-spacing: 2.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 18px; }
   .doc-title { font-size: 34px; font-weight: 700; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; }
   .doc-title .accent { color: var(--accent); background: var(--black); padding: 0 10px; }
   .doc-sub { font-size: 14px; color: var(--muted); max-width: 800px; line-height: 1.7; }
-  .doc-meta { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 24px; font-size: 12px; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .doc-meta { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 24px; font-size: 12px; color: var(--muted); font-family: 'Pretendard Variable', Pretendard, sans-serif; }
   .doc-meta strong { color: var(--text); font-weight: 700; }
 
   section { margin-bottom: 56px; }
@@ -46,7 +45,7 @@
   .section-stripe.cokr { background: #0d9488; }
   .section-stripe.bramco { background: #db2777; }
   .section-head-content { flex: 1; }
-  .section-num { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 2.5px; font-family: 'Inter', sans-serif; margin-bottom: 6px; }
+  .section-num { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 2.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 6px; }
   .section-title { font-size: 25px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 8px; }
   .section-desc { font-size: 13px; color: var(--text-soft); line-height: 1.65; max-width: 800px; }
 
@@ -56,15 +55,15 @@
     padding: 22px 0; border-bottom: 1px solid var(--line);
   }
   .phase:last-child { border-bottom: none; }
-  .phase-meta .pn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; padding: 4px 9px; letter-spacing: 1.5px; display: inline-block; margin-bottom: 8px; color: #fff; }
+  .phase-meta .pn { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 11px; font-weight: 700; padding: 4px 9px; letter-spacing: 1.5px; display: inline-block; margin-bottom: 8px; color: #fff; }
   .phase-meta .pn.web { background: var(--web); }
   .phase-meta .pn.cat { background: var(--cat); }
   .phase-meta .pn.cat-urgent { background: var(--warning); }
   .phase-meta .pn.cokr { background: #0d9488; }
   .phase-meta .pn.bramco { background: #db2777; }
   .phase-meta .pn.sns { background: var(--sns); }
-  .phase-meta .date { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 4px; }
-  .phase-meta .days { font-size: 11px; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .phase-meta .date { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 4px; }
+  .phase-meta .days { font-size: 11px; color: var(--muted); font-family: 'Pretendard Variable', Pretendard, sans-serif; }
   .phase-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; line-height: 1.4; }
   .phase-content > p { font-size: 13px; color: var(--text-soft); line-height: 1.7; margin-bottom: 12px; }
   .phase-content strong { color: var(--text); font-weight: 700; }
@@ -73,13 +72,13 @@
   .task-col { padding: 14px 16px; border-radius: 4px; }
   .task-col.us { background: #fffdf0; border-left: 3px solid var(--accent); }
   .task-col.stork { background: #eff6ff; border-left: 3px solid var(--web); }
-  .task-col .ph { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; font-family: 'Inter', sans-serif; margin-bottom: 8px; padding: 2px 8px; display: inline-block; }
+  .task-col .ph { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 8px; padding: 2px 8px; display: inline-block; }
   .task-col.us .ph { color: var(--text); background: var(--accent); }
   .task-col.stork .ph { color: #fff; background: var(--web); }
   .task-col ul li { font-size: 12px; color: var(--text-soft); padding: 4px 0 4px 14px; position: relative; line-height: 1.55; }
   .task-col ul li::before { content: ''; position: absolute; left: 0; top: 12px; width: 7px; height: 1px; background: var(--text-soft); }
   .task-col ul li strong { color: var(--text); font-weight: 700; }
-  .task-col ul li .date-tag { display: inline-block; font-size: 10px; background: #fff; border: 1px solid var(--line); padding: 1px 5px; margin-right: 5px; font-family: 'Inter', sans-serif; color: var(--muted); font-weight: 700; }
+  .task-col ul li .date-tag { display: inline-block; font-size: 10px; background: #fff; border: 1px solid var(--line); padding: 1px 5px; margin-right: 5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; color: var(--muted); font-weight: 700; }
   @media (max-width: 900px) { .task-grid { grid-template-columns: 1fr; } }
 
   /* Catalog track box */
@@ -87,11 +86,11 @@
   .cat-track { border: 1px solid var(--line); padding: 18px 20px; border-radius: 4px; }
   .cat-track.urgent { background: #fff8e6; border-left: 3px solid var(--warning); }
   .cat-track.new { background: #f5f3ff; border-left: 3px solid var(--cat); }
-  .cat-track .ct-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 4px 9px; letter-spacing: 1.5px; font-family: 'Inter', sans-serif; margin-bottom: 8px; color: #fff; }
+  .cat-track .ct-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 4px 9px; letter-spacing: 1.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 8px; color: #fff; }
   .cat-track.urgent .ct-tag { background: var(--warning); }
   .cat-track.new .ct-tag { background: var(--cat); }
   .cat-track h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.2px; line-height: 1.4; }
-  .cat-track .deadline { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+  .cat-track .deadline { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
   .cat-track .deadline .star { color: var(--negative); margin-left: 4px; }
   .cat-track ul li { font-size: 12px; color: var(--text-soft); padding: 3px 0 3px 14px; position: relative; line-height: 1.55; }
   .cat-track ul li::before { content: ''; position: absolute; left: 0; top: 11px; width: 7px; height: 1px; background: var(--text-soft); }
@@ -105,14 +104,14 @@
   .print-option { padding: 22px 24px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
   .print-option.standard { border-left: 4px solid var(--print); background: #fff7ed; }
   .print-option.test { border-left: 4px solid var(--web); background: #eff6ff; }
-  .print-option .po-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 4px 10px; letter-spacing: 1.5px; font-family: 'Inter', sans-serif; margin-bottom: 12px; color: #fff; }
+  .print-option .po-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 4px 10px; letter-spacing: 1.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 12px; color: #fff; }
   .print-option.standard .po-tag { background: var(--print); }
   .print-option.test .po-tag { background: var(--web); }
   .print-option h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.2px; line-height: 1.35; }
-  .print-option .sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; font-family: 'Inter', sans-serif; }
+  .print-option .sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; font-family: 'Pretendard Variable', Pretendard, sans-serif; }
   .print-option .cost-line { padding: 10px 14px; background: #fff; border: 1px solid var(--line); border-radius: 3px; font-size: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
   .print-option .cost-line strong { color: var(--text); font-weight: 700; }
-  .print-option .cost-line .val { font-family: 'Inter', sans-serif; font-weight: 700; color: var(--text); }
+  .print-option .cost-line .val { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-weight: 700; color: var(--text); }
   .print-option .cost-line .val.free { color: var(--positive); }
   .print-option .cost-line .val.note { font-size: 11px; color: var(--muted); font-weight: 500; }
   .print-option ul li { font-size: 12.5px; color: var(--text-soft); padding: 5px 0 5px 16px; position: relative; line-height: 1.55; }
@@ -126,7 +125,7 @@
   .print-summary h4 .y { color: var(--accent); }
   .print-summary table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
   .print-summary td { padding: 9px 0; border-bottom: 1px dashed #333; color: #ddd; }
-  .print-summary td.r { text-align: right; font-family: 'Inter', sans-serif; color: #fff; font-weight: 700; }
+  .print-summary td.r { text-align: right; font-family: 'Pretendard Variable', Pretendard, sans-serif; color: #fff; font-weight: 700; }
   .print-summary tr:last-child td { border-bottom: none; }
   .print-summary p { font-size: 12px; color: #bbb; line-height: 1.7; margin-top: 12px; margin-bottom: 0; }
   .print-summary p strong { color: var(--accent); }
@@ -136,7 +135,7 @@
   .meeting-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.2px; }
   .meeting-info .flow-row { display: grid; grid-template-columns: 100px 1fr; gap: 14px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.06); align-items: start; }
   .meeting-info .flow-row:last-child { border-bottom: none; }
-  .meeting-info .day-label { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px; color: var(--meet); letter-spacing: 0.5px; }
+  .meeting-info .day-label { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-weight: 700; font-size: 12px; color: var(--meet); letter-spacing: 0.5px; }
   .meeting-info .day-desc { font-size: 13px; color: var(--text); line-height: 1.6; }
   .meeting-info .day-desc strong { color: var(--text); font-weight: 700; }
 
@@ -149,7 +148,7 @@
 
   /* Flexible deadline box */
   .flex-box { background: #f0f9ff; border: 1px solid var(--web); padding: 22px 26px; margin: 16px 0; border-radius: 4px; }
-  .flex-box .tag-flex { display: inline-block; font-size: 10px; font-weight: 700; background: var(--web); color: #fff; padding: 4px 10px; letter-spacing: 1.5px; font-family: 'Inter', sans-serif; margin-bottom: 12px; }
+  .flex-box .tag-flex { display: inline-block; font-size: 10px; font-weight: 700; background: var(--web); color: #fff; padding: 4px 10px; letter-spacing: 1.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 12px; }
   .flex-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.2px; }
   .flex-box p { font-size: 13px; color: var(--text-soft); line-height: 1.7; margin-bottom: 0; }
   .flex-box strong { color: var(--text); font-weight: 700; }
@@ -161,9 +160,9 @@
     padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
     border-radius: 4px 4px 0 0;
   }
-  .week-header .week-num { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 1.5px; }
+  .week-header .week-num { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 1.5px; }
   .week-header h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
-  .week-header .range { font-size: 12px; color: #aaa; font-family: 'Inter', sans-serif; }
+  .week-header .range { font-size: 12px; color: #aaa; font-family: 'Pretendard Variable', Pretendard, sans-serif; }
   .week-days {
     display: grid; grid-template-columns: repeat(7, 1fr);
     border: 1px solid var(--line); border-top: none; border-radius: 0 0 4px 4px; overflow: hidden;
@@ -172,8 +171,8 @@
   .week-day { padding: 12px 12px; border-right: 1px solid var(--line-soft); min-height: 130px; position: relative; }
   .week-day:last-child { border-right: none; }
   .week-day.weekend { background: var(--surface); }
-  .week-day .day-num { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-  .week-day .day-name { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; font-family: 'Inter', sans-serif; margin-bottom: 8px; }
+  .week-day .day-num { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .week-day .day-name { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 8px; }
   .week-day.today .day-num { color: var(--negative); }
   .week-day .events { display: flex; flex-direction: column; gap: 4px; }
   .week-day .event {
@@ -205,11 +204,11 @@
   table.ms thead th:last-child { border-right: none; }
   table.ms tbody td { padding: 11px 14px; border-bottom: 1px solid var(--line-soft); border-right: 1px solid var(--line); vertical-align: middle; }
   table.ms tbody td:last-child { border-right: none; }
-  table.ms tbody td.date { font-family: 'Inter', sans-serif; font-weight: 700; color: var(--text); width: 120px; white-space: nowrap; }
-  table.ms tbody td.week-col { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); width: 60px; text-align: center; }
+  table.ms tbody td.date { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-weight: 700; color: var(--text); width: 120px; white-space: nowrap; }
+  table.ms tbody td.week-col { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); width: 60px; text-align: center; }
   table.ms tbody td.cat-c { width: 80px; }
   table.ms tbody td.track-c { width: 130px; }
-  .lbl-c { font-size: 10px; font-weight: 700; padding: 3px 8px; letter-spacing: 0.5px; font-family: 'Inter', sans-serif; color: #fff; display: inline-block; margin-right: 4px; }
+  .lbl-c { font-size: 10px; font-weight: 700; padding: 3px 8px; letter-spacing: 0.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; color: #fff; display: inline-block; margin-right: 4px; }
   .lbl-c.web { background: var(--web); }
   .lbl-c.cat { background: var(--cat); }
   .lbl-c.meet { background: var(--meet); }
@@ -223,7 +222,7 @@
 
   /* Critical block */
   .deadline-box { background: var(--black); color: #fff; padding: 32px; margin: 28px 0; border-left: 5px solid var(--negative); }
-  .deadline-box .lbl { display: inline-block; font-size: 10px; font-weight: 700; background: var(--negative); color: #fff; padding: 4px 10px; letter-spacing: 2px; font-family: 'Inter', sans-serif; margin-bottom: 16px; }
+  .deadline-box .lbl { display: inline-block; font-size: 10px; font-weight: 700; background: var(--negative); color: #fff; padding: 4px 10px; letter-spacing: 2px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 16px; }
   .deadline-box h3 { font-size: 22px; font-weight: 700; margin-bottom: 14px; color: #fff; letter-spacing: -0.4px; line-height: 1.35; }
   .deadline-box h3 .y { color: var(--accent); }
   .deadline-box > p { font-size: 13px; color: #ddd; line-height: 1.75; margin-bottom: 14px; }
@@ -234,7 +233,7 @@
   .change-card { padding: 22px 24px; border-radius: 4px; }
   .change-card.free { background: #f0f9f2; border: 1px solid var(--positive); }
   .change-card.paid { background: #fdf2f2; border: 1px solid var(--negative); }
-  .change-card .head { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; font-family: 'Inter', sans-serif; margin-bottom: 12px; padding: 4px 10px; display: inline-block; }
+  .change-card .head { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 12px; padding: 4px 10px; display: inline-block; }
   .change-card.free .head { background: var(--positive); color: #fff; }
   .change-card.paid .head { background: var(--negative); color: #fff; }
   .change-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.2px; }
@@ -252,10 +251,10 @@
   .pile-box strong { color: var(--text); font-weight: 700; }
   .pile-flow { display: flex; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
   .pile-step { background: #fff; border: 1px solid var(--line); padding: 12px 16px; flex: 1; min-width: 180px; }
-  .pile-step .n { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; font-family: 'Inter', sans-serif; margin-bottom: 4px; font-weight: 700; }
+  .pile-step .n { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; font-family: 'Pretendard Variable', Pretendard, sans-serif; margin-bottom: 4px; font-weight: 700; }
   .pile-step h5 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
   .pile-step p { font-size: 11px; color: var(--text-soft); margin: 0; line-height: 1.5; }
-  .pile-arrow { color: var(--accent); font-size: 18px; font-weight: 700; font-family: 'Inter', sans-serif; }
+  .pile-arrow { color: var(--accent); font-size: 18px; font-weight: 700; font-family: 'Pretendard Variable', Pretendard, sans-serif; }
   @media (max-width: 900px) {
     .pile-flow { flex-direction: column; }
     .pile-arrow { transform: rotate(90deg); }
@@ -291,7 +290,7 @@
   :root{ --cr-accent:#8B6FD4; --cr-accent2:#C4A8F5; --cr-ink:#111; }
   body.cr-locked{ overflow:hidden; }
   /* gate */
-  .cr-gate{ position:fixed; inset:0; z-index:100000; background:#fff; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Noto Sans KR',sans-serif; }
+  .cr-gate{ position:fixed; inset:0; z-index:100000; background:#fff; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
   .cr-gate.cr-hidden{ display:none; }
   .cr-gate-card{ width:100%; max-width:380px; text-align:center; }
   .cr-gate-card .cr-logo{ font-family:'Inter',sans-serif; font-weight:700; letter-spacing:2px; color:var(--cr-accent); font-size:13px; margin-bottom:14px; }
@@ -303,7 +302,7 @@
   .cr-btn:disabled{ opacity:.45; cursor:default; }
   .cr-err{ color:#d23; font-size:13px; min-height:18px; margin:4px 0 6px; }
   /* top bar */
-  .cr-bar{ position:fixed; top:0; left:0; right:0; height:42px; z-index:9000; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid #eee; display:flex; align-items:center; gap:12px; padding:0 14px; font-family:'Noto Sans KR',sans-serif; font-size:13px; }
+  .cr-bar{ position:fixed; top:0; left:0; right:0; height:42px; z-index:9000; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid #eee; display:flex; align-items:center; gap:12px; padding:0 14px; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; font-size:13px; }
   .cr-bar.cr-hidden{ display:none; }
   .cr-bar .cr-proj{ font-weight:700; color:var(--cr-ink); }
   .cr-bar .cr-who{ color:#888; }
@@ -326,7 +325,7 @@
   .cr-pin.cr-paste{ animation:crPaste .42s cubic-bezier(.2,.8,.3,1); }
   @keyframes crPaste{ 0%{ transform:scale(.7);} 55%{ transform:scale(1.12);} 100%{ transform:scale(1);} }
   /* modal */
-  .cr-modal{ position:fixed; inset:0; z-index:99990; background:rgba(10,6,20,.5); display:none; align-items:center; justify-content:center; padding:16px; font-family:'Noto Sans KR',sans-serif; }
+  .cr-modal{ position:fixed; inset:0; z-index:99990; background:rgba(10,6,20,.5); display:none; align-items:center; justify-content:center; padding:16px; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
   .cr-modal.cr-open{ display:flex; }
   .cr-sheet{ background:#fff; border-radius:16px; width:100%; max-width:420px; max-height:88vh; overflow:auto; padding:22px; position:relative; }
   .cr-sheet h3{ font-size:16px; margin:0 0 14px; color:var(--cr-ink); }
@@ -348,9 +347,9 @@
   .cr-chip{ display:inline-block; font-size:12px; padding:5px 10px; border-radius:999px; border:1px solid #e2e0ea; cursor:pointer; margin-right:6px; }
   .cr-chip.cr-on{ background:var(--cr-accent); color:#fff; border-color:var(--cr-accent); }
   /* list panel */
-  .cr-fab{ position:fixed; right:16px; bottom:16px; z-index:9500; background:var(--cr-ink); color:#fff; border:none; border-radius:999px; padding:12px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif; box-shadow:0 6px 20px rgba(0,0,0,.25); }
+  .cr-fab{ position:fixed; right:16px; bottom:16px; z-index:9500; background:var(--cr-ink); color:#fff; border:none; border-radius:999px; padding:12px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; box-shadow:0 6px 20px rgba(0,0,0,.25); }
   .cr-fab.cr-hidden{ display:none; }
-  .cr-panel{ position:fixed; top:0; right:0; bottom:0; width:340px; max-width:90vw; z-index:99980; background:#fff; box-shadow:-8px 0 30px rgba(0,0,0,.15); transform:translateX(100%); transition:transform .28s ease; display:flex; flex-direction:column; font-family:'Noto Sans KR',sans-serif; }
+  .cr-panel{ position:fixed; top:0; right:0; bottom:0; width:340px; max-width:90vw; z-index:99980; background:#fff; box-shadow:-8px 0 30px rgba(0,0,0,.15); transform:translateX(100%); transition:transform .28s ease; display:flex; flex-direction:column; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
   .cr-panel.cr-open{ transform:none; }
   .cr-panel-hd{ padding:16px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:8px; }
   .cr-panel-hd h3{ margin:0; font-size:15px; flex:1; }
@@ -366,13 +365,13 @@
   .cr-card .cr-card-meta{ font-size:11px; color:#aaa; margin-top:4px; }
   .cr-empty{ text-align:center; color:#bbb; font-size:13px; padding:30px 0; }
   /* toast */
-  .cr-toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); z-index:99999; background:#111; color:#fff; padding:11px 16px; border-radius:10px; font-size:13px; font-family:'Noto Sans KR',sans-serif; display:flex; gap:14px; align-items:center; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
+  .cr-toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); z-index:99999; background:#111; color:#fff; padding:11px 16px; border-radius:10px; font-size:13px; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; display:flex; gap:14px; align-items:center; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
   .cr-toast.cr-show{ opacity:1; transform:translateX(-50%); pointer-events:auto; }
   .cr-toast button{ background:none; border:none; color:var(--cr-accent2); font-weight:700; cursor:pointer; font-size:13px; }
   @media (prefers-reduced-motion: reduce){ .cr-pin.cr-paste,.cr-pin.cr-flash{ animation:none; } .cr-panel{ transition:none; } }
 
   /* ── 스티커 보관함(팔레트) ── */
-  .cr-palette{ position:fixed; top:50%; right:0; transform:translateY(-50%); z-index:9400; background:#fff; border:1px solid #e8e6f0; border-right:none; border-radius:14px 0 0 14px; box-shadow:-6px 0 24px rgba(20,12,40,.12); padding:12px 12px 12px 10px; display:flex; flex-direction:column; gap:8px; transition:transform .26s ease; font-family:'Noto Sans KR',sans-serif; }
+  .cr-palette{ position:fixed; top:50%; right:0; transform:translateY(-50%); z-index:9400; background:#fff; border:1px solid #e8e6f0; border-right:none; border-radius:14px 0 0 14px; box-shadow:-6px 0 24px rgba(20,12,40,.12); padding:12px 12px 12px 10px; display:flex; flex-direction:column; gap:8px; transition:transform .26s ease; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
   .cr-palette.cr-hidden{ display:none; }
   .cr-palette.cr-collapsed{ transform:translateY(-50%) translateX(calc(100% - 30px)); }
   .cr-pal-handle{ position:absolute; left:-1px; top:50%; transform:translate(-100%,-50%); background:#6B4FB8; color:#fff; border:none; border-radius:10px 0 0 10px; width:28px; padding:14px 0; cursor:pointer; writing-mode:vertical-rl; font-size:12px; font-weight:700; letter-spacing:2px; box-shadow:-4px 0 14px rgba(20,12,40,.18); }
@@ -386,11 +385,11 @@
   .cr-drag-ghost{ position:fixed; z-index:99998; width:46px; height:46px; margin:-23px 0 0 -23px; pointer-events:none; filter:drop-shadow(0 6px 14px rgba(20,12,40,.35)); }
   body.cr-arming [data-cr-item]{ outline:2px dashed rgba(139,111,212,.5); outline-offset:2px; }
   [data-cr-item].cr-drop-hover{ outline:3px solid var(--cr-accent) !important; background:rgba(196,168,245,.10); }
-  .cr-arm-banner{ position:fixed; top:52px; left:50%; transform:translateX(-50%); z-index:9600; background:#6B4FB8; color:#fff; padding:9px 14px; border-radius:999px; font-size:13px; font-family:'Noto Sans KR',sans-serif; display:none; align-items:center; gap:12px; box-shadow:0 6px 20px rgba(107,79,184,.4); }
+  .cr-arm-banner{ position:fixed; top:52px; left:50%; transform:translateX(-50%); z-index:9600; background:#6B4FB8; color:#fff; padding:9px 14px; border-radius:999px; font-size:13px; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; display:none; align-items:center; gap:12px; box-shadow:0 6px 20px rgba(107,79,184,.4); }
   .cr-arm-banner.cr-show{ display:flex; }
   .cr-arm-banner button{ background:rgba(255,255,255,.2); border:none; color:#fff; border-radius:999px; padding:3px 10px; font-size:12px; cursor:pointer; }
   /* tutorial */
-  .cr-tut{ position:fixed; inset:0; z-index:99995; background:rgba(10,6,20,.55); display:none; align-items:center; justify-content:center; padding:20px; font-family:'Noto Sans KR',sans-serif; }
+  .cr-tut{ position:fixed; inset:0; z-index:99995; background:rgba(10,6,20,.55); display:none; align-items:center; justify-content:center; padding:20px; font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
   .cr-tut.cr-show{ display:flex; }
   .cr-tut-card{ background:#fff; border-radius:16px; max-width:360px; width:100%; padding:24px; text-align:center; }
   .cr-tut-card h3{ margin:0 0 6px; font-size:18px; color:var(--cr-ink); }
@@ -475,11 +474,12 @@
   <header class="doc-header">
     <span class="doc-eyebrow">PROJECT SCHEDULE V3 · STORK</span>
     <h1 class="doc-title">STORK 작업 <span class="accent">일정</span></h1>
-    <p class="doc-sub">2026년 6월 16일 계약 기준의 전체 작업 일정입니다. 웹사이트·카탈로그·SNS 운영·.co.kr·브람코 작업까지 포함하며, 회의 운영 방식과 인쇄 옵션도 함께 정리했습니다.</p>
+    <p class="doc-sub">2026년 6월 19일 계약, 6월 23일 착수 기준의 전체 작업 일정입니다. 웹사이트·카탈로그·SNS 운영·.co.kr·브람코 작업까지 포함하며, 회의 운영 방식과 인쇄 옵션도 함께 정리했습니다.</p>
     <div class="doc-meta">
-      <span><strong>계약일</strong> · 2026년 6월 16일 (월)</span>
-      <span><strong>사이트 오픈</strong> · 7월 말 목표</span>
-      <span><strong>전체 기간</strong> · 6월 ~ 12월</span>
+      <span><strong>계약일</strong> · 2026년 6월 19일 (목)</span>
+      <span><strong>착수일</strong> · 2026년 6월 23일 (월)</span>
+      <span><strong>종료일</strong> · 2027년 6월 30일 (수)</span>
+      <span><strong>사이트 오픈</strong> · 2026년 7월 이내</span>
     </div>
   </header>
 
@@ -490,7 +490,7 @@
       <div class="section-head-content">
         <div class="section-num">SECTION 01 · 웹사이트</div>
         <h2 class="section-title">웹사이트 일정</h2>
-        <p class="section-desc">사이트 구축은 콘텐츠 정리와 시안 작업을 병행하면서 7월 3일까지 모든 내용을 검수·확정하고, 7월 말 공식 오픈하는 흐름입니다. 일정 변경에 대한 유연한 대응도 가능합니다.</p>
+        <p class="section-desc">사이트 구축은 콘텐츠 정리와 시안 작업을 병행하면서 7월 중순까지 모든 내용을 검수·확정하고, 7월 이내 공식 오픈하는 흐름입니다. 일정 변경에 대한 유연한 대응도 가능합니다.</p>
       </div>
     </div>
 
@@ -498,12 +498,12 @@
     <div class="phase">
       <div class="phase-meta">
         <span class="pn web">W·1</span>
-        <div class="date">6/16(월) ~ 6/22(일)</div>
-        <div class="days">킥오프 + 시안 1차</div>
+        <div class="date">6/23(월) ~ 6/29(월)</div>
+        <div class="days">착수 + 시안 1차</div>
       </div>
       <div class="phase-content">
-        <h3>콘텐츠 정리 + 시안 2종 동시 진행</h3>
-        <p>계약 직후 STORK 측은 기본 내용 검토를 시작하고, 우리는 동시에 브레인스토밍용 시안을 작업에 들어갑니다. 시안을 보면서 콘텐츠 방향을 함께 맞춰가는 방식입니다.</p>
+        <h3>착수 + 콘텐츠 정리 + 시안 2종 동시 진행</h3>
+        <p>6월 23일 착수와 함께 STORK 측은 기본 내용 검토를 시작하고, 우리는 동시에 브레인스토밍용 시안을 작업에 들어갑니다. 시안을 보면서 콘텐츠 방향을 함께 맞춰가는 방식입니다.</p>
         <div class="task-grid">
           <div class="task-col us">
             <span class="ph">우리 측</span>
@@ -531,17 +531,17 @@
     <div class="phase">
       <div class="phase-meta">
         <span class="pn web">W·2</span>
-        <div class="date">6/23(월) ~ 6/30(화)</div>
+        <div class="date">6/30(화) ~ 7/10(금)</div>
         <div class="days">일일 피드백 단계</div>
       </div>
       <div class="phase-content">
         <h3>매일 디자인 확인 + 일일 피드백으로 완성</h3>
-        <p>이 주간은 <strong>매일 디자인을 확인하시면서 즉시 피드백을 주시는 흐름</strong>입니다. 빠르게 의사결정이 이뤄지면 완성도가 훨씬 올라갑니다.</p>
+        <p>이 기간은 <strong>매일 디자인을 확인하시면서 즉시 피드백을 주시는 흐름</strong>입니다. 빠르게 의사결정이 이뤄지면 완성도가 훨씬 올라갑니다.</p>
 
         <div class="daily-box">
           <h4>일일 피드백 운영 방식</h4>
           <p>STORK 측에서 매일 디자인 진행 상황을 확인하시면서 의견을 주시면, 우리 측은 다음 날까지 반영합니다. <strong>필요한 경우 당일 즉시 온라인 회의</strong>로 풀어갑니다 (Zoom/Google Meet, 15~30분 짧게).</p>
-          <p style="margin-top:8px;"><strong>장점</strong> — 회의를 따로 잡지 않아도 그날그날 풀리고, 7/3 검수 마감까지 완성도가 자연스럽게 올라갑니다.</p>
+          <p style="margin-top:8px;"><strong>장점</strong> — 회의를 따로 잡지 않아도 그날그날 풀리고, 검수 마감까지 완성도가 자연스럽게 올라갑니다.</p>
         </div>
 
         <div class="task-grid">
@@ -569,17 +569,17 @@
     <div class="phase">
       <div class="phase-meta">
         <span class="pn" style="background:var(--negative);">W·3 ★</span>
-        <div class="date">7/1(수) ~ 7/3(목)</div>
+        <div class="date">7/13(월) ~ 7/20(월)</div>
         <div class="days">최종 검수 · 핵심</div>
       </div>
       <div class="phase-content">
         <h3>STORK 측 최종 검수 — <span style="color:var(--negative);">전체 일정의 분기점</span></h3>
-        <p>이 시점이 <strong>전체 작업의 분기점</strong>입니다. 7/3까지 검수된 내용 중심의 변경·변용은 추가금 없이 진행되고, 구성·내용을 새로 만드는 변경은 추가금이 발생할 수 있습니다. (자세한 안내는 마지막 섹션 참고)</p>
+        <p>이 시점이 <strong>전체 작업의 분기점</strong>입니다. 검수된 내용 중심의 변경·변용은 추가금 없이 진행되고, 구성·내용을 새로 만드는 변경은 추가금이 발생할 수 있습니다. (자세한 안내는 마지막 섹션 참고)</p>
 
         <div class="flex-box">
           <span class="tag-flex">FLEXIBLE</span>
           <h4>일정은 유연하게 조정 가능합니다</h4>
-          <p>6/30까지의 진행 상황을 보고 <strong>7/3 검수 마감을 7/20 이내까지 연장</strong>할 수 있습니다. STORK 측 상황(내부 검토, 추가 자료 정리 등)에 따라 무리하지 않고 진행하는 게 더 좋은 결과로 이어집니다.</p>
+          <p>일일 피드백 단계의 진행 상황을 보고 <strong>검수 마감일을 7/20 이내에서 협의</strong>할 수 있습니다. STORK 측 상황(내부 검토, 추가 자료 정리 등)에 따라 무리하지 않고 진행하는 게 더 좋은 결과로 이어집니다.</p>
         </div>
       </div>
     </div>
@@ -588,7 +588,7 @@
     <div class="phase">
       <div class="phase-meta">
         <span class="pn web">W·4</span>
-        <div class="date">7/4(금) ~ 7월 중순</div>
+        <div class="date">7/13(월) ~ 7/25(토)</div>
         <div class="days">퍼블리싱</div>
       </div>
       <div class="phase-content">
@@ -619,7 +619,7 @@
     <div class="phase">
       <div class="phase-meta">
         <span class="pn web">W·5</span>
-        <div class="date">7월 말</div>
+        <div class="date">2026년 7월 이내</div>
         <div class="days">사이트 오픈</div>
       </div>
       <div class="phase-content">
@@ -653,7 +653,7 @@
       <div class="section-head-content">
         <div class="section-num">SECTION 02 · 카탈로그</div>
         <h2 class="section-title">카탈로그 일정</h2>
-        <p class="section-desc">카탈로그는 두 트랙으로 나누어 진행합니다. 긴급한 부분은 6/26까지 인쇄 가능한 PDF로 먼저 전달드리고, 신규 디자인은 7월 중 정기 회의를 통해 선택·확정합니다.</p>
+        <p class="section-desc">카탈로그는 두 트랙으로 나누어 진행합니다. 긴급한 부분은 7월 초까지 인쇄 가능한 PDF로 먼저 전달드리고, 신규 디자인은 7월 중 정기 회의를 통해 선택·확정합니다.</p>
       </div>
     </div>
 
@@ -661,7 +661,7 @@
       <div class="cat-track urgent">
         <span class="ct-tag">TRACK A · 긴급</span>
         <h4>기존 블랙 버전 + 추가 페이지</h4>
-        <div class="deadline">📅 6/26 (금) 완성 ⚡</div>
+        <div class="deadline">📅 7월 초 완성 ⚡</div>
         <ul>
           <li>기존 블랙 버전 디자인 그대로 활용</li>
           <li><strong>연혁 페이지 추가</strong></li>
@@ -690,8 +690,8 @@
     <div class="phase">
       <div class="phase-meta">
         <span class="pn cat-urgent">C·A</span>
-        <div class="date">6/16(월) ~ 6/26(금)</div>
-        <div class="days">트랙 A · 11일</div>
+        <div class="date">6/23(월) ~ 7월 초</div>
+        <div class="days">트랙 A · 약 2주</div>
       </div>
       <div class="phase-content">
         <h3>긴급 카탈로그 — 기존 블랙 버전에 신규 페이지 추가</h3>
@@ -700,9 +700,9 @@
           <div class="task-col us">
             <span class="ph">우리 측</span>
             <ul>
-              <li><span class="date-tag">6/16 ~ 6/22</span> 추가 페이지 구성·디자인</li>
-              <li><span class="date-tag">6/23 ~ 6/25</span> 검수·수정</li>
-              <li><span class="date-tag">6/26 금</span> <strong>인쇄 가능한 PDF 전달</strong></li>
+              <li><span class="date-tag">6/23 ~ 6/29</span> 추가 페이지 구성·디자인</li>
+              <li><span class="date-tag">6/30 ~ 7/3</span> 검수·수정</li>
+              <li><span class="date-tag">7월 초</span> <strong>인쇄 가능한 PDF 전달</strong></li>
             </ul>
           </div>
           <div class="task-col stork">
@@ -710,7 +710,7 @@
             <ul>
               <li>연혁·신규 장비 자료 제공</li>
               <li>중간 검토 (회의에서)</li>
-              <li><span class="date-tag">6/26 이후</span> 인쇄 발주 여부 결정</li>
+              <li><span class="date-tag">전달 이후</span> 인쇄 발주 여부 결정</li>
             </ul>
           </div>
         </div>
@@ -886,8 +886,8 @@
     <!-- 회의 1: 첫 회의 -->
     <div class="meeting-info" style="border-left-color:var(--web);background:var(--web-soft);">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <span style="background:var(--web);color:#fff;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">회의 ①</span>
-        <h4 style="margin:0;">첫 회의 — 6/15 주간 (목·금)</h4>
+        <span style="background:var(--web);color:#fff;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">회의 ①</span>
+        <h4 style="margin:0;">첫 회의 — 6/23 착수 주간 (목·금)</h4>
       </div>
       <p style="font-size:13px;color:var(--text-soft);margin-bottom:14px;line-height:1.7;">계약 직후 첫 주차 회의입니다. 이 회의에서 큰 방향과 콘텐츠 구성을 정합니다.</p>
 
@@ -905,17 +905,17 @@
       </div>
       <div class="flow-row">
         <div class="day-label">회의 이후</div>
-        <div class="day-desc"><strong>우리 측</strong> — 회의 결과 반영해서 다음 주(6/23 주간) 시안 작업 시작</div>
+        <div class="day-desc"><strong>우리 측</strong> — 회의 결과 반영해서 다음 주(6/30 주간) 시안 작업 시작</div>
       </div>
     </div>
 
     <!-- 회의 2: 일일 피드백 -->
     <div class="meeting-info" style="border-left-color:var(--accent);background:var(--surface-warm);margin-top:18px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <span style="background:var(--accent);color:var(--text);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">회의 ②</span>
-        <h4 style="margin:0;">웹 디자인 작업 중 상시 회의 — 6/23 주간</h4>
+        <span style="background:var(--accent);color:var(--text);font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">회의 ②</span>
+        <h4 style="margin:0;">웹 디자인 작업 중 상시 회의 — 6/30 ~ 7/10 주간</h4>
       </div>
-      <p style="font-size:13px;color:var(--text-soft);margin-bottom:14px;line-height:1.7;">웹 디자인 작업이 본격적으로 진행되는 6/23 주간은 <strong>정기 회의 대신 일일 피드백 방식</strong>으로 운영됩니다.</p>
+      <p style="font-size:13px;color:var(--text-soft);margin-bottom:14px;line-height:1.7;">웹 디자인 작업이 본격적으로 진행되는 이 기간은 <strong>정기 회의 대신 일일 피드백 방식</strong>으로 운영됩니다.</p>
 
       <div class="flow-row">
         <div class="day-label">매일</div>
@@ -938,7 +938,7 @@
     <!-- 회의 3: 카탈로그 -->
     <div class="meeting-info" style="border-left-color:var(--cat);background:var(--cat-soft);margin-top:18px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <span style="background:var(--cat);color:#fff;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">회의 ③</span>
+        <span style="background:var(--cat);color:#fff;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">회의 ③</span>
         <h4 style="margin:0;">카탈로그 신규 디자인 작업 회의 — 7월 (예: 화·목, 변경 가능)</h4>
       </div>
       <p style="font-size:13px;color:var(--text-soft);margin-bottom:14px;line-height:1.7;">카탈로그 두 번째 작업(트랙 B, 블랙·화이트 혼용 신규 디자인) 진행 시의 회의입니다. <strong>2주간(7/6~7/17) 정기적으로 진행</strong>되며, 요일은 STORK 상황에 맞춰 협의합니다.</p>
@@ -1260,7 +1260,7 @@
       <div class="cat-track" style="background:#f1f5f9;border-left:3px solid #1e293b;">
         <span class="ct-tag" style="background:#1e293b;">1차 보도</span>
         <h4>2026년 9월 · 3분기 발행</h4>
-        <div class="deadline" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:var(--text);">📅 9월 중 발행</div>
+        <div class="deadline" style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;font-weight:700;color:var(--text);">📅 9월 중 발행</div>
         <ul>
           <li><strong>소재</strong> — 사이트 리뉴얼 + 신규 장비 출시</li>
           <li>기획·작성 풀 대행</li>
@@ -1271,7 +1271,7 @@
       <div class="cat-track" style="background:#f1f5f9;border-left:3px solid #1e293b;">
         <span class="ct-tag" style="background:#1e293b;">2차 보도</span>
         <h4>2026년 12월 · 4분기 발행</h4>
-        <div class="deadline" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:var(--text);">📅 12월 중 발행</div>
+        <div class="deadline" style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;font-weight:700;color:var(--text);">📅 12월 중 발행</div>
         <ul>
           <li><strong>소재</strong> — 한 해 성과·인증·파트너십</li>
           <li>잔금 평가 시점과 연계</li>
@@ -1411,22 +1411,22 @@
 
       <div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div style="background:#1a1a1a;padding:14px 16px;border-left:3px solid var(--accent);">
-          <div style="font-size:10px;color:var(--accent);font-family:'Inter',sans-serif;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">기준 ①</div>
+          <div style="font-size:10px;color:var(--accent);font-family:'Pretendard Variable',Pretendard,sans-serif;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">기준 ①</div>
           <h5 style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">AI 검색 노출</h5>
           <p style="font-size:11px;color:#bbb;line-height:1.5;margin:0;">ChatGPT·Perplexity·Claude·Gemini 등 AI 검색 2곳 이상에서 인용 확인</p>
         </div>
         <div style="background:#1a1a1a;padding:14px 16px;border-left:3px solid var(--accent);">
-          <div style="font-size:10px;color:var(--accent);font-family:'Inter',sans-serif;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">기준 ②</div>
+          <div style="font-size:10px;color:var(--accent);font-family:'Pretendard Variable',Pretendard,sans-serif;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">기준 ②</div>
           <h5 style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">구글·네이버 검색</h5>
           <p style="font-size:11px;color:#bbb;line-height:1.5;margin:0;">핵심 키워드 검색 결과 1~3페이지 진입 또는 현행 수준 유지·개선</p>
         </div>
         <div style="background:#1a1a1a;padding:14px 16px;border-left:3px solid var(--accent);">
-          <div style="font-size:10px;color:var(--accent);font-family:'Inter',sans-serif;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">기준 ③</div>
+          <div style="font-size:10px;color:var(--accent);font-family:'Pretendard Variable',Pretendard,sans-serif;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">기준 ③</div>
           <h5 style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">콘텐츠 누적</h5>
           <p style="font-size:11px;color:#bbb;line-height:1.5;margin:0;">SNS·블로그 6개월간 약 50건 이상 발행 완료</p>
         </div>
         <div style="background:#1a1a1a;padding:14px 16px;border-left:3px solid var(--accent);">
-          <div style="font-size:10px;color:var(--accent);font-family:'Inter',sans-serif;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">기준 ④</div>
+          <div style="font-size:10px;color:var(--accent);font-family:'Pretendard Variable',Pretendard,sans-serif;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">기준 ④</div>
           <h5 style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">언론 보도</h5>
           <p style="font-size:11px;color:#bbb;line-height:1.5;margin:0;">최소 2회 발행 (광고비 미사용 시 추가 발행)</p>
         </div>
@@ -1439,7 +1439,7 @@
       <div class="cat-track" style="background:var(--accent-soft);border-left:3px solid var(--accent);">
         <span class="ct-tag" style="background:var(--accent);color:var(--text);">선지급</span>
         <h4>1,000만 원</h4>
-        <div class="deadline" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:var(--text);">📅 2026년 6월 (계약 시)</div>
+        <div class="deadline" style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;font-weight:700;color:var(--text);">📅 2026년 6월 (계약 시)</div>
         <ul>
           <li>작업 착수 시 입금</li>
           <li>6월 ~ 12월 작업 진행</li>
@@ -1449,7 +1449,7 @@
       <div class="cat-track" style="background:#fef2f2;border-left:3px solid #dc2626;">
         <span class="ct-tag" style="background:#dc2626;">잔금</span>
         <h4>500만 원</h4>
-        <div class="deadline" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:var(--text);">📅 2027년 6월 30일</div>
+        <div class="deadline" style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;font-weight:700;color:var(--text);">📅 2027년 6월 30일</div>
         <ul>
           <li>12월 평가 시점에서 검토</li>
           <li>2027.6.30 결제</li>
@@ -1561,68 +1561,16 @@
       <div class="section-head-content">
         <div class="section-num">SECTION 13 · 6월 주간 일정</div>
         <h2 class="section-title">6월 주간 일정</h2>
-        <p class="section-desc">회의와 마감일 중심으로 간결하게 정리했습니다. 진행 업무는 회의 사이 기간에 이뤄집니다.</p>
+        <p class="section-desc">회의와 마감일 중심으로 간결하게 정리했습니다. 6월 19일 계약 → 6월 23일 착수 → 첫 회의 → 일일 피드백 흐름입니다.</p>
       </div>
     </div>
 
-    <!-- Week 1 -->
+    <!-- Week 1 : 6/22 ~ 6/28 (착수 주간) -->
     <div class="week-block">
       <div class="week-header">
         <div>
           <div class="week-num">WEEK 1</div>
-          <h3>킥오프 + 콘텐츠 정리·시안 작업</h3>
-        </div>
-        <div class="range">6/15(일) ~ 6/21(토)</div>
-      </div>
-      <div class="week-days">
-        <div class="week-day weekend">
-          <div class="day-num">15</div>
-          <div class="day-name">일</div>
-        </div>
-        <div class="week-day">
-          <div class="day-num">16</div>
-          <div class="day-name">월</div>
-          <div class="events">
-            <div class="event start">계약 처리</div>
-            <div class="event web">콘텐츠·시안 작업 시작</div>
-            <div class="event cat">긴급 카탈로그 시작</div>
-          </div>
-        </div>
-        <div class="week-day">
-          <div class="day-num">17</div>
-          <div class="day-name">화</div>
-        </div>
-        <div class="week-day">
-          <div class="day-num">18</div>
-          <div class="day-name">수</div>
-          <div class="events">
-            <div class="event web">콘텐츠 전체 정리 전달</div>
-          </div>
-        </div>
-        <div class="week-day">
-          <div class="day-num">19</div>
-          <div class="day-name">목</div>
-          <div class="events">
-            <div class="event meet">정기 회의 (목 또는 금)</div>
-          </div>
-        </div>
-        <div class="week-day">
-          <div class="day-num">20</div>
-          <div class="day-name">금</div>
-        </div>
-        <div class="week-day weekend">
-          <div class="day-num">21</div>
-          <div class="day-name">토</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Week 2 : 일일 피드백 + 긴급 카탈로그 -->
-    <div class="week-block">
-      <div class="week-header">
-        <div>
-          <div class="week-num">WEEK 2</div>
-          <h3>일일 피드백 단계 + 긴급 카탈로그 마감</h3>
+          <h3>착수 + 첫 회의 + 시안 1차 작업</h3>
         </div>
         <div class="range">6/22(일) ~ 6/28(토)</div>
       </div>
@@ -1631,41 +1579,36 @@
           <div class="day-num">22</div>
           <div class="day-name">일</div>
         </div>
-        <div class="week-day">
+        <div class="week-day today">
           <div class="day-num">23</div>
-          <div class="day-name">월</div>
+          <div class="day-name">월 ★</div>
           <div class="events">
-            <div class="event daily">일일 피드백 시작</div>
+            <div class="event start">착수 시작</div>
+            <div class="event web">콘텐츠·시안 작업 시작</div>
+            <div class="event cat">긴급 카탈로그 시작</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">24</div>
           <div class="day-name">화</div>
-          <div class="events">
-            <div class="event daily">일일 피드백</div>
-          </div>
         </div>
         <div class="week-day">
           <div class="day-num">25</div>
           <div class="day-name">수</div>
           <div class="events">
-            <div class="event daily">일일 피드백</div>
+            <div class="event web">콘텐츠 정리 전달</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">26</div>
           <div class="day-name">목</div>
           <div class="events">
-            <div class="event daily">일일 피드백</div>
-            <div class="event milestone">긴급 카탈로그 PDF ⚡</div>
+            <div class="event meet">정기 회의 (목 또는 금)</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">27</div>
           <div class="day-name">금</div>
-          <div class="events">
-            <div class="event daily">일일 피드백</div>
-          </div>
         </div>
         <div class="week-day weekend">
           <div class="day-num">28</div>
@@ -1674,12 +1617,12 @@
       </div>
     </div>
 
-    <!-- Week 3 : 7/3 검수 마감 -->
+    <!-- Week 2 : 6/29 ~ 7/5 (일일 피드백 시작) -->
     <div class="week-block">
       <div class="week-header">
         <div>
-          <div class="week-num">WEEK 3</div>
-          <h3>검수 마감 (★ 핵심 주간)</h3>
+          <div class="week-num">WEEK 2</div>
+          <h3>일일 피드백 단계 시작 + 긴급 카탈로그 완성</h3>
         </div>
         <div class="range">6/29(일) ~ 7/5(토)</div>
       </div>
@@ -1692,33 +1635,36 @@
           <div class="day-num">30</div>
           <div class="day-name">월</div>
           <div class="events">
-            <div class="event daily">일일 피드백 종료</div>
+            <div class="event daily">일일 피드백 시작</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">1</div>
           <div class="day-name">화 · 7월</div>
           <div class="events">
-            <div class="event web">최종 검수 시작</div>
+            <div class="event daily">일일 피드백</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">2</div>
           <div class="day-name">수</div>
-        </div>
-        <div class="week-day today">
-          <div class="day-num">3</div>
-          <div class="day-name">목 ★</div>
           <div class="events">
-            <div class="event milestone">검수 마감 ★</div>
-            <div class="event meet">최종 결정 회의</div>
+            <div class="event daily">일일 피드백</div>
+          </div>
+        </div>
+        <div class="week-day">
+          <div class="day-num">3</div>
+          <div class="day-name">목</div>
+          <div class="events">
+            <div class="event daily">일일 피드백</div>
+            <div class="event milestone">긴급 카탈로그 PDF ⚡</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">4</div>
           <div class="day-name">금</div>
           <div class="events">
-            <div class="event start">퍼블리싱 착수</div>
+            <div class="event daily">일일 피드백</div>
           </div>
         </div>
         <div class="week-day weekend">
@@ -1745,16 +1691,16 @@
       <div class="section-head-content">
         <div class="section-num">SECTION 14 · 7월 주간 일정</div>
         <h2 class="section-title">7월 주간 일정</h2>
-        <p class="section-desc">7월은 사이트 퍼블리싱과 카탈로그 신규 디자인 시안을 병행한 후, 마지막 주에 공식 오픈하는 흐름입니다.</p>
+        <p class="section-desc">7월은 일일 피드백 마무리 → 검수 → 퍼블리싱 → 사이트 공식 오픈 + 카탈로그 인쇄 발주까지 모두 완료되는 핵심 기간입니다.</p>
       </div>
     </div>
 
-    <!-- Week 4 -->
+    <!-- Week 3 : 7/6 ~ 7/12 -->
     <div class="week-block">
       <div class="week-header">
         <div>
-          <div class="week-num">WEEK 4</div>
-          <h3>웹 퍼블리싱 + 카탈로그 신규 시안 1차</h3>
+          <div class="week-num">WEEK 3</div>
+          <h3>일일 피드백 마무리 + 카탈로그 트랙 B 시안 시작</h3>
         </div>
         <div class="range">7/6(일) ~ 7/12(토)</div>
       </div>
@@ -1767,26 +1713,29 @@
           <div class="day-num">7</div>
           <div class="day-name">월</div>
           <div class="events">
-            <div class="event web">퍼블리싱 본격 진행</div>
-            <div class="event cat">신규 시안 작업 시작</div>
+            <div class="event daily">일일 피드백</div>
+            <div class="event cat">신규 카탈로그 시안 시작</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">8</div>
           <div class="day-name">화</div>
+          <div class="events">
+            <div class="event meet">카탈로그 검토 회의</div>
+          </div>
         </div>
         <div class="week-day">
           <div class="day-num">9</div>
           <div class="day-name">수</div>
           <div class="events">
-            <div class="event cat">카탈로그 시안 1차 전달</div>
+            <div class="event daily">일일 피드백</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">10</div>
           <div class="day-name">목</div>
           <div class="events">
-            <div class="event meet">정기 회의 (시안 검토)</div>
+            <div class="event meet">카탈로그 방향 결정</div>
           </div>
         </div>
         <div class="week-day">
@@ -1800,12 +1749,12 @@
       </div>
     </div>
 
-    <!-- Week 5 -->
+    <!-- Week 4 : 7/13 ~ 7/19 (최종 검수) -->
     <div class="week-block">
       <div class="week-header">
         <div>
-          <div class="week-num">WEEK 5</div>
-          <h3>카탈로그 최종 확정 + 사이트 셋업</h3>
+          <div class="week-num">WEEK 4</div>
+          <h3>최종 검수 + 퍼블리싱 시작 (★ 핵심 주간)</h3>
         </div>
         <div class="range">7/13(일) ~ 7/19(토)</div>
       </div>
@@ -1814,16 +1763,20 @@
           <div class="day-num">13</div>
           <div class="day-name">일</div>
         </div>
-        <div class="week-day">
+        <div class="week-day today">
           <div class="day-num">14</div>
-          <div class="day-name">월</div>
+          <div class="day-name">월 ★</div>
           <div class="events">
-            <div class="event web">호스팅·SSL 셋업</div>
+            <div class="event milestone">최종 검수 시작</div>
+            <div class="event start">퍼블리싱 착수</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">15</div>
           <div class="day-name">화</div>
+          <div class="events">
+            <div class="event meet">디테일 검토 회의</div>
+          </div>
         </div>
         <div class="week-day">
           <div class="day-num">16</div>
@@ -1844,7 +1797,7 @@
           <div class="day-num">18</div>
           <div class="day-name">금</div>
           <div class="events">
-            <div class="event cat">카탈로그 완성 작업</div>
+            <div class="event web">검수 마감 (유연 7/20)</div>
           </div>
         </div>
         <div class="week-day weekend">
@@ -1854,12 +1807,12 @@
       </div>
     </div>
 
-    <!-- Week 6 -->
+    <!-- Week 5 : 7/20 ~ 7/26 (퍼블리싱 + 인쇄 준비) -->
     <div class="week-block">
       <div class="week-header">
         <div>
-          <div class="week-num">WEEK 6</div>
-          <h3>사이트 오픈 준비 + 인쇄 발주 준비</h3>
+          <div class="week-num">WEEK 5</div>
+          <h3>사이트 셋업 + 카탈로그 인쇄 준비</h3>
         </div>
         <div class="range">7/20(일) ~ 7/26(토)</div>
       </div>
@@ -1867,28 +1820,38 @@
         <div class="week-day weekend">
           <div class="day-num">20</div>
           <div class="day-name">일</div>
+          <div class="events">
+            <div class="event milestone">검수 마감 (유연 한계)</div>
+          </div>
         </div>
         <div class="week-day">
           <div class="day-num">21</div>
           <div class="day-name">월</div>
           <div class="events">
+            <div class="event web">호스팅·SSL 셋업</div>
             <div class="event cat">인쇄소 견적</div>
           </div>
         </div>
         <div class="week-day">
           <div class="day-num">22</div>
           <div class="day-name">화</div>
-        </div>
-        <div class="week-day">
-          <div class="day-num">23</div>
-          <div class="day-name">수</div>
           <div class="events">
             <div class="event cat">종이·후가공 확정</div>
           </div>
         </div>
         <div class="week-day">
+          <div class="day-num">23</div>
+          <div class="day-name">수</div>
+          <div class="events">
+            <div class="event web">기본 SEO 셋팅</div>
+          </div>
+        </div>
+        <div class="week-day">
           <div class="day-num">24</div>
           <div class="day-name">목</div>
+          <div class="events">
+            <div class="event cat">감리 진행</div>
+          </div>
         </div>
         <div class="week-day">
           <div class="day-num">25</div>
@@ -1904,12 +1867,12 @@
       </div>
     </div>
 
-    <!-- Week 7 -->
+    <!-- Week 6 : 7/27 ~ 8/2 (사이트 오픈) -->
     <div class="week-block">
       <div class="week-header">
         <div>
-          <div class="week-num">WEEK 7</div>
-          <h3>사이트 공식 오픈 + 카탈로그 발주 🎉</h3>
+          <div class="week-num">WEEK 6</div>
+          <h3>사이트 공식 오픈 + 카탈로그 인쇄 발주 🎉</h3>
         </div>
         <div class="range">7/27(일) ~ 8/2(토)</div>
       </div>
@@ -1930,6 +1893,7 @@
           <div class="day-name">화</div>
           <div class="events">
             <div class="event start">기술 SEO 착수</div>
+            <div class="event start">SNS 운영 시작</div>
           </div>
         </div>
         <div class="week-day">
@@ -1937,6 +1901,7 @@
           <div class="day-name">수</div>
           <div class="events">
             <div class="event milestone">카탈로그 발주 마감</div>
+            <div class="event start">검색 광고 시작</div>
           </div>
         </div>
         <div class="week-day">
@@ -1961,10 +1926,12 @@
       <span><span class="sw" style="background:var(--web-soft);border-left:2px solid var(--web);"></span>웹사이트</span>
       <span><span class="sw" style="background:var(--cat-soft);border-left:2px solid var(--cat);"></span>카탈로그</span>
       <span><span class="sw" style="background:var(--meet-soft);border-left:2px solid var(--meet);"></span>회의</span>
+      <span><span class="sw" style="background:#fffdf0;border-left:2px solid var(--accent);"></span>일일 피드백</span>
       <span><span class="sw" style="background:var(--accent);"></span>시작</span>
       <span><span class="sw" style="background:var(--negative);"></span>마일스톤</span>
     </div>
   </section>
+
 
   <!-- ============ SECTION 15 : 마일스톤 요약표 ============ -->
   <section>
@@ -1979,7 +1946,7 @@
 
     <!-- 표 1: 6~7월 셋업 -->
     <h3 style="font-size:17px;font-weight:700;margin:24px 0 12px;letter-spacing:-0.3px;display:flex;align-items:center;gap:10px;">
-      <span style="background:var(--web);color:#fff;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">PHASE 1</span>
+      <span style="background:var(--web);color:#fff;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">PHASE 1</span>
       6월 ~ 7월 · 셋업 및 오픈
     </h3>
 
@@ -1996,32 +1963,25 @@
         </thead>
         <tbody>
           <tr>
-            <td class="week-col">W1</td>
-            <td class="date">6/16 (월)</td>
-            <td class="cat-c"><span class="lbl-c milestone">시작</span></td>
+            <td class="week-col">—</td>
+            <td class="date">6/19 (목)</td>
+            <td class="cat-c"><span class="lbl-c milestone">계약</span></td>
             <td class="track-c"><span class="lbl-c web">웹</span><span class="lbl-c cat">카탈로그</span></td>
-            <td class="label">계약 처리 + 선지급 입금 + 작업 착수</td>
+            <td class="label">계약 체결</td>
           </tr>
           <tr>
             <td class="week-col">W1</td>
-            <td class="date">6/19 (목)</td>
+            <td class="date">6/23 (월)</td>
+            <td class="cat-c"><span class="lbl-c milestone">착수</span></td>
+            <td class="track-c"><span class="lbl-c web">웹</span><span class="lbl-c cat">카탈로그</span></td>
+            <td class="label">착수 + 1차 선금 입금 + 작업 시작</td>
+          </tr>
+          <tr>
+            <td class="week-col">W1</td>
+            <td class="date">6/26 (금)</td>
             <td class="cat-c"><span class="lbl-c meet">회의</span></td>
             <td class="track-c"><span class="lbl-c web">웹</span></td>
-            <td class="label">정기 회의 — 시안 검토·방향 결정</td>
-          </tr>
-          <tr>
-            <td class="week-col">W2</td>
-            <td class="date">6/23 ~ 6/27</td>
-            <td class="cat-c"><span class="lbl-c meet">진행</span></td>
-            <td class="track-c"><span class="lbl-c web">웹</span></td>
-            <td class="label">일일 피드백 단계 (필요 시 당일 회의)</td>
-          </tr>
-          <tr class="highlight">
-            <td class="week-col">W2</td>
-            <td class="date">6/26 (금) ⚡</td>
-            <td class="cat-c"><span class="lbl-c milestone">마감</span></td>
-            <td class="track-c"><span class="lbl-c cat">카탈로그</span></td>
-            <td class="label">긴급 카탈로그 PDF 완성 (기존 블랙 + 신규 페이지)</td>
+            <td class="label">첫 회의 — 시안 검토 · 방향 결정</td>
           </tr>
           <tr>
             <td class="week-col">—</td>
@@ -2030,37 +1990,51 @@
             <td class="track-c"><span class="lbl-c sns">SNS</span></td>
             <td class="label">SNS 채널 셋팅 (네이버·페이스북·인스타)</td>
           </tr>
-          <tr class="highlight">
-            <td class="week-col">W3</td>
-            <td class="date">7/3 (목) ★</td>
-            <td class="cat-c"><span class="lbl-c milestone">★</span></td>
+          <tr>
+            <td class="week-col">W2 ~ W3</td>
+            <td class="date">6/30 ~ 7/10</td>
+            <td class="cat-c"><span class="lbl-c meet">진행</span></td>
             <td class="track-c"><span class="lbl-c web">웹</span></td>
-            <td class="label"><strong>웹 검수 마감 + 최종 결정 회의</strong> (7/20까지 유연 조정 가능)</td>
+            <td class="label">일일 피드백 단계 (필요 시 당일 회의)</td>
+          </tr>
+          <tr class="highlight">
+            <td class="week-col">W2</td>
+            <td class="date">7월 초 ⚡</td>
+            <td class="cat-c"><span class="lbl-c milestone">마감</span></td>
+            <td class="track-c"><span class="lbl-c cat">카탈로그</span></td>
+            <td class="label">긴급 카탈로그 PDF 완성 (기존 블랙 + 신규 페이지)</td>
           </tr>
           <tr>
-            <td class="week-col">W4</td>
-            <td class="date">7/10 (목)</td>
+            <td class="week-col">W3</td>
+            <td class="date">7/8 ~ 7/10</td>
             <td class="cat-c"><span class="lbl-c meet">회의</span></td>
             <td class="track-c"><span class="lbl-c cat">카탈로그</span></td>
             <td class="label">카탈로그 신규 시안 검토 회의</td>
           </tr>
           <tr class="highlight">
-            <td class="week-col">W5</td>
+            <td class="week-col">W4</td>
+            <td class="date">7/13 ~ 7/20 ★</td>
+            <td class="cat-c"><span class="lbl-c milestone">★</span></td>
+            <td class="track-c"><span class="lbl-c web">웹</span></td>
+            <td class="label"><strong>웹 검수 마감 + 최종 결정</strong> (유연 조정 가능)</td>
+          </tr>
+          <tr class="highlight">
+            <td class="week-col">W4</td>
             <td class="date">7/17 (목) ★</td>
             <td class="cat-c"><span class="lbl-c milestone">★</span></td>
             <td class="track-c"><span class="lbl-c cat">카탈로그</span></td>
             <td class="label"><strong>카탈로그 최종 확정</strong></td>
           </tr>
           <tr class="highlight">
-            <td class="week-col">W7</td>
-            <td class="date">7/28 (월)</td>
+            <td class="week-col">W6</td>
+            <td class="date">2026년 7월 이내</td>
             <td class="cat-c"><span class="lbl-c milestone">오픈</span></td>
             <td class="track-c"><span class="lbl-c web">웹</span></td>
             <td class="label">🎉 <strong>사이트 공식 오픈</strong> — 기술 SEO·검색 광고 운영 시작</td>
           </tr>
           <tr class="highlight">
-            <td class="week-col">W7</td>
-            <td class="date">7/30 이내</td>
+            <td class="week-col">W6</td>
+            <td class="date">2026년 7월 이내</td>
             <td class="cat-c"><span class="lbl-c milestone">마감</span></td>
             <td class="track-c"><span class="lbl-c cat">카탈로그</span></td>
             <td class="label"><strong>카탈로그 인쇄 발주 마감</strong> (배송 약 2주)</td>
@@ -2070,12 +2044,12 @@
     </div>
 
     <div class="callout">
-      <strong>Phase 1 요약</strong> — 사이트와 카탈로그 디자인을 7월 3일까지 완성하고, 7월 말에 사이트 공식 오픈 + 카탈로그 인쇄 발주까지 마무리합니다. 이후부터는 본격적인 운영 단계로 전환됩니다.
+      <strong>Phase 1 요약</strong> — 6월 23일 착수 후 일일 피드백 단계를 거쳐 7월 중순 검수 완료, 7월 이내 사이트 공식 오픈 + 카탈로그 인쇄 발주까지 마무리합니다. 이후부터는 본격적인 운영 단계로 전환됩니다.
     </div>
 
     <!-- 표 2: 8~12월 운영 -->
     <h3 style="font-size:17px;font-weight:700;margin:36px 0 12px;letter-spacing:-0.3px;display:flex;align-items:center;gap:10px;">
-      <span style="background:#0d9488;color:#fff;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">PHASE 2</span>
+      <span style="background:#0d9488;color:#fff;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">PHASE 2</span>
       8월 ~ 12월 · 운영 및 평가
     </h3>
 
@@ -2160,7 +2134,7 @@
 
     <!-- 표 3: 2027.1~6월 -->
     <h3 style="font-size:17px;font-weight:700;margin:36px 0 12px;letter-spacing:-0.3px;display:flex;align-items:center;gap:10px;">
-      <span style="background:#dc2626;color:#fff;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">PHASE 3</span>
+      <span style="background:#dc2626;color:#fff;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:1.5px;">PHASE 3</span>
       2027년 1월 ~ 6월 · 마무리 및 잔금 결제
     </h3>
 
@@ -2228,19 +2202,19 @@
       <div class="section-head-content">
         <div class="section-num">SECTION 16 · 안내 사항</div>
         <h2 class="section-title">클라이언트 안내 사항</h2>
-        <p class="section-desc">전체 일정에서 가장 중요한 분기점인 7월 3일 검수 마감에 대한 안내입니다. 미리 알고 계셔야 할 부분입니다.</p>
+        <p class="section-desc">전체 일정에서 가장 중요한 분기점인 검수 마감에 대한 안내입니다. 미리 알고 계셔야 할 부분입니다.</p>
       </div>
     </div>
 
     <div class="deadline-box">
       <span class="lbl">★ CRITICAL DEADLINE</span>
-      <h3>7월 3일까지의 검수가 <span class="y">전체 작업의 분기점</span>입니다.</h3>
-      <p>이 기간 동안 가능한 <strong>많은 콘텐츠·구성·텍스트·이미지를 펼쳐서 확정</strong>해주십시오. 이 시점 이후로는 같은 작업이라도 비용 처리가 달라집니다.</p>
-      <p style="border-top:1px solid #333;padding-top:14px;margin-top:14px;"><strong>핵심 원칙</strong> — 7/3까지 검수된 내용 중심의 <strong>변경·변용은 추가금 없이</strong> 진행됩니다. 그러나 <strong>구성 자체나 내용을 새로 만들어내는 변경은 추가금</strong>이 발생할 수 있습니다.</p>
-      <p style="border-top:1px solid #333;padding-top:14px;margin-top:14px;"><strong>유연한 대응</strong> — 6/30까지의 진행 상황을 봐서 <strong>7/3 마감을 7/20 이내까지 연장 가능</strong>합니다. 무리하지 않고 STORK 상황에 맞춰 조정합니다.</p>
+      <h3>검수 마감(7월 중순)이 <span class="y">전체 작업의 분기점</span>입니다.</h3>
+      <p style="margin-bottom:14px;">이 시점이 전체 작업의 핵심 분기점이며, <strong>STORK 측 상황에 따라 일정을 유연하게 조정</strong>할 수 있습니다.</p>
+      <p style="border-top:1px solid #333;padding-top:14px;margin-top:14px;"><strong>핵심 원칙</strong> — 검수 마감까지 확정된 내용 중심의 <strong>변경·변용은 추가금 없이</strong> 진행됩니다. 그러나 <strong>구성 자체나 내용을 새로 만들어내는 변경은 추가금</strong>이 발생할 수 있습니다.</p>
+      <p style="border-top:1px solid #333;padding-top:14px;margin-top:14px;"><strong>유연한 대응</strong> — 일일 피드백 단계의 진행 상황을 봐서 <strong>검수 마감을 7월 20일까지 조정 가능</strong>합니다. 무리하지 않고 STORK 상황에 맞춰 조정합니다.</p>
     </div>
 
-    <h3 style="font-size:17px;font-weight:700;margin:24px 0 14px;letter-spacing:-0.3px;">7월 3일 이후 — 어떤 변경이 무료이고 어떤 변경이 추가금인가</h3>
+    <h3 style="font-size:17px;font-weight:700;margin:24px 0 14px;letter-spacing:-0.3px;">검수 마감 이후 — 어떤 변경이 무료이고 어떤 변경이 추가금인가</h3>
 
     <div class="change-grid">
       <div class="change-card free">
