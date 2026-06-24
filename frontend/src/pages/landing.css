@@ -652,6 +652,8 @@
   .bento-author-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
   .bento-author-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   .bento-quote-logo { margin-left: auto; flex-shrink: 0; }
+  /* 로고 영역(플레이스홀더) 전부 숨김 — 실제 로고 준비 전까지 비표시 */
+  .bento-logo-slot, .bento-quote-logo { display: none !important; }
 
   /* Mobile — single column */
   @media (max-width: 900px) {

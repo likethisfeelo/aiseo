@@ -273,14 +273,14 @@ export function LandingPage({ authError }: Props) {
       })(start);
     }
     const counters = [
-      { id: 'c1', target: 5200, dur: 2000 },
-      { id: 'c2', target: 78, dur: 1600 },
-      { id: 'c3', target: 3, dur: 1200 },
+      { id: 'c1', target: 10, dur: 1400 },
+      { id: 'c2', target: 100, dur: 1800 },
+      { id: 'c3', target: 10, dur: 1400 },
       { id: 'c4', target: 10, dur: 1400 },
       { id: 'r1', target: 320, dur: 2000 },
       { id: 'r2', target: 3, dur: 1000 },
-      { id: 'r3', target: 12, dur: 1400 },
-      { id: 'r4', target: 850, dur: 2000 },
+      { id: 'r3', target: 10, dur: 1400 },
+      { id: 'r4', target: 100, dur: 1800 },
     ];
     const countObserver = new IntersectionObserver((entries) => {
       entries.forEach(e => {
@@ -750,30 +750,30 @@ export function LandingPage({ authError }: Props) {
         <div className="trusted-label">5,200+ 팀이 신뢰하는 AI SEO 플랫폼</div>
         <div className="marquee-wrap">
           <div className="marquee-track" id="marquee">
-            {['스타트업 스튜디오','크리에이터 에이전시','마케팅 솔루션','이커머스 그룹','디지털 미디어','브랜드 컨설팅','콘텐츠 팩토리','로컬 비즈니스'].map((name, i) => (
+            {['로컬비지니스','반려동물서비스','청소 및 특수청소','사진스튜디오','스냅사진작가','공방','원데이클래스','꽃집'].map((name, i) => (
               <div className="marquee-item" key={`m1-${i}`}><div className="logo-pill">{name}</div></div>
             ))}
-            {['스타트업 스튜디오','크리에이터 에이전시','마케팅 솔루션','이커머스 그룹','디지털 미디어','브랜드 컨설팅','콘텐츠 팩토리','로컬 비즈니스'].map((name, i) => (
+            {['로컬비지니스','반려동물서비스','청소 및 특수청소','사진스튜디오','스냅사진작가','공방','원데이클래스','꽃집'].map((name, i) => (
               <div className="marquee-item" key={`m2-${i}`}><div className="logo-pill">{name}</div></div>
             ))}
           </div>
         </div>
         <div className="stats-row">
           <div className="stat-item reveal">
-            <div className="stat-num"><span id="c1">0</span><span>+</span></div>
-            <div className="stat-label">누적 가입자</div>
+            <div className="stat-num"><span id="c1">0</span><span>년+</span></div>
+            <div className="stat-label">SEO 업력</div>
           </div>
           <div className="stat-item reveal">
             <div className="stat-num"><span id="c2">0</span><span>%</span></div>
-            <div className="stat-label">SEO 상위 노출률</div>
+            <div className="stat-label">SEO 상위 노출</div>
           </div>
           <div className="stat-item reveal">
             <div className="stat-num"><span id="c3">0</span><span>x</span></div>
             <div className="stat-label">평균 트래픽 증가</div>
           </div>
           <div className="stat-item reveal">
-            <div className="stat-num"><span id="c4">0</span><span>시간</span></div>
-            <div className="stat-label">주당 절약 시간</div>
+            <div className="stat-num"><span id="c4">0</span><span>만원</span></div>
+            <div className="stat-label">월간 절약 비용</div>
           </div>
         </div>
       </div>
@@ -800,9 +800,9 @@ export function LandingPage({ authError }: Props) {
                   <p>AI 홈페이지 제작 프롬프트 &amp; 템플릿을 제공합니다. 내 비즈니스에 맞는 사이트를 만드는 비법을 쉽고 빠르게 익히고 바로 적용하세요.</p>
                   <ul className="sf-feature-list">
                     <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>업종별 AI 프롬프트 템플릿 제공</span></li>
-                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>ChatGPT · Claude로 페이지 즉시 생성</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>ChatGPT · Claude로 페이지 즉시 생성 지원</span></li>
                     <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>모바일/PC 반응형 자동 적용</span></li>
-                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>비개발자도 1시간 안에 완성</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#F0EBFF',color:'#8B6FD4'}}>✓</div><span>누구나! 1시간 안에 완성</span></li>
                   </ul>
                 </div>
                 <div className="sf-card-img" style={{'--card-bg1':'#0B0414','--card-bg2':'#1A0F2E'} as React.CSSProperties}>
@@ -821,12 +821,12 @@ export function LandingPage({ authError }: Props) {
               <div className="sf-card-bd">
                 <div className="sf-card-text">
                   <h3>만든 사이트를<br/>바로 세상에 올리세요</h3>
-                  <p>12개월 무료 서브도메인과 1G 호스팅을 제공합니다. 파일 업로드 한 번으로 내 사이트가 실제 인터넷에 서비스됩니다. 매달 나가는 호스팅 비용 걱정 없이 시작하세요.</p>
+                  <p>12개월 무료 서브도메인과 호스팅을 제공합니다. 파일 업로드 한 번으로 내 사이트가 실제 인터넷에 서비스됩니다. 매달 나가는 호스팅 비용 걱정 없이 시작하세요!</p>
                   <ul className="sf-feature-list">
                     <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>12개월 무료 서브도메인 제공 (yourname.aiseo.tips)</span></li>
-                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>1G 웹호스팅 무료 제공</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>웹호스팅 무료 제공</span></li>
                     <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>파일 업로드 한 번으로 즉시 서비스</span></li>
-                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>SSL 보안 인증서 자동 적용</span></li>
+                    <li className="sf-feature-item"><div className="sf-check" style={{background:'#D1FAE5',color:'#059669'}}>✓</div><span>SSL 보안 인증서 무료 &amp; 자동 적용</span></li>
                   </ul>
                 </div>
                 <div className="sf-card-img" style={{'--card-bg1':'#021510','--card-bg2':'#062B22'} as React.CSSProperties}>
@@ -1029,14 +1029,14 @@ export function LandingPage({ authError }: Props) {
             </div>
             <div className="results-metric">
               <div className="results-metric-num"><span id="r4">0</span><span>+</span></div>
-              <div className="results-metric-label">성공 사례<br/>다양한 업종</div>
+              <div className="results-metric-label">검색 문의 증가</div>
             </div>
           </div>
           <div className="results-carousel reveal">
             <div className="testimonial-track" id="testimonialTrack">
               {[
-                { quote: '"AISEO 도입 한 달 만에 \'홍대 맛집\' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다."', avatar: '🍜', name: '강동현', role: '홍대 라멘집 운영', badge: '소상공인' },
-                { quote: '"SEO 에이전시에 매달 150만원 쓰던 걸 AISEO로 대체했어요. 오히려 성과는 더 좋아졌고 비용은 10분의 1로 줄었습니다. 팀 전체가 만족합니다."', avatar: '💻', name: '윤서진', role: 'SaaS 스타트업 마케팅 리드', badge: '스타트업' },
+                { quote: '"AISEO 도입 한 달 만에 \'반려동물 미용\' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다."', avatar: '🍜', name: '강동현', role: '평택 반려동물 미용샵 운영', badge: '소상공인' },
+                { quote: '"SEO 에이전시에 매달 150만원 쓰던 걸 AISEO로 대체했어요. 오히려 성과는 더 좋아졌고 비용은 10분의 1로 줄었습니다. 팀 전체가 만족합니다."', avatar: '💻', name: '윤서진', role: 'B2B 제조기업 마케팅 리드', badge: '스타트업' },
                 { quote: '"프리랜서로 일하면서 영업이 가장 힘들었는데, AISEO로 포트폴리오 사이트 최적화하고 나서 매달 안정적으로 클라이언트가 검색으로 들어와요."', avatar: '🎨', name: '이수아', role: '브랜딩 디자이너', badge: '프리랜서' },
                 { quote: '"콘텐츠 발행하면 AI가 자동으로 SEO 최적화해주니까 글 쓰는 데만 집중할 수 있어요. 구독자가 6개월 만에 5배 늘었습니다."', avatar: '✍️', name: '박지민', role: '테크 블로거', badge: '크리에이터' },
                 { quote: '"월 리포트 작성에 이틀씩 쓰던 게 이제 30분으로 줄었어요. AI가 데이터 분석하고 인사이트까지 뽑아주니 진짜 전략에만 집중할 수 있습니다."', avatar: '📈', name: '한지현', role: '이커머스 SEO 매니저', badge: '마케터' },
@@ -1092,12 +1092,12 @@ export function LandingPage({ authError }: Props) {
               </div>
             </div>
             <div className="bento-quote bento-span3">
-              <p className="bento-quote-text">AISEO 도입 한 달 만에 '홍대 맛집' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다.</p>
+              <p className="bento-quote-text">AISEO 도입 한 달 만에 '반려동물 미용' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다.</p>
               <div className="bento-author">
                 <div className="bento-avatar">🍜</div>
                 <div>
                   <div className="bento-author-name">강동현</div>
-                  <div className="bento-author-role">홍대 라멘집 운영</div>
+                  <div className="bento-author-role">평택 반려동물 미용샵 운영</div>
                 </div>
                 <div className="bento-quote-logo"><div className="bento-logo-placeholder">로고 영역</div></div>
               </div>
@@ -1108,7 +1108,7 @@ export function LandingPage({ authError }: Props) {
                 <div className="bento-avatar">💻</div>
                 <div>
                   <div className="bento-author-name">윤서진</div>
-                  <div className="bento-author-role">SaaS 스타트업 마케팅 리드</div>
+                  <div className="bento-author-role">B2B 제조기업 마케팅 리드</div>
                 </div>
                 <div className="bento-quote-logo"><div className="bento-logo-placeholder">로고 영역</div></div>
               </div>
@@ -1143,12 +1143,12 @@ export function LandingPage({ authError }: Props) {
             <div className="bento-flip bento-span2" data-href="#">
               <div className="bento-flip-inner">
                 <div className="bento-front" style={{background:'#DDD6FE'}}>
-                  <div className="bento-stat-num">5,200<span style={{fontSize:32}}>+</span></div>
-                  <div className="bento-stat-label">누적 가입자</div>
+                  <div className="bento-stat-num">1+1</div>
+                  <div className="bento-stat-label">추가디렉토리마케팅 제공</div>
                   <div className="bento-logo-slot"><div className="bento-logo-placeholder">로고 영역</div></div>
                 </div>
                 <div className="bento-back">
-                  <p className="bento-back-desc">다양한 업종의 5,200개 이상 팀이 AISEO로 SEO를 자동화하고 있습니다.</p>
+                  <p className="bento-back-desc">10개 이상 가입한 카테고리의 업종은 추가 디렉토리 사이트로 SEO관리를 지원해드립니다.</p>
                   <a href="#results" className="bento-back-link">사례 보기 →</a>
                 </div>
               </div>
