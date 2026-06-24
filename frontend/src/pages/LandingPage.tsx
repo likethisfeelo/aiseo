@@ -157,6 +157,9 @@ export function LandingPage({ authError }: Props) {
     });
 
     // ── Scroll features stacked accordion ──
+    // 모바일(≤600px)에서는 스크롤 고정(scroll-jacking)을 쓰지 않고
+    // CSS로 모든 카드를 펼친 정적 리스트로 보여준다 → 아래 setup 전체를 건너뜀.
+    const sfMobile = window.matchMedia('(max-width: 600px)').matches;
     const sfSection = document.getElementById('scrollFeatures');
     const sfStack = document.getElementById('sfStack');
     const sfCards = sfStack ? Array.from(sfStack.querySelectorAll('.sf-card')) : [];
@@ -208,22 +211,24 @@ export function LandingPage({ authError }: Props) {
         sfSetActive(idx);
       });
     };
-    window.addEventListener('scroll', sfScrollHandler, { passive: true } as EventListenerOptions);
-    window.addEventListener('resize', () => {
-      if (sfCurrent >= 0) {
-        sfCurrent = -1;
-        sfSetActive(Math.min(Math.floor(sfProgress() * SF_TOTAL), SF_TOTAL - 1));
-      }
-    }, { passive: true } as EventListenerOptions);
-    sfCards.forEach((card, i) => {
-      card.querySelector('.sf-card-hd')?.addEventListener('click', () => {
-        if (!sfSection) return;
-        const scrollable = sfSection.offsetHeight - window.innerHeight;
-        const target = sfSection.offsetTop + (i / SF_TOTAL) * scrollable + 4;
-        window.scrollTo({ top: target, behavior: 'smooth' });
+    if (!sfMobile) {
+      window.addEventListener('scroll', sfScrollHandler, { passive: true } as EventListenerOptions);
+      window.addEventListener('resize', () => {
+        if (sfCurrent >= 0) {
+          sfCurrent = -1;
+          sfSetActive(Math.min(Math.floor(sfProgress() * SF_TOTAL), SF_TOTAL - 1));
+        }
+      }, { passive: true } as EventListenerOptions);
+      sfCards.forEach((card, i) => {
+        card.querySelector('.sf-card-hd')?.addEventListener('click', () => {
+          if (!sfSection) return;
+          const scrollable = sfSection.offsetHeight - window.innerHeight;
+          const target = sfSection.offsetTop + (i / SF_TOTAL) * scrollable + 4;
+          window.scrollTo({ top: target, behavior: 'smooth' });
+        });
       });
-    });
-    requestAnimationFrame(() => requestAnimationFrame(() => sfSetActive(0)));
+      requestAnimationFrame(() => requestAnimationFrame(() => sfSetActive(0)));
+    }
 
     // ── Testimonial carousel ──
     const tTrack = document.getElementById('testimonialTrack');
