@@ -652,6 +652,8 @@
   .bento-author-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
   .bento-author-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   .bento-quote-logo { margin-left: auto; flex-shrink: 0; }
+  /* 로고 영역(플레이스홀더) 전부 숨김 — 실제 로고 준비 전까지 비표시 */
+  .bento-logo-slot, .bento-quote-logo { display: none !important; }
 
   /* Mobile — single column */
   @media (max-width: 900px) {
@@ -1601,9 +1603,28 @@
     }
     .mp-dot.active { background: var(--accent); transform: scale(1.3); }
 
-    /* ─ 섹션 폭 통일 ─ */
-    .sf-sticky { padding: 40px 20px 24px !important; }
-    .sf-card-text { padding: 20px 20px 20px 16px !important; }
+    /* ─ 스크롤 기능 섹션: 모바일은 스크롤 고정(scroll-jacking) 제거 →
+       네이티브 스크롤로 4개 카드를 모두 펼친 정적 리스트로 표시 ─ */
+    .sf-section { height: auto !important; }
+    .sf-sticky {
+      position: static !important;
+      height: auto !important;
+      overflow: visible !important;
+      padding: 40px 20px 24px !important;
+    }
+    .sf-stack { flex: none !important; min-height: 0; }
+    .sf-card { height: auto !important; }
+    .sf-card + .sf-card { margin-top: 12px; }
+    .sf-card-hd { height: auto; min-height: 56px; padding: 16px 18px; cursor: default; }
+    .sf-card .sf-label { color: var(--text-primary); font-weight: 700; }
+    .sf-hd-sub, .sf-card-hd::after { display: none !important; }
+    .sf-card-bd {
+      grid-template-columns: 1fr !important;
+      height: auto !important;
+      opacity: 1 !important;
+    }
+    .sf-card-text { padding: 4px 18px 22px !important; border-right: none !important; }
+    .sf-card-text h3 { font-size: 22px; }
     .sf-card-img { display: none; }
     .aio-layout { grid-template-columns: 1fr !important; }
     .bento-grid { grid-template-columns: 1fr !important; grid-auto-rows: auto !important; gap: 12px; }
