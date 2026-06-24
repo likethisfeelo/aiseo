@@ -1035,7 +1035,7 @@ export function LandingPage({ authError }: Props) {
           <div className="results-carousel reveal">
             <div className="testimonial-track" id="testimonialTrack">
               {[
-                { quote: '"AISEO 도입 한 달 만에 \'반려동물 미용\' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다."', avatar: '🍜', name: '강동현', role: '평택 반려동물 미용샵 운영', badge: '소상공인' },
+                { quote: '"AISEO 도입 한 달 만에 \'반려동물 미용\' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다."', avatar: '🐾', name: '강동현', role: '평택 반려동물 미용샵 운영', badge: '소상공인' },
                 { quote: '"SEO 에이전시에 매달 150만원 쓰던 걸 AISEO로 대체했어요. 오히려 성과는 더 좋아졌고 비용은 10분의 1로 줄었습니다. 팀 전체가 만족합니다."', avatar: '💻', name: '윤서진', role: 'B2B 제조기업 마케팅 리드', badge: '스타트업' },
                 { quote: '"프리랜서로 일하면서 영업이 가장 힘들었는데, AISEO로 포트폴리오 사이트 최적화하고 나서 매달 안정적으로 클라이언트가 검색으로 들어와요."', avatar: '🎨', name: '이수아', role: '브랜딩 디자이너', badge: '프리랜서' },
                 { quote: '"콘텐츠 발행하면 AI가 자동으로 SEO 최적화해주니까 글 쓰는 데만 집중할 수 있어요. 구독자가 6개월 만에 5배 늘었습니다."', avatar: '✍️', name: '박지민', role: '테크 블로거', badge: '크리에이터' },
@@ -1094,7 +1094,7 @@ export function LandingPage({ authError }: Props) {
             <div className="bento-quote bento-span3">
               <p className="bento-quote-text">AISEO 도입 한 달 만에 '반려동물 미용' 키워드로 네이버 3위에 올랐어요. 전에는 SEO가 뭔지도 몰랐는데 이제 매달 새 고객이 검색으로 들어옵니다.</p>
               <div className="bento-author">
-                <div className="bento-avatar">🍜</div>
+                <div className="bento-avatar">🐾</div>
                 <div>
                   <div className="bento-author-name">강동현</div>
                   <div className="bento-author-role">평택 반려동물 미용샵 운영</div>
