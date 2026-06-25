@@ -1317,6 +1317,7 @@
   .hero-mobile-cta { display: none; }
   .hero-mobile-hero { display: none; }
   .copilot-mobile-mockup { display: none; }
+  .copilot-mobile-head { display: none; }
   /* ── 햄버거 메뉴 (데스크탑: hidden) ── */
   .nav-hamburger { display: none; }
   .nav-mobile-menu { display: none; }
@@ -1480,6 +1481,11 @@
       -webkit-text-fill-color: transparent; color: transparent;
       filter: drop-shadow(0 0 22px rgba(196,181,253,0.35));
     }
+    /* 일반(비강조) 단어는 순수 흰색 + 옅은 그림자로 어두운 배경 대비 확보 */
+    .hmh-h1 .hmh-stroke {
+      color: #fff;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.45);
+    }
     .hmh-cta {
       align-self: flex-end;
       display: inline-flex; align-items: center; gap: 12px;
@@ -1524,8 +1530,12 @@
 
     /* ─ Copilot 섹션: 이미지 먼저, 텍스트 나중 ─ */
     .copilot-intro-inner { display: flex; flex-direction: column; gap: 32px; }
+    .copilot-mobile-head { display: block; order: -2; text-align: center; }
     .copilot-visual { order: -1; }           /* 이미지/플로팅 먼저 */
     .copilot-intro-text { order: 1; text-align: center; }
+    /* 모바일선 mobile-head가 헤드라인을 대체 → 데스크탑 eyebrow/h2 숨겨 중복 방지 */
+    .copilot-intro-text .section-eyebrow,
+    .copilot-intro-text .section-h2 { display: none; }
     .copilot-intro-text .section-sub { max-width: 100%; }
     .copilot-mockup-wrap { padding: 20px 0 0; }
     .copilot-fc { display: none; }
