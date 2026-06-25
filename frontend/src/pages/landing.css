@@ -1481,12 +1481,10 @@
       -webkit-text-fill-color: transparent; color: transparent;
       filter: drop-shadow(0 0 22px rgba(196,181,253,0.35));
     }
-    /* 일반(비강조) 단어는 흰색 + 옅은 외곽선/그림자로 어두운 배경 대비 확보 */
+    /* 일반(비강조) 단어는 순수 흰색 + 옅은 그림자로 어두운 배경 대비 확보 */
     .hmh-h1 .hmh-stroke {
       color: #fff;
-      -webkit-text-stroke: 1.2px rgba(0,0,0,0.55);
-      paint-order: stroke fill;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+      text-shadow: 0 1px 6px rgba(0,0,0,0.45);
     }
     .hmh-cta {
       align-self: flex-end;
