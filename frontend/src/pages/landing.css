@@ -1315,6 +1315,7 @@
   .mobile-persona { display: none; }
   .footer-mobile { display: none; }
   .hero-mobile-cta { display: none; }
+  .hero-mobile-hero { display: none; }
   .copilot-mobile-mockup { display: none; }
   /* ── 햄버거 메뉴 (데스크탑: hidden) ── */
   .nav-hamburger { display: none; }
@@ -1442,6 +1443,74 @@
       box-shadow: 0 4px 20px rgba(196,168,245,0.4);
       letter-spacing: -0.2px;
     }
+
+    /* ─ 모바일 전용 히어로 레이아웃 (랜딩 한정, 배경은 기존 그대로) ─ */
+    .landing-hero { max-height: none; }
+    .landing-hero .hero-content { display: none; }
+    .landing-hero .hero-mobile-hero {
+      display: flex; flex: 1; flex-direction: column; justify-content: center;
+      width: 100%; max-width: 760px; margin: 0 auto; padding: 24px 0 48px;
+      position: relative; z-index: 1;
+    }
+    .hmh-eyebrow {
+      align-self: flex-start; text-align: left;
+      font-family: var(--font-ko);
+      font-size: clamp(1.3rem, 5.6vw, 2.1rem); font-weight: 700;
+      line-height: 1.32; color: #E9E5F4;
+      word-break: keep-all; margin-bottom: 28px;
+    }
+    .hmh-brand { font-weight: 800; color: #fff; }
+    .hmh-sub {
+      align-self: flex-end; text-align: right;
+      width: 100%; max-width: 34ch;
+      font-family: var(--font-ko);
+      font-size: clamp(1rem, 4.3vw, 1.22rem); line-height: 1.7; font-weight: 400;
+      color: #B7B0CC; word-break: keep-all; margin-bottom: 32px;
+    }
+    .hmh-h1 {
+      align-self: flex-start; text-align: left;
+      font-family: var(--font-ko); font-weight: 900;
+      font-size: clamp(1.3rem, 5.6vw, 2.1rem);
+      line-height: 1.2; letter-spacing: -0.02em;
+      word-break: keep-all; margin-bottom: 32px;
+    }
+    .hmh-accent {
+      background: linear-gradient(100deg, #C4B5FD 0%, #F0ABFC 48%, #93C5FD 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      filter: drop-shadow(0 0 22px rgba(196,181,253,0.35));
+    }
+    .hmh-cta {
+      align-self: flex-end;
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 20px 34px; border: none; border-radius: 20px;
+      font-family: inherit; font-size: 1.12rem; font-weight: 800; letter-spacing: -0.01em;
+      color: #1A0B2E; cursor: pointer;
+      background: linear-gradient(135deg, #D6C6FF 0%, #A78BFA 58%, #8B7BE8 100%);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.18) inset,
+        0 18px 50px -12px rgba(139,123,232,0.65),
+        0 0 80px -20px rgba(167,139,250,0.6);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .hmh-cta .arrow { transition: transform 0.18s ease; }
+    .hmh-cta:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.28) inset,
+        0 24px 60px -12px rgba(139,123,232,0.8),
+        0 0 110px -16px rgba(167,139,250,0.75);
+    }
+    .hmh-cta:hover .arrow { transform: translateX(5px); }
+    .hmh-cta:active { transform: translateY(-1px); }
+    .hmh-reveal {
+      opacity: 0; transform: translateY(22px);
+      animation: fadeUp 0.9s cubic-bezier(0.2,0.7,0.2,1) forwards;
+    }
+    .hmh-d1 { animation-delay: 0.05s; }
+    .hmh-d2 { animation-delay: 0.18s; }
+    .hmh-d3 { animation-delay: 0.34s; }
+    .hmh-d4 { animation-delay: 0.5s; }
 
     /* ─ 영상 섹션 완전 숨김 ─ */
     .video-reveal-section { display: none !important; }
@@ -1672,6 +1741,12 @@
     .marquee-wrap::before, .marquee-wrap::after { width: 40px; }
     .hero-cta-row { flex-direction: column; align-items: center; }
     .btn-primary-lg, .btn-outline-lg { width: 100%; max-width: 320px; text-align: center; justify-content: center; }
+  }
+
+  /* 모바일 히어로 등장 모션 — 모션 최소화 설정 시 즉시 표시 */
+  @media (prefers-reduced-motion: reduce) {
+    .hmh-reveal { animation: none; opacity: 1; transform: none; }
+    .hmh-cta, .hmh-cta .arrow { transition: none; }
   }
 
   /* === Footer SNS link === */

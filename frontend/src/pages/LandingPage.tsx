@@ -552,7 +552,7 @@ export function LandingPage({ authError }: Props) {
       </div>
 
       {/* HERO */}
-      <section className="hero" id="hero">
+      <section className="hero landing-hero" id="hero">
         <div className="hero-bg"></div>
         <div className="hero-noise"></div>
         <div className="hero-grid"></div>
@@ -577,6 +577,30 @@ export function LandingPage({ authError }: Props) {
           <div className="hero-mobile-cta">
             <a href="/?auth=signup" className="hero-mobile-btn-primary">수강신청하기 →</a>
           </div>
+        </div>
+
+        {/* HERO — 모바일 전용 레이아웃 (≤600px에서만 표시) */}
+        <div className="hero-mobile-hero">
+          {authError && (
+            <div className="hmh-reveal hmh-d1" style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 12, marginBottom: 16, color: '#dc2626' }}>
+              {authError}
+            </div>
+          )}
+          <div className="hmh-eyebrow hmh-reveal hmh-d1">
+            <span className="hmh-accent">AI</span>시대에 맞는<br/>
+            <span className="hmh-accent">소상공인</span>들을 위한 <span className="hmh-brand">AISEO.TIPS</span>
+          </div>
+          <p className="hmh-sub hmh-reveal hmh-d2">
+            AI로 원하는 사이트를 만들고, 10년 전문가의 핵심 SEO 노하우로 검색엔진에서 쉽게 찾아지도록 만들어드립니다.
+          </p>
+          <h1 className="hmh-h1 hmh-reveal hmh-d3">
+            <span className="hmh-accent">AI</span>로 만들고<br/>
+            <span className="hmh-accent">검색</span>에 올리는<br/>
+            <span className="hmh-accent">SEO 홈페이지</span>
+          </h1>
+          <button type="button" className="hmh-cta hmh-reveal hmh-d4" onClick={() => setConsultOpen(true)}>
+            1시간만에 완성하기 <span className="arrow">→</span>
+          </button>
         </div>
       </section>
 
