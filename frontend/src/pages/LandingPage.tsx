@@ -594,8 +594,8 @@ export function LandingPage({ authError }: Props) {
             AI로 원하는 사이트를 만들고, 10년 전문가의 핵심 SEO 노하우로 검색엔진에서 쉽게 찾아지도록 만들어드립니다.
           </p>
           <h1 className="hmh-h1 hmh-reveal hmh-d3">
-            <span className="hmh-accent">AI</span>로 만들고<br/>
-            <span className="hmh-accent">검색</span>에 올리는<br/>
+            <span className="hmh-accent">AI</span><span className="hmh-stroke">로 만들고</span><br/>
+            <span className="hmh-accent">검색</span><span className="hmh-stroke">에 올리는</span><br/>
             <span className="hmh-accent">SEO 홈페이지</span>
           </h1>
           <button type="button" className="hmh-cta hmh-reveal hmh-d4" onClick={() => setConsultOpen(true)}>
@@ -660,6 +660,11 @@ export function LandingPage({ authError }: Props) {
       {/* AI COPILOT INTRO */}
       <section className="copilot-intro" id="copilot-intro">
         <div className="copilot-intro-inner">
+          {/* 모바일 전용 헤드 (데스크탑 숨김) — 순서: 라벨 → 헤드라인 → 그림 → 세부설명 */}
+          <div className="copilot-mobile-head">
+            <div className="section-eyebrow">AISEO.TIPS</div>
+            <h2 className="section-h2">딱 1시간, 완벽한 사이트로<br/>검색 마케팅이 시작됩니다.</h2>
+          </div>
           <div className="copilot-intro-text reveal">
             <div className="section-eyebrow">AI SEO TIPS</div>
             <h2 className="section-h2">1시간이면 완벽한 사이트로<br/>온라인 마케팅을 시작할 수 있습니다</h2>
