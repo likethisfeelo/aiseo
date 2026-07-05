@@ -89,6 +89,11 @@ export class CdkStack extends Stack {
       code: lambda.Code.fromAsset(functionsRoot),
       handler: 'validate-site/handler.handler',
       timeout: Duration.seconds(30),
+      // 128MB(기본값)에서는 프리미엄 ZIP(최대 500MB)을 통째로 메모리에
+      // 버퍼링(streamToBuffer→AdmZip)하다 OOM/초저속으로 29초 게이트웨이
+      // 타임아웃(504)을 넘긴다. 대형 ZIP 버퍼를 담고 CPU/네트워크 대역폭을
+      // 확보하도록 메모리를 크게 잡는다.
+      memorySize: 2048,
       environment: {
         REPORTS_TABLE: reportsTableName,
         UPLOAD_BUCKET: uploadBucketName,
@@ -101,6 +106,9 @@ export class CdkStack extends Stack {
       code: lambda.Code.fromAsset(functionsRoot),
       handler: 'deploy-site/handler.handler',
       timeout: Duration.seconds(60),
+      // 대형 ZIP 버퍼 + 각 파일 압축해제 + 병렬 S3 업로드를 위해 넉넉히.
+      // 128MB에서는 CPU/네트워크가 스로틀돼 파일 많은 사이트가 29초 초과 → 504.
+      memorySize: 3008,
       environment: {
         UPLOAD_BUCKET: uploadBucketName,
         SITES_TABLE: this.node.tryGetContext('sitesTableName') ?? process.env.SITES_TABLE ?? 'aiseo-sites',
