@@ -243,36 +243,52 @@ const uploadZipEntries = async ({ uploadBucket, objectKey, targetBucket, siteId,
   let hasIndexHtml = false;
   let hasAssetsDir = false;
 
+  // Build the list of files to deploy (resolve deploy path, inject head
+  // snippets into HTML) before uploading.
+  const jobs = [];
   for (const { entry, relativePath } of cleaned) {
     const deployPath = commonPrefix && relativePath.startsWith(commonPrefix)
       ? relativePath.substring(commonPrefix.length)
       : relativePath;
     if (!deployPath) continue;
 
-    const targetKey = `${siteId}/${deployPath}`;
     let body = entry.getData();
-
     if (headInjection && deployPath.toLowerCase().endsWith('.html')) {
       const html = body.toString('utf-8');
       const injected = injectHeadSnippets(html, headInjection);
       body = Buffer.from(injected, 'utf-8');
     }
 
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: targetBucket,
-        Key: targetKey,
-        Body: body,
-        ContentType: detectContentType(deployPath),
-      }),
-    );
-
     if (deployPath === 'index.html') hasIndexHtml = true;
     if (deployPath.startsWith('assets/')) hasAssetsDir = true;
 
-    uploadedKeys.push(targetKey);
-    uploadedBytes += body.length || 0;
+    jobs.push({ targetKey: `${siteId}/${deployPath}`, body, deployPath });
   }
+
+  // Upload with bounded concurrency. Serial `await` per file made large
+  // (premium) sites blow past the 29s API Gateway timeout → 504. A worker
+  // pool of PUTs keeps memory bounded while cutting wall-clock time.
+  const CONCURRENCY = 24;
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < jobs.length) {
+      const job = jobs[cursor];
+      cursor += 1;
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: targetBucket,
+          Key: job.targetKey,
+          Body: job.body,
+          ContentType: detectContentType(job.deployPath),
+        }),
+      );
+      uploadedKeys.push(job.targetKey);
+      uploadedBytes += job.body.length || 0;
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, () => worker()),
+  );
 
   return { uploadedKeys, uploadedBytes, skippedJunk, commonPrefix, hasIndexHtml, hasAssetsDir };
 };
