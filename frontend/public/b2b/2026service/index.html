@@ -214,8 +214,9 @@
   .promise .yes .b { color: var(--accent); font-weight: 700; }
 
   /* ── 이런 회사라면 ── */
-  .fits { border-top: 2px solid var(--text-primary); }
-  .fit { padding: 26px 4px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: baseline; }
+  .fits { display: flex; flex-direction: column; gap: 16px; }
+  .fit { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 28px 32px; display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: center; transition: border-color .25s, box-shadow .25s; }
+  .fit:hover { border-color: rgba(196,168,245,0.55); box-shadow: var(--shadow-md); }
   .fit .ft-t { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.45; }
   .fit .fd { font-size: 16px; color: var(--text-secondary); line-height: 1.8; }
   .method-note { margin-top: 44px; }
@@ -373,7 +374,7 @@
     .etype.open .tiers { display: flex; margin-top: 18px; }
     .embed { min-height: 150px; padding: 20px 16px; }
     .promise, .consult { padding: 76px 24px; }
-    .fit { grid-template-columns: 1fr; gap: 8px; }
+    .fit { grid-template-columns: 1fr; gap: 8px; padding: 22px 20px; }
     .common-box ul { grid-template-columns: 1fr; }
     .tiers { flex-direction: column; gap: 18px; }
     .tier.out { margin: 0; }
