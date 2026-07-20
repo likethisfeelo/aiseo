@@ -157,6 +157,9 @@ function handler(event) {
     var apexUri = request.uri;
     if (apexUri === '/library' || apexUri === '/library/') {
       request.uri = '/library/index.html';
+    } else if (apexUri === '/reservation' || apexUri === '/reservation/') {
+      // 1:1 상담 예약 정적 페이지 (frontend/public/reservation/)
+      request.uri = '/reservation/index.html';
     } else if (apexUri.match(/^\/library\/[a-z0-9-]+\/[a-z0-9-]+\/?$/)) {
       // /library/{cover}/{post} 또는 /library/{cover}/{post}/ →
       // 단일 reader 템플릿. JS 가 URL pathname 에서 두 slug 를 읽고

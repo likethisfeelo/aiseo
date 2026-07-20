@@ -12,7 +12,7 @@ const VALID_MARKETING_STATUS = ['none', 'partial', 'outsourced', 'inhouse'];
 
 // Landing pages that reuse this endpoint. An unknown source is dropped so
 // the notification falls back to the default B2B 도입문의 format.
-const VALID_SOURCE = ['2026service'];
+const VALID_SOURCE = ['2026service', 'reservation'];
 
 // Package-type options on b2b.aiseo.tips/2026service (kept in sync with
 // that page's 관심 유형 select).
@@ -41,9 +41,14 @@ const sendSlackNotification = async (data) => {
     undecided: '미정 · 상담 후 결정',
   };
 
-  // 2026service 접수는 같은 웹훅을 쓰되 헤더·필드로 구분한다.
+  // 접수 경로(source)별로 같은 웹훅을 쓰되 헤더·필드로 구분한다.
   const isMarketingPkg = data.source === '2026service';
-  const headerText = isMarketingPkg ? '📋 2026 용인시 맞춤형 창업지원사업 접수' : '새 B2B 도입문의';
+  const isReservation = data.source === 'reservation';
+  const headerText = isMarketingPkg
+    ? '📋 2026 용인시 맞춤형 창업지원사업 접수'
+    : isReservation
+      ? '📞 1:1 상담 예약'
+      : '새 B2B 도입문의';
 
   const fields = [
     { type: 'mrkdwn', text: `*회사명:* ${data.company}` },
@@ -54,6 +59,10 @@ const sendSlackNotification = async (data) => {
     fields.push(
       { type: 'mrkdwn', text: `*관심 유형:* ${packageTypeLabels[data.packageType] || '-'}` },
       { type: 'mrkdwn', text: `*접수 경로:* b2b.aiseo.tips/2026service` },
+    );
+  } else if (isReservation) {
+    fields.push(
+      { type: 'mrkdwn', text: `*접수 경로:* aiseo.tips/reservation` },
     );
   } else {
     fields.push(

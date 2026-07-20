@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1:1 상담 예약 | AISEO.TIPS</title>
+<meta name="description" content="AISEO.TIPS 1:1 상담 예약. 카카오톡 채팅 또는 상담 신청을 남겨주시면 1영업일 내 연락드립니다.">
+<link rel="canonical" href="https://aiseo.tips/reservation" />
+<meta name="robots" content="noindex" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="AISEO" />
+<meta property="og:title" content="1:1 상담 예약 | AISEO.TIPS" />
+<meta property="og:description" content="카카오톡 채팅 또는 상담 신청을 남겨주시면 1영업일 내 연락드립니다." />
+<meta property="og:url" content="https://aiseo.tips/reservation" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --accent: #C4A8F5;
+    --accent-mid: #9BB8F8;
+    --accent-dark: #8B6FD4;
+    --accent-deep: #6B4FB8;
+    --text-primary: #0A0614;
+    --font-ko: 'Noto Sans KR', sans-serif;
+    --font-en: 'Plus Jakarta Sans', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-ko); color: #fff; -webkit-font-smoothing: antialiased; word-break: keep-all;
+    min-height: 100vh; display: flex; flex-direction: column;
+    background: linear-gradient(180deg, #07040E 0%, #120B24 55%, #07040E 100%);
+  }
+  .stars {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 60% 20%, rgba(196,168,245,0.7), transparent),
+      radial-gradient(1.5px 1.5px at 40% 70%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 80% 50%, rgba(155,184,248,0.7), transparent),
+      radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1.5px 1.5px at 90% 80%, rgba(196,168,245,0.6), transparent);
+    animation: twinkle 8s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%,100%{opacity:.7;} 50%{opacity:1;} }
+  .glow { position: fixed; left: 50%; top: 40%; width: 760px; height: 760px; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(196,168,245,0.13) 0%, rgba(196,168,245,0.04) 40%, transparent 70%); z-index: 0; pointer-events: none; }
+
+  .top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 22px 32px; }
+  .logo { font-family: var(--font-en); font-weight: 800; font-size: 19px; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  .logo .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+  .back { font-size: 14.5px; font-weight: 600; color: rgba(255,255,255,.75); text-decoration: none; }
+  .back:hover { color: #fff; }
+
+  main { position: relative; z-index: 1; flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px 60px; }
+  .card { width: 100%; max-width: 520px; background: rgba(255,255,255,0.05); border: 1px solid rgba(196,168,245,0.28); border-radius: 24px; padding: 40px 38px 34px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .eyebrow { font-family: var(--font-en); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  h1 { font-size: clamp(28px, 5vw, 36px); font-weight: 700; letter-spacing: -1px; line-height: 1.25; margin-bottom: 12px; }
+  .lede { font-size: 15.5px; color: rgba(255,255,255,0.68); line-height: 1.75; margin-bottom: 26px; }
+  .lede b { color: #fff; font-weight: 700; }
+
+  .kakao-btn { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; background: #FEE500; color: #181600; font-size: 15.5px; font-weight: 700; text-decoration: none; border-radius: 12px; padding: 15px 20px; margin-bottom: 22px; transition: transform .15s, opacity .15s; }
+  .kakao-btn:hover { transform: translateY(-1px); opacity: .93; }
+
+  .or { display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,0.14); }
+
+  .f-label { display: block; font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,0.85); margin: 0 0 6px; }
+  .f-label .opt { font-weight: 400; color: rgba(255,255,255,0.45); font-size: 12.5px; }
+  .f-input, .f-textarea { width: 100%; padding: 13px 14px; border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; font-size: 15px; outline: none; font-family: inherit; color: #fff; background: rgba(255,255,255,0.06); transition: border-color .15s; margin-bottom: 14px; }
+  .f-input::placeholder, .f-textarea::placeholder { color: rgba(255,255,255,0.35); }
+  .f-input:focus, .f-textarea:focus { border-color: var(--accent); }
+  .f-textarea { resize: vertical; line-height: 1.6; }
+  .f-check { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; cursor: pointer; color: rgba(255,255,255,0.85); font-weight: 500; line-height: 1.5; margin: 4px 0 20px; }
+  .f-check input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-dark); margin-top: 1px; flex-shrink: 0; }
+  .f-submit { width: 100%; background: var(--accent-deep); color: #fff; border: none; border-radius: 12px; padding: 16px 28px; font-size: 15.5px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .2s, opacity .15s; box-shadow: 0 8px 24px rgba(107,79,184,0.4); }
+  .f-submit:hover { background: var(--accent-dark); }
+  .f-submit:disabled { opacity: .45; cursor: default; }
+  .f-error { display: none; margin-top: 12px; font-size: 13.5px; color: #FF8A80; line-height: 1.6; }
+  .f-error.show { display: block; }
+  .f-done { display: none; text-align: center; padding: 26px 0 12px; }
+  .f-done.show { display: block; }
+  .f-done .di { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-dark); color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .f-done .dt { font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+  .f-done .ds { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.65; }
+  .fine { margin-top: 18px; font-size: 13px; color: rgba(255,255,255,0.42); line-height: 1.7; }
+
+  .foot { position: relative; z-index: 1; text-align: center; padding: 0 24px 28px; font-size: 12.5px; color: rgba(255,255,255,0.38); line-height: 1.8; }
+  .foot a { color: rgba(255,255,255,0.55); text-decoration: none; }
+
+  @media (max-width: 560px) {
+    .top { padding: 18px 20px; }
+    .card { padding: 30px 22px 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="glow"></div>
+
+<div class="top">
+  <a class="logo" href="https://aiseo.tips/">AISEO.TIPS<span class="dot"></span></a>
+  <a class="back" href="https://aiseo.tips/">← 메인으로</a>
+</div>
+
+<main>
+  <div class="card">
+    <div class="eyebrow">Reservation</div>
+    <h1>1:1 상담 예약</h1>
+    <p class="lede">궁금한 점을 남겨주시면 <b>1영업일 내</b> 연락드립니다.<br>카카오톡 채팅으로 바로 문의하셔도 좋습니다.</p>
+
+    <a class="kakao-btn" href="https://pf.kakao.com/_NUhCX/chat" target="_blank" rel="noopener noreferrer">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.74 5.16 4.4 6.62l-1.06 3.92c-.1.36.27.65.59.46l4.62-2.78c.47.06.94.1 1.45.1 5.52 0 10-3.58 10-8 0-4.42-4.48-8-10-8z"/></svg>
+      카카오톡 1:1 채팅 바로가기
+    </a>
+
+    <div class="or">또는 상담 신청 남기기</div>
+
+    <form id="rsvForm" novalidate>
+      <label class="f-label" for="rf-company">회사명 / 상호 <span class="opt">(개인은 성함)</span></label>
+      <input class="f-input" id="rf-company" placeholder="예: (주)필로" autocomplete="organization" maxlength="100">
+      <label class="f-label" for="rf-name">성함</label>
+      <input class="f-input" id="rf-name" placeholder="예: 홍길동" autocomplete="name" maxlength="100">
+      <label class="f-label" for="rf-phone">연락처</label>
+      <input class="f-input" id="rf-phone" type="tel" placeholder="010-0000-0000" autocomplete="tel">
+      <label class="f-label" for="rf-memo">문의 내용 <span class="opt">(선택)</span></label>
+      <textarea class="f-textarea" id="rf-memo" rows="3" placeholder="궁금하신 내용을 자유롭게 적어주세요." maxlength="1000"></textarea>
+      <label class="f-check"><input type="checkbox" id="rf-consent"> 개인정보 수집·이용 및 상담 연락에 동의합니다.</label>
+      <button class="f-submit" type="submit" id="rf-submit" disabled>상담 예약 신청 →</button>
+      <div class="f-error" id="rf-error">신청 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</div>
+    </form>
+    <div class="f-done" id="rsvDone">
+      <div class="di">&#10003;</div>
+      <div class="dt">상담 예약이 접수되었습니다!</div>
+      <div class="ds" id="rsvDoneSub">등록하신 번호로 1영업일 내 연락드리겠습니다.</div>
+    </div>
+    <p class="fine">수집 항목: 회사명·성함·연락처·문의내용 / 수집 목적: 상담 및 안내. 상담 목적 외 연락은 하지 않습니다.</p>
+  </div>
+</main>
+
+<footer class="foot">
+  © 2026 AISEO.TIPS · K-RIDA · 사업자등록번호 231-88-03647 · <a href="mailto:contact@k-rida.co.kr">contact@k-rida.co.kr</a>
+</footer>
+
+<script>
+  // b2b-consultation 람다 재사용 (source 'reservation' 으로 Slack 알림 구분)
+  var RSV_API = 'https://api.aiseo.tips/b2b-consultation';
+  var rfCompany = document.getElementById('rf-company');
+  var rfName = document.getElementById('rf-name');
+  var rfPhone = document.getElementById('rf-phone');
+  var rfMemo = document.getElementById('rf-memo');
+  var rfConsent = document.getElementById('rf-consent');
+  var rfSubmit = document.getElementById('rf-submit');
+  var rfError = document.getElementById('rf-error');
+  var rsvForm = document.getElementById('rsvForm');
+  var rsvSubmitting = false;
+
+  function rfFmtPhone(v) {
+    var d = v.replace(/\D/g, '').slice(0, 11);
+    if (d.length > 7) return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+    if (d.length > 3) return d.slice(0, 3) + '-' + d.slice(3);
+    return d;
+  }
+  function rfCan() {
+    return rfCompany.value.trim().length > 0
+      && rfName.value.trim().length > 0
+      && rfPhone.value.replace(/\D/g, '').length >= 10
+      && rfConsent.checked
+      && !rsvSubmitting;
+  }
+  function rfSync() { rfSubmit.disabled = !rfCan(); }
+  rfCompany.addEventListener('input', rfSync);
+  rfName.addEventListener('input', rfSync);
+  rfPhone.addEventListener('input', function () { rfPhone.value = rfFmtPhone(rfPhone.value); rfSync(); });
+  rfConsent.addEventListener('change', rfSync);
+
+  rsvForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!rfCan()) return;
+    rsvSubmitting = true;
+    rfError.classList.remove('show');
+    rfSubmit.disabled = true;
+    rfSubmit.textContent = '접수 중...';
+    fetch(RSV_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company: rfCompany.value.trim(),
+        contactName: rfName.value.trim(),
+        phone: rfPhone.value,
+        industry: '',
+        marketingStatus: '',
+        memo: rfMemo.value.trim(),
+        consent: true,
+        source: 'reservation'
+      })
+    })
+      .then(function (r) { return r.json().then(function (p) { return { ok: r.ok, p: p }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.p || !res.p.success) throw new Error((res.p && res.p.error) || 'Submission failed');
+        rsvForm.style.display = 'none';
+        document.getElementById('rsvDoneSub').textContent =
+          rfName.value.trim() + '님, 등록하신 번호로 1영업일 내 연락드리겠습니다.';
+        document.getElementById('rsvDone').classList.add('show');
+      })
+      .catch(function () {
+        rsvSubmitting = false;
+        rfError.classList.add('show');
+        rfSubmit.textContent = '상담 예약 신청 →';
+        rfSync();
+      });
+  });
+</script>
+</body>
+</html>
