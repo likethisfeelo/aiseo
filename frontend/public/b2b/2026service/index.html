@@ -153,6 +153,7 @@
   .ledger-note p { margin-bottom: 14px; }
   .ledger-note p:last-child { margin-bottom: 0; }
   .ledger-note b { color: var(--text-primary); font-weight: 700; }
+  .more-btn { display: none; margin-top: 14px; background: var(--accent-light); color: var(--accent-deep); border: 1px solid rgba(196,168,245,0.35); border-radius: 100px; padding: 10px 22px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; }
 
   /* ── OSMU ── */
   .osmu { border-left: 3px solid var(--accent-dark); padding: 4px 0 4px 24px; margin: 0 0 34px; }
@@ -338,9 +339,21 @@
   @media (max-width: 900px) {
     .hero { padding: 190px 24px 80px; }
     section { padding: 80px 24px; }
-    .promise, .consult { padding: 90px 24px; }
-    .tcard { grid-template-columns: 1fr; gap: 20px; }
-    .tcard-vis { max-width: 340px; }
+    .tcard { grid-template-columns: 1fr; gap: 14px; padding: 20px 20px; }
+    .tcard-vis { max-width: 230px; }
+    .tcard .name { font-size: 21px; }
+    /* 긴 안내문: 첫 문단만 보이고 '내용 더보기'로 펼침 */
+    .ledger-note .ledger-more { display: none; }
+    .ledger-note.expanded .ledger-more { display: block; }
+    .more-btn { display: inline-block; }
+    /* 유형별 3단 비교: 아코디언 (탭해서 펼침) */
+    .etype .eh { cursor: pointer; position: relative; padding-right: 36px; margin-bottom: 0; }
+    .etype .eh::after { content: ""; position: absolute; right: 8px; top: 8px; width: 9px; height: 9px; border-right: 2px solid var(--accent-dark); border-bottom: 2px solid var(--accent-dark); transform: rotate(45deg); transition: transform .25s; }
+    .etype.open .eh::after { transform: rotate(225deg); top: 12px; }
+    .etype .tiers { display: none; }
+    .etype.open .tiers { display: flex; margin-top: 18px; }
+    .embed { min-height: 150px; padding: 20px 16px; }
+    .promise, .consult { padding: 76px 24px; }
     .fit { grid-template-columns: 1fr; gap: 8px; }
     .common-box ul { grid-template-columns: 1fr; }
     .tiers { flex-direction: column; gap: 18px; }
@@ -557,9 +570,12 @@
 
     <div class="ledger-note rv">
       <p><b>소수의 기업만 받는 이유는 분명합니다.</b> 단순히 결과물을 대신 만들어주는 것이 아니라, 사업장의 상황과 제공 서비스, 인력 구성, 실제 업무 흐름까지 살펴 각 회사에 맞는 방식을 처음부터 함께 설계하기 때문입니다.</p>
+      <div class="ledger-more">
       <p>제안서 작성과 콘텐츠 제작, 업무 정리 과정에도 AI를 적극적으로 활용합니다. 다만 정해진 자동화 플로우에 정보를 넣고 일괄적으로 결과물을 생산하지는 않습니다. 어떤 업무에 AI를 적용해야 효과적인지, 어떤 부분은 사람이 판단해야 하는지, 업종과 조직에 맞는 질문과 지시 방식은 무엇인지까지 전문가가 직접 조율합니다.</p>
       <p>따라서 작업이 진행되는 동안 단순히 결과물만 전달받는 것이 아니라, 우리 회사는 AI를 어디에 어떻게 활용해야 하는지, 실무자가 어떤 방식으로 AI와 협업해야 하는지를 정확히 노티하고 필요할 경우 프롬프트와 과정을 모두 공유해드립니다. 프로젝트가 끝난 뒤에도 내부에서 반복해 활용할 수 있는 AI 실무 방식과 기준이 남도록 진행하는 것도 가능합니다.</p>
       <p>같은 업종이라도 판매하는 서비스와 고객, 일하는 사람이 다르면 필요한 AI 활용 방식도 달라집니다. 그래서 정해진 솔루션을 찍어내지 않고, <b>유형별로 한 곳만</b> 진행합니다.</p>
+      </div>
+      <button class="more-btn" type="button" id="ledgerMoreBtn">내용 더보기</button>
     </div>
   </div>
 </section>
@@ -588,7 +604,7 @@
     </div>
 
     <div class="rv">
-      <div class="etype">
+      <div class="etype open">
         <div class="eh"><span class="en">유형 하나 · 카달로그</span><span class="es">28p 이내 · 100부</span></div>
         <div class="tiers">
           <div class="tier"><div class="tl">만드는 것</div><p>회사·제품을 담은 28페이지 카달로그와 인쇄본 100부.</p></div>
@@ -891,6 +907,19 @@
     });
   }, { threshold: 0.14 });
   document.querySelectorAll('.rv:not(.in)').forEach(function (el) { io.observe(el); });
+
+  // ── 모바일: 긴 안내문 더보기 + 유형별 아코디언 ──
+  var ledgerBtn = document.getElementById('ledgerMoreBtn');
+  if (ledgerBtn) {
+    ledgerBtn.addEventListener('click', function () {
+      var note = ledgerBtn.closest('.ledger-note');
+      var opened = note.classList.toggle('expanded');
+      ledgerBtn.textContent = opened ? '접기' : '내용 더보기';
+    });
+  }
+  document.querySelectorAll('.etype .eh').forEach(function (h) {
+    h.addEventListener('click', function () { h.parentElement.classList.toggle('open'); });
+  });
 
   // ── 지원사업 요약 카드: 모바일 자동 슬라이드 ──
   (function () {
