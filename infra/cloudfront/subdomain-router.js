@@ -84,6 +84,7 @@ function handler(event) {
         '/events2026/paid': '/site/events2026/paid/index.html',
         '/events2026/first': '/site/events2026/first/index.html',
         '/b2b': '/site/b2b/index.html',
+        '/b2b/2026service': '/site/b2b/2026service/index.html',
         '/blog': '/site/blog/index.html',
         // 클라이언트 검토 페이지(정적). 프로젝트별로 한 줄씩 추가.
         '/client/stork': '/site/client/stork/index.html',
@@ -122,6 +123,17 @@ function handler(event) {
     if (siteId === 'b2b') {
       if (uri.match(/\.\w+$/)) {
         request.uri = '/site' + uri;
+        return request;
+      }
+      // 마케팅지원사업 패키지 서브페이지 — /2026service 와
+      // /2026service/ 모두 정적 스냅샷으로. 신규 서브페이지가
+      // 생기면 같은 패턴으로 한 줄씩 추가.
+      var b2bRoute = uri;
+      if (b2bRoute.length > 1 && b2bRoute.charAt(b2bRoute.length - 1) === '/') {
+        b2bRoute = b2bRoute.substring(0, b2bRoute.length - 1);
+      }
+      if (b2bRoute === '/2026service') {
+        request.uri = '/site/b2b/2026service/index.html';
         return request;
       }
       request.uri = '/site/b2b/index.html';
