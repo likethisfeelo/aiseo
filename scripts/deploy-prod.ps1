@@ -72,6 +72,8 @@ aws s3 cp frontend/public/robots.txt "s3://$BUCKET/b2b/robots.txt" --content-typ
 aws s3 cp frontend/public/aiseo-main-sitemap.xml "s3://$BUCKET/sitemap.xml" --content-type "application/xml; charset=utf-8" --profile $PROFILE
 # apex stub /account.html — 로그인 후 진입할 회원 페이지 placeholder (P-7 까지). noindex.
 aws s3 cp frontend/public/account.html "s3://$BUCKET/account.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
+# /reservation — 1:1 상담 예약 정적 페이지 (apex). CF subdomain-router 가 /reservation 을 index.html 로 rewrite.
+aws s3 cp frontend/public/reservation/index.html "s3://$BUCKET/reservation/index.html" --content-type "text/html; charset=utf-8" --profile $PROFILE
 
 # /library/ — apex 라이브러리 페이지. CF subdomain-router 가 /library,
 # /library/ clean URL 을 /library/index.html 로 rewrite. reader-config.js 는

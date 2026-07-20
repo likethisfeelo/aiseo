@@ -78,6 +78,11 @@ aws s3 cp frontend/public/aiseo-main-sitemap.xml s3://$BUCKET/sitemap.xml \
 aws s3 cp frontend/public/account.html s3://$BUCKET/account.html \
   --content-type "text/html; charset=utf-8" --profile $PROFILE
 
+# /reservation — 1:1 상담 예약 정적 페이지 (apex). CF subdomain-router 가
+# /reservation 을 /reservation/index.html 로 rewrite.
+aws s3 cp frontend/public/reservation/index.html s3://$BUCKET/reservation/index.html \
+  --content-type "text/html; charset=utf-8" --profile $PROFILE
+
 # /library/ — apex 라이브러리 페이지. CF subdomain-router 가 /library,
 # /library/ clean URL 을 /library/index.html 로 rewrite. reader-config.js 는
 # 별도 sed + cp 로 처리하므로 sync 에서 exclude.
