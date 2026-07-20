@@ -43,7 +43,7 @@ const sendSlackNotification = async (data) => {
 
   // 2026service 접수는 같은 웹훅을 쓰되 헤더·필드로 구분한다.
   const isMarketingPkg = data.source === '2026service';
-  const headerText = isMarketingPkg ? '📋 새 마케팅지원사업패키지 상담신청' : '새 B2B 도입문의';
+  const headerText = isMarketingPkg ? '📋 2026 용인시 맞춤형 창업지원사업 접수' : '새 B2B 도입문의';
 
   const fields = [
     { type: 'mrkdwn', text: `*회사명:* ${data.company}` },
