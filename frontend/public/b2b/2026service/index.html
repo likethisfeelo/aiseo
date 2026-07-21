@@ -367,6 +367,7 @@
   .footer-legal a:hover { color: #fff; text-decoration: underline; }
 
   /* ── REVEAL ── */
+  [hidden] { display: none !important; }
   .rv { opacity: 0; transform: translateY(16px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
   .rv.in { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
@@ -730,8 +731,9 @@
       <li><span class="cy">2022</span><span class="cx">스마트서비스 지원사업 · AI 이미지 정보 프로젝트 책임 PM·컨설턴트</span></li>
     </ul>
 
-    <div class="sub-h rv">작업 이력 · 예시</div>
-    <div class="media-grid rv">
+    <!-- 작업 이력 · 예시: 실제 임베드 준비 전까지 임시 숨김 (PC·모바일 모두) -->
+    <div class="sub-h rv" hidden>작업 이력 · 예시</div>
+    <div class="media-grid rv" hidden>
       <div class="embed vid">
         <div class="ei"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 3 L4 13 L13 8 Z" fill="#8B6FD4"/></svg></div>
         <div class="el">영상 예시 · 임베드 영역</div>
