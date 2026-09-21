@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { adminGetEventSignups } from '../../api';
-import type { EventCode, EventHasSite } from '../../api';
+import type { EventCode, EventHasSite, PreferredSlot } from '../../api';
 
 interface EventSignup {
   signupId: string;
@@ -16,6 +16,8 @@ interface EventSignup {
   source?: string;
   status?: string;
   kakaoConsent?: boolean;
+  privacyConsent?: boolean;
+  preferredSlots?: PreferredSlot[];
 }
 
 const EVENT_LABELS: Record<EventCode, string> = {
@@ -23,7 +25,12 @@ const EVENT_LABELS: Record<EventCode, string> = {
   EVENT_02_PAID: 'EVENT 02 · 검색 전략',
   EVENT_03_PAID: 'EVENT 03 · 콘텐츠 기획',
   EVENT_04_PAID: 'EVENT 04 · 풀패키지',
+  EVENT_05_PET_PHOTO: 'EVENT 05 · 반려동물 사진작가',
 };
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const formatSlot = (slot: PreferredSlot) =>
+  `${slot.label} ${slot.date} ${pad2(slot.hour)}:00~${pad2(slot.hour + 1)}:00`;
 
 const HAS_SITE_LABEL: Record<string, string> = {
   yes: '있음',
@@ -86,6 +93,7 @@ export function EventSignupAdminPage() {
             <option value="EVENT_02_PAID">{EVENT_LABELS.EVENT_02_PAID}</option>
             <option value="EVENT_03_PAID">{EVENT_LABELS.EVENT_03_PAID}</option>
             <option value="EVENT_04_PAID">{EVENT_LABELS.EVENT_04_PAID}</option>
+            <option value="EVENT_05_PET_PHOTO">{EVENT_LABELS.EVENT_05_PET_PHOTO}</option>
           </select>
         </label>
         <label style={styles.filterLabel}>
@@ -125,6 +133,7 @@ export function EventSignupAdminPage() {
                 <th style={styles.th}>업종</th>
                 <th style={styles.th}>지역</th>
                 <th style={styles.th}>홈피</th>
+                <th style={styles.th}>희망 일정</th>
                 <th style={styles.th}>한 줄 고민</th>
                 <th style={styles.th}>출처</th>
                 <th style={styles.th}>상태</th>
@@ -141,6 +150,13 @@ export function EventSignupAdminPage() {
                   <td style={styles.td}>{item.industry || '-'}</td>
                   <td style={styles.td}>{item.region || '-'}</td>
                   <td style={styles.td}>{HAS_SITE_LABEL[item.hasSite || ''] ?? '-'}</td>
+                  <td style={styles.td}>
+                    {item.preferredSlots && item.preferredSlots.length > 0
+                      ? item.preferredSlots.map((slot, i) => (
+                          <div key={`${slot.session}-${i}`}>{formatSlot(slot)}</div>
+                        ))
+                      : '-'}
+                  </td>
                   <td style={{ ...styles.td, whiteSpace: 'normal', maxWidth: 280 }}>
                     {item.concern || '-'}
                   </td>

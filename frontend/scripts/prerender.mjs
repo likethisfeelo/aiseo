@@ -105,6 +105,13 @@ const ROUTES = [
     image: '/events/hero-pc.jpg',
     ssg: true,
   },
+  {
+    path: '/events2026/pet-photo',
+    title: '반려동물 사진작가 특별 이벤트 — 50만원 첫완성패키지를 10만원에 | AISEO',
+    description: '반려동물 사진작가·펫 스튜디오를 위한 AISEO 특별 이벤트. 검색 전략 + 콘텐츠 기획 + 즉시 배포 3회 교육, 정가 50만원 → 10만원. 회원가입 없이 희망 교육 시간을 등록하면 카카오톡으로 연락드립니다.',
+    image: '/events/hero-pc.jpg',
+    ssg: true,
+  },
   // NOTE: `/b2b` 는 더 이상 React 프리렌더로 생성하지 않는다. b2b.aiseo.tips 는
   // 별도 정적 랜딩(`frontend/public/b2b/index.html`)으로 서빙되며, Vite 가 이를
   // dist/b2b/index.html 로 복사 → deploy 가 /site/b2b/index.html 로 업로드한다.

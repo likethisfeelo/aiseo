@@ -520,6 +520,7 @@ export function LandingPage({ authError }: Props) {
                 <a href="/events2026/free" role="menuitem">무료이벤트</a>
                 <a href="/events2026/paid" role="menuitem">할인이벤트</a>
                 <a href="/events2026/first" role="menuitem">첫완성패키지</a>
+                <a href="/events2026/pet-photo" role="menuitem">반려동물 사진작가 이벤트</a>
               </div>
             </div>
             <a href="/blog">블로그</a>
@@ -543,6 +544,7 @@ export function LandingPage({ authError }: Props) {
           <a href="/events2026/free" className="nmm-link nmm-sublink">└ 무료이벤트</a>
           <a href="/events2026/paid" className="nmm-link nmm-sublink">└ 할인이벤트</a>
           <a href="/events2026/first" className="nmm-link nmm-sublink">└ 첫완성패키지</a>
+          <a href="/events2026/pet-photo" className="nmm-link nmm-sublink">└ 반려동물 사진작가 이벤트</a>
           <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">

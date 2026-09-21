@@ -216,8 +216,25 @@ export const submitCourseInquiry = async (input: {
 export const adminGetCourseInquiries = () => getJson('/admin/course-inquiries');
 
 // ── Event signup APIs (events 2026: free / paid) ──
-export type EventCode = 'EVENT_01_FREE' | 'EVENT_02_PAID' | 'EVENT_03_PAID' | 'EVENT_04_PAID';
+export type EventCode =
+  | 'EVENT_01_FREE'
+  | 'EVENT_02_PAID'
+  | 'EVENT_03_PAID'
+  | 'EVENT_04_PAID'
+  | 'EVENT_05_PET_PHOTO';
 export type EventHasSite = 'yes' | 'no' | 'wip';
+
+/**
+ * 희망 교육/상담 일정 한 칸. `hour` 는 시작 시각(0–23)이고 1시간
+ * 단위라 종료는 hour+1. ScheduleRequestWidget 이 회차별로 하나씩
+ * 만들어 `preferredSlots` 로 보낸다.
+ */
+export interface PreferredSlot {
+  session: number;
+  label: string;
+  date: string; // YYYY-MM-DD
+  hour: number;
+}
 
 export interface EventSignupPayload {
   eventCode: EventCode;
@@ -229,6 +246,9 @@ export interface EventSignupPayload {
   hasSite?: EventHasSite;
   concern?: string;
   kakaoConsent: boolean;
+  /** 개인정보 수집·이용 동의 (위젯 신청 시 필수 체크) */
+  privacyConsent?: boolean;
+  preferredSlots?: PreferredSlot[];
   source?: string;
 }
 
