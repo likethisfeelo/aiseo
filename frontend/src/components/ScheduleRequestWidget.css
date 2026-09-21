@@ -1,0 +1,261 @@
+/* ============================================================
+   ScheduleRequestWidget — 희망 교육/상담 시간 등록 위젯
+   ------------------------------------------------------------
+   모든 규칙은 `.srw` 아래에 스코프. 색은 CSS 변수로 두어 어느
+   페이지(다크/라이트)에 심어도 `.srw-dark` 토글 하나로 맞출 수
+   있게 했다. design-tokens.css 의 --accent 계열이 있으면 그걸
+   쓰고, 없으면 여기 fallback 값으로 동작한다.
+   ============================================================ */
+
+.srw {
+  --srw-bg: #ffffff;
+  --srw-bg-soft: #f8f7f4;
+  --srw-border: #e4e2dc;
+  --srw-border-strong: #cfcbc2;
+  --srw-text: #1a1a18;
+  --srw-text-2: #5a5a56;
+  --srw-text-3: #8a8a86;
+  --srw-accent: var(--accent-dark, #7A5AF8);
+  --srw-accent-deep: #6B4FB8;
+  --srw-accent-soft: var(--accent-light, rgba(196, 168, 245, 0.14));
+  --srw-danger: #d0453c;
+  --srw-radius: 18px;
+  --srw-font: var(--font-ko, 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif);
+
+  font-family: var(--srw-font);
+  color: var(--srw-text);
+  background: var(--srw-bg);
+  border: 1px solid var(--srw-border);
+  border-radius: var(--srw-radius);
+  padding: 32px 32px 28px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: left;
+  box-shadow: 0 20px 60px rgba(20, 16, 42, 0.12);
+}
+.srw *, .srw *::before, .srw *::after { box-sizing: border-box; }
+
+/* 다크 배경 섹션(예: launch-cta) 위에 올릴 때 */
+.srw.srw-dark {
+  --srw-bg: rgba(255, 255, 255, 0.06);
+  --srw-bg-soft: rgba(255, 255, 255, 0.06);
+  --srw-border: rgba(255, 255, 255, 0.16);
+  --srw-border-strong: rgba(255, 255, 255, 0.32);
+  --srw-text: #ffffff;
+  --srw-text-2: rgba(255, 255, 255, 0.78);
+  --srw-text-3: rgba(255, 255, 255, 0.55);
+  --srw-accent: var(--accent, #C4A8F5);
+  --srw-accent-deep: #C4A8F5;
+  --srw-accent-soft: rgba(196, 168, 245, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+/* ── 헤더 ── */
+.srw-head { margin-bottom: 22px; }
+.srw-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  margin: 0 0 6px;
+}
+.srw-desc {
+  font-size: 14px;
+  color: var(--srw-text-2);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── 필드 공통 ── */
+.srw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.srw-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.srw-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--srw-text-2);
+  letter-spacing: 0.2px;
+}
+.srw-label .req { color: var(--srw-accent); margin-left: 2px; }
+.srw-input,
+.srw-select,
+.srw-textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--srw-text);
+  background: var(--srw-bg-soft);
+  border: 1px solid var(--srw-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+  min-height: 46px;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.srw-input::placeholder, .srw-textarea::placeholder { color: var(--srw-text-3); }
+.srw-input:focus, .srw-select:focus, .srw-textarea:focus {
+  border-color: var(--srw-accent);
+  box-shadow: 0 0 0 3px var(--srw-accent-soft);
+}
+.srw-select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+  cursor: pointer;
+}
+.srw-select option { color: #1a1a18; background: #fff; }
+.srw-input[type="date"] { cursor: pointer; }
+.srw-dark .srw-input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: .8; }
+.srw-textarea { resize: vertical; min-height: 76px; line-height: 1.55; }
+
+/* ── 회차 슬롯 ── */
+.srw-sessions { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.srw-sessions-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  margin-bottom: 2px;
+}
+.srw-sessions-hint { font-size: 12px; color: var(--srw-text-3); }
+.srw-session {
+  display: grid;
+  grid-template-columns: 82px 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--srw-border);
+  border-radius: 12px;
+  background: var(--srw-bg-soft);
+}
+.srw-session.filled { border-color: var(--srw-accent); }
+.srw-session-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--srw-accent-soft);
+  color: var(--srw-accent);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.srw-session .srw-input, .srw-session .srw-select { background: var(--srw-bg); }
+.srw-dark .srw-session .srw-input, .srw-dark .srw-session .srw-select { background: rgba(0,0,0,0.25); }
+
+/* ── 동의 ── */
+.srw-consent { margin-top: 22px; }
+.srw-check {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; line-height: 1.55; cursor: pointer;
+  color: var(--srw-text);
+}
+.srw-check input {
+  width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0;
+  accent-color: var(--srw-accent); cursor: pointer;
+}
+.srw-check .tag {
+  display: inline-block; font-size: 11px; font-weight: 800; padding: 1px 6px;
+  border-radius: 5px; background: var(--srw-accent-soft); color: var(--srw-accent);
+  margin-right: 6px; vertical-align: 1px;
+}
+.srw-consent-toggle {
+  background: none; border: none; padding: 0; margin: 6px 0 0 28px;
+  font-family: inherit; font-size: 12px; color: var(--srw-text-3);
+  text-decoration: underline; cursor: pointer;
+}
+.srw-consent-detail {
+  margin: 10px 0 0 28px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--srw-bg-soft);
+  border: 1px solid var(--srw-border);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--srw-text-2);
+}
+.srw-consent-detail dl { margin: 0; display: grid; grid-template-columns: 76px 1fr; gap: 2px 10px; }
+.srw-consent-detail dt { font-weight: 700; color: var(--srw-text); }
+.srw-consent-detail dd { margin: 0; }
+.srw-kakao-note {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 14px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: var(--srw-accent-soft);
+  color: var(--srw-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.srw-kakao-note .ico { font-size: 16px; line-height: 1; }
+
+/* ── 액션 ── */
+.srw-actions { margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
+.srw-submit {
+  width: 100%;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--srw-accent-deep) 0%, var(--accent-dark, #7A5AF8) 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .2s, opacity .15s;
+  box-shadow: 0 8px 24px rgba(107, 79, 184, 0.35);
+}
+.srw-dark .srw-submit { color: #14102A; background: linear-gradient(135deg, #C4A8F5 0%, #E6D6FF 100%); box-shadow: 0 8px 24px rgba(196,168,245,0.35); }
+.srw-submit:hover:not(:disabled) { transform: translateY(-1px); }
+.srw-submit:disabled { opacity: .45; cursor: default; box-shadow: none; }
+.srw-error {
+  font-size: 13px; color: var(--srw-danger);
+  padding: 10px 12px; border-radius: 8px;
+  background: rgba(208, 69, 60, 0.08);
+  border: 1px solid rgba(208, 69, 60, 0.25);
+}
+.srw-dark .srw-error { color: #FFB4AE; }
+.srw-foot { font-size: 12px; color: var(--srw-text-3); text-align: center; line-height: 1.6; }
+
+/* ── 완료 ── */
+.srw-done { text-align: center; padding: 16px 0 6px; }
+.srw-done-icon {
+  width: 60px; height: 60px; border-radius: 50%;
+  margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--srw-accent); color: #fff; font-size: 28px;
+}
+.srw-dark .srw-done-icon { color: #14102A; }
+.srw-done-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.4px; }
+.srw-done-sub { font-size: 14px; color: var(--srw-text-2); line-height: 1.7; margin-bottom: 18px; }
+.srw-done-list {
+  list-style: none; margin: 0 auto 20px; padding: 14px 16px;
+  max-width: 420px; text-align: left;
+  background: var(--srw-bg-soft); border: 1px solid var(--srw-border); border-radius: 12px;
+  font-size: 13.5px; line-height: 1.8;
+}
+.srw-done-list strong { color: var(--srw-accent); margin-right: 8px; }
+.srw-done-reset {
+  background: none; border: 1px solid var(--srw-border-strong); color: var(--srw-text);
+  font-family: inherit; font-size: 13px; padding: 9px 18px; border-radius: 100px; cursor: pointer;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 640px) {
+  .srw { padding: 24px 18px 22px; border-radius: 16px; }
+  .srw-grid { grid-template-columns: 1fr; }
+  .srw-session { grid-template-columns: 1fr; gap: 8px; }
+  .srw-session-badge { height: 34px; justify-content: flex-start; padding: 0 12px; }
+  .srw-consent-detail dl { grid-template-columns: 1fr; }
+  .srw-consent-detail dt { margin-top: 4px; }
+}

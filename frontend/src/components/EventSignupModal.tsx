@@ -33,6 +33,7 @@ const EVENT_LABELS: Record<EventCode, string> = {
   EVENT_02_PAID: 'EVENT 02 · 검색 전략 + 배포',
   EVENT_03_PAID: 'EVENT 03 · 콘텐츠 기획 + 배포',
   EVENT_04_PAID: 'EVENT 04 · 풀패키지 (첫완성)',
+  EVENT_05_PET_PHOTO: 'EVENT 05 · 반려동물 사진작가 특별',
 };
 
 // 유료 이벤트별 입금 금액 — 완료 화면 안내 문구에 사용.

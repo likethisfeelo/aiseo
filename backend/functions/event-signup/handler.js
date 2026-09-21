@@ -6,12 +6,19 @@ const { randomUUID } = require('crypto');
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-const EVENT_CODES = ['EVENT_01_FREE', 'EVENT_02_PAID', 'EVENT_03_PAID', 'EVENT_04_PAID'];
+const EVENT_CODES = [
+  'EVENT_01_FREE',
+  'EVENT_02_PAID',
+  'EVENT_03_PAID',
+  'EVENT_04_PAID',
+  'EVENT_05_PET_PHOTO',
+];
 const EVENT_LABELS = {
   EVENT_01_FREE: 'EVENT 01 · 무료 런칭 파트너',
   EVENT_02_PAID: 'EVENT 02 · 검색 전략 + 배포',
   EVENT_03_PAID: 'EVENT 03 · 콘텐츠 기획 + 배포',
   EVENT_04_PAID: 'EVENT 04 · 풀패키지 (첫완성)',
+  EVENT_05_PET_PHOTO: 'EVENT 05 · 반려동물 사진작가 특별 (10만원)',
 };
 const HAS_SITE_VALUES = ['yes', 'no', 'wip'];
 
@@ -23,6 +30,41 @@ const parseBody = (event) => {
 
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const enumVal = (v, allowed) => (allowed.includes(v) ? v : '');
+
+// ── 희망 교육 일정 (ScheduleRequestWidget) ──
+// 위젯은 회차별로 { session, label, date, hour } 를 보낸다. 시간은
+// "hour 시 ~ hour+1 시" 1시간 단위. 위젯 기본값(08~23시)보다 넓게
+// 허용해 두고, 실제 범위 제한은 프론트 위젯 props 가 담당한다.
+const MAX_SLOTS = 6;
+const SLOT_HOUR_MIN = 0;
+const SLOT_HOUR_MAX = 23;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+
+const parseSlots = (raw) => {
+  if (!Array.isArray(raw)) return [];
+  const slots = [];
+  for (const item of raw.slice(0, MAX_SLOTS)) {
+    if (!item || typeof item !== 'object') continue;
+    const date = str(item.date, 10);
+    const hour = Number(item.hour);
+    if (!DATE_RE.test(date) || Number.isNaN(Date.parse(date))) continue;
+    if (!Number.isInteger(hour) || hour < SLOT_HOUR_MIN || hour > SLOT_HOUR_MAX) continue;
+    const session = Number.isInteger(Number(item.session)) ? Number(item.session) : slots.length + 1;
+    const label = str(item.label, 30) || `${session}회차`;
+    slots.push({ session, label, date, hour });
+  }
+  return slots;
+};
+
+const pad2 = (n) => String(n).padStart(2, '0');
+const formatSlot = (slot) => {
+  // 'YYYY-MM-DD' 를 UTC 자정으로 파싱하면 getUTCDay() 가 그 달력 날짜의 요일.
+  const d = new Date(`${slot.date}T00:00:00Z`);
+  const weekday = Number.isNaN(d.getTime()) ? '' : ` (${WEEKDAY_KO[d.getUTCDay()]})`;
+  return `${slot.label} · ${slot.date}${weekday} ${pad2(slot.hour)}:00~${pad2(slot.hour + 1)}:00`;
+};
+
 
 const sendSlackNotification = async (data) => {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
@@ -39,11 +81,19 @@ const sendSlackNotification = async (data) => {
   if (data.region) fields.push({ type: 'mrkdwn', text: `*지역:* ${data.region}` });
   if (data.hasSite) fields.push({ type: 'mrkdwn', text: `*홈페이지 유무:* ${data.hasSite}` });
   if (data.source) fields.push({ type: 'mrkdwn', text: `*출처:* ${data.source}` });
+  if (data.privacyConsent) fields.push({ type: 'mrkdwn', text: '*개인정보 동의:* 동의함' });
 
   const blocks = [
     { type: 'header', text: { type: 'plain_text', text: `새 이벤트 신청 — ${eventLabel}` } },
     { type: 'section', fields },
   ];
+  if (Array.isArray(data.preferredSlots) && data.preferredSlots.length > 0) {
+    const lines = data.preferredSlots.map((slot) => `• ${formatSlot(slot)}`).join('\n');
+    blocks.push({
+      type: 'section',
+      text: { type: 'mrkdwn', text: `*희망 교육 일정:*\n${lines}\n_입력된 전화번호의 카카오톡으로 연락 필요_` },
+    });
+  }
   if (data.concern) {
     blocks.push({
       type: 'section',
@@ -78,6 +128,8 @@ const handleSubmit = async (event) => {
   const concern = str(body.concern, 2000);
   const source = str(body.source, 50);
   const kakaoConsent = !!body.kakaoConsent;
+  const privacyConsent = !!body.privacyConsent;
+  const preferredSlots = parseSlots(body.preferredSlots);
 
   if (!eventCode) {
     return badRequest('유효하지 않은 이벤트 코드입니다.', event);
@@ -104,6 +156,8 @@ const handleSubmit = async (event) => {
     hasSite,
     concern,
     kakaoConsent,
+    privacyConsent,
+    preferredSlots,
     source: source || 'unknown',
     status: 'new',
   };

@@ -15,6 +15,7 @@ import { Events2026Page } from './pages/public/Events2026Page';
 import { Events2026FreePage } from './pages/public/Events2026FreePage';
 import { Events2026PaidPage } from './pages/public/Events2026PaidPage';
 import { Events2026FirstPage } from './pages/public/Events2026FirstPage';
+import { Events2026PetPhotoPage } from './pages/public/Events2026PetPhotoPage';
 import { B2BPage } from './pages/public/B2BPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { AdminLayout } from './components/layout/AdminLayout';
@@ -295,6 +296,7 @@ export default function App() {
         <Route path="/events2026/free" element={<Events2026FreePage />} />
         <Route path="/events2026/paid" element={<Events2026PaidPage />} />
         <Route path="/events2026/first" element={<Events2026FirstPage />} />
+        <Route path="/events2026/pet-photo" element={<Events2026PetPhotoPage />} />
         <Route path="/b2b" element={<B2BPage />} />
         <Route path="/blog" element={<BlogListPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />

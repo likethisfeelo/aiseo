@@ -794,6 +794,7 @@ export function Events2026Page() {
                 <a href="/events2026/free" role="menuitem">무료이벤트</a>
                 <a href="/events2026/paid" role="menuitem">할인이벤트</a>
                 <a href="/events2026/first" role="menuitem">첫완성패키지</a>
+                <a href="/events2026/pet-photo" role="menuitem">반려동물 사진작가 이벤트</a>
               </div>
             </div>
             <a href="/blog">블로그</a>
@@ -817,6 +818,7 @@ export function Events2026Page() {
           <a href="/events2026/free" className="nmm-link nmm-sublink">└ 무료이벤트</a>
           <a href="/events2026/paid" className="nmm-link nmm-sublink">└ 할인이벤트</a>
           <a href="/events2026/first" className="nmm-link nmm-sublink">└ 첫완성패키지</a>
+          <a href="/events2026/pet-photo" className="nmm-link nmm-sublink">└ 반려동물 사진작가 이벤트</a>
           <a href="/blog" className="nmm-link">블로그</a>
         </nav>
         <div className="nmm-cta">
@@ -1041,6 +1043,44 @@ export function Events2026Page() {
                   <span>#풀패키지</span>
                   <span>#사전상담포함</span>
                   <span>#한번에완성</span>
+                </div>
+                <span className="event-card-cta">
+                  자세히 보기 <span className="event-card-cta-arrow">→</span>
+                </span>
+              </div>
+            </a>
+
+            {/* EVENT 05 — 반려동물 사진작가 특별 (10만원) */}
+            <a href="/events2026/pet-photo" className="event-card">
+              <div className="event-card-head">
+                <span className="event-card-status">진행 중</span>
+                <span className="event-card-date">사진작가 · 펫 스튜디오 한정</span>
+              </div>
+
+              <div className="event-card-tag-row">
+                <span className="event-card-num">EVENT 05</span>
+                <span className="event-card-tag">SPECIAL · 반려동물 사진작가</span>
+              </div>
+
+              <h3 className="event-card-h">
+                반려동물 사진작가님,<br />50만원 패키지를 10만원에
+              </h3>
+              <p className="event-card-sub">
+                첫완성패키지의 본세션 3회(검색 전략 · 콘텐츠 기획 · 즉시 배포)를 반려동물
+                사진작가 한정 특별가로. 회원가입 없이 희망 교육 시간만 등록하면 카카오톡으로 연락드립니다.
+              </p>
+
+              <ul className="event-card-meta">
+                <li>정가 50만원 → <strong>10만원</strong> (80% off)</li>
+                <li>1 · 2 · 3회차 희망 시간 직접 등록 · 08~23시 1시간 단위</li>
+                <li>회원가입 없이 신청 · 카카오톡으로 일정 확정</li>
+              </ul>
+
+              <div className="event-card-foot">
+                <div className="event-card-tags">
+                  <span>#반려동물사진작가</span>
+                  <span>#펫스튜디오</span>
+                  <span>#희망시간등록</span>
                 </div>
                 <span className="event-card-cta">
                   자세히 보기 <span className="event-card-cta-arrow">→</span>
