@@ -15,8 +15,8 @@ import type { EventCode, PreferredSlot } from '../api';
 //
 // 사용 예:
 //   <ScheduleRequestWidget
-//     eventCode="EVENT_05_PET_PHOTO"
-//     source="pet-photo-apply"
+//     eventCode="EVENT_05_SNAP"
+//     source="snap-apply"
 //     sessions={['1회차', '2회차', '3회차']}
 //     startHour={8} endHour={23}
 //   />
@@ -37,7 +37,7 @@ export interface ScheduleRequestSubmission {
 
 export interface ScheduleRequestWidgetProps {
   /** 기본 제출 경로(/event-signup)에 함께 보낼 이벤트 코드. `onSubmit` 을 쓰면 무시. */
-  eventCode?: EventCode;
+  eventCode: EventCode;
   /** 어느 페이지/버튼에서 들어온 신청인지 추적용 (Slack 에 '출처' 로 표시). */
   source: string;
   /** 회차 라벨. 개수만큼 날짜/시간 입력 줄이 생긴다. 기본 1·2·3회차. */
@@ -100,7 +100,7 @@ interface SlotDraft {
 }
 
 export function ScheduleRequestWidget({
-  eventCode = 'EVENT_05_PET_PHOTO',
+  eventCode,
   source,
   sessions = DEFAULT_SESSIONS,
   startHour = 8,

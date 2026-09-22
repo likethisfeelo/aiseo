@@ -11,14 +11,16 @@ const EVENT_CODES = [
   'EVENT_02_PAID',
   'EVENT_03_PAID',
   'EVENT_04_PAID',
-  'EVENT_05_PET_PHOTO',
+  'EVENT_05_SNAP',
+  'EVENT_06_PET',
 ];
 const EVENT_LABELS = {
   EVENT_01_FREE: 'EVENT 01 · 무료 런칭 파트너',
   EVENT_02_PAID: 'EVENT 02 · 검색 전략 + 배포',
   EVENT_03_PAID: 'EVENT 03 · 콘텐츠 기획 + 배포',
   EVENT_04_PAID: 'EVENT 04 · 풀패키지 (첫완성)',
-  EVENT_05_PET_PHOTO: 'EVENT 05 · 반려동물 사진작가 특별 (10만원)',
+  EVENT_05_SNAP: 'EVENT 05 · 사진스냅 작가 특별 (10만원)',
+  EVENT_06_PET: 'EVENT 06 · 반려동물 서비스 특별 (10만원)',
 };
 const HAS_SITE_VALUES = ['yes', 'no', 'wip'];
 

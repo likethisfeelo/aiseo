@@ -29,7 +29,8 @@ import { Events2026Page } from './pages/public/Events2026Page';
 import { Events2026FreePage } from './pages/public/Events2026FreePage';
 import { Events2026PaidPage } from './pages/public/Events2026PaidPage';
 import { Events2026FirstPage } from './pages/public/Events2026FirstPage';
-import { Events2026PetPhotoPage } from './pages/public/Events2026PetPhotoPage';
+import { Events2026SpecialPage } from './pages/public/Events2026SpecialPage';
+import { SNAP_CONTENT, PET_CONTENT } from './pages/public/events2026SpecialContent';
 import { B2BPage } from './pages/public/B2BPage';
 
 // Routes we statically render the body for. Keep in sync with the
@@ -39,7 +40,8 @@ const PAGES: Record<string, ComponentType> = {
   '/events2026/free': Events2026FreePage,
   '/events2026/paid': Events2026PaidPage,
   '/events2026/first': Events2026FirstPage,
-  '/events2026/pet-photo': Events2026PetPhotoPage,
+  '/events2026/snap': () => <Events2026SpecialPage content={SNAP_CONTENT} />,
+  '/events2026/pet': () => <Events2026SpecialPage content={PET_CONTENT} />,
   '/b2b': B2BPage,
 };
 
