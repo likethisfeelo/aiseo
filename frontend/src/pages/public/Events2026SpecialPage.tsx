@@ -79,6 +79,12 @@ export interface SpecialEventContent {
     /** 5개 권장 — 마지막 항목은 전체 너비로 렌더된다. */
     items: string[];
   };
+  /** STEP 1 — 무료 30분 온라인 1:1 상담 (부담 없는 첫 접점). */
+  consult: {
+    widgetTitle: string;
+    notePlaceholder: string;
+  };
+  /** STEP 2 — 3회차 희망 시간 바로 등록 (거의 확정된 분을 위한 빠른 등록). */
   apply: {
     eyebrow: string;
     widgetTitle: string;
@@ -163,7 +169,7 @@ export function Events2026SpecialPage({ content }: { content: SpecialEventConten
     return () => observer.disconnect();
   }, []);
 
-  const { hero, benefits, pkg, coreCards, targets, apply, faq, compare, crossLink } = content;
+  const { hero, benefits, pkg, coreCards, targets, consult, apply, faq, compare, crossLink } = content;
 
   // CSR-only app, so `window` is always defined at render time.
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -1652,6 +1658,71 @@ export function Events2026SpecialPage({ content }: { content: SpecialEventConten
         }
         .evtspecial .apply-time-badge strong { color: var(--accent); }
         .evtspecial .cross-card + .cross-card { margin-top: 16px; }
+        .evtspecial .hero-price-strip { margin-bottom: 14px; }
+        .evtspecial .hero-free-line {
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          margin: 0 0 28px;
+          font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.92);
+          position: relative; z-index: 2;
+        }
+        .evtspecial .hero-free-line .dot {
+          width: 8px; height: 8px; border-radius: 50%; background: #4ADE80;
+          box-shadow: 0 0 0 4px rgba(74,222,128,0.2);
+        }
+
+        /* STEP 1 — 무료 상담 섹션 (라이트) */
+        .evtspecial .consult-section {
+          background: linear-gradient(180deg, #F6F2FF 0%, #FFFFFF 100%);
+          padding: 100px 40px;
+          border-top: 1px solid rgba(107,79,184,0.08);
+        }
+        .evtspecial .consult-inner { max-width: 980px; margin: 0 auto; text-align: center; }
+        .evtspecial .step-tag {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 7px 16px; border-radius: 100px;
+          background: #14102A; color: #fff;
+          font-family: var(--font-en); font-size: 12px; font-weight: 800; letter-spacing: 1.6px;
+          margin-bottom: 22px;
+        }
+        .evtspecial .consult-badges {
+          display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+          margin: 0 0 28px;
+        }
+        .evtspecial .consult-badges span {
+          font-size: 14px; font-weight: 700; color: #3B2D6E;
+          padding: 9px 16px; border-radius: 100px;
+          background: #fff; border: 1px solid rgba(107,79,184,0.18);
+          box-shadow: 0 4px 14px rgba(107,79,184,0.08);
+        }
+        .evtspecial .consult-banner {
+          display: flex; gap: 16px; align-items: flex-start; text-align: left;
+          max-width: 720px; margin: 0 auto 28px;
+          padding: 18px 22px; border-radius: 16px;
+          background: #14102A; color: #fff;
+          line-height: 1.6; font-size: 15px;
+          box-shadow: 0 16px 40px rgba(20,16,42,0.18);
+        }
+        .evtspecial .consult-banner .ico { font-size: 26px; line-height: 1; flex-shrink: 0; }
+        .evtspecial .consult-banner strong { color: var(--accent); }
+        .evtspecial .consult-banner .sub { font-size: 13.5px; color: rgba(255,255,255,0.72); }
+        .evtspecial .consult-widget-wrap { text-align: left; }
+        .evtspecial .consult-free-note {
+          margin: 28px auto 0; max-width: 720px;
+          padding: 14px 18px; border-radius: 12px;
+          background: #fff; border: 1px dashed rgba(107,79,184,0.4);
+          font-size: 14px; color: #3B2D6E; line-height: 1.6;
+        }
+        .evtspecial .consult-free-note strong { color: var(--accent-deep); }
+        .evtspecial .consult-skip {
+          display: inline-flex; align-items: center; gap: 6px;
+          margin-top: 18px; font-size: 14px; font-weight: 600;
+          color: #6B4FB8; text-decoration: none;
+        }
+        .evtspecial .consult-skip:hover { text-decoration: underline; }
+        @media (max-width: 768px) {
+          .evtspecial .consult-section { padding: 72px 20px; }
+          .evtspecial .consult-banner { flex-direction: column; gap: 10px; }
+        }
         @media (max-width: 480px) {
           .evtspecial .hero-cta-row { flex-direction: column; width: 100%; }
           .evtspecial .hero-cta-row a { width: 100%; justify-content: center; }
@@ -1733,12 +1804,17 @@ export function Events2026SpecialPage({ content }: { content: SpecialEventConten
               <span className="off">80% OFF</span>
             </div>
 
+            <div className="hero-free-line">
+              <span className="dot" aria-hidden="true"></span>
+              1회차는 누구나 무료 · 결제는 1회차 이후
+            </div>
+
             <div className="hero-cta-row">
-              <a href="#apply" className="btn-primary-lg">
-                <span>희망 교육 시간 등록하기</span>
+              <a href="#consult" className="btn-primary-lg">
+                <span>무료 30분 상담 잡기</span>
                 <span aria-hidden="true">→</span>
               </a>
-              <a href="#package" className="btn-outline-lg">포함 내용 보기</a>
+              <a href="#apply" className="btn-outline-lg">3회차 바로 등록</a>
             </div>
 
             <div className="hero-prism" aria-hidden="true">
@@ -1937,12 +2013,12 @@ export function Events2026SpecialPage({ content }: { content: SpecialEventConten
             {/* CTA */}
             <div className="event01-cta">
               <div className="event01-cta-row">
-                <a href="#apply" className="event01-btn">
-                  <span>희망 교육 시간 등록하기</span>
+                <a href="#consult" className="event01-btn">
+                  <span>무료 30분 상담 잡기</span>
                   <span className="event01-btn-arrow">→</span>
                 </a>
-                <a href="/events2026/first" className="event01-btn secondary">
-                  <span>일반 첫완성패키지 보기</span>
+                <a href="#apply" className="event01-btn secondary">
+                  <span>3회차 바로 등록</span>
                 </a>
               </div>
               <p className="event01-cta-note">{pkg.ctaNote}</p>
@@ -1976,7 +2052,69 @@ export function Events2026SpecialPage({ content }: { content: SpecialEventConten
         </section>
 
         {/* ══════════════════════════════════════════════
-              희망 교육 시간 등록 (ScheduleRequestWidget)
+              STEP 1 — 무료 30분 온라인 1:1 상담 (ScheduleRequestWidget)
+        ══════════════════════════════════════════════ */}
+        <section className="consult-section" id="consult">
+          <div className="consult-inner">
+            <div className="step-tag">STEP 1 · FREE ORIENTATION</div>
+            <h2 className="section-h2">
+              부담 없이,<br /><span className="em">무료 30분 1:1 상담</span>부터
+            </h2>
+            <p className="event01-lead">
+              교육 신청 전에 온라인으로 30분만 이야기 나눠요.<br />
+              지금 상황에 맞는지, 어떤 순서로 진행되는지 편하게 물어보세요.
+            </p>
+
+            <div className="consult-badges" aria-label="상담 조건">
+              <span>💸 무료</span>
+              <span>⏱ 30분</span>
+              <span>💻 온라인 1:1</span>
+              <span>🙆 부담 없음</span>
+            </div>
+
+            <div className="consult-banner">
+              <span className="ico" aria-hidden="true">🎓</span>
+              <div>
+                <strong>온라인 오리엔테이션</strong>에서 전 과정을 설명해드립니다.<br />
+                <span className="sub">
+                  검색 전략 → 콘텐츠 기획 → 즉시 배포까지 어떻게 진행되는지, 무엇을 준비하면 되는지
+                  30분 안에 정리해드립니다. 들어보고 결정하셔도 됩니다.
+                </span>
+              </div>
+            </div>
+
+            <div className="consult-widget-wrap">
+              <ScheduleRequestWidget
+                eventCode={content.eventCode}
+                source={`${content.slug}-consult`}
+                intent="무료 오리엔테이션 상담 (온라인 1:1 · 30분)"
+                sessions={['상담 시간']}
+                sessionsLabel="희망 상담 일시"
+                durationMinutes={30}
+                startHour={8}
+                endHour={23}
+                title={consult.widgetTitle}
+                description="회원가입 없이 바로 등록됩니다. 편한 날짜와 시작 시간을 하나만 골라주세요. 확인 후 카카오톡으로 화상 링크를 보내드립니다."
+                notePlaceholder={consult.notePlaceholder}
+                submitLabel="무료 상담 시간 잡기"
+                doneTitle="무료 상담이 등록되었습니다"
+                privacyPurpose={apply.privacyPurpose}
+              />
+            </div>
+
+            <p className="consult-free-note">
+              <strong>1회차 교육은 누구나 무료</strong>입니다. 결제는 1회차를 들어보신 뒤,
+              2 · 3회차를 이어가실 때 하시면 됩니다.
+            </p>
+
+            <a href="#apply" className="consult-skip">
+              이미 마음을 정하셨다면 3회차 시간 바로 등록 <span aria-hidden="true">↓</span>
+            </a>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+              STEP 2 — 더 빠른 등록: 3회차 희망 시간 바로 등록
         ══════════════════════════════════════════════ */}
         <section className="launch-cta" id="apply">
           <div className="launch-cta-inner">
@@ -1987,24 +2125,27 @@ export function Events2026SpecialPage({ content }: { content: SpecialEventConten
             </div>
 
             <h2 className="launch-cta-h">
-              희망 교육 시간을<br />
-              <span className="accent">지금 등록</span>해 주세요
+              이미 마음을 정하셨다면<br />
+              <span className="accent">3회차 시간을 바로 등록</span>하세요
             </h2>
             <p className="launch-cta-sub">
-              1 · 2 · 3회차 각각 원하는 날짜와 시간을 고르시면 됩니다.<br />
-              확인 후 <strong>입력하신 번호의 카카오톡</strong>으로 일정 확정과 입금 안내를 드립니다.
+              상담 없이 바로 시작하실 분을 위한 더 빠른 등록입니다.<br />
+              등록하신 분께도 <strong>동일하게 온라인 오리엔테이션</strong>이 진행되고, <strong>1회차는 무료</strong>입니다.<br />
+              확인 후 입력하신 번호의 카카오톡으로 일정을 확정해 드립니다.
             </p>
 
             <div className="apply-time-badges" aria-label="신청 가능 시간">
               <span className="apply-time-badge"><strong>오전 8시 ~ 오후 11시</strong> 신청 가능</span>
               <span className="apply-time-badge"><strong>1시간</strong> 단위</span>
-              <span className="apply-time-badge">평일 저녁 · 주말 <strong>OK</strong></span>
+              <span className="apply-time-badge">오리엔테이션 <strong>동일 진행</strong></span>
+              <span className="apply-time-badge"><strong>1회차 무료</strong> · 결제는 1회차 이후</span>
             </div>
 
             <div className="apply-widget-wrap">
               <ScheduleRequestWidget
                 eventCode={content.eventCode}
                 source={content.source}
+                intent="본세션 3회 빠른 등록 (1회차 무료)"
                 sessions={['1회차', '2회차', '3회차']}
                 startHour={8}
                 endHour={23}

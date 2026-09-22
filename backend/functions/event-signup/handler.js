@@ -54,7 +54,9 @@ const parseSlots = (raw) => {
     if (!Number.isInteger(hour) || hour < SLOT_HOUR_MIN || hour > SLOT_HOUR_MAX) continue;
     const session = Number.isInteger(Number(item.session)) ? Number(item.session) : slots.length + 1;
     const label = str(item.label, 30) || `${session}회차`;
-    slots.push({ session, label, date, hour });
+    const dur = Number(item.durationMinutes);
+    const durationMinutes = Number.isInteger(dur) && dur >= 15 && dur <= 240 ? dur : 60;
+    slots.push({ session, label, date, hour, durationMinutes });
   }
   return slots;
 };
@@ -64,7 +66,9 @@ const formatSlot = (slot) => {
   // 'YYYY-MM-DD' 를 UTC 자정으로 파싱하면 getUTCDay() 가 그 달력 날짜의 요일.
   const d = new Date(`${slot.date}T00:00:00Z`);
   const weekday = Number.isNaN(d.getTime()) ? '' : ` (${WEEKDAY_KO[d.getUTCDay()]})`;
-  return `${slot.label} · ${slot.date}${weekday} ${pad2(slot.hour)}:00~${pad2(slot.hour + 1)}:00`;
+  const endTotal = slot.hour * 60 + (slot.durationMinutes || 60);
+  const end = `${pad2(Math.floor(endTotal / 60))}:${pad2(endTotal % 60)}`;
+  return `${slot.label} · ${slot.date}${weekday} ${pad2(slot.hour)}:00~${end}`;
 };
 
 
@@ -82,6 +86,7 @@ const sendSlackNotification = async (data) => {
   if (data.industry) fields.push({ type: 'mrkdwn', text: `*업종:* ${data.industry}` });
   if (data.region) fields.push({ type: 'mrkdwn', text: `*지역:* ${data.region}` });
   if (data.hasSite) fields.push({ type: 'mrkdwn', text: `*홈페이지 유무:* ${data.hasSite}` });
+  if (data.intent) fields.push({ type: 'mrkdwn', text: `*신청 유형:* ${data.intent}` });
   if (data.source) fields.push({ type: 'mrkdwn', text: `*출처:* ${data.source}` });
   if (data.privacyConsent) fields.push({ type: 'mrkdwn', text: '*개인정보 동의:* 동의함' });
 
@@ -132,6 +137,7 @@ const handleSubmit = async (event) => {
   const kakaoConsent = !!body.kakaoConsent;
   const privacyConsent = !!body.privacyConsent;
   const preferredSlots = parseSlots(body.preferredSlots);
+  const intent = str(body.intent, 100);
 
   if (!eventCode) {
     return badRequest('유효하지 않은 이벤트 코드입니다.', event);
@@ -160,6 +166,7 @@ const handleSubmit = async (event) => {
     kakaoConsent,
     privacyConsent,
     preferredSlots,
+    intent,
     source: source || 'unknown',
     status: 'new',
   };

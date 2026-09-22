@@ -235,6 +235,8 @@ export interface PreferredSlot {
   label: string;
   date: string; // YYYY-MM-DD
   hour: number;
+  /** 진행 시간(분). 생략 시 60. 30분 상담 슬롯이면 30. */
+  durationMinutes?: number;
 }
 
 export interface EventSignupPayload {
@@ -250,6 +252,8 @@ export interface EventSignupPayload {
   /** 개인정보 수집·이용 동의 (위젯 신청 시 필수 체크) */
   privacyConsent?: boolean;
   preferredSlots?: PreferredSlot[];
+  /** 신청 유형 라벨 (예: '무료 오리엔테이션 상담 30분' / '본세션 3회 빠른 등록'). */
+  intent?: string;
   source?: string;
 }
 
