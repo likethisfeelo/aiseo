@@ -1074,8 +1074,8 @@ export function Events2026Page() {
 
               <ul className="event-card-meta">
                 <li>정가 50만원 → <strong>10만원</strong> (80% off)</li>
-                <li>1 · 2 · 3회차 희망 시간 직접 등록 · 08~23시 1시간 단위</li>
-                <li>회원가입 없이 신청 · 카카오톡으로 일정 확정</li>
+                <li>무료 30분 온라인 상담 또는 3회차 희망 시간 바로 등록</li>
+                <li><strong>1회차 무료</strong> · 결제는 1회차 이후 · 회원가입 없이 신청</li>
               </ul>
 
               <div className="event-card-foot">
@@ -1112,8 +1112,8 @@ export function Events2026Page() {
 
               <ul className="event-card-meta">
                 <li>정가 50만원 → <strong>10만원</strong> (80% off)</li>
-                <li>1 · 2 · 3회차 희망 시간 직접 등록 · 08~23시 1시간 단위</li>
-                <li>회원가입 없이 신청 · 카카오톡으로 일정 확정</li>
+                <li>무료 30분 온라인 상담 또는 3회차 희망 시간 바로 등록</li>
+                <li><strong>1회차 무료</strong> · 결제는 1회차 이후 · 회원가입 없이 신청</li>
               </ul>
 
               <div className="event-card-foot">

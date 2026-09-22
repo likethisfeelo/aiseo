@@ -42,6 +42,14 @@ export interface ScheduleRequestWidgetProps {
   source: string;
   /** 회차 라벨. 개수만큼 날짜/시간 입력 줄이 생긴다. 기본 1·2·3회차. */
   sessions?: string[];
+  /** 회차 목록 위 라벨 (기본 '희망 교육 일시'). 상담용이면 '희망 상담 일시' 등. */
+  sessionsLabel?: string;
+  /** 한 슬롯의 진행 시간(분). 시작은 항상 정각. 기본 60 → "14:00 ~ 15:00", 30 → "14:00 ~ 14:30". */
+  durationMinutes?: number;
+  /** 신청 유형 (예: '무료 오리엔테이션 상담 30분'). Slack · 관리자 화면에 그대로 표시. */
+  intent?: string;
+  /** 완료 화면 제목 (기본 '희망 시간이 등록되었습니다'). */
+  doneTitle?: string;
   /** 신청 가능한 첫 시작 시각 (기본 8 → 08:00). */
   startHour?: number;
   /** 신청 가능한 마지막 종료 시각 (기본 23 → 마지막 슬롯 22:00~23:00). */
@@ -92,7 +100,10 @@ const formatDateKo = (date: string) => {
   return `${date} (${WEEKDAY_KO[d.getUTCDay()]})`;
 };
 
-const formatHourRange = (hour: number) => `${pad2(hour)}:00 ~ ${pad2(hour + 1)}:00`;
+const formatHourRange = (hour: number, durationMinutes = 60) => {
+  const endTotal = hour * 60 + durationMinutes;
+  return `${pad2(hour)}:00 ~ ${pad2(Math.floor(endTotal / 60))}:${pad2(endTotal % 60)}`;
+};
 
 interface SlotDraft {
   date: string;
@@ -103,6 +114,10 @@ export function ScheduleRequestWidget({
   eventCode,
   source,
   sessions = DEFAULT_SESSIONS,
+  sessionsLabel = '희망 교육 일시',
+  durationMinutes = 60,
+  intent,
+  doneTitle = '희망 시간이 등록되었습니다',
   startHour = 8,
   endHour = 23,
   minDate,
@@ -179,6 +194,7 @@ export function ScheduleRequestWidget({
         label: sessions[i],
         date: s.date,
         hour: Number(s.hour),
+        durationMinutes,
       })),
       privacyConsent: true,
       kakaoConsent: true,
@@ -195,6 +211,7 @@ export function ScheduleRequestWidget({
           phone: payload.phone,
           concern: payload.note || undefined,
           preferredSlots: payload.preferredSlots,
+          intent,
           privacyConsent: true,
           kakaoConsent: true,
           source,
@@ -222,7 +239,7 @@ export function ScheduleRequestWidget({
       <div className={rootClass} id={id}>
         <div className="srw-done" role="status">
           <div className="srw-done-icon" aria-hidden="true">&#10003;</div>
-          <div className="srw-done-title">희망 시간이 등록되었습니다</div>
+          <div className="srw-done-title">{doneTitle}</div>
           <div className="srw-done-sub">
             {doneMessage ?? (
               <>
@@ -236,7 +253,7 @@ export function ScheduleRequestWidget({
             {done.preferredSlots.map((s) => (
               <li key={s.session}>
                 <strong>{s.label}</strong>
-                {formatDateKo(s.date)} {formatHourRange(s.hour)}
+                {formatDateKo(s.date)} {formatHourRange(s.hour, s.durationMinutes)}
               </li>
             ))}
           </ul>
@@ -287,9 +304,9 @@ export function ScheduleRequestWidget({
 
       <div className="srw-sessions">
         <div className="srw-sessions-head">
-          <span className="srw-label">희망 교육 일시 <span className="req">*</span></span>
+          <span className="srw-label">{sessionsLabel} <span className="req">*</span></span>
           <span className="srw-sessions-hint">
-            {pad2(startHour)}:00 ~ {pad2(endHour)}:00 · 1시간 단위
+            {pad2(startHour)}:00 ~ {pad2(endHour)}:00 · {durationMinutes === 60 ? '1시간 단위' : `정각 시작 · ${durationMinutes}분 진행`}
           </span>
         </div>
         {sessions.map((label, i) => {
@@ -314,7 +331,7 @@ export function ScheduleRequestWidget({
               >
                 <option value="">시간 선택</option>
                 {hourOptions.map((h) => (
-                  <option key={h} value={String(h)}>{formatHourRange(h)}</option>
+                  <option key={h} value={String(h)}>{formatHourRange(h, durationMinutes)}</option>
                 ))}
               </select>
             </div>

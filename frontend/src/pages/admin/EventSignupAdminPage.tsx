@@ -18,6 +18,7 @@ interface EventSignup {
   kakaoConsent?: boolean;
   privacyConsent?: boolean;
   preferredSlots?: PreferredSlot[];
+  intent?: string;
 }
 
 const EVENT_LABELS: Record<EventCode, string> = {
@@ -30,8 +31,11 @@ const EVENT_LABELS: Record<EventCode, string> = {
 };
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
-const formatSlot = (slot: PreferredSlot) =>
-  `${slot.label} ${slot.date} ${pad2(slot.hour)}:00~${pad2(slot.hour + 1)}:00`;
+const formatSlot = (slot: PreferredSlot) => {
+  const endTotal = slot.hour * 60 + (slot.durationMinutes || 60);
+  const end = `${pad2(Math.floor(endTotal / 60))}:${pad2(endTotal % 60)}`;
+  return `${slot.label} ${slot.date} ${pad2(slot.hour)}:00~${end}`;
+};
 
 const HAS_SITE_LABEL: Record<string, string> = {
   yes: '있음',
@@ -153,11 +157,12 @@ export function EventSignupAdminPage() {
                   <td style={styles.td}>{item.region || '-'}</td>
                   <td style={styles.td}>{HAS_SITE_LABEL[item.hasSite || ''] ?? '-'}</td>
                   <td style={styles.td}>
+                    {item.intent && <div style={{ fontWeight: 600 }}>{item.intent}</div>}
                     {item.preferredSlots && item.preferredSlots.length > 0
                       ? item.preferredSlots.map((slot, i) => (
                           <div key={`${slot.session}-${i}`}>{formatSlot(slot)}</div>
                         ))
-                      : '-'}
+                      : !item.intent && '-'}
                   </td>
                   <td style={{ ...styles.td, whiteSpace: 'normal', maxWidth: 280 }}>
                     {item.concern || '-'}
