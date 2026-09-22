@@ -221,7 +221,8 @@ export type EventCode =
   | 'EVENT_02_PAID'
   | 'EVENT_03_PAID'
   | 'EVENT_04_PAID'
-  | 'EVENT_05_PET_PHOTO';
+  | 'EVENT_05_SNAP'
+  | 'EVENT_06_PET';
 export type EventHasSite = 'yes' | 'no' | 'wip';
 
 /**

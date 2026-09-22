@@ -25,7 +25,8 @@ const EVENT_LABELS: Record<EventCode, string> = {
   EVENT_02_PAID: 'EVENT 02 · 검색 전략',
   EVENT_03_PAID: 'EVENT 03 · 콘텐츠 기획',
   EVENT_04_PAID: 'EVENT 04 · 풀패키지',
-  EVENT_05_PET_PHOTO: 'EVENT 05 · 반려동물 사진작가',
+  EVENT_05_SNAP: 'EVENT 05 · 사진스냅 작가',
+  EVENT_06_PET: 'EVENT 06 · 반려동물 서비스',
 };
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -93,7 +94,8 @@ export function EventSignupAdminPage() {
             <option value="EVENT_02_PAID">{EVENT_LABELS.EVENT_02_PAID}</option>
             <option value="EVENT_03_PAID">{EVENT_LABELS.EVENT_03_PAID}</option>
             <option value="EVENT_04_PAID">{EVENT_LABELS.EVENT_04_PAID}</option>
-            <option value="EVENT_05_PET_PHOTO">{EVENT_LABELS.EVENT_05_PET_PHOTO}</option>
+            <option value="EVENT_05_SNAP">{EVENT_LABELS.EVENT_05_SNAP}</option>
+            <option value="EVENT_06_PET">{EVENT_LABELS.EVENT_06_PET}</option>
           </select>
         </label>
         <label style={styles.filterLabel}>
